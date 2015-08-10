@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.ExtraService">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ExtraService">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="serviceType" property="servicetype" jdbcType="VARCHAR" />
+		<result column="companyId" property="companyid" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, serviceType, companyId, content
+		from extra_service
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from extra_service
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ExtraService">
+		insert into extra_service (id, serviceType, companyId,
+		content)
+		values (#{id,jdbcType=VARCHAR}, #{servicetype,jdbcType=VARCHAR}, #{companyid,jdbcType=VARCHAR},
+		#{content,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ExtraService">
+		update extra_service
+		set serviceType = #{servicetype,jdbcType=VARCHAR},
+		companyId = #{companyid,jdbcType=VARCHAR},
+		content = #{content,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

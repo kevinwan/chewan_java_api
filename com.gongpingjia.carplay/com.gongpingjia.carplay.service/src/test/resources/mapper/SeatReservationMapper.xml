@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.SeatReservationMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.SeatReservation">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="carId" property="carid" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+		<result column="bookTime" property="booktime" jdbcType="BIGINT" />
+		<result column="seatIndex" property="seatindex" jdbcType="INTEGER" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, activityId, carId, userId, createTime, bookTime, seatIndex
+		from seat_reservation
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from seat_reservation
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.SeatReservation">
+		insert into seat_reservation (id, activityId, carId,
+		userId, createTime, bookTime,
+		seatIndex)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{carid,jdbcType=VARCHAR},
+		#{userid,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT}, #{booktime,jdbcType=BIGINT},
+		#{seatindex,jdbcType=INTEGER})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.SeatReservation">
+		update seat_reservation
+		set activityId = #{activityid,jdbcType=VARCHAR},
+		carId = #{carid,jdbcType=VARCHAR},
+		userId = #{userid,jdbcType=VARCHAR},
+		createTime = #{createtime,jdbcType=BIGINT},
+		bookTime = #{booktime,jdbcType=BIGINT},
+		seatIndex = #{seatindex,jdbcType=INTEGER}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

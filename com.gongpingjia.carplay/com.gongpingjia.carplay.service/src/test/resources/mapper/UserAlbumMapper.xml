@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.UserAlbumMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.UserAlbum">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="coverImageUrl" property="coverimageurl" jdbcType="VARCHAR" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, userId, coverImageUrl, createTime
+		from user_album
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from user_album
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.UserAlbum">
+		insert into user_album (id, userId, coverImageUrl, createTime)
+		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{coverimageurl,jdbcType=VARCHAR},
+		#{createtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.UserAlbum">
+		update user_album
+		set userId = #{userid,jdbcType=VARCHAR},
+		coverImageUrl = #{coverimageurl,jdbcType=VARCHAR},
+		createTime = #{createtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

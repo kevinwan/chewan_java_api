@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.InvitationCode">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.InvitationCode">
+		<id column="code" property="code" jdbcType="VARCHAR" />
+		<result column="allocateTime" property="allocatetime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		code, allocateTime
+		from invitation_code
+		where code = #{code,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from invitation_code
+		where code = #{code,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.InvitationCode">
+		insert into invitation_code (code, allocateTime)
+		values (#{code,jdbcType=VARCHAR}, #{allocatetime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.InvitationCode">
+		update invitation_code
+		set allocateTime = #{allocatetime,jdbcType=BIGINT}
+		where code = #{code,jdbcType=VARCHAR}
+	</update>
+</mapper>

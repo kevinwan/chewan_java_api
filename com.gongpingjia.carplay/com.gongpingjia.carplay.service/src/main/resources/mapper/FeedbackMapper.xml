@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.Feedback">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.Feedback">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="nickname" property="nickname" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, userId, nickname, phone,
+		content, createTime
+		from feedback
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from feedback
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Feedback">
+		insert into feedback (id, userId, nickname,
+		phone, content, createTime
+		)
+		values
+		(#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR},
+		#{content,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Feedback">
+		update feedback
+		set userId = #{userid,jdbcType=VARCHAR},
+		nickname =
+		#{nickname,jdbcType=VARCHAR},
+		phone = #{phone,jdbcType=VARCHAR},
+		content = #{content,jdbcType=VARCHAR},
+		createTime =
+		#{createtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityInvitationMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityInvitation">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="channel" property="channel" jdbcType="VARCHAR" />
+		<result column="invitationCode" property="invitationcode" jdbcType="VARCHAR" />
+		<result column="timestamp" property="timestamp" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, activityId, channel, invitationCode, timestamp
+		from activity_invitation
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from activity_invitation
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityInvitation">
+		insert into activity_invitation (id, activityId, channel,
+		invitationCode, timestamp)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{channel,jdbcType=VARCHAR},
+		#{invitationcode,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityInvitation">
+		update activity_invitation
+		set activityId = #{activityid,jdbcType=VARCHAR},
+		channel = #{channel,jdbcType=VARCHAR},
+		invitationCode = #{invitationcode,jdbcType=VARCHAR},
+		timestamp = #{timestamp,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.TokenVerification">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.TokenVerification">
+		<id column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="token" property="token" jdbcType="VARCHAR" />
+		<result column="expire" property="expire" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		userId, token, expire
+		from token_verification
+		where userId = #{userid,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from token_verification
+		where userId = #{userid,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.TokenVerification">
+		insert into token_verification (userId, token, expire)
+		values (#{userid,jdbcType=VARCHAR}, #{token,jdbcType=VARCHAR}, #{expire,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.TokenVerification">
+		update token_verification
+		set token = #{token,jdbcType=VARCHAR},
+		expire = #{expire,jdbcType=BIGINT}
+		where userId = #{userid,jdbcType=VARCHAR}
+	</update>
+</mapper>

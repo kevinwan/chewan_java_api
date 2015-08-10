@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityApplicationMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityApplication">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="seat" property="seat" jdbcType="INTEGER" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, activityId, userId, status,
+		seat, createTime
+		from activity_application
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		activity_application
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityApplication">
+		insert into
+		activity_application (id, activityId, userId,
+		status, seat,
+		createTime
+		)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR},
+		#{userid,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR},
+		#{seat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<insert id="insertSelective" parameterType="com.gongpingjia.carplay.po.ActivityApplication">
+		insert into
+		activity_application(
+		id,
+		activityId,
+		userId,
+		status,
+		seat,
+		createTime,
+		)values (
+		#{id,jdbcType=VARCHAR},
+		#{activityid,jdbcType=VARCHAR},
+		#{userid,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR},
+		#{seat,jdbcType=INTEGER},
+		#{createtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityApplication">
+		update
+		activity_application
+		set activityId = #{activityid,jdbcType=VARCHAR},
+		userId = #{userid,jdbcType=VARCHAR},
+		status = #{status,jdbcType=VARCHAR},
+		seat = #{seat,jdbcType=INTEGER},
+		createTime = #{createtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

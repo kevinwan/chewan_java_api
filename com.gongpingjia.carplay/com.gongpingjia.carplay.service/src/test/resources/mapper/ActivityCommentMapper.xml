@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityCommentMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityComment">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="comment" property="comment" jdbcType="VARCHAR" />
+		<result column="replyUserId" property="replyuserid" jdbcType="VARCHAR" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, userId, activityId, comment,
+		replyUserId, createTime
+		from activity_comment
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from activity_comment
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityComment">
+		insert into activity_comment (id, userId, activityId, comment, replyUserId,	createTime)
+		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR},
+		#{comment,jdbcType=VARCHAR}, #{replyuserid,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityComment">
+		update activity_comment
+		set userId = #{userid,jdbcType=VARCHAR},
+		activityId = #{activityid,jdbcType=VARCHAR},
+		comment = #{comment,jdbcType=VARCHAR},
+		replyUserId = #{replyuserid,jdbcType=VARCHAR},
+		createTime = #{createtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

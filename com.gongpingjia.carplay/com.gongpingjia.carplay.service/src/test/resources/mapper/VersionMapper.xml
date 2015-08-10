@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.VersionMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.Version">
+		<id column="product" property="product" jdbcType="VARCHAR" />
+		<result column="version" property="version" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="remarks" property="remarks" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		product, version, url, remarks
+		from version
+		where product = #{product,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from version
+		where product = #{product,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Version">
+		insert into version (product, version, url, remarks)
+		values
+		(#{product,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Version">
+		update version
+		set version = #{version,jdbcType=VARCHAR},
+		url =
+		#{url,jdbcType=VARCHAR},
+		remarks = #{remarks,jdbcType=VARCHAR}
+		where product = #{product,jdbcType=VARCHAR}
+	</update>
+</mapper>

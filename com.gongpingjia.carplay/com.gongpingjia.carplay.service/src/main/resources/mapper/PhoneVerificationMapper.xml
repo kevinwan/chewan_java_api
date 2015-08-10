@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.PhoneVerification">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.PhoneVerification">
+		<id column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="expire" property="expire" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		phone, code, expire
+		from
+		phone_verification
+		where phone = #{phone,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from phone_verification
+		where phone =
+		#{phone,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.PhoneVerification">
+		insert into phone_verification (phone, code, expire)
+		values
+		(#{phone,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{expire,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.PhoneVerification">
+		update phone_verification
+		set code = #{code,jdbcType=VARCHAR},
+		expire = #{expire,jdbcType=BIGINT}
+		where phone = #{phone,jdbcType=VARCHAR}
+	</update>
+</mapper>

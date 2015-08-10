@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.FeedbackPhoto">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.FeedbackPhoto">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="feedbackId" property="feedbackid" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="uploadTime" property="uploadtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, feedbackId, url, uploadTime
+		from feedback_photo
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from feedback_photo
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.FeedbackPhoto">
+		insert into feedback_photo (id, feedbackId, url,
+		uploadTime)
+		values (#{id,jdbcType=VARCHAR}, #{feedbackid,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR},
+		#{uploadtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.FeedbackPhoto">
+		update feedback_photo
+		set feedbackId = #{feedbackid,jdbcType=VARCHAR},
+		url = #{url,jdbcType=VARCHAR},
+		uploadTime = #{uploadtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

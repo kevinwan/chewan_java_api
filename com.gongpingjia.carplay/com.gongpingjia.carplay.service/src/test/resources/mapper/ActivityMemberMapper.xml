@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityMemberMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityMember">
+		<id column="userId" property="userid" jdbcType="VARCHAR" />
+		<id column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="joinTime" property="jointime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.gongpingjia.carplay.po.ActivityMemberKey">
+		select
+		userId, activityId, joinTime
+		from activity_member
+		where userId = #{userid,jdbcType=VARCHAR}
+		and activityId = #{activityid,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityMemberKey">
+		delete from activity_member
+		where userId = #{userid,jdbcType=VARCHAR}
+		and activityId = #{activityid,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityMember">
+		insert into activity_member (userId, activityId, joinTime
+		)
+		values (#{userid,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{jointime,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityMember">
+		update activity_member
+		set joinTime = #{jointime,jdbcType=BIGINT}
+		where userId = #{userid,jdbcType=VARCHAR}
+		and activityId = #{activityid,jdbcType=VARCHAR}
+	</update>
+</mapper>

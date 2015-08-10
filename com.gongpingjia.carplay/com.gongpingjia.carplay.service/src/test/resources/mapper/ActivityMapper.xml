@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.Activity">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="organizer" property="organizer" jdbcType="VARCHAR" />
+		<result column="photo" property="photo" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="district" property="district" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
+		<result column="start" property="start" jdbcType="BIGINT" />
+		<result column="end" property="end" jdbcType="BIGINT" />
+		<result column="location" property="location" jdbcType="VARCHAR" />
+		<result column="longitude" property="longitude" jdbcType="DOUBLE" />
+		<result column="latitude" property="latitude" jdbcType="DOUBLE" />
+		<result column="paymentType" property="paymenttype" jdbcType="VARCHAR" />
+		<result column="initialSeat" property="initialseat" jdbcType="INTEGER" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+		<result column="lastModifiedTime" property="lastmodifiedtime" jdbcType="BIGINT" />
+		<result column="extraServiceId" property="extraserviceid" jdbcType="VARCHAR" />
+		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, organizer, photo, type,
+		province, city, district, address, title, description,
+		extraInfo, start, end, location, longitude, latitude,
+		paymentType, initialSeat, createTime,
+		lastModifiedTime, extraServiceId, invalid
+		from activity
+		where id =
+		#{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from activity
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Activity">
+		insert into activity (id, organizer, photo,
+		type, province, city,
+		district,
+		address, title,
+		description, extraInfo, start,
+		end, location, longitude,
+		latitude, paymentType, initialSeat,
+		createTime,
+		lastModifiedTime, extraServiceId,
+		invalid)
+		values (#{id,jdbcType=VARCHAR}, #{organizer,jdbcType=VARCHAR},
+		#{photo,jdbcType=VARCHAR},
+		#{type,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR},
+		#{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
+		#{description,jdbcType=VARCHAR},
+		#{extrainfo,jdbcType=VARCHAR}, #{start,jdbcType=BIGINT},
+		#{end,jdbcType=BIGINT}, #{location,jdbcType=VARCHAR},
+		#{longitude,jdbcType=DOUBLE},
+		#{latitude,jdbcType=DOUBLE}, #{paymenttype,jdbcType=VARCHAR},
+		#{initialseat,jdbcType=INTEGER},
+		#{createtime,jdbcType=BIGINT}, #{lastmodifiedtime,jdbcType=BIGINT},
+		#{extraserviceid,jdbcType=VARCHAR},
+		#{invalid,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Activity">
+		update activity
+		set organizer = #{organizer,jdbcType=VARCHAR},
+		photo = #{photo,jdbcType=VARCHAR},
+		type = #{type,jdbcType=VARCHAR},
+		province = #{province,jdbcType=VARCHAR},
+		city =
+		#{city,jdbcType=VARCHAR},
+		district = #{district,jdbcType=VARCHAR},
+		address = #{address,jdbcType=VARCHAR},
+		title =
+		#{title,jdbcType=VARCHAR},
+		description = #{description,jdbcType=VARCHAR},
+		extraInfo = #{extrainfo,jdbcType=VARCHAR},
+		start = #{start,jdbcType=BIGINT},
+		end = #{end,jdbcType=BIGINT},
+		location = #{location,jdbcType=VARCHAR},
+		longitude =
+		#{longitude,jdbcType=DOUBLE},
+		latitude = #{latitude,jdbcType=DOUBLE},
+		paymentType = #{paymenttype,jdbcType=VARCHAR},
+		initialSeat = #{initialseat,jdbcType=INTEGER},
+		createTime = #{createtime,jdbcType=BIGINT},
+		lastModifiedTime =
+		#{lastmodifiedtime,jdbcType=BIGINT},
+		extraServiceId = #{extraserviceid,jdbcType=VARCHAR},
+		invalid =
+		#{invalid,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

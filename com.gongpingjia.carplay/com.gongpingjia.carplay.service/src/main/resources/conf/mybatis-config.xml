@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 命名空间 -->
+	<typeAliases>
+		<package name="com.gongpingjia.carplay.po.Activity" />
+		<package name="com.gongpingjia.carplay.po.ActivityApplication" />
+		<package name="com.gongpingjia.carplay.po.ActivityComment" />
+		<package name="com.gongpingjia.carplay.po.ActivityCover" />
+		<package name="com.gongpingjia.carplay.po.ActivityInvitation" />
+		<package name="com.gongpingjia.carplay.po.ActivityMember" />
+		<package name="com.gongpingjia.carplay.po.ActivityMemberKey" />
+		<package name="com.gongpingjia.carplay.po.ActivitySubscription" />
+		<package name="com.gongpingjia.carplay.po.ActivitySubscriptionKey" />
+		<package name="com.gongpingjia.carplay.po.ActivityType" />
+		<package name="com.gongpingjia.carplay.po.ActivityViewHistory" />
+		<package name="com.gongpingjia.carplay.po.AlbumPhoto" />
+		<package name="com.gongpingjia.carplay.po.ApplicationChangeHistory" />
+		<package name="com.gongpingjia.carplay.po.ApplicationStatus" />
+		<package name="com.gongpingjia.carplay.po.AuthenticationAhangeHistory" />
+		<package name="com.gongpingjia.carplay.po.AuthenticationApplication" />
+		<package name="com.gongpingjia.carplay.po.Car" />
+		<package name="com.gongpingjia.carplay.po.City" />
+		<package name="com.gongpingjia.carplay.po.Company" />
+		<package name="com.gongpingjia.carplay.po.EmchatAccount" />
+		<package name="com.gongpingjia.carplay.po.ExtraService" />
+		<package name="com.gongpingjia.carplay.po.Feedback" />
+		<package name="com.gongpingjia.carplay.po.FeedbackPhoto" />
+		<package name="com.gongpingjia.carplay.po.InvitationChannel" />
+		<package name="com.gongpingjia.carplay.po.InvitationCode" />
+		<package name="com.gongpingjia.carplay.po.InvitationFollower" />
+		<package name="com.gongpingjia.carplay.po.Message" />
+		<package name="com.gongpingjia.carplay.po.MessageType" />
+		<package name="com.gongpingjia.carplay.po.PhoneVerification" />
+		<package name="com.gongpingjia.carplay.po.Province" />
+		<package name="com.gongpingjia.carplay.po.SeatReservation" />
+		<package name="com.gongpingjia.carplay.po.ServiceType" />
+		<package name="com.gongpingjia.carplay.po.TokenVerification" />
+		<package name="com.gongpingjia.carplay.po.User" />
+		<package name="com.gongpingjia.carplay.po.UserAlbum" />
+		<package name="com.gongpingjia.carplay.po.UserSubscription" />
+		<package name="com.gongpingjia.carplay.po.UserSubscriptionKey" />
+		<package name="com.gongpingjia.carplay.po.Version" />
+	</typeAliases>
+
+	<!-- 映射map -->
+	<mappers>
+	</mappers>
+</configuration>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ActivityCoverMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityCover">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="uploadTime" property="uploadtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+			id, activityId, url, uploadTime
+		from activity_cover
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from activity_cover
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityCover">
+		insert into activity_cover (id, activityId, url, uploadTime)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{uploadtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityCover">
+		update activity_cover
+		set activityId = #{activityid,jdbcType=VARCHAR},
+		url = #{url,jdbcType=VARCHAR},
+		uploadTime = #{uploadtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

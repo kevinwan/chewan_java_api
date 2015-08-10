@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.MessageMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.Message">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="fromUser" property="fromuser" jdbcType="VARCHAR" />
+		<result column="toUser" property="touser" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="extra1" property="extra1" jdbcType="VARCHAR" />
+		<result column="extra2" property="extra2" jdbcType="INTEGER" />
+		<result column="extra3" property="extra3" jdbcType="VARCHAR" />
+		<result column="remarks" property="remarks" jdbcType="VARCHAR" />
+		<result column="isChecked" property="ischecked" jdbcType="TINYINT" />
+		<result column="isDeleted" property="isdeleted" jdbcType="TINYINT" />
+		<result column="createTime" property="createtime" jdbcType="BIGINT" />
+	</resultMap>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, fromUser, toUser, type, content, extra1, extra2, extra3, remarks, isChecked,
+		isDeleted, createTime
+		from message
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from message
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Message">
+		insert into message (id, fromUser, toUser,
+		type, content, extra1,
+		extra2, extra3, remarks,
+		isChecked, isDeleted, createTime
+		)
+		values (#{id,jdbcType=VARCHAR}, #{fromuser,jdbcType=VARCHAR}, #{touser,jdbcType=VARCHAR},
+		#{type,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{extra1,jdbcType=VARCHAR},
+		#{extra2,jdbcType=INTEGER}, #{extra3,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
+		#{ischecked,jdbcType=TINYINT}, #{isdeleted,jdbcType=TINYINT}, #{createtime,jdbcType=BIGINT}
+		)
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Message">
+		update message
+		set fromUser = #{fromuser,jdbcType=VARCHAR},
+		toUser = #{touser,jdbcType=VARCHAR},
+		type = #{type,jdbcType=VARCHAR},
+		content = #{content,jdbcType=VARCHAR},
+		extra1 = #{extra1,jdbcType=VARCHAR},
+		extra2 = #{extra2,jdbcType=INTEGER},
+		extra3 = #{extra3,jdbcType=VARCHAR},
+		remarks = #{remarks,jdbcType=VARCHAR},
+		isChecked = #{ischecked,jdbcType=TINYINT},
+		isDeleted = #{isdeleted,jdbcType=TINYINT},
+		createTime = #{createtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

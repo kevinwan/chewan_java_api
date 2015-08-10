@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.ApplicationChangeHistoryMapper">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ApplicationChangeHistory">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="applicationId" property="applicationid" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="timestamp" property="timestamp" jdbcType="BIGINT" />
+	</resultMap>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, applicationId, status, remark,
+		timestamp
+		from application_change_history
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from application_change_history
+		where id =
+		#{id,jdbcType=VARCHAR}
+	</delete>
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ApplicationChangeHistory">
+		insert into application_change_history (id, applicationId, status,
+		remark,
+		timestamp)
+		values (#{id,jdbcType=VARCHAR}, #{applicationid,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ApplicationChangeHistory">
+		update application_change_history
+		set applicationId =
+		#{applicationid,jdbcType=VARCHAR},
+		status = #{status,jdbcType=VARCHAR},
+		remark = #{remark,jdbcType=VARCHAR},
+		timestamp =
+		#{timestamp,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

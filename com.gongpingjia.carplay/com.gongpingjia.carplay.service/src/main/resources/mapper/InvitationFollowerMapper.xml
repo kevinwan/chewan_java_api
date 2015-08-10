@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.InvitationFollower">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.InvitationFollower">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="invitationId" property="invitationid" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="joinTime" property="jointime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, invitationId, userId, joinTime
+		from invitation_follower
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from invitation_follower
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.InvitationFollower">
+		insert into invitation_follower (id, invitationId, userId,
+		joinTime)
+		values (#{id,jdbcType=VARCHAR}, #{invitationid,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
+		#{jointime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.InvitationFollower">
+		update invitation_follower
+		set invitationId = #{invitationid,jdbcType=VARCHAR},
+		userId = #{userid,jdbcType=VARCHAR},
+		joinTime = #{jointime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

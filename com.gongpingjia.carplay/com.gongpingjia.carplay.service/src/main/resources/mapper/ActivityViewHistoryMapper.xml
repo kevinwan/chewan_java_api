@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.ActivityViewHistory">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityViewHistory">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
+		<result column="userId" property="userid" jdbcType="VARCHAR" />
+		<result column="viewTime" property="viewtime" jdbcType="BIGINT" />
+	</resultMap>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, activityId, userId, viewTime
+		from activity_view_history
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from activity_view_history
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityViewHistory">
+		insert into activity_view_history (id, activityId, userId,
+		viewTime)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
+		#{viewtime,jdbcType=BIGINT})
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityViewHistory">
+		update activity_view_history
+		set activityId = #{activityid,jdbcType=VARCHAR},
+		userId = #{userid,jdbcType=VARCHAR},
+		viewTime = #{viewtime,jdbcType=BIGINT}
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>
