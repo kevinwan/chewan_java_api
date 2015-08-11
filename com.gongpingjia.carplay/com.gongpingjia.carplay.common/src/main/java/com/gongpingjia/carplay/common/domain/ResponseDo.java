@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.common.domain;
 
+import org.springframework.util.StringUtils;
+
 /**
  * 
  * @author licheng
@@ -27,6 +29,15 @@ public class ResponseDo {
 		} else {
 			response.data = data;
 		}
+
+		return response;
+	}
+
+	public static ResponseDo buildSuccessResponse(String data) {
+		ResponseDo response = new ResponseDo();
+		response.result = 0;
+		response.errmsg = "";
+		response.data = StringUtils.isEmpty(data) ? "" : data;
 
 		return response;
 	}
