@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.common.util;
+﻿package com.gongpingjia.carplay.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertiesUtil {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class); //test 
 
 	/**
 	 * 存放配置文件的配置信息，配置文件名称为：third-party.config.properties
