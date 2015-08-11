@@ -31,6 +31,21 @@
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
 
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		id, password, nickname, phone, gender, birthYear, birthMonth, birthDay, province,
+		city, district, photo, drivingLicenseYear, drivingLicensePhoto, isAuthenticated,
+		credit, registerTime, invalid
+		from user
+		where 1 = 1
+		<if test="id != null">
+        	and id = #{id,jdbcType=VARCHAR}
+     	</if>
+		<if test="phone != null">
+        	and phone = #{phone,jdbcType=VARCHAR}
+     	</if>
+	</select>
+	
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from user where id = #{id,jdbcType=VARCHAR}
 	</delete>

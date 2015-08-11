@@ -5,11 +5,11 @@ import com.gongpingjia.carplay.po.PhoneVerification;
 public interface PhoneVerificationDao {
     int deleteByPrimaryKey(String phone);
 
-    int insert(PhoneVerification record);
+    int insert(PhoneVerification phone);
 
 
     PhoneVerification selectByPrimaryKey(String phone);
 
 
-    int updateByPrimaryKey(PhoneVerification record);
+    int updateByPrimaryKey(PhoneVerification phone);
 }

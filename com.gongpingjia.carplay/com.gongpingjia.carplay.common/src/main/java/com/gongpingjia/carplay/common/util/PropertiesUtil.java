@@ -68,11 +68,35 @@ public class PropertiesUtil {
 	}
 
 	/**
-	 * 获取第三方配置信息
+	 * 获取配置属性的值
 	 * 
-	 * @return
+	 * @param propName
+	 *            属性名称
+	 * @param defaultValue
+	 *            默认值
+	 * @return 返回属性值
 	 */
-	public static Properties getThirdConfig() {
-		return thirdConfig;
+	public static String getProperty(String propName, String defaultValue) {
+		return thirdConfig.getProperty(propName, defaultValue);
+	}
+
+	/**
+	 * 获取配置属性的值
+	 * 
+	 * @param propName
+	 *            属性名称
+	 * @param defaultValue
+	 *            默认值
+	 * @return 返回属性值
+	 */
+	public static int getProperty(String propName, int defaultValue) {
+		String prop = thirdConfig.getProperty(propName, String.valueOf(defaultValue));
+		int value = defaultValue;
+		try {
+			value = Integer.valueOf(prop);
+		} catch (NumberFormatException e) {
+			LOG.error("Parse config property failure, property name: " + propName, e);
+		}
+		return value;
 	}
 }
