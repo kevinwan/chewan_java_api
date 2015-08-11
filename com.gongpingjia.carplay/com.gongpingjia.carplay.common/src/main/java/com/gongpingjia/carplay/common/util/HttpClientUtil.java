@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.common.util;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,13 +38,14 @@ public class HttpClientUtil {
 
 		CloseableHttpResponse response = null;
 		try {
-			URIBuilder uriBilder = new URIBuilder(httpUrl);
+			URIBuilder uriBuilder = new URIBuilder(httpUrl);
+			uriBuilder.setCharset(Charset.forName("GBK"));
 
 			for (Entry<String, String> entry : params.entrySet()) {
-				uriBilder.setParameter(entry.getKey(), entry.getValue());
+				uriBuilder.setParameter(entry.getKey(), entry.getValue());
 			}
 
-			HttpGet httpGet = new HttpGet(uriBilder.build());
+			HttpGet httpGet = new HttpGet(uriBuilder.build());
 
 			for (Header header : headers) {
 				httpGet.addHeader(header);

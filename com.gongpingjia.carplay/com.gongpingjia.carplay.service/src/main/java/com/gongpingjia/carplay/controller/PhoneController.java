@@ -61,6 +61,11 @@ public class PhoneController {
 
 		String code = (String) request.getAttribute("code");
 
-		return service.verify(phone, code);
+		try {
+			return service.verify(phone, code);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 }

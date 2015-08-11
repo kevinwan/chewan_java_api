@@ -22,6 +22,7 @@ public interface PhoneService {
 	 * @param code
 	 *            验证码
 	 * @return 返回验证结果信息
+	 * @throws ApiException 
 	 */
-	ResponseDo verify(String phone, String code);
+	ResponseDo verify(String phone, String code) throws ApiException;
 }

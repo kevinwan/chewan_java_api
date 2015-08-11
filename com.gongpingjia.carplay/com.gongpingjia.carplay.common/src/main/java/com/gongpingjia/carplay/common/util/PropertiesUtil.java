@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -46,16 +47,26 @@ public class PropertiesUtil {
 	private static Properties loadProperties(File propFile) {
 		Properties properties = new Properties();
 		InputStream inStream = null;
+		InputStreamReader inReader = null;
 
 		LOG.info("Load properties file: " + propFile.getName());
 		try {
 			inStream = new FileInputStream(propFile);
-			properties.load(inStream);
+			inReader = new InputStreamReader(inStream, "UTF-8");
+			properties.load(inReader);
 		} catch (FileNotFoundException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 		} finally {
+			if (inReader != null) {
+				try {
+					inReader.close();
+				} catch (IOException e) {
+					LOG.error(e.getMessage(), e);
+				}
+			}
+
 			if (inStream != null) {
 				try {
 					inStream.close();

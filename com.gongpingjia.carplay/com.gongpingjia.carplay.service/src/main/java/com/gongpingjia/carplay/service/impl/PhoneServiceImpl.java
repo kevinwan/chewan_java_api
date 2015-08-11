@@ -46,22 +46,23 @@ public class PhoneServiceImpl implements PhoneService {
 	public ResponseDo sendVerification(String phone, int type) throws ApiException {
 
 		if (!isPhoneNumber(phone)) {
+			LOG.error("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
 		}
 
-		Map<String, Object> param = new HashMap<String, Object>(1);
-		param.put("phone", phone);
-		List<User> users = userDao.selectByParam(param);
+		List<User> users = getUserList(phone);
 
 		if (type == 0) {
 			// 注册流程
 			if (users.size() > 0) {
 				// 用户已经存在，手机号不能重复注册
+				LOG.error("Phone number is already registed");
 				throw new ApiException("手机号已被注册");
 			}
 		} else if (type == 1) {
 			// 忘记密码流程
 			if (users.size() == 0) {
+				LOG.error("User is not exist");
 				throw new ApiException("用户不存在");
 			}
 		} else {
@@ -78,6 +79,39 @@ public class PhoneServiceImpl implements PhoneService {
 		return response;
 	}
 
+	@Override
+	public ResponseDo verify(String phone, String code) throws ApiException {
+		if (!isPhoneNumber(phone)) {
+			LOG.error("Phone number is not correct format");
+			throw new ApiException("不是有效的手机号");
+		}
+		if (StringUtils.isEmpty(code)) {
+			LOG.error("Parameter code is empty");
+			throw new ApiException("输入参数有误");
+		}
+
+		List<User> userList = getUserList(phone);
+		if (userList.size() > 0) {
+			LOG.error("User with phone number is already registed, phone: " + phone);
+			throw new ApiException("该用户已注册");
+		}
+
+		return ResponseDo.buildSuccessResponse("");
+	}
+
+	/**
+	 * 通过手机号获取用户信息
+	 * 
+	 * @param phone
+	 *            手机号
+	 * @return 用户列表信息
+	 */
+	private List<User> getUserList(String phone) {
+		Map<String, Object> param = new HashMap<String, Object>(1);
+		param.put("phone", phone);
+		return userDao.selectByParam(param);
+	}
+
 	/**
 	 * 往指定的手机上发送验证码消息
 	 * 
@@ -87,29 +121,24 @@ public class PhoneServiceImpl implements PhoneService {
 	 */
 	private ResponseDo sendPhoneVerifyMessage(String phone, String verifyCode) {
 		// 调用运营商接口发送验证码短信
-		String message = MessageFormat.format(PropertiesUtil.getProperty("message.send.format", "【车玩】 您的短信验证码为（{0}）"),
-				verifyCode);
+		String prop = PropertiesUtil.getProperty("message.send.format", "【车玩】 您的短信验证码为（{0}）");
+		String message = MessageFormat.format(prop, verifyCode);
 
 		String url = PropertiesUtil.getProperty("message.send.url", "");
 		Map<String, String> queryParams = new HashMap<String, String>(4, 1);
 		queryParams.put("user", PropertiesUtil.getProperty("message.send.username", ""));
 		queryParams.put("pwd", PropertiesUtil.getProperty("message.send.password", ""));
 		queryParams.put("phone", phone);
-		try {
-			queryParams.put("msgcont", URLEncoder.encode(message, "GBK"));
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("Conver message failure, message: " + message, e);
-			queryParams.put("msgcont", verifyCode);
-		}
+		queryParams.put("msgcont", message);
 
 		Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
 
 		CloseableHttpResponse response = HttpClientUtil.get(url, queryParams, Arrays.asList(header));
 
+		LOG.info(response.toString());
 		if (Constants.HTTP_STATUS_OK == response.getStatusLine().getStatusCode()) {
 			return ResponseDo.buildSuccessResponse("");
 		} else {
-			LOG.info(response.toString());
 			return ResponseDo.buildFailureResponse("未能成功获取验证码");
 		}
 	}
@@ -134,12 +163,6 @@ public class PhoneServiceImpl implements PhoneService {
 		} else {
 			phoneDao.updateByPrimaryKey(phoneVerify);
 		}
-	}
-
-	@Override
-	public ResponseDo verify(String phone, String code) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	private boolean isPhoneNumber(String phone) {
