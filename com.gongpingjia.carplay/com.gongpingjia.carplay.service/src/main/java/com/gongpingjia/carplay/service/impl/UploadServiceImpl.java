@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.gongpingjia.carplay.common.avatar.AvatarService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.UploadService;
@@ -30,7 +30,7 @@ public class UploadServiceImpl implements UploadService {
 	private static final String KEY_FORMAT = "asset/user/{0}/avatar.jpg";
 
 	@Autowired
-	private AvatarService avatarService;
+	private PhotoService avatarService;
 
 	@Override
 	public ResponseDo uploadFile(MultipartFile multiFile, HttpServletRequest request) throws ApiException {

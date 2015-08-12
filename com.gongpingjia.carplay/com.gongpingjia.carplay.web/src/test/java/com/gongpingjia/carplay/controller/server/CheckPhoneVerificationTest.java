@@ -12,6 +12,12 @@ import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.PhoneVerification;
 
+/**
+ * 2.2 验证码校验
+ * 
+ * @author licheng
+ *
+ */
 public class CheckPhoneVerificationTest extends BaseTest {
 
 	@Autowired

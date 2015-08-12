@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.common.avatar;
+package com.gongpingjia.carplay.common.photo;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
  * @author licheng
  *
  */
-public interface AvatarService {
+public interface PhotoService {
 
 	/**
 	 * 上传图片资源文件

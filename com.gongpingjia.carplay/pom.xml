@@ -23,7 +23,7 @@
 		<module>com.gongpingjia.carplay.web</module>
 		<module>com.gongpingjia.carplay.service</module>
 		<module>com.gongpingjia.carplay.common</module>
-		<module>com.gongpingjia.carplay.third</module>
+		<module>com.gongpingjia.carplay.thirdparty</module>
 	</modules>
 
 	<dependencies>
@@ -105,6 +105,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc-portlet</artifactId>
 			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
 		</dependency>
 
 		<!-- springframe end -->
@@ -194,10 +200,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-    		<groupId>net.sf.json-lib</groupId>
-    		<artifactId>json-lib</artifactId>
-    		<version>2.4</version>
-    		<classifier>jdk15</classifier>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier>
 		</dependency>
 		<!-- JUnit Test -->
 		<dependency>

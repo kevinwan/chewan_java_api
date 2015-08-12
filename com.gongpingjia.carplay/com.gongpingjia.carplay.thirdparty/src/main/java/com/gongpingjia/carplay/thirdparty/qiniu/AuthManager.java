@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.third.qiniu;
+package com.gongpingjia.carplay.thirdparty.qiniu;
 
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.qiniu.storage.BucketManager;

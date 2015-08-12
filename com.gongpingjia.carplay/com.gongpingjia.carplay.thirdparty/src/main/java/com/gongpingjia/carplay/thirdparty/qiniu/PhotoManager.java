@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.third.qiniu;
+package com.gongpingjia.carplay.thirdparty.qiniu;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,17 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.gongpingjia.carplay.common.avatar.AvatarService;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
 
 @Service
-public class AvataManager implements AvatarService {
+public class PhotoManager implements PhotoService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AvataManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PhotoManager.class);
 
 	/**
 	 * 重用 uploadManager。一般地，只需要创建一个 uploadManager 对象
@@ -111,6 +111,7 @@ public class AvataManager implements AvatarService {
 		}
 	}
 
+	@Override
 	public void rename(String oldname, String newname) throws ApiException {
 		AuthManager instance = AuthManager.getInstance();
 		try {
