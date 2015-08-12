@@ -1,7 +1,5 @@
 package com.gongpingjia.carplay.service.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -96,6 +94,22 @@ public class PhoneServiceImpl implements PhoneService {
 			throw new ApiException("该用户已注册");
 		}
 
+		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
+		if (phoneVerify == null) {
+			LOG.error("Phone number is not exist in the phone verification table");
+			throw new ApiException("未能获取该手机的验证码");
+		}
+
+		if (!code.equals(phoneVerify.getCode())) {
+			LOG.error("Phone verify code is not corrected");
+			throw new ApiException("未能获取该手机的验证码");
+		}
+
+		if (phoneVerify.getExpire() < DateUtil.getTime()) {
+			LOG.error("Phone verify code is expired, please re acquisition");
+			throw new ApiException("该验证码已过期，请重新获取验证码");
+		}
+
 		return ResponseDo.buildSuccessResponse("");
 	}
 
@@ -133,10 +147,14 @@ public class PhoneServiceImpl implements PhoneService {
 
 		Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
 
-		CloseableHttpResponse response = HttpClientUtil.get(url, queryParams, Arrays.asList(header));
-
+		CloseableHttpResponse response = HttpClientUtil.get(url, queryParams, Arrays.asList(header), "GBK");
+		int status = response.getStatusLine().getStatusCode();
 		LOG.info(response.toString());
-		if (Constants.HTTP_STATUS_OK == response.getStatusLine().getStatusCode()) {
+
+		// 用完response需要释放资源
+		HttpClientUtil.close(response);
+
+		if (status == Constants.HTTP_STATUS_OK) {
 			return ResponseDo.buildSuccessResponse("");
 		} else {
 			return ResponseDo.buildFailureResponse("未能成功获取验证码");

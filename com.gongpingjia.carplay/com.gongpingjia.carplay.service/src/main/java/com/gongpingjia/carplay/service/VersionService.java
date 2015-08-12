@@ -1,7 +1,8 @@
 package com.gongpingjia.carplay.service;
 
-import com.gongpingjia.carplay.po.Version;
+import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
 
 public interface VersionService {
-	Version getVersion(String product);
+	ResponseDo getVersion(String product) throws ApiException;
 }

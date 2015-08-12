@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.controller.server;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,5 +25,10 @@ public class BaseTest {
 	@Before
 	public void setUp() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+	}
+	
+	@Test
+	public void test(){
+		//do nothing
 	}
 }

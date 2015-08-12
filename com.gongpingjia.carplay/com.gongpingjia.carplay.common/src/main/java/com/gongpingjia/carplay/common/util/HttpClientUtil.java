@@ -8,12 +8,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +32,10 @@ public class HttpClientUtil {
 	 *            请求URL
 	 * @param params
 	 *            参数信息
-	 * @return 返回响应结果
+	 * @return 返回响应结果HttpResponse,记得用完关闭流
 	 */
-	public static CloseableHttpResponse get(String httpUrl, Map<String, String> params, List<Header> headers) {
+	public static CloseableHttpResponse get(String httpUrl, Map<String, String> params, List<Header> headers,
+			String charSetName) {
 		LOG.debug("Request url:" + httpUrl);
 		LOG.debug("Request params:" + params);
 
@@ -39,7 +44,7 @@ public class HttpClientUtil {
 		CloseableHttpResponse response = null;
 		try {
 			URIBuilder uriBuilder = new URIBuilder(httpUrl);
-			uriBuilder.setCharset(Charset.forName("GBK"));
+			uriBuilder.setCharset(Charset.forName(charSetName));
 
 			for (Entry<String, String> entry : params.entrySet()) {
 				uriBuilder.setParameter(entry.getKey(), entry.getValue());
@@ -58,47 +63,44 @@ public class HttpClientUtil {
 			LOG.error(e.getMessage(), e);
 		} catch (URISyntaxException e) {
 			LOG.error(e.getMessage(), e);
-		} finally {
-			if (response != null) {
-				try {
-					response.close();
-				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
 		}
 
 		return response;
 	}
 
-	// public static Map<String, String> parseResponse(CloseableHttpResponse
-	// response) {
-	// Map<String, String> map = new HashMap<String, String>();
-	// if (response == null) {
-	// return map;
-	// }
-	//
-	// HttpEntity entity = response.getEntity();
-	// if (entity != null) {
-	// InputStream instream = null;
-	// try {
-	// instream = entity.getContent();
-	//
-	// } catch (UnsupportedOperationException e) {
-	// LOG.error(e.getMessage(), e);
-	// } catch (IOException e) {
-	// LOG.error(e.getMessage(), e);
-	// } finally {
-	// try {
-	// if (instream != null) {
-	// instream.close();
-	// }
-	// } catch (IOException e) {
-	// LOG.error(e.getMessage(), e);
-	// }
-	// }
-	// }
-	// return map;
-	// }
+	/**
+	 * 关闭响应流
+	 * 
+	 * @param response
+	 *            CloseableHttpResponse 对象
+	 */
+	public static void close(CloseableHttpResponse response) {
+		try {
+			response.close();
+		} catch (IOException e) {
+			LOG.error("Close http response failure");
+		}
+	}
+
+	/**
+	 * 解析HTTP响应，返回响应体的字符串
+	 * 
+	 * @param response
+	 *            响应体
+	 * @return 返回响应字符串
+	 */
+	public static String parseResponse(HttpResponse response) {
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			try {
+				return EntityUtils.toString(entity);
+			} catch (ParseException e) {
+				LOG.error("Convert response entity to String failure with ParseException");
+			} catch (IOException e) {
+				LOG.error("Convert response entity to String failure with IOException");
+			}
+		}
+		return "";
+	}
 
 }

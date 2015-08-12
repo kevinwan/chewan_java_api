@@ -59,7 +59,7 @@ public class PhoneController {
 
 		LOG.debug("checkPhoneVerification begin");
 
-		String code = (String) request.getAttribute("code");
+		String code = (String) request.getParameter("code");
 
 		try {
 			return service.verify(phone, code);
