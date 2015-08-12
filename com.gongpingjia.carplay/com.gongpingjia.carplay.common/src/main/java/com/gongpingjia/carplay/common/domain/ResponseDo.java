@@ -50,6 +50,18 @@ public class ResponseDo {
 		return response;
 	}
 
+	/**
+	 * 该方法仅针对data为JSON字符串的场景，可以直接生成JSON字符串返回
+	 * 
+	 * @return JSON字符串
+	 */
+	public String toJsonString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("\"result\":").append(this.result).append(",\"data\":").append(this.data.toString())
+				.append(",\"errmsg\":\"").append(this.errmsg).append("\"");
+		return builder.toString();
+	}
+
 	public int getResult() {
 		return result;
 	}
