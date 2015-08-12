@@ -19,7 +19,10 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.dao.TokenVerificationDao;
+import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.service.UploadService;
 
 @Service
@@ -27,30 +30,48 @@ public class UploadServiceImpl implements UploadService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UploadServiceImpl.class);
 
-	private static final String KEY_FORMAT = "asset/user/{0}/avatar.jpg";
+	@Autowired
+	private PhotoService photoService;
 
 	@Autowired
-	private PhotoService avatarService;
+	private TokenVerificationDao tokenDao;
 
 	@Override
-	public ResponseDo uploadFile(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
+	public ResponseDo uploadAvatarPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
 		LOG.debug("Begin upload file to server");
 
 		byte[] data = buildFileBytes(multiFile);
 
 		String id = CodeGenerator.generatorId();
-		String key = MessageFormat.format(KEY_FORMAT, id);
+		String key = MessageFormat.format("asset/user/{0}/avatar.jpg", id);
 
-		Map<String, String> result = avatarService.upload(data, key, false);
+		return uploadPhoto(data, id, key);
+	}
+
+	/**
+	 * 上传图片
+	 * 
+	 * @param data
+	 *            photo二进制数据文件
+	 * @param photoId
+	 *            photo的ID值
+	 * @param key
+	 *            七牛服务器唯一识别的Key值
+	 * @return 返回上传结果对象
+	 * @throws ApiException
+	 *             义务异常
+	 */
+	private ResponseDo uploadPhoto(byte[] data, String photoId, String key) throws ApiException {
+		Map<String, String> result = photoService.upload(data, key, false);
 		LOG.debug("Upload result: " + result);
 		if ("success".equalsIgnoreCase(result.get("result"))) {
 			Map<String, String> dataMap = new HashMap<String, String>();
 			dataMap.put("photoUrl", PropertiesUtil.getProperty("qiniu.server.url", "") + result.get("key"));
-			dataMap.put("photoId", id);
+			dataMap.put("photoId", photoId);
 			return ResponseDo.buildSuccessResponse(dataMap);
 		} else {
 			LOG.error("Upload avatar resource failure, result: " + result);
-			return ResponseDo.buildFailureResponse("未能成功上传图片");
+			return ResponseDo.buildFailureResponse("未能成功上传");
 		}
 	}
 
@@ -101,5 +122,33 @@ public class UploadServiceImpl implements UploadService {
 			}
 		}
 		return fileContent;
+	}
+
+	@Override
+	public ResponseDo uploadLicensePhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
+			throws ApiException {
+		LOG.debug("uploadLicensePhoto to server, userId:{0}", userId);
+
+		String token = request.getParameter("token");
+		if ((!CodeGenerator.isUUID(userId)) || (!CodeGenerator.isUUID(token))) {
+			LOG.error("userId or token is not correct format UUID string, userId:{0}, token:{1}", userId, token);
+			throw new ApiException("输入参数有误");
+		}
+
+		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
+		if (tokenVerify == null) {
+			LOG.error("No user token exist in the system, userId:{0}", userId);
+			throw new ApiException("用户不存在");
+		}
+
+		if (tokenVerify.getExpire() < DateUtil.getTime()) {
+			LOG.error("User token is out of date, userId:", userId);
+			throw new ApiException("口令已过期，请重新登录获取新口令");
+		}
+
+		byte[] data = buildFileBytes(multiFile);
+		String key = MessageFormat.format("asset/user/{0}/license.jpg", userId);
+
+		return uploadPhoto(data, userId, key);
 	}
 }

@@ -9,6 +9,32 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 
 public interface UploadService {
 
-	ResponseDo uploadFile(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
+	/**
+	 * 上传图片资源
+	 * 
+	 * @param multiFile
+	 *            图片文件资源
+	 * @param request
+	 *            Request请求
+	 * @return 返回结果对象
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo uploadAvatarPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
 
+	/**
+	 * 上传图片资源
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param multiFile
+	 *            图片文件资源
+	 * @param request
+	 *            Request请求
+	 * @return 返回结果对象
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo uploadLicensePhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
+			throws ApiException;
 }
