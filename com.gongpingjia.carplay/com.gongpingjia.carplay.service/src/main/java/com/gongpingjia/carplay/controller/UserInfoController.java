@@ -22,7 +22,7 @@ public class UserInfoController {
 	@Autowired
 	private UserService userService;
 	
-	@RequestMapping(value = "/user/register", method = RequestMethod.GET)
+	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseDo register(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "code") String code,
@@ -35,7 +35,7 @@ public class UserInfoController {
 			@RequestParam(value = "province") String province,
 			@RequestParam(value = "city") String city,
 			@RequestParam(value = "district") String district,
-			@RequestParam(value = "photo") String photo) throws ApiException {
+			@RequestParam(value = "photo") String photo) {
 
 		LOG.debug("register is called, request parameter produce:");
 
@@ -52,12 +52,10 @@ public class UserInfoController {
 		user.setDistrict(district);
 		user.setPhoto(photo);
 
-		return userService.register(user, code);
-//		Map<String, Object> data = new HashMap<String, Object>();
-//		data.put("test", "1");
-//
-//		LOG.debug("register is called, response data:" + data);
-//
-//		return ResponseDo.buildSuccessResponse(data);
+		try {
+			return userService.register(user, code);
+		} catch (ApiException e) {
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 }

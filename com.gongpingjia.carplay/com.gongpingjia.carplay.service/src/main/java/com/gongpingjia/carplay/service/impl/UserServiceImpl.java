@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseDo register(User user, String code) throws ApiException {
 		
 		//验证参数 
-	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !ToolsUtils.isUuid(user.getPhoto())) {
+	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !CodeGenerator.isUUID(user.getPhoto())) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
 	    if (null == phoneVerification){
 	    	LOG.warn("Cannot find code of this phone :" + user.getPhone());
 	    	return ResponseDo.buildFailureResponse("未能获取该手机的验证码");
-	    } else if (Integer.valueOf(phoneVerification.getCode()) != Integer.valueOf(code)){
+	    } else if (!code.equals(phoneVerification.getCode())){
 	    	LOG.warn("Code not correct,phone : " + user.getPhone() + ". error code :" + code);
 	    	return ResponseDo.buildFailureResponse("验证码错误");
 	    } else if (phoneVerification.getExpire() < new Date().getTime()/1000){
