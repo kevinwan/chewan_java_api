@@ -8,6 +8,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+/**
+ * 2.1 获取注册验证码
+ * 
+ * @author licheng
+ *
+ */
 public class SendPhoneVerificationTest extends BaseTest {
 
 	@Test

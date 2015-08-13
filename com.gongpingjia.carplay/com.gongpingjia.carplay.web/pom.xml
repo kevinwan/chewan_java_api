@@ -12,11 +12,11 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>com.gongpingjia.carplay.web Maven Webapp</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<properties>
 		<test.scope>test</test.scope>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.gongpingjia.carplay</groupId>
