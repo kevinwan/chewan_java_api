@@ -43,4 +43,12 @@ public interface UserService {
 	 * @throws ApiException 
 	 */
 	ResponseDo register(User user, String code);
+	
+	/**
+	 * 用户登录
+	 * 
+	 * @param user
+	 * @return
+	 */
+	ResponseDo loginUser(User user);
 }
