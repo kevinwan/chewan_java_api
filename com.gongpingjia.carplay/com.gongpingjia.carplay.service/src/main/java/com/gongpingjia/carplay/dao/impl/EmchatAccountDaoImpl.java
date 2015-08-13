@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.dao.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
 import com.gongpingjia.carplay.po.EmchatAccount;
 
@@ -10,26 +11,22 @@ public class EmchatAccountDaoImpl implements EmchatAccountDao {
 
 	@Override
 	public int deleteByPrimaryKey(String userid) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.delete(EmchatAccount.class.getName(), "deleteByPrimaryKey", userid);
 	}
 
 	@Override
 	public int insert(EmchatAccount record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.save(EmchatAccount.class.getName(), "insert", record);
 	}
 
 	@Override
 	public EmchatAccount selectByPrimaryKey(String userid) {
-		// TODO Auto-generated method stub
-		return null;
+		return DASUtil.selectOne(EmchatAccount.class.getName(), "selectByPrimaryKey", userid);
 	}
 
 	@Override
 	public int updateByPrimaryKey(EmchatAccount record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.update(EmchatAccount.class.getName(), "updateByPrimaryKey", record);
 	}
 
 }
