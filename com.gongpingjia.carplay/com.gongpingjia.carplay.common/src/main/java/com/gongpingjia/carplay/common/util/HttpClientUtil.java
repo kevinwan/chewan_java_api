@@ -21,6 +21,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gongpingjia.carplay.common.exception.ApiException;
+
 public class HttpClientUtil {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HttpClientUtil.class);
@@ -33,9 +35,10 @@ public class HttpClientUtil {
 	 * @param params
 	 *            参数信息
 	 * @return 返回响应结果HttpResponse,记得用完关闭流
+	 * @throws ApiException 
 	 */
 	public static CloseableHttpResponse get(String httpUrl, Map<String, String> params, List<Header> headers,
-			String charSetName) {
+			String charSetName) throws ApiException {
 		LOG.debug("Request url:{}", httpUrl);
 		LOG.debug("Request params:{}", params);
 
@@ -59,10 +62,13 @@ public class HttpClientUtil {
 			response = httpclient.execute(httpGet);
 		} catch (ClientProtocolException e) {
 			LOG.error(e.getMessage(), e);
+			throw new ApiException("请求异常");
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
+			throw new ApiException("请求异常");
 		} catch (URISyntaxException e) {
 			LOG.error(e.getMessage(), e);
+			throw new ApiException("请求异常");
 		}
 
 		return response;

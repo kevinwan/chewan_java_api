@@ -132,8 +132,9 @@ public class PhoneServiceImpl implements PhoneService {
 	 * @param phone
 	 * @param verifyCode
 	 * @return
+	 * @throws ApiException
 	 */
-	private ResponseDo sendPhoneVerifyMessage(String phone, String verifyCode) {
+	private ResponseDo sendPhoneVerifyMessage(String phone, String verifyCode) throws ApiException {
 		// 调用运营商接口发送验证码短信
 		String prop = PropertiesUtil.getProperty("message.send.format", "【车玩】 您的短信验证码为（{0}）");
 		String message = MessageFormat.format(prop, verifyCode);
