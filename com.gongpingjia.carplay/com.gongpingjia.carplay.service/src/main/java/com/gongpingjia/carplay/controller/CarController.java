@@ -16,46 +16,55 @@ import com.gongpingjia.carplay.service.CarService;
 public class CarController {
 	private static final Logger LOG = LoggerFactory.getLogger(VersionController.class);
 
-	
 	@Autowired
 	private CarService service;
 
-	
+	/**
+	 * 2.6 获取品牌
+	 * 
+	 * 。
+	 * 
+	 * @return 品牌信息
+	 */
 	@RequestMapping(value = "/car/brand", method = RequestMethod.GET)
-	public ResponseDo CarBrand(){
-		
+	public ResponseDo CarBrand() {
+
 		LOG.debug("car/brand is called, no request parameter");
-		
+
 		try {
 			return service.getCarBrand();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
-		
-		//1、定义服务层接口
-		//定义restful名称，以及参数赋值
-		//2、调用服务层方法，得到所需信息的data
-		//3、将得到信息转为map对象
-		//此处得到的carBrand为公平价返回的json数据
-		//4、将信息封装为responseDo类，返回
-	}
-	
-	
-	@RequestMapping(value = "/car/model", method = RequestMethod.GET)
-	public ResponseDo getCarModel(@RequestParam(value ="brand" ,defaultValue="") String brand){
 
-		LOG.debug("car/model is called, request parameter brand:"+brand);
-		
+		// 1、定义服务层接口
+		// 定义restful名称，以及参数赋值
+		// 2、调用服务层方法，得到所需信息的data
+		// 3、将得到信息转为map对象
+		// 此处得到的carBrand为公平价返回的json数据
+		// 4、将信息封装为responseDo类，返回
+	}
+
+	/**
+	 * 2.7获取车型信息@throws ApiException
+	 * 
+	 * @param brand
+	 *            品牌
+	 * @return 此品牌的车型信息
+	 */
+	@RequestMapping(value = "/car/model", method = RequestMethod.GET)
+	public ResponseDo getCarModel(@RequestParam(value = "brand", defaultValue = "") String brand) {
+
+		LOG.debug("car/model is called, request parameter brand:" + brand);
+
 		try {
 			return service.getCarModel(brand);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
-		
+
 	}
-	
-	
 
 }
