@@ -12,6 +12,12 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.VersionService;
 
+/**
+ * 版本信息控制
+ * 
+ * @author licheng
+ *
+ */
 @RestController
 public class VersionController {
 

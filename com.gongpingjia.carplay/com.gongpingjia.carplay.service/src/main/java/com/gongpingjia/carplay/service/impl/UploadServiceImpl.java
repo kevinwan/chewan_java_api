@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,10 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.dao.AlbumPhotoDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
+import com.gongpingjia.carplay.dao.UserAlbumDao;
+import com.gongpingjia.carplay.po.UserAlbum;
 import com.gongpingjia.carplay.service.UploadService;
 
 @Service
@@ -28,11 +32,29 @@ public class UploadServiceImpl implements UploadService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UploadServiceImpl.class);
 
+	/**
+	 * 图片上传
+	 */
 	@Autowired
 	private PhotoService photoService;
 
+	/**
+	 * Token校验
+	 */
 	@Autowired
 	private TokenVerificationDao tokenDao;
+
+	/**
+	 * 相册Dao
+	 */
+	@Autowired
+	private AlbumPhotoDao albumDao;
+
+	/**
+	 * 个人相册Dao
+	 */
+	@Autowired
+	private UserAlbumDao userAlbumDao;
 
 	@Override
 	public ResponseDo uploadUserPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
@@ -69,7 +91,7 @@ public class UploadServiceImpl implements UploadService {
 			return ResponseDo.buildSuccessResponse(dataMap);
 		} else {
 			LOG.error("Upload avatar resource failure, result: {}", result);
-			return ResponseDo.buildFailureResponse("未能成功上传");
+			return ResponseDo.buildFailureResponse("上传失败");
 		}
 	}
 
@@ -149,6 +171,49 @@ public class UploadServiceImpl implements UploadService {
 		String coverUuid = CodeGenerator.generatorId();
 		String key = MessageFormat.format("asset/activity/cover/{0}/cover.jpg", coverUuid);
 
-		return uploadPhoto(data, userId, key);
+		return uploadPhoto(data, coverUuid, key);
+	}
+
+	@Override
+	public ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
+			throws ApiException {
+
+		String token = request.getParameter("token");
+		// 1.参数校验
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		LOG.debug("check user album exist or not");
+		// 2.检查数据库信息
+		List<UserAlbum> userAlbumList = userAlbumDao.selectListByUserId(userId);
+		if (userAlbumList.isEmpty()) {
+			LOG.error("get userAlbum by userId return empty result");
+			throw new ApiException("获取相册失败");
+		}
+		UserAlbum userAlbum = userAlbumList.get(0);
+
+		LOG.debug("check photos in album is over max count or not");
+		int photosCount = albumDao.selectPhotosCoutByAlbumid(userAlbum.getId());
+		int maxCount = PropertiesUtil.getProperty("user.album.photo.max.count", 9);
+		if (photosCount >= maxCount) {
+			LOG.error("Photos in album size is {}, nearly over max count{}", photosCount, maxCount);
+			throw new ApiException(MessageFormat.format("相册图片数不能超过{0}张", maxCount));
+		}
+
+		LOG.debug("transfer photo file into byte array and upload photo to server");
+		// 3.上传个人相册图片
+		byte[] data = buildFileBytes(multiFile);
+		String photoId = CodeGenerator.generatorId();
+		String key = MessageFormat.format("asset/user/{0}/album/{1}.jpg", userId, photoId);
+		return uploadPhoto(data, photoId, key);
+	}
+
+	@Override
+	public ResponseDo uploadFeedbackPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
+		byte[] data = buildFileBytes(multiFile);
+		String photoId = CodeGenerator.generatorId();
+		LOG.debug("begin upload feedback photo , photoId:{}", photoId);
+		
+		String key = MessageFormat.format("asset/feedback/{0}.jpg", photoId);
+		return uploadPhoto(data, photoId, key);
 	}
 }

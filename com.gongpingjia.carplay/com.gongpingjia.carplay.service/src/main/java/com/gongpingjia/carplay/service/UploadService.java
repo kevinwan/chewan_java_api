@@ -50,4 +50,32 @@ public interface UploadService {
 	 *             业务异常信息
 	 */
 	ResponseDo uploadCoverPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
+
+	/**
+	 * 相册图片上传
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param multiFile
+	 *            上传的图片资源文件
+	 * @param request
+	 *            请求参数
+	 * @return 返回上传结果信息
+	 * @throws ApiException
+	 *             业务异常信息
+	 */
+	ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, HttpServletRequest request) throws ApiException;
+
+	/**
+	 * 上传反馈图片资源文件
+	 * 
+	 * @param multiFile
+	 *            反馈图片资源文件
+	 * @param request
+	 *            请求参数信息
+	 * @return 返回上传结果
+	 * @throws ApiException
+	 *             业务异常信息
+	 */
+	ResponseDo uploadFeedbackPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
 }

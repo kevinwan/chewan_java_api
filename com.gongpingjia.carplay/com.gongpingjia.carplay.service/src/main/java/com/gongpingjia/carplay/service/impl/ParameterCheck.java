@@ -10,6 +10,12 @@ import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.po.TokenVerification;
 
+/**
+ * 业务参数检查
+ * 
+ * @author licheng
+ *
+ */
 public class ParameterCheck {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ParameterCheck.class);

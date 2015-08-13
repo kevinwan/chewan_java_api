@@ -37,4 +37,20 @@
 		uploadTime = #{uploadtime,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="selectListByAlbumid" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, albumId, url, uploadTime
+		from
+		album_photo
+		where albumId = #{albumId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectPhotosCoutByAlbumid" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select
+			count(1)
+		from
+		album_photo
+		where albumId = #{albumId,jdbcType=VARCHAR}
+	</select>
 </mapper>

@@ -15,6 +15,12 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.PhoneService;
 
+/**
+ * 手机验证码相关的操作
+ * 
+ * @author licheng
+ *
+ */
 @RestController
 public class PhoneController {
 

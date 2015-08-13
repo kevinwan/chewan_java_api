@@ -33,4 +33,11 @@
 		createTime = #{createtime,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="selectListByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		id, userId, coverImageUrl, createTime
+		from user_album
+		where userId = #{userId,jdbcType=VARCHAR}
+	</select>
 </mapper>

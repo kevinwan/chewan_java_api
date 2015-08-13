@@ -16,6 +16,12 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.UploadService;
 
+/**
+ * 图片资源文件上传
+ * 
+ * @author licheng
+ *
+ */
 @RestController
 public class UploadController {
 
@@ -83,4 +89,47 @@ public class UploadController {
 		}
 	}
 
+	/**
+	 * 2.39 相册图片上传
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param attach
+	 *            上传的附件
+	 * @param request
+	 *            请求参数
+	 * @return 返回响应结果信息
+	 */
+	@RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	public ResponseDo uploadAlbumPhoto(@PathVariable("userId") String userId,
+			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+		LOG.info("uploadAlbumPhoto attach size: {}, userId: {}", attach.getSize(), userId);
+
+		try {
+			return service.uploadAlbumPhoto(userId, attach, request);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.43 上传意见反馈图片
+	 * 
+	 * @param attach
+	 *            图片资源文件
+	 * @param request
+	 *            请求信息
+	 * @return 返回上传结果信息
+	 */
+	@RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	public ResponseDo uploadFeedbackPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+		LOG.info("uploadFeedbackPhoto attach size: {}", attach.getSize());
+		try {
+			return service.uploadFeedbackPhoto(attach, request);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }
