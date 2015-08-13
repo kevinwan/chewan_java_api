@@ -21,19 +21,18 @@ public class PropertiesUtil {
 	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
 
 	/**
-	 * 存放配置文件的配置信息，配置文件名称为：third-party.config.properties
+	 * 存放配置文件的配置信息，配置文件名称为：carplay.config.properties
 	 */
-	private static Properties thirdConfig = loadThirdConfig();
+	private static Properties config = loadConfig();
 
 	/**
-	 * 添加第三方配置文件
+	 * 加载配置文件
 	 * 
 	 * @return 返回配置文件的属性集合
 	 */
-	private static Properties loadThirdConfig() {
+	private static Properties loadConfig() {
 		LOG.debug("Begin load config properties");
-		String fileName = PropertiesUtil.class.getClassLoader().getResource("conf/third-party.config.properties")
-				.getFile();
+		String fileName = PropertiesUtil.class.getClassLoader().getResource("conf/carplay.config.properties").getFile();
 		LOG.debug("Load config properties: {}", fileName);
 		return loadProperties(new File(fileName));
 	}
@@ -88,7 +87,7 @@ public class PropertiesUtil {
 	 * @return 返回属性值
 	 */
 	public static String getProperty(String propName, String defaultValue) {
-		return thirdConfig.getProperty(propName, defaultValue);
+		return config.getProperty(propName, defaultValue);
 	}
 
 	/**
@@ -101,7 +100,7 @@ public class PropertiesUtil {
 	 * @return 返回属性值
 	 */
 	public static int getProperty(String propName, int defaultValue) {
-		String prop = thirdConfig.getProperty(propName, String.valueOf(defaultValue));
+		String prop = config.getProperty(propName, String.valueOf(defaultValue));
 		int value = defaultValue;
 		try {
 			value = Integer.valueOf(prop);

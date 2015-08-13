@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
+import com.gongpingjia.carplay.dao.impl.TokenVerificationDaoImpl;
 import com.gongpingjia.carplay.po.TokenVerification;
 
 /**
@@ -22,10 +23,10 @@ public class ParameterCheck {
 
 	private static ParameterCheck instance = new ParameterCheck();
 
-	@Autowired
 	private TokenVerificationDao tokenDao;
 
 	private ParameterCheck() {
+		tokenDao = new TokenVerificationDaoImpl();
 	}
 
 	public static ParameterCheck getInstance() {
