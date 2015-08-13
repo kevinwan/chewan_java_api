@@ -54,7 +54,7 @@ public class UserInfoController {
 		return userService.register(user, code);
 	}
 	
-	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/login", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseDo loginUser(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "password") String password) {
@@ -64,17 +64,8 @@ public class UserInfoController {
 		User user = new User();
 		user.setPhone(phone);
 		user.setPassword(password);
-		user.setNickname(nickname);
-		user.setGender(gender);
-		user.setBirthyear(birthYear);
-		user.setBirthmonth(birthMonth);
-		user.setBirthday(birthDay);
-		user.setProvince(province);
-		user.setCity(city);
-		user.setDistrict(district);
-		user.setPhoto(photo);
 
-		return userService.register(user, code);
+		return userService.loginUser(user);
 	}
 	
 }
