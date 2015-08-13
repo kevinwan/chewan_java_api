@@ -19,10 +19,8 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
-import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
-import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.service.UploadService;
 
 @Service
@@ -37,7 +35,7 @@ public class UploadServiceImpl implements UploadService {
 	private TokenVerificationDao tokenDao;
 
 	@Override
-	public ResponseDo uploadAvatarPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
+	public ResponseDo uploadUserPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
 		LOG.debug("Begin upload file to server");
 
 		byte[] data = buildFileBytes(multiFile);
@@ -70,7 +68,7 @@ public class UploadServiceImpl implements UploadService {
 			dataMap.put("photoId", photoId);
 			return ResponseDo.buildSuccessResponse(dataMap);
 		} else {
-			LOG.error("Upload avatar resource failure, result: " + result);
+			LOG.error("Upload avatar resource failure, result: {}", result);
 			return ResponseDo.buildFailureResponse("未能成功上传");
 		}
 	}
@@ -127,27 +125,29 @@ public class UploadServiceImpl implements UploadService {
 	@Override
 	public ResponseDo uploadLicensePhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
 			throws ApiException {
-		LOG.debug("uploadLicensePhoto to server, userId:{0}", userId);
+		LOG.debug("uploadLicensePhoto to server, userId:{}", userId);
 
 		String token = request.getParameter("token");
-		if ((!CodeGenerator.isUUID(userId)) || (!CodeGenerator.isUUID(token))) {
-			LOG.error("userId or token is not correct format UUID string, userId:{0}, token:{1}", userId, token);
-			throw new ApiException("输入参数有误");
-		}
 
-		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
-		if (tokenVerify == null) {
-			LOG.error("No user token exist in the system, userId:{0}", userId);
-			throw new ApiException("用户不存在");
-		}
-
-		if (tokenVerify.getExpire() < DateUtil.getTime()) {
-			LOG.error("User token is out of date, userId:", userId);
-			throw new ApiException("口令已过期，请重新登录获取新口令");
-		}
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
 
 		byte[] data = buildFileBytes(multiFile);
 		String key = MessageFormat.format("asset/user/{0}/license.jpg", userId);
+
+		return uploadPhoto(data, userId, key);
+	}
+
+	@Override
+	public ResponseDo uploadCoverPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException {
+		LOG.debug("uploadCoverPhoto to server begin");
+		String userId = request.getParameter("userId");
+		String token = request.getParameter("token");
+
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		byte[] data = buildFileBytes(multiFile);
+
+		String coverUuid = CodeGenerator.generatorId();
+		String key = MessageFormat.format("asset/activity/cover/{0}/cover.jpg", coverUuid);
 
 		return uploadPhoto(data, userId, key);
 	}

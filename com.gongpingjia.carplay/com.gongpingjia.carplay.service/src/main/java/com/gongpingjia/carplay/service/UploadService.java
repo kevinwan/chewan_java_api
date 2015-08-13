@@ -10,7 +10,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 public interface UploadService {
 
 	/**
-	 * 上传图片资源
+	 * 上传用户图像资源
 	 * 
 	 * @param multiFile
 	 *            图片文件资源
@@ -20,7 +20,7 @@ public interface UploadService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	ResponseDo uploadAvatarPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
+	ResponseDo uploadUserPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
 
 	/**
 	 * 上传图片资源
@@ -37,4 +37,17 @@ public interface UploadService {
 	 */
 	ResponseDo uploadLicensePhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
 			throws ApiException;
+
+	/**
+	 * 上传活动图片资源文件
+	 * 
+	 * @param multiFile
+	 *            图片资源文件
+	 * @param request
+	 *            请求参数
+	 * @return 返回上传结果
+	 * @throws ApiException
+	 *             业务异常信息
+	 */
+	ResponseDo uploadCoverPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
 }

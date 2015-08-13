@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
- 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PropertiesUtil {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class); 
+	private static final Logger LOG = LoggerFactory.getLogger(PropertiesUtil.class);
 
 	/**
 	 * 存放配置文件的配置信息，配置文件名称为：third-party.config.properties
@@ -34,7 +34,7 @@ public class PropertiesUtil {
 		LOG.debug("Begin load config properties");
 		String fileName = PropertiesUtil.class.getClassLoader().getResource("conf/third-party.config.properties")
 				.getFile();
-		LOG.debug("Load config properties: " + fileName);
+		LOG.debug("Load config properties: {}", fileName);
 		return loadProperties(new File(fileName));
 	}
 
@@ -49,7 +49,7 @@ public class PropertiesUtil {
 		InputStream inStream = null;
 		InputStreamReader inReader = null;
 
-		LOG.info("Load properties file: " + propFile.getName());
+		LOG.info("Load properties file: {}", propFile.getName());
 		try {
 			inStream = new FileInputStream(propFile);
 			inReader = new InputStreamReader(inStream, "UTF-8");
@@ -106,7 +106,7 @@ public class PropertiesUtil {
 		try {
 			value = Integer.valueOf(prop);
 		} catch (NumberFormatException e) {
-			LOG.error("Parse config property failure, property name: " + propName, e);
+			LOG.error("Parse config property failure, property name: {}", propName, e);
 		}
 		return value;
 	}

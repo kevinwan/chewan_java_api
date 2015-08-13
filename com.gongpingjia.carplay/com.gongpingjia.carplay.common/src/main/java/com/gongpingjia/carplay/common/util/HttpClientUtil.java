@@ -36,8 +36,8 @@ public class HttpClientUtil {
 	 */
 	public static CloseableHttpResponse get(String httpUrl, Map<String, String> params, List<Header> headers,
 			String charSetName) {
-		LOG.debug("Request url:" + httpUrl);
-		LOG.debug("Request params:" + params);
+		LOG.debug("Request url:{}", httpUrl);
+		LOG.debug("Request params:{}", params);
 
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 

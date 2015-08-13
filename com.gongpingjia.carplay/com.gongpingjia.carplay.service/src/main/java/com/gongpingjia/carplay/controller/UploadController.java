@@ -30,11 +30,11 @@ public class UploadController {
 	 * @return 上传结果
 	 */
 	@RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadAvatarPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
-		LOG.info("uploadAvatarPhoto file size: " + attach.getSize());
+	public ResponseDo uploadUserPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+		LOG.info("uploadAvatarPhoto attach size: {}", attach.getSize());
 
 		try {
-			return service.uploadAvatarPhoto(attach, request);
+			return service.uploadUserPhoto(attach, request);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
@@ -50,10 +50,10 @@ public class UploadController {
 	 *            用户会话Token
 	 * @return 返回结果对象
 	 */
-	@RequestMapping(value = "/user/{userId}/license/upload", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/{userId}/license/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
 	public ResponseDo uploadLicensePhoto(@PathVariable(value = "userId") String userId,
 			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
-		LOG.info("uploadLicensePhoto file size: " + attach.getSize());
+		LOG.info("uploadLicensePhoto attach size: {}", attach.getSize());
 
 		try {
 			return service.uploadLicensePhoto(userId, attach, request);
@@ -62,4 +62,25 @@ public class UploadController {
 			return ResponseDo.buildFailureResponse("上传文件失败");
 		}
 	}
+
+	/**
+	 * 2.14 活动图片上传
+	 * 
+	 * @param attach
+	 *            图片资源文件
+	 * @param request
+	 *            请求参数
+	 * @return 返回上传结果
+	 */
+	@RequestMapping(value = "/activity/cover/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	public ResponseDo uploadCoverPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+		LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
+		try {
+			return service.uploadCoverPhoto(attach, request);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
 }
