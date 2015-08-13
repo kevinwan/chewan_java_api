@@ -16,6 +16,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.ToolsUtils;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
@@ -73,13 +74,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional 
-	public ResponseDo register(User user, String code) throws ApiException {
+	public ResponseDo register(User user, String code){
 		
 		//验证参数 
 	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !CodeGenerator.isUUID(user.getPhoto())) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
+	    user.setPhoto(Constants.Photo.PHOTO_HEAD + user.getPhoto() + Constants.Photo.PHOTO_END);
 	    
 	    //验证验证码
 	    PhoneVerification phoneVerification = phoneVerificationDao.selectByPrimaryKey(user.getPhone());
@@ -95,7 +97,14 @@ public class UserServiceImpl implements UserService {
 	    }
 	    
 	    //判断七牛上图片是否存在
-	    if (photoService.isExist(user.getPhoto())){
+	    Boolean isPhotoExist;
+		try {
+			isPhotoExist = photoService.isExist(user.getPhoto());
+		} catch (ApiException e) {
+			//抛出异常则认为图片不存在
+			isPhotoExist = false;
+		}
+	    if (isPhotoExist){
 	    	LOG.warn("photo Exist");
 	    	return ResponseDo.buildFailureResponse("注册图片已存在");
 	    }

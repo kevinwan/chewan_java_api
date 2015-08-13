@@ -42,5 +42,5 @@ public interface UserService {
 	 * @return
 	 * @throws ApiException 
 	 */
-	ResponseDo register(User user, String code) throws ApiException;
+	ResponseDo register(User user, String code);
 }

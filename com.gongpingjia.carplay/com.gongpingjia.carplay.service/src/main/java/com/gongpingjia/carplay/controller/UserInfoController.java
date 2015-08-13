@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.UserService;
 
@@ -52,10 +51,6 @@ public class UserInfoController {
 		user.setDistrict(district);
 		user.setPhoto(photo);
 
-		try {
-			return userService.register(user, code);
-		} catch (ApiException e) {
-			return ResponseDo.buildFailureResponse(e.getMessage());
-		}
+		return userService.register(user, code);
 	}
 }
