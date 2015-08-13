@@ -39,18 +39,18 @@ public class ParameterCheck {
 	public void checkUserInfo(String userId, String token) throws ApiException {
 
 		if ((!CodeGenerator.isUUID(userId)) || (!CodeGenerator.isUUID(token))) {
-			LOG.error("userId or token is not correct format UUID string, userId:{0}, token:{1}", userId, token);
+			LOG.error("userId or token is not correct format UUID string, userId:{}, token:{}", userId, token);
 			throw new ApiException("输入参数有误");
 		}
 
 		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
 		if (tokenVerify == null) {
-			LOG.error("No user token exist in the system, userId:{0}", userId);
+			LOG.error("No user token exist in the system, userId:{}", userId);
 			throw new ApiException("用户不存在");
 		}
 
 		if (tokenVerify.getExpire() < DateUtil.getTime()) {
-			LOG.error("User token is out of date, userId: {0}", userId);
+			LOG.error("User token is out of date, userId: {}", userId);
 			throw new ApiException("口令已过期，请重新登录获取新口令");
 		}
 	}

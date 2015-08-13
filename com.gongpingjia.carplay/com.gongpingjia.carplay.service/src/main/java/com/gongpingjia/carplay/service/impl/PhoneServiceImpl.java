@@ -90,7 +90,7 @@ public class PhoneServiceImpl implements PhoneService {
 
 		List<User> userList = getUserList(phone);
 		if (userList.size() > 0) {
-			LOG.error("User with phone number is already registed, phone: " + phone);
+			LOG.error("User with phone number is already registed, phone: {}", phone);
 			throw new ApiException("该用户已注册");
 		}
 
