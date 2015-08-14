@@ -1,8 +1,5 @@
 package com.gongpingjia.carplay.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import com.gongpingjia.carplay.po.Car;
 
 public interface CarDao {
@@ -14,5 +11,5 @@ public interface CarDao {
 
 	int updateByPrimaryKey(Car record);
 
-	List<Car> selectByParam(Map<String, Object> param);
+	public Car selectByUserId(String userId);
 }

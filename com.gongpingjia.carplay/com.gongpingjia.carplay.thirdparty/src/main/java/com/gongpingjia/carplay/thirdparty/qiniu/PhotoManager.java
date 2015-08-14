@@ -88,14 +88,14 @@ public class PhotoManager implements PhotoService {
 	}
 
 	@Override
-	public boolean isExist(String key) throws ApiException {
+	public boolean isExist(String key) {
 		AuthManager instance = AuthManager.getInstance();
 		FileInfo fileInfo = null;
 		try {
 			fileInfo = instance.getBucketManager().stat(instance.getBucket(), key);
 		} catch (QiniuException e) {
 			LOG.error(e.getMessage(), e);
-			throw new ApiException("查找文件失败");
+			// throw new ApiException("查找文件失败");
 		}
 		return fileInfo != null;
 	}

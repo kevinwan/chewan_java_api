@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
@@ -62,4 +62,77 @@ public class ParameterCheck {
 		}
 	}
 
+	/**
+	 * 检查参数是否为空，为空抛出异常
+	 * 
+	 * @param paramName
+	 *            参数名称，主要用于记录日志
+	 * @param paramValue
+	 *            参数值
+	 * @throws ApiException
+	 *             参数为空抛出业务异常
+	 */
+	public void checkParameterEmpty(String paramName, String paramValue) throws ApiException {
+		if (StringUtils.isEmpty(paramValue)) {
+			LOG.error("Parameter {} is empty", paramName);
+			throw new ApiException("输入参数有误");
+		}
+	}
+
+	/**
+	 * 检查参数是否为空，为空抛出异常
+	 * 
+	 * @param paramName
+	 *            参数名称，主要用于记录日志
+	 * @param paramValue
+	 *            参数值
+	 * @throws ApiException
+	 *             参数为空抛出业务异常
+	 */
+	public void checkParameterEmpty(String paramName, String[] paramValues) throws ApiException {
+		if (paramValues == null || paramValues.length == 0) {
+			LOG.error("Parameter {} is empty", paramName);
+			throw new ApiException("输入参数有误");
+		}
+	}
+
+	/**
+	 * 检查参数是否为Long类型
+	 * 
+	 * @param paramName
+	 *            参数名称
+	 * @param paramValue
+	 *            参数值
+	 * @throws ApiException
+	 *             业务异常信息,参数不为Long类型
+	 */
+	public void checkParameterLongType(String paramName, String paramValue) throws ApiException {
+		try {
+			Long.valueOf(paramValue);
+		} catch (NumberFormatException e) {
+			LOG.error("Paramter [{}={}] is not Long type", paramName, paramValue);
+			LOG.error(e.getMessage(), e);
+			throw new ApiException("输入参数有误");
+		}
+	}
+
+	/**
+	 * 检查参数是否为Integer类型
+	 * 
+	 * @param paramName
+	 *            参数名称
+	 * @param paramValue
+	 *            参数值
+	 * @throws ApiException
+	 *             业务异常信息,参数不为Long类型
+	 */
+	public void checkParameterIntegerType(String paramName, String paramValue) throws ApiException {
+		try {
+			Integer.valueOf(paramValue);
+		} catch (NumberFormatException e) {
+			LOG.error("Paramter [{}={}] is not Integer type", paramName, paramValue);
+			LOG.error(e.getMessage(), e);
+			throw new ApiException("输入参数有误");
+		}
+	}
 }
