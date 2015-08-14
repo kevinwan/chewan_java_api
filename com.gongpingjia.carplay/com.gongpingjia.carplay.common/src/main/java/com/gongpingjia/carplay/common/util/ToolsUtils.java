@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 public class ToolsUtils {
 	
@@ -18,11 +19,18 @@ public class ToolsUtils {
 	 */
 	public static Boolean isPhoneNumber(String phone) {
 		LOG.debug("isPhoneNumber phone :" + phone);
-		String regExp = "^[1]([3][0-9]{1}|59|58|88|89)[0-9]{8}$";  
-		Pattern p = Pattern.compile(regExp);  
+		if (StringUtils.isEmpty(phone)) {
+			LOG.error("phone number is empty");
+			return false;
+		}
 
-		Matcher m = p.matcher(phone);  
-		return m.find();//boolean
+		// 手机号必须为长度为11的数字字符串
+		if (!phone.matches("^[0-9]{11}$")) {
+			LOG.error("phone number is not a number sequence which length is 11");
+			return false;
+		}
+
+		return true;
 	}
 	
 	/**

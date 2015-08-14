@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.po.User;
 
 @Service
@@ -40,7 +39,6 @@ public interface UserService {
 	 * @param user
 	 * @param code
 	 * @return
-	 * @throws ApiException 
 	 */
 	ResponseDo register(User user, String code);
 	
@@ -51,4 +49,13 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo loginUser(User user);
+	
+	/**
+	 * 忘记密码
+	 * 
+	 * @param user
+	 * @param code
+	 * @return
+	 */
+	ResponseDo forgetPassword(User user, String code);
 }

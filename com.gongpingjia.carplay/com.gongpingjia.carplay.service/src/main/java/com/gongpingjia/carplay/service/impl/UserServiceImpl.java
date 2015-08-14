@@ -93,16 +93,9 @@ public class UserServiceImpl implements UserService {
 	    user.setPhoto(MessageFormat.format(Constants.USER_PHOTO_KEY, user.getPhoto()));
 	    
 	    //验证验证码
-	    PhoneVerification phoneVerification = phoneVerificationDao.selectByPrimaryKey(user.getPhone());
-	    if (null == phoneVerification){
-	    	LOG.warn("Cannot find code of this phone :" + user.getPhone());
-	    	return ResponseDo.buildFailureResponse("未能获取该手机的验证码");
-	    } else if (!code.equals(phoneVerification.getCode())){
-	    	LOG.warn("Code not correct,phone : " + user.getPhone() + ". error code :" + code);
-	    	return ResponseDo.buildFailureResponse("验证码错误");
-	    } else if (phoneVerification.getExpire() < new Date().getTime()/1000){
-	    	LOG.warn("Code expired");
-	    	return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
+	    ResponseDo failureResponse = checkPhoneVerification(user.getPhone(),code);
+	    if (null != failureResponse){
+	    	return failureResponse;
 	    }
 	    
 	    //判断七牛上图片是否存在
@@ -179,25 +172,12 @@ public class UserServiceImpl implements UserService {
 	    		data.put("isAuthenticated", userData.getIsauthenticated());
 	    		
 	    		//获取用户授权信息
-	    		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userData.getId());
-	    		if (null == tokenVerification){
-			    	LOG.warn("Fail to get token and expire info from token_verification");
-			    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+	    		ResponseDo tokenResponseDo = getUserToken(userData.getId());
+	    		if (1 == tokenResponseDo.getResult()){
+	    			return tokenResponseDo;
 	    		}
+	    		data.put("token", tokenResponseDo.getData());
 	    		
-	    		if (tokenVerification.getExpire() > DateUtil.getTime()){
-	    			data.put("token", tokenVerification.getToken());
-	    		} else {
-	    			//过期跟新Token
-	    			String uuid = CodeGenerator.generatorId();
-	    		    tokenVerification.setToken(uuid);
-	    		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
-	    			if (0 == tokenVerificationDao.updateByPrimaryKey(tokenVerification)){
-				    	LOG.warn("Fail to update new token and expire info");
-				    	return ResponseDo.buildFailureResponse("更新用户授权信息失败");
-	    			}
-	    			data.put("token", uuid);
-	    		}
     			//查询用户车辆信息
     			Car car = carDao.selectByUserId(userData.getId());
     			if (null != car){
@@ -214,5 +194,87 @@ public class UserServiceImpl implements UserService {
 	    }
 	    
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	@Override
+	public ResponseDo forgetPassword(User user, String code) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		//验证参数 
+	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) ) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //验证验证码
+	    ResponseDo failureResponse = checkPhoneVerification(user.getPhone(),code);
+	    if (null != failureResponse){
+	    	return failureResponse;
+	    }
+	    
+	    //查询用户注册信息
+	    Map<String, Object> param = new HashMap<String, Object>();
+	    param.put("phone", user.getPhone());
+	    List<User> users = userDao.selectByParam(param);
+	    if (null == users || users.size() < 1){
+	    	LOG.warn("Fail to find user");
+	    	return ResponseDo.buildFailureResponse("用户不存在");
+	    }
+	    
+	    //跟新密码
+	    User upUser = users.get(0);
+	    upUser.setPassword(user.getPassword());
+		if (0 == userDao.updateByPrimaryKey(upUser)){
+	    	LOG.warn("Fail to update password");
+	    	return ResponseDo.buildFailureResponse("更新密码失败");
+		}
+		
+		//获取用户授权信息
+		ResponseDo tokenResponseDo = getUserToken(upUser.getId());
+		if (1 == tokenResponseDo.getResult()){
+			return tokenResponseDo;
+		}
+		data.put("userId", upUser.getId());
+		data.put("token", tokenResponseDo.getData());
+	    
+		return ResponseDo.buildSuccessResponse(data);
+	}
+	
+	private ResponseDo checkPhoneVerification(String phone,String code){
+		
+	    //验证验证码
+	    PhoneVerification phoneVerification = phoneVerificationDao.selectByPrimaryKey(phone);
+	    if (null == phoneVerification){
+	    	LOG.warn("Cannot find code of this phone :" + phone);
+	    	return ResponseDo.buildFailureResponse("未能获取该手机的验证码");
+	    } else if (!code.equals(phoneVerification.getCode())){
+	    	LOG.warn("Code not correct,phone : " + phone + ". error code :" + code);
+	    	return ResponseDo.buildFailureResponse("验证码错误");
+	    } else if (phoneVerification.getExpire() < new Date().getTime()/1000){
+	    	LOG.warn("Code expired");
+	    	return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
+	    }
+	    return null;
+	}
+	
+	private ResponseDo getUserToken(String userId){
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		
+		//如果过期 跟新Token
+		if (tokenVerification.getExpire() > DateUtil.getTime()){
+			return ResponseDo.buildSuccessResponse(tokenVerification.getToken());
+		} else {
+			String uuid = CodeGenerator.generatorId();
+		    tokenVerification.setToken(uuid);
+		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
+			if (0 == tokenVerificationDao.updateByPrimaryKey(tokenVerification)){
+		    	LOG.warn("Fail to update new token and expire info");
+		    	return ResponseDo.buildFailureResponse("更新用户授权信息失败");
+			}
+			return ResponseDo.buildSuccessResponse(uuid);
+		}
 	}
 }

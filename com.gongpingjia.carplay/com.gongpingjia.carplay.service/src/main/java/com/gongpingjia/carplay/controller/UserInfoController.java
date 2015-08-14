@@ -68,4 +68,19 @@ public class UserInfoController {
 		return userService.loginUser(user);
 	}
 	
+	@RequestMapping(value = "/user/password", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseDo forgetPassword(@RequestParam(value = "phone") String phone,
+			@RequestParam(value = "code") String code,
+			@RequestParam(value = "password") String password) {
+
+		LOG.debug("forgetPassword is called, request parameter produce:");
+
+		User user = new User();
+		user.setPhone(phone);
+		user.setPassword(password);
+
+		return userService.forgetPassword(user, code);
+	}
+	
 }

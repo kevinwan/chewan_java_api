@@ -53,4 +53,22 @@ public class UserTest extends BaseTest {
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
+	
+	@Test
+	public void forgetPassword() throws Exception {
+		MvcResult result = mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/user/password")
+								.param("phone", "18951650021")
+								.param("password", "e10adc3949ba59abbe56e057f20f883e")
+								.param("code", "2302"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								"application/json;charset=UTF-8"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+		Assert.assertNull(result.getModelAndView());
+	}
 }
