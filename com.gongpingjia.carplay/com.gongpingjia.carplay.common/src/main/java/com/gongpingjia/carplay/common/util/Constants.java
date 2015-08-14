@@ -7,6 +7,12 @@ public class Constants {
 	 */
 	public static final int HTTP_STATUS_OK = 200;
 	
+	/**
+	 * 图片路径
+	 * 
+	 * @author Administrator
+	 *
+	 */
 	public interface Photo{
 		
 		/**
@@ -20,5 +26,14 @@ public class Constants {
 		public static final String PHOTO_END = "/avatar.jpg";
 		
 	}
+	
+	public interface Logo{
+		
+		/**
+		 * logo根目录
+		 */
+		public static final String LOGO_ROOT = "http://img.gongpingjia.com/img/logo/";
+	}
+	
 
 }

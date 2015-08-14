@@ -18,6 +18,7 @@ import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.ToolsUtils;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
 	    emchatAccount.setUserid(uuid);
 	    emchatAccount.setPassword(user.getPassword());
 	    emchatAccount.setRegistertime(DateUtil.getTime());
-	    emchatAccount.setUsername(user.getNickname());
+	    emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getNickname()));
 	    emchatAccountDao.insert(emchatAccount);
 	    
 	    UserAlbum userAlbum = new UserAlbum();
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService {
 	    			if (null != cars && cars.size() > 0){
 	    				Car car = cars.get(0);
 	    			    data.put("brand", car.getBrand());
-	    			    data.put("brandLogo", car.getBrandlogo());
+	    			    data.put("brandLogo", car.getBrandlogo() == null ? "" : Constants.Logo.LOGO_ROOT);
 	    			    data.put("model", car.getModel());
 	    			    data.put("seatNumber", car.getSeat());
 	    			}
