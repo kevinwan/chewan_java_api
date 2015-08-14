@@ -1,9 +1,6 @@
 package com.gongpingjia.carplay.common.util;
 
 import java.util.UUID;
-import java.util.regex.Pattern;
-
-import org.springframework.util.StringUtils;
 
 /**
  * 生成随机验证码和主键信息
@@ -12,12 +9,6 @@ import org.springframework.util.StringUtils;
  *
  */
 public class CodeGenerator {
-
-	/**
-	 * UUID的正则表达式匹配
-	 */
-	private static final Pattern UUID_PATTERN = Pattern.compile(
-			"^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * 生成数据表的主键，采用UUID生成
@@ -39,17 +30,4 @@ public class CodeGenerator {
 		return codeStr.substring(codeStr.length() - 4);
 	}
 
-	/**
-	 * 检查字符串是否为UUID生成字符串
-	 * 
-	 * @param uuid
-	 *            UUID字符串
-	 * @return 是UUID字符串返回true，否则返回false
-	 */
-	public static boolean isUUID(String uuid) {
-		if (StringUtils.isEmpty(uuid)) {
-			return false;
-		}
-		return UUID_PATTERN.matcher(uuid).matches();
-	}
 }

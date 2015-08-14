@@ -21,7 +21,7 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
-import com.gongpingjia.carplay.common.util.ToolsUtils;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
 import com.gongpingjia.carplay.dao.PhoneVerificationDao;
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		//验证参数 
-	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !CodeGenerator.isUUID(user.getPhoto())) {
+	    if (!CommonUtil.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !CommonUtil.isUUID(user.getPhoto())) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		//验证参数 
-	    if (!ToolsUtils.isPhoneNumber(user.getPhone())) {
+	    if (!CommonUtil.isPhoneNumber(user.getPhone())) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }

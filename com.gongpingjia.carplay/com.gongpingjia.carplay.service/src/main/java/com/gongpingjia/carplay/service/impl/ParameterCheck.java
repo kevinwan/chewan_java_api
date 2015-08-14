@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.impl.TokenVerificationDaoImpl;
@@ -45,7 +45,7 @@ public class ParameterCheck {
 	 */
 	public void checkUserInfo(String userId, String token) throws ApiException {
 
-		if ((!CodeGenerator.isUUID(userId)) || (!CodeGenerator.isUUID(token))) {
+		if ((!CommonUtil.isUUID(userId)) || (!CommonUtil.isUUID(token))) {
 			LOG.error("userId or token is not correct format UUID string, userId:{}, token:{}", userId, token);
 			throw new ApiException("输入参数有误");
 		}

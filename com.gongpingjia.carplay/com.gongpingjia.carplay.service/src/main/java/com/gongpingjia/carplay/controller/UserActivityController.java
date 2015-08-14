@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.service.UserActivityService;
 
 
@@ -82,7 +82,7 @@ public class UserActivityController {
 
 		LOG.info("=> getUserPost");
 		
-		if (!CodeGenerator.isUUID(userId1) || !CodeGenerator.isUUID(userId2) || !CodeGenerator.isUUID(token)) {
+		if (!CommonUtil.isUUID(userId1) || !CommonUtil.isUUID(userId2) || !CommonUtil.isUUID(token)) {
 			LOG.error("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}

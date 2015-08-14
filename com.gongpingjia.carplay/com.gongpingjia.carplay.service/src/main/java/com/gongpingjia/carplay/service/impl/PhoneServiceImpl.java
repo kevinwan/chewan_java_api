@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.HttpClientUtil;
@@ -43,7 +44,7 @@ public class PhoneServiceImpl implements PhoneService {
 	@Override
 	public ResponseDo sendVerification(String phone, int type) throws ApiException {
 
-		if (!isPhoneNumber(phone)) {
+		if (!CommonUtil.isPhoneNumber(phone)) {
 			LOG.error("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
 		}
@@ -79,7 +80,7 @@ public class PhoneServiceImpl implements PhoneService {
 
 	@Override
 	public ResponseDo verify(String phone, String code) throws ApiException {
-		if (!isPhoneNumber(phone)) {
+		if (!CommonUtil.isPhoneNumber(phone)) {
 			LOG.error("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
 		}
@@ -184,19 +185,6 @@ public class PhoneServiceImpl implements PhoneService {
 		}
 	}
 
-	private boolean isPhoneNumber(String phone) {
-		if (StringUtils.isEmpty(phone)) {
-			LOG.error("phone number is empty");
-			return false;
-		}
 
-		// 手机号必须为长度为11的数字字符串
-		if (!phone.matches("^[0-9]{11}$")) {
-			LOG.error("phone number is not a number sequence which length is 11");
-			return false;
-		}
-
-		return true;
-	}
 
 }
