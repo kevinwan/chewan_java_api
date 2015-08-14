@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.gongpingjia.carplay.po.ActivityCover;
 
@@ -14,5 +15,7 @@ public interface ActivityCoverDao {
 	ActivityCover selectByPrimaryKey(String id);
 
 	int updateByPrimaryKey(ActivityCover record);
+
+	List<Map<String, String>> selectByActivity(Map<String, Object> param);
 
 }

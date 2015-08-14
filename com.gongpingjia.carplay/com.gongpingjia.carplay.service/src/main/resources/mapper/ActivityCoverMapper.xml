@@ -14,6 +14,12 @@
 		from activity_cover
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
+	
+	<select id="selectByActivity" resultType="java.util.Map" parameterType="java.util.Map">
+		select concat(#{AssetUrl}, url ,#{thumbnails}) as thumbnail_pic from
+		activity_cover where activityId=#{activityId}
+		order by uploadTime 	
+	</select>
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from activity_cover

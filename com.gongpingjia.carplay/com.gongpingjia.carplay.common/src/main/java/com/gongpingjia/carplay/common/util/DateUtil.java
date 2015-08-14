@@ -15,6 +15,15 @@ public class DateUtil {
 	}
 
 	/**
+	 * 获取当前时间
+	 * @param 当前毫秒数
+	 * @return 返回当前时间
+	 */
+	public static Date getDate(Long s) {
+		return new Date(s);
+	}
+	
+	/**
 	 * 获取当前时间毫秒数
 	 * 
 	 * @return 返回当前时间毫秒数
