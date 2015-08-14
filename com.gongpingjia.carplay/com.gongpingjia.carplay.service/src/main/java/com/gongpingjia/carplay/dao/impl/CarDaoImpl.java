@@ -1,8 +1,5 @@
 package com.gongpingjia.carplay.dao.impl;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
@@ -33,8 +30,8 @@ public class CarDaoImpl implements CarDao {
 	}
 
 	@Override
-	public List<Car> selectByParam(Map<String, Object> param) {
-		return DASUtil.selectList(Car.class.getName(), "selectByParam", param);
+	public Car selectByUserId(String userId) {
+		return DASUtil.selectOne(Car.class.getName(), "selectByUserId", userId);
 	}
 
 }

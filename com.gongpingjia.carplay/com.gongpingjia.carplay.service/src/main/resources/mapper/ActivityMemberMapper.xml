@@ -20,6 +20,19 @@
 		where userId = #{userid,jdbcType=VARCHAR}
 		and activityId = #{activityid,jdbcType=VARCHAR}
 	</delete>
+	
+	<delete id="deleteByParam" parameterType="com.gongpingjia.carplay.po.ActivityMemberKey">
+		delete from activity_member
+		where
+		<where>
+			<if test="userId != null">
+				and userId = #{userid,jdbcType=VARCHAR}
+			</if>
+			<if test="activityId != null">
+				and activityId = #{activityid,jdbcType=VARCHAR}
+			</if>
+		</where> 
+	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityMember">
 		insert into activity_member (userId, activityId, joinTime

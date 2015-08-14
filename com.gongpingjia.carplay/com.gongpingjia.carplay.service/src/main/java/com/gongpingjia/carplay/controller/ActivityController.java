@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,24 @@ public class ActivityController {
 
 		try {
 			return activityService.getAvailableSeats(userId, token);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.15 创建活动
+	 * 
+	 * @param request
+	 *            请求
+	 * @return 返回响应结果对象
+	 */
+	@RequestMapping(value = "/activity/register", method = RequestMethod.POST)
+	public ResponseDo registerActivity(HttpServletRequest request) {
+		LOG.info("registerActivity begin");
+		try {
+			return activityService.registerActivity(request);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

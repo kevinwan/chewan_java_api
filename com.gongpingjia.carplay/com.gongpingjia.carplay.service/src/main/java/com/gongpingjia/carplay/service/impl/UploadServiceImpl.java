@@ -20,6 +20,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.AlbumPhotoDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
@@ -63,7 +64,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 
 		String id = CodeGenerator.generatorId();
-		String key = MessageFormat.format("asset/user/{0}/avatar.jpg", id);
+		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, id);
 
 		return uploadPhoto(data, id, key);
 	}
@@ -154,7 +155,7 @@ public class UploadServiceImpl implements UploadService {
 		ParameterCheck.getInstance().checkUserInfo(userId, token);
 
 		byte[] data = buildFileBytes(multiFile);
-		String key = MessageFormat.format("asset/user/{0}/license.jpg", userId);
+		String key = MessageFormat.format(Constants.LICENSE_PHOTO_KEY, userId);
 
 		return uploadPhoto(data, userId, key);
 	}
@@ -169,7 +170,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 
 		String coverUuid = CodeGenerator.generatorId();
-		String key = MessageFormat.format("asset/activity/cover/{0}/cover.jpg", coverUuid);
+		String key = MessageFormat.format(Constants.COVER_PHOTO_KEY, coverUuid);
 
 		return uploadPhoto(data, coverUuid, key);
 	}
@@ -203,7 +204,7 @@ public class UploadServiceImpl implements UploadService {
 		// 3.上传个人相册图片
 		byte[] data = buildFileBytes(multiFile);
 		String photoId = CodeGenerator.generatorId();
-		String key = MessageFormat.format("asset/user/{0}/album/{1}.jpg", userId, photoId);
+		String key = MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId, photoId);
 		return uploadPhoto(data, photoId, key);
 	}
 
@@ -212,8 +213,8 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		String photoId = CodeGenerator.generatorId();
 		LOG.debug("begin upload feedback photo , photoId:{}", photoId);
-		
-		String key = MessageFormat.format("asset/feedback/{0}.jpg", photoId);
+
+		String key = MessageFormat.format(Constants.FEEDBACK_PHOTO_KEY, photoId);
 		return uploadPhoto(data, photoId, key);
 	}
 }
