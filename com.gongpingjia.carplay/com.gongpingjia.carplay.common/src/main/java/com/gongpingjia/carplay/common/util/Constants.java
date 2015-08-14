@@ -12,7 +12,7 @@ public class Constants {
 	 * HTTP请求响应200
 	 */
 	public static final int HTTP_STATUS_OK = 200;
-	
+
 	/**
 	 * 用户图像上传的Key值
 	 */
@@ -37,4 +37,9 @@ public class Constants {
 	 * 用户反馈图片Key值
 	 */
 	public static final String FEEDBACK_PHOTO_KEY = "asset/feedback/{0}.jpg";
+
+	/**
+	 * 活动分享格式
+	 */
+	public static final String ACTIVITY_SHARE_DATE_FORMAT = "MM月dd日";
 }

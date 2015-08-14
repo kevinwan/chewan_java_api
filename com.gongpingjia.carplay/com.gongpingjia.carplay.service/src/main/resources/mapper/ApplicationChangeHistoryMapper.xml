@@ -19,13 +19,11 @@
 	</select>
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from application_change_history
-		where id =
-		#{id,jdbcType=VARCHAR}
+		where id =	#{id,jdbcType=VARCHAR}
 	</delete>
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ApplicationChangeHistory">
 		insert into application_change_history (id, applicationId, status,
-		remark,
-		timestamp)
+		remark,	timestamp)
 		values (#{id,jdbcType=VARCHAR}, #{applicationid,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
 		#{remark,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
 	</insert>

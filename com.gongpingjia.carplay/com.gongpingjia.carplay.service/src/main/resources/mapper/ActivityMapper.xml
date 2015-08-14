@@ -15,7 +15,7 @@
 		<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
 		<result column="start" property="start" jdbcType="BIGINT" />
 		<result column="end" property="end" jdbcType="BIGINT" />
-    		<result column="endTime" property="endtime" jdbcType="BIGINT" />
+    	<result column="endTime" property="endtime" jdbcType="BIGINT" />
 		<result column="location" property="location" jdbcType="VARCHAR" />
 		<result column="longitude" property="longitude" jdbcType="DOUBLE" />
 		<result column="latitude" property="latitude" jdbcType="DOUBLE" />
@@ -35,8 +35,7 @@
 		paymentType, initialSeat, createTime,
 		lastModifiedTime, extraServiceId, invalid
 		from activity
-		where id =
-		#{id,jdbcType=VARCHAR}
+		where id =	#{id,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="selectByOrganizer" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
@@ -84,20 +83,17 @@
 		photo = #{photo,jdbcType=VARCHAR},
 		type = #{type,jdbcType=VARCHAR},
 		province = #{province,jdbcType=VARCHAR},
-		city =
-		#{city,jdbcType=VARCHAR},
+		city = #{city,jdbcType=VARCHAR},
 		district = #{district,jdbcType=VARCHAR},
 		address = #{address,jdbcType=VARCHAR},
-		title =
-		#{title,jdbcType=VARCHAR},
+		title =	#{title,jdbcType=VARCHAR},
 		description = #{description,jdbcType=VARCHAR},
 		extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		start = #{start,jdbcType=BIGINT},
 		end = #{end,jdbcType=BIGINT},
-      		endTime = #{endtime,jdbcType=BIGINT},
+      	endTime = #{endtime,jdbcType=BIGINT},
 		location = #{location,jdbcType=VARCHAR},
-		longitude =
-		#{longitude,jdbcType=DOUBLE},
+		longitude =	#{longitude,jdbcType=DOUBLE},
 		latitude = #{latitude,jdbcType=DOUBLE},
 		paymentType = #{paymenttype,jdbcType=VARCHAR},
 		initialSeat = #{initialseat,jdbcType=INTEGER},
@@ -105,8 +101,7 @@
 		lastModifiedTime =
 		#{lastmodifiedtime,jdbcType=BIGINT},
 		extraServiceId = #{extraserviceid,jdbcType=VARCHAR},
-		invalid =
-		#{invalid,jdbcType=VARCHAR}
+		invalid = #{invalid,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
 </mapper>

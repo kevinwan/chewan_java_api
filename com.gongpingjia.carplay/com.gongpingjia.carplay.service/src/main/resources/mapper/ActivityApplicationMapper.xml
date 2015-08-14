@@ -27,14 +27,9 @@
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityApplication">
 		insert into
 		activity_application (id, activityId, userId,
-		status, seat,
-		createTime
-		)
-		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR},
-		#{userid,jdbcType=VARCHAR},
-		#{status,jdbcType=VARCHAR},
-		#{seat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT}
-		)
+		status, seat, createTime)
+		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR},	#{userid,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR},	#{seat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityApplication">
