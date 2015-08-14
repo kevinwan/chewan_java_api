@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class ActivityDaoImpl implements ActivityDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> selectByOrganizer(Map<String, Object> param) {
+	public List<LinkedHashMap<String, Object>> selectByOrganizer(Map<String, Object> param) {
 		return DASUtil.selectList(Activity.class.getName(), "selectByOrganizer", param);
 	}
 

@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class ActivityCoverDaoImpl implements ActivityCoverDao {
 	}
 
 	@Override
-	public List<Map<String, String>> selectByActivity(Map<String, Object> param) {
+	public List<LinkedHashMap<String, String>> selectByActivity(Map<String, Object> param) {
 		return DASUtil.selectList(ActivityCover.class.getName(),"selectByActivity", param);
 	}
 

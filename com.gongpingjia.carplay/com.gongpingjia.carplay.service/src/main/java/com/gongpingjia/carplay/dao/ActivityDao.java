@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.dao;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,5 +15,5 @@ public interface ActivityDao {
 
 	int updateByPrimaryKey(Activity record);
 
-	List<Map<String, Object>> selectByOrganizer(Map<String, Object> param);
+	List<LinkedHashMap<String, Object>> selectByOrganizer(Map<String, Object> param);
 }
