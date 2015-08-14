@@ -1,10 +1,13 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import org.springframework.stereotype.Service;
+
 import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
 import com.gongpingjia.carplay.po.ActivityMember;
 import com.gongpingjia.carplay.po.ActivityMemberKey;
 
+@Service
 public class ActivityMemberDaoImpl implements ActivityMemberDao {
 
 	@Override
