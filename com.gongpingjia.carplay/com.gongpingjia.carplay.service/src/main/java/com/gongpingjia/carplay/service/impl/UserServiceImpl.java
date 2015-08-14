@@ -197,17 +197,16 @@ public class UserServiceImpl implements UserService {
 				    	return ResponseDo.buildFailureResponse("更新用户授权信息失败");
 	    			}
 	    			data.put("token", uuid);
-	    			
-	    			//查询用户车辆信息
-	    			Car car = carDao.selectByUserId(userData.getId());
-	    			if (null != car){
-	    			    data.put("brand", car.getBrand());
-	    			    data.put("brandLogo", 
-	    			    		car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + car.getBrandlogo());
-	    			    data.put("model", car.getModel());
-	    			    data.put("seatNumber", car.getSeat());
-	    			}
 	    		}
+    			//查询用户车辆信息
+    			Car car = carDao.selectByUserId(userData.getId());
+    			if (null != car){
+    			    data.put("brand", car.getBrand());
+    			    data.put("brandLogo", 
+    			    		car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + car.getBrandlogo());
+    			    data.put("model", car.getModel());
+    			    data.put("seatNumber", car.getSeat());
+    			}
 	    	}
 	    } else {
 	    	LOG.warn("Fail to find user");

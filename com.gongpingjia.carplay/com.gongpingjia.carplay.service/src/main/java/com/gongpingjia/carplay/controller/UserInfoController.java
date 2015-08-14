@@ -59,7 +59,7 @@ public class UserInfoController {
 	public ResponseDo loginUser(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "password") String password) {
 
-		LOG.debug("register is called, request parameter produce:");
+		LOG.debug("login is called, request parameter produce:");
 
 		User user = new User();
 		user.setPhone(phone);
