@@ -15,8 +15,8 @@
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
 	
-	<select id="selectByActivity" resultType="java.util.Map" parameterType="java.util.Map">
-		select concat(#{AssetUrl}, url ,#{thumbnails}) as thumbnail_pic from
+	<select id="selectByActivity" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select concat(#{AssetUrl}, url) as original_pic from
 		activity_cover where activityId=#{activityId}
 		order by uploadTime 	
 	</select>

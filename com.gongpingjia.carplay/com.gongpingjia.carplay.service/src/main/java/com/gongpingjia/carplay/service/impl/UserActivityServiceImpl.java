@@ -64,7 +64,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			map.put("pay",activity.get("pay"));
 			
 			map.put("publishDate",new SimpleDateFormat("MM.dd").format(DateUtil.getDate((Long)activity.get("publishTime"))));
-			map.put("startDate",new SimpleDateFormat("MM月dd日").format( DateUtil.getDate((Long)activity.get("start"))));
+			map.put("startDate",(Long)activity.get("start"));
 			
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
@@ -75,9 +75,15 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", IMGUrl);
-			param.put("thumbnails", "?imageView2/1/w/200");
-			List<Map<String,String>> coverList=coverDao.selectByActivity(param);
-			map.put("cover",coverList);
+			List<LinkedHashMap<String,String>> coverList=coverDao.selectByActivity(param);
+			
+			List<LinkedHashMap<String,String>> coverAllList=new ArrayList<>();
+			for(LinkedHashMap<String,String> cover:coverList){
+				cover.put("original_pic", cover.get("original_pic"));
+				cover.put("thumbnail_pic", cover.get("original_pic")+"?imageView2/1/w/200");
+				coverAllList.add(cover);
+			}
+			map.put("cover",coverAllList);
 			
 			activityMapList.add(map);
 		}
