@@ -14,35 +14,6 @@ public class Constants {
 	public static final int HTTP_STATUS_OK = 200;
 	
 	/**
-	 * 图片路径
-	 * 
-	 * @author Administrator
-	 *
-	 */
-	public interface Photo{
-		
-		/**
-		 * 拼接图片路径前段
-		 */
-		public static final String PHOTO_HEAD = "asset/user/";
-		
-		/**
-		 * 拼接图片路径后端
-		 */
-		public static final String PHOTO_END = "/avatar.jpg";
-		
-	}
-	
-	public interface Logo{
-		
-		/**
-		 * logo根目录
-		 */
-		public static final String LOGO_ROOT = "http://img.gongpingjia.com/img/logo/";
-	}
-	
-
-	/**
 	 * 用户图像上传的Key值
 	 */
 	public static final String USER_PHOTO_KEY = "asset/user/{0}/avatar.jpg";

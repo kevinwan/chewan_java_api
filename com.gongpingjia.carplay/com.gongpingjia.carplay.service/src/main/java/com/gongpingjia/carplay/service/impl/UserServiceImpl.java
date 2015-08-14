@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.service.impl;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.ToolsUtils;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
-	    user.setPhoto(Constants.Photo.PHOTO_HEAD + user.getPhoto() + Constants.Photo.PHOTO_END);
+	    user.setPhoto(MessageFormat.format(Constants.USER_PHOTO_KEY, user.getPhoto()));
 	    
 	    //验证验证码
 	    PhoneVerification phoneVerification = phoneVerificationDao.selectByPrimaryKey(user.getPhone());
@@ -197,13 +199,11 @@ public class UserServiceImpl implements UserService {
 	    			data.put("token", uuid);
 	    			
 	    			//查询用户车辆信息
-	    			Map<String, Object> carParam = new HashMap<String, Object>();
-	    			carParam.put("userId", userData.getId());
-	    			List<Car> cars = carDao.selectByParam(carParam);
-	    			if (null != cars && cars.size() > 0){
-	    				Car car = cars.get(0);
+	    			Car car = carDao.selectByUserId(userData.getId());
+	    			if (null != car){
 	    			    data.put("brand", car.getBrand());
-	    			    data.put("brandLogo", car.getBrandlogo() == null ? "" : Constants.Logo.LOGO_ROOT);
+	    			    data.put("brandLogo", 
+	    			    		car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + car.getBrandlogo());
 	    			    data.put("model", car.getModel());
 	    			    data.put("seatNumber", car.getSeat());
 	    			}
