@@ -9,6 +9,8 @@ public class EmchatAccount {
 
     private Long registertime;
 
+    private Long activatetime;
+
     public String getUserid() {
         return userid;
     }
@@ -39,5 +41,13 @@ public class EmchatAccount {
 
     public void setRegistertime(Long registertime) {
         this.registertime = registertime;
+    }
+
+    public Long getActivatetime() {
+        return activatetime;
+    }
+
+    public void setActivatetime(Long activatetime) {
+        this.activatetime = activatetime;
     }
 }

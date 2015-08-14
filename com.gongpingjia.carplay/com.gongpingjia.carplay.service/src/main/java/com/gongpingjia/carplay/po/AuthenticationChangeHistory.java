@@ -1,6 +1,6 @@
 package com.gongpingjia.carplay.po;
 
-public class AuthenticationAhangeHistory {
+public class AuthenticationChangeHistory {
     private String id;
 
     private String applicationid;

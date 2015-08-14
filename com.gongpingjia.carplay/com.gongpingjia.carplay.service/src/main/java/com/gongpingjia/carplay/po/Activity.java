@@ -27,6 +27,8 @@ public class Activity {
 
     private Long end;
 
+    private Long endtime;
+
     private String location;
 
     private Double longitude;
@@ -147,6 +149,14 @@ public class Activity {
 
     public void setEnd(Long end) {
         this.end = end;
+    }
+
+    public Long getEndtime() {
+        return endtime;
+    }
+
+    public void setEndtime(Long endtime) {
+        this.endtime = endtime;
     }
 
     public String getLocation() {

@@ -26,11 +26,13 @@ import com.gongpingjia.carplay.dao.ActivityCoverDao;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
 import com.gongpingjia.carplay.dao.CarDao;
+import com.gongpingjia.carplay.dao.SeatReservationDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
 import com.gongpingjia.carplay.po.Car;
+import com.gongpingjia.carplay.po.SeatReservation;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.ActivityService;
 
@@ -56,6 +58,9 @@ public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
 	private ActivityMemberDao memberDao;
+
+	@Autowired
+	private SeatReservationDao seatReservDao;
 
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
@@ -115,31 +120,56 @@ public class ActivityServiceImpl implements ActivityService {
 		checkActivitySeat(request, userId);
 
 		String activityId = CodeGenerator.generatorId();
-		saveActivity(request, activityId);
+		Activity activity = saveActivity(request, activityId);
 
 		saveActivityCovers(request, activityId);
 
 		saveActivityMember(userId, activityId);
 
-		// seat_reservation
-		
-		
-		
-		LOG.debug("Save activity reservation");
+		saveSeatReservation(userId, activityId, activity.getInitialseat());
 
 		return null;
 	}
 
-	private void saveActivityMember(String userId, String activityId) {
+	/**
+	 * 保存座位预定信息
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param activityId
+	 *            活动ID
+	 * @param activity
+	 * @return
+	 */
+	private int saveSeatReservation(String userId, String activityId, int seat) {
+		LOG.debug("Save activity seat reservation");
+		List<SeatReservation> reservationList = new ArrayList<SeatReservation>();
+		Car car = carDao.selectByUserId(userId);
+		for (int i = 0; i < seat; i++) {
+			SeatReservation seatReserve = new SeatReservation();
+			seatReserve.setActivityid(activityId);
+			seatReserve.setUserid(userId);
+			seatReserve.setCarid((car != null) ? car.getId() : null);
+			seatReserve.setCreatetime(DateUtil.getTime());
+			seatReserve.setId(CodeGenerator.generatorId());
+			seatReserve.setSeatindex(i);
+			reservationList.add(seatReserve);
+		}
+		return seatReservDao.insert(reservationList);
+	}
+
+	private ActivityMember saveActivityMember(String userId, String activityId) {
 		LOG.debug("Save activity member");
 		ActivityMember member = new ActivityMember();
 		member.setActivityid(activityId);
 		member.setUserid(userId);
 		member.setJointime(DateUtil.getTime());
 		memberDao.insert(member);
+
+		return member;
 	}
 
-	private void saveActivityCovers(HttpServletRequest request, String activityId) {
+	private List<ActivityCover> saveActivityCovers(HttpServletRequest request, String activityId) {
 		String[] covers = request.getParameterValues("cover");
 		List<ActivityCover> activityCovers = new ArrayList<ActivityCover>();
 		for (String coverId : covers) {
@@ -150,6 +180,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activityCovers.add(activityCover);
 		}
 		coverDao.insert(activityCovers);
+		return activityCovers;
 	}
 
 	/**
@@ -244,7 +275,7 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @param activityId
 	 * @return 返回活动对象
 	 */
-	private void saveActivity(HttpServletRequest request, String activityId) {
+	private Activity saveActivity(HttpServletRequest request, String activityId) {
 		LOG.debug("Build activity by request parameters");
 		Activity activity = new Activity();
 		activity.setId(activityId);
@@ -293,6 +324,8 @@ public class ActivityServiceImpl implements ActivityService {
 
 		LOG.debug("Save activity");
 		activityDao.insert(activity);
+
+		return activity;
 	}
 
 }

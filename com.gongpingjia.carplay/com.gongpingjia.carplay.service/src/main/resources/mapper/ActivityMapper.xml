@@ -15,6 +15,7 @@
 		<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
 		<result column="start" property="start" jdbcType="BIGINT" />
 		<result column="end" property="end" jdbcType="BIGINT" />
+    		<result column="endTime" property="endtime" jdbcType="BIGINT" />
 		<result column="location" property="location" jdbcType="VARCHAR" />
 		<result column="longitude" property="longitude" jdbcType="DOUBLE" />
 		<result column="latitude" property="latitude" jdbcType="DOUBLE" />
@@ -30,12 +31,20 @@
 		select
 		id, organizer, photo, type,
 		province, city, district, address, title, description,
-		extraInfo, start, end, location, longitude, latitude,
+		extraInfo, start, end, endTime, location, longitude, latitude,
 		paymentType, initialSeat, createTime,
 		lastModifiedTime, extraServiceId, invalid
 		from activity
 		where id =
 		#{id,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectByOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
+		select
+		id as activityId, createTime as publishTime, ifnull(start, 0) as start,
+		ifnull(description, "") as introduction, location, paymentType as pay
+		from activity where organizer = #{organizer,jdbcType=VARCHAR}
+		order by publishTime desc limit #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}	
 	</select>
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
@@ -49,7 +58,7 @@
 		district,
 		address, title,
 		description, extraInfo, start,
-		end, location, longitude,
+		end, endTime, location, longitude,
 		latitude, paymentType, initialSeat,
 		createTime,
 		lastModifiedTime, extraServiceId,
@@ -60,7 +69,7 @@
 		#{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
 		#{description,jdbcType=VARCHAR},
 		#{extrainfo,jdbcType=VARCHAR}, #{start,jdbcType=BIGINT},
-		#{end,jdbcType=BIGINT}, #{location,jdbcType=VARCHAR},
+		#{end,jdbcType=BIGINT}, #{endtime,jdbcType=BIGINT}, #{location,jdbcType=VARCHAR},
 		#{longitude,jdbcType=DOUBLE},
 		#{latitude,jdbcType=DOUBLE}, #{paymenttype,jdbcType=VARCHAR},
 		#{initialseat,jdbcType=INTEGER},
@@ -85,6 +94,7 @@
 		extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		start = #{start,jdbcType=BIGINT},
 		end = #{end,jdbcType=BIGINT},
+      		endTime = #{endtime,jdbcType=BIGINT},
 		location = #{location,jdbcType=VARCHAR},
 		longitude =
 		#{longitude,jdbcType=DOUBLE},

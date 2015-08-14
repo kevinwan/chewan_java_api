@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.dao.EmchatTokenMapper" >
+  <resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.EmchatToken" >
+    <id column="application" property="application" jdbcType="VARCHAR" />
+    <result column="token" property="token" jdbcType="VARCHAR" />
+    <result column="expire" property="expire" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    application, token, expire
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from emchat_token
+    where application = #{application,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from emchat_token
+    where application = #{application,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.gongpingjia.carplay.po.EmchatToken" >
+    insert into emchat_token (application, token, expire
+      )
+    values (#{application,jdbcType=VARCHAR}, #{token,jdbcType=VARCHAR}, #{expire,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.gongpingjia.carplay.po.EmchatToken" >
+    insert into emchat_token
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="application != null" >
+        application,
+      </if>
+      <if test="token != null" >
+        token,
+      </if>
+      <if test="expire != null" >
+        expire,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="application != null" >
+        #{application,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null" >
+        #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="expire != null" >
+        #{expire,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gongpingjia.carplay.po.EmchatToken" >
+    update emchat_token
+    <set >
+      <if test="token != null" >
+        token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="expire != null" >
+        expire = #{expire,jdbcType=BIGINT},
+      </if>
+    </set>
+    where application = #{application,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.EmchatToken" >
+    update emchat_token
+    set token = #{token,jdbcType=VARCHAR},
+      expire = #{expire,jdbcType=BIGINT}
+    where application = #{application,jdbcType=VARCHAR}
+  </update>
+</mapper>

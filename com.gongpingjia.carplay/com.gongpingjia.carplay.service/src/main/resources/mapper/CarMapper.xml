@@ -7,7 +7,7 @@
 		<result column="brand" property="brand" jdbcType="VARCHAR" />
 		<result column="brandLogo" property="brandlogo" jdbcType="VARCHAR" />
 		<result column="model" property="model" jdbcType="VARCHAR" />
-		<result column="price" property="price" jdbcType="BIGINT" />
+    		<result column="price" property="price" jdbcType="DOUBLE" />
 		<result column="color" property="color" jdbcType="VARCHAR" />
 		<result column="seat" property="seat" jdbcType="INTEGER" />
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
@@ -31,7 +31,7 @@
 		color, seat, invalid
 		)
 		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR},
-		#{brandlogo,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{price,jdbcType=BIGINT},
+      		#{brandlogo,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, 
 		#{color,jdbcType=VARCHAR}, #{seat,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR}
 		)
 	</insert>
@@ -42,7 +42,7 @@
 		brand = #{brand,jdbcType=VARCHAR},
 		brandLogo = #{brandlogo,jdbcType=VARCHAR},
 		model = #{model,jdbcType=VARCHAR},
-		price = #{price,jdbcType=BIGINT},
+      		price = #{price,jdbcType=DOUBLE},
 		color = #{color,jdbcType=VARCHAR},
 		seat = #{seat,jdbcType=INTEGER},
 		invalid = #{invalid,jdbcType=VARCHAR}

@@ -7,7 +7,7 @@ public class ActivityInvitation {
 
     private String channel;
 
-    private String invitationcode;
+    private String phone;
 
     private Long timestamp;
 
@@ -35,12 +35,12 @@ public class ActivityInvitation {
         this.channel = channel;
     }
 
-    public String getInvitationcode() {
-        return invitationcode;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setInvitationcode(String invitationcode) {
-        this.invitationcode = invitationcode;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Long getTimestamp() {

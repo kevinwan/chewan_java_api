@@ -9,6 +9,7 @@
 		<result column="brandLogo" property="brandlogo" jdbcType="VARCHAR" />
 		<result column="model" property="model" jdbcType="VARCHAR" />
 		<result column="slug" property="slug" jdbcType="VARCHAR" />
+    		<result column="price" property="price" jdbcType="DOUBLE" />
 		<result column="status" property="status" jdbcType="VARCHAR" />
 		<result column="createTime" property="createtime" jdbcType="BIGINT" />
 	</resultMap>
@@ -16,7 +17,7 @@
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
 		id, userId, drivingExperience,
-		brand, brandLogo, model, slug, status, createTime
+		brand, brandLogo, model, slug, price, status, createTime
 		from authentication_application
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -37,7 +38,7 @@
 		#{drivingexperience,jdbcType=INTEGER},
 		#{brand,jdbcType=VARCHAR}, #{brandlogo,jdbcType=VARCHAR},
 		#{model,jdbcType=VARCHAR},
-		#{slug,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT}
+		#{slug,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, #{status,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT}
 		)
 	</insert>
 
@@ -53,6 +54,7 @@
 		model = #{model,jdbcType=VARCHAR},
 		slug =
 		#{slug,jdbcType=VARCHAR},
+ 		price = #{price,jdbcType=DOUBLE},
 		status = #{status,jdbcType=VARCHAR},
 		createTime = #{createtime,jdbcType=BIGINT}
 		where id =
