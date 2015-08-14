@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
 
 @Service
@@ -58,4 +59,13 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo forgetPassword(User user, String code);
+	
+	/**
+	 * 车主认证
+	 * 
+	 * @param authenticationApplication
+	 * @return
+	 */
+	ResponseDo applyAuthentication(AuthenticationApplication authenticationApplication,String token,String userId);
+	
 }

@@ -32,7 +32,7 @@
 		insert into authentication_application (id, userId, drivingExperience,
 		brand,
 		brandLogo, model,
-		slug, status, createTime
+		slug, price,status, createTime
 		)
 		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
 		#{drivingexperience,jdbcType=INTEGER},
@@ -60,4 +60,18 @@
 		where id =
 		#{id,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		id, userId, drivingExperience,
+		brand, brandLogo, model, slug, price, status, createTime
+		from authentication_application
+		where 1 = 1
+		<if test="id != null">
+        	and id = #{id,jdbcType=VARCHAR}
+     	</if>
+		<if test="userId != null">
+        	and userId = #{userId,jdbcType=VARCHAR}
+     	</if>
+	</select>
 </mapper>

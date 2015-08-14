@@ -1,40 +1,93 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.gongpingjia.carplay.dao.AuthenticationAhangeHistoryMapper">
-	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.AuthenticationAhangeHistory">
-		<id column="id" property="id" jdbcType="VARCHAR" />
-		<result column="applicationId" property="applicationid" jdbcType="VARCHAR" />
-		<result column="status" property="status" jdbcType="VARCHAR" />
-		<result column="remark" property="remark" jdbcType="VARCHAR" />
-		<result column="timestamp" property="timestamp" jdbcType="BIGINT" />
-	</resultMap>
-
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
-		select
-		id, applicationId, status, remark, timestamp
-		from authentication_change_history
-		where id = #{id,jdbcType=VARCHAR}
-	</select>
-
-	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-		delete from authentication_change_history
-		where id = #{id,jdbcType=VARCHAR}
-	</delete>
-
-	<insert id="insert" parameterType="com.gongpingjia.carplay.po.AuthenticationAhangeHistory">
-		insert into authentication_change_history (id, applicationId, status,
-		remark, timestamp)
-		values (#{id,jdbcType=VARCHAR}, #{applicationid,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
-		#{remark,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
-	</insert>
-
-
-	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.AuthenticationAhangeHistory">
-		update authentication_change_history
-		set applicationId = #{applicationid,jdbcType=VARCHAR},
-		status = #{status,jdbcType=VARCHAR},
-		remark = #{remark,jdbcType=VARCHAR},
-		timestamp = #{timestamp,jdbcType=BIGINT}
-		where id = #{id,jdbcType=VARCHAR}
-	</update>
+<mapper namespace="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+  <resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="applicationId" property="applicationid" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="timestamp" property="timestamp" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, applicationId, status, remark, timestamp
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from authentication_change_history
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from authentication_change_history
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+    insert into authentication_change_history (id, applicationId, status, 
+      remark, timestamp)
+    values (#{id,jdbcType=VARCHAR}, #{applicationid,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+    insert into authentication_change_history
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="applicationid != null" >
+        applicationId,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="timestamp != null" >
+        timestamp,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationid != null" >
+        #{applicationid,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="timestamp != null" >
+        #{timestamp,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+    update authentication_change_history
+    <set >
+      <if test="applicationid != null" >
+        applicationId = #{applicationid,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="timestamp != null" >
+        timestamp = #{timestamp,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.AuthenticationChangeHistory" >
+    update authentication_change_history
+    set applicationId = #{applicationid,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      timestamp = #{timestamp,jdbcType=BIGINT}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
 </mapper>
