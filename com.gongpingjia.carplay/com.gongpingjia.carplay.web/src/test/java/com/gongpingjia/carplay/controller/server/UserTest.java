@@ -26,7 +26,7 @@ public class UserTest extends BaseTest {
 								.param("province", "江苏省")
 								.param("city", "南京市")
 								.param("district", "栖霞区")
-								.param("photo", "4d672627-860c-4118-bcbd-2978aca469ad"))
+								.param("photo", "846de312-306c-4916-91c1-a5e69b158014"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(
