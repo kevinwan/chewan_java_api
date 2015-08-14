@@ -4,7 +4,7 @@
 	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.Version">
 		<id column="product" property="product" jdbcType="VARCHAR" />
 		<result column="version" property="version" jdbcType="VARCHAR" />
-		<result column="forceUpgrade" jdbcType="TINYINT" property="forceupgrade" />
+    		<result column="forceUpgrade" property="forceupgrade" jdbcType="TINYINT" />
 		<result column="url" property="url" jdbcType="VARCHAR" />
 		<result column="remarks" property="remarks" jdbcType="VARCHAR" />
 	</resultMap>

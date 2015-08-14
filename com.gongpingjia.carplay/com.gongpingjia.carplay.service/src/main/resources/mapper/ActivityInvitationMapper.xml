@@ -5,13 +5,13 @@
 		<id column="id" property="id" jdbcType="VARCHAR" />
 		<result column="activityId" property="activityid" jdbcType="VARCHAR" />
 		<result column="channel" property="channel" jdbcType="VARCHAR" />
-		<result column="invitationCode" property="invitationcode" jdbcType="VARCHAR" />
+    		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="timestamp" property="timestamp" jdbcType="BIGINT" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
-		id, activityId, channel, invitationCode, timestamp
+		id, activityId, channel, phone, timestamp
 		from activity_invitation
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -23,16 +23,16 @@
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityInvitation">
 		insert into activity_invitation (id, activityId, channel,
-		invitationCode, timestamp)
+		phone, timestamp)
 		values (#{id,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{channel,jdbcType=VARCHAR},
-		#{invitationcode,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
+		#{phone,jdbcType=VARCHAR}, #{timestamp,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityInvitation">
 		update activity_invitation
 		set activityId = #{activityid,jdbcType=VARCHAR},
 		channel = #{channel,jdbcType=VARCHAR},
-		invitationCode = #{invitationcode,jdbcType=VARCHAR},
+		phone = #{phone,jdbcType=VARCHAR},
 		timestamp = #{timestamp,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>

@@ -15,6 +15,8 @@ public class AuthenticationApplication {
 
     private String slug;
 
+    private Double price;
+
     private String status;
 
     private Long createtime;
@@ -73,6 +75,14 @@ public class AuthenticationApplication {
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public String getStatus() {

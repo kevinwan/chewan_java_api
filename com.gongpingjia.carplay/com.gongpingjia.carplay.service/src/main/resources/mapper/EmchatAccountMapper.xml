@@ -6,12 +6,13 @@
 		<result column="username" property="username" jdbcType="VARCHAR" />
 		<result column="password" property="password" jdbcType="VARCHAR" />
 		<result column="registerTime" property="registertime" jdbcType="BIGINT" />
+    		<result column="activateTime" property="activatetime" jdbcType="BIGINT" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
 		userId, username, password,
-		registerTime
+		registerTime, activateTime
 		from emchat_account
 		where userId = #{userid,jdbcType=VARCHAR}
 	</select>
@@ -24,17 +25,18 @@
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.EmchatAccount">
 		insert into emchat_account (userId, username, password,
-		registerTime)
+      		registerTime, activateTime)
 		values
 		(#{userid,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
-		#{registertime,jdbcType=BIGINT})
+		#{registertime,jdbcType=BIGINT}, #{activatetime,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.EmchatAccount">
 		update emchat_account
 		set username = #{username,jdbcType=VARCHAR},
 		password = #{password,jdbcType=VARCHAR},
-		registerTime = #{registertime,jdbcType=BIGINT}
+		registerTime = #{registertime,jdbcType=BIGINT},
+      		activateTime = #{activatetime,jdbcType=BIGINT}
 		where userId =
 		#{userid,jdbcType=VARCHAR}
 	</update>
