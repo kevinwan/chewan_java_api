@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
-import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityApplication;
 
 @Service
