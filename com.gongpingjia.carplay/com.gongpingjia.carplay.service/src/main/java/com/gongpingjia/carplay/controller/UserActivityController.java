@@ -129,10 +129,47 @@ public class UserActivityController {
 			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error("getUserPost(): ");
+			LOG.error("getUserSubscribe(): ");
 			return ResponseDo.buildFailureResponse("获取关注活动列表失败");
 		}
 	}
 	
+	/**
+	 * 2.23 我(TA)的参与
+	 * 
+	 * @param userId1
+	 *            被访问用户的userId
+	 * @param userId2
+	 *            访问者的userId
+	 * @param token
+	 *            访问者的 token
+	 * @param ignore
+	 *            返回结果将扔掉的条数，例如是 1000， 代表前1000条记录不考虑。 不填默认为 0
+	 * @param limit
+	 *            返回的条数。默认为 10，可以不传
+	 * 
+	 * @return 活动发布列表信息
+	 */
+	@RequestMapping(value = "/user/{userId1}/join", method = RequestMethod.GET)
+	public ResponseDo getUserJoin(@PathVariable String userId1, @RequestParam(value = "userId") String userId2,
+			@RequestParam(value = "token") String token,
+			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
+		LOG.info("=> getUserJoin");
+		
+		if (!CommonUtil.isUUID(userId1) || !CommonUtil.isUUID(userId2) || !CommonUtil.isUUID(token)) {
+			LOG.error("invalid params");
+			return ResponseDo.buildFailureResponse("输入参数有误");
+		}
+		try {
+			
+			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
+
+		} catch (ApiException e) {
+			LOG.error("getUserJoin(): ");
+			return ResponseDo.buildFailureResponse("获取参加活动列表失败");
+		}
+	}
+	
 }

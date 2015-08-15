@@ -44,4 +44,9 @@ public class ActivityMemberDaoImpl implements ActivityMemberDao {
 		return DASUtil.selectList(ActivityMember.class.getName(), "selectByActivity", param);
 	}
 
+	@Override
+	public List<LinkedHashMap<String, Object>> selectByUserId(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityMember.class.getName(), "selectByUserId", param);
+	}
+
 }
