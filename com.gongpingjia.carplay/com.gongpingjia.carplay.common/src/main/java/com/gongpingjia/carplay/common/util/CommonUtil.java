@@ -63,4 +63,31 @@ public class CommonUtil {
 		}
 		return UUID_PATTERN.matcher(uuid).matches();
 	}
+
+	/**
+	 * 获取图片资源服务器
+	 * 
+	 * @return 图片资源服务器URL
+	 */
+	public static String getPhotoServer() {
+		return PropertiesUtil.getProperty("qiniu.server.url", "http://7xknzo.com1.z0.glb.clouddn.com/");
+	}
+
+	/**
+	 * 获取公平价图标前缀
+	 * 
+	 * @return 返回gpjImagePrefix
+	 */
+	public static String getGPJImagePrefix() {
+		return PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "http://img.gongpingjia.com/img/logo/");
+	}
+
+	/**
+	 * 获取查找七牛服务器的后缀
+	 * 
+	 * @return 返回后缀配置信息
+	 */
+	public static String getActivityPhotoPostfix() {
+		return PropertiesUtil.getProperty("activity.photo.postfix", "&imageView2/1/w/200");
+	}
 }

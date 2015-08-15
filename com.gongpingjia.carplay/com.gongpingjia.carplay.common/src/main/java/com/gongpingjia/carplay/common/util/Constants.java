@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.common.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 常量类
  * 
@@ -42,4 +45,25 @@ public class Constants {
 	 * 活动分享格式
 	 */
 	public static final String ACTIVITY_SHARE_DATE_FORMAT = "MM月dd日";
+
+	/**
+	 * 获取热点活动的Key值
+	 */
+	public static final String ACTIVITY_KEY_HOTTEST = "hot";
+
+	/**
+	 * 获取附近的活动的Key值
+	 */
+	public static final String ACTIVITY_KEY_NEARBY = "nearby";
+
+	/**
+	 * 获取最新的活动的Key值
+	 */
+	public static final String ACTIVITY_KEY_LATEST = "latest";
+
+	/**
+	 * 活动列表Key值集合
+	 */
+	public static final List<String> ACTIVITY_KEY_LIST = Arrays.asList(Constants.ACTIVITY_KEY_HOTTEST,
+			Constants.ACTIVITY_KEY_LATEST, Constants.ACTIVITY_KEY_NEARBY);
 }

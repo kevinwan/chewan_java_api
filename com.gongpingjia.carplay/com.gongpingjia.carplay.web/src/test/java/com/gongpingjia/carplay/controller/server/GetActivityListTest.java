@@ -8,43 +8,48 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-public class GetAvailableSeatsTest extends BaseTest {
+public class GetActivityListTest extends BaseTest {
 
 	@Test
-	public void testGetAvailableSeats() throws Exception {
-		String userId = "846de312-306c-4916-91c1-a5e69b158014";
-		String token = "846de312-306c-4916-91c1-a5e69b158014";
-		MvcResult result = mockMvc.perform(get("/user/" + userId + "/seats").param("token", token))
+	public void testGetActivityList() throws Exception {
+		MvcResult result = mockMvc.perform(get("/activity/list")
+				.param("userId", "5c19d977-1ed9-42d1-9cbb-8d7e5b4911fd")
+				.param("token", "5b8ae80d-c34e-4aca-92c3-3962c425964c")
+				.param("key", "latest"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(1)).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
-
+	
 	@Test
-	public void testGetAvailableSeats2() throws Exception {
-		// String userId = "846de312-306c-4916-91c1-a5e69b158014";
-		String token = "846de312-306c-4916-91c1-a5e69b158014";
-		MvcResult result = mockMvc.perform(get("/user/" + 123 + "/seats").param("token", token))
+	public void testGetActivityList2() throws Exception {
+		MvcResult result = mockMvc.perform(get("/activity/list")
+				.param("userId", "5c19d977-1ed9-42d1-9cbb-8d7e5b4911fd")
+				.param("token", "5b8ae80d-c34e-4aca-92c3-3962c425964c")
+				.param("key", "nearby")
+				.param("longitude", "118.88409")
+				.param("latitude", "32.096827"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(1)).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
-
+	
 	@Test
-	public void testGetAvailableSeats3() throws Exception {
-		String userId = "846de312-306c-4916-91c1-a5e69b158014";
-		// String token = "846de312-306c-4916-91c1-a5e69b158014";
-		MvcResult result = mockMvc.perform(get("/user/" + userId + "/seats").param("token", "1234"))
+	public void testGetActivityList3() throws Exception {
+		MvcResult result = mockMvc.perform(get("/activity/list")
+				.param("userId", "5c19d977-1ed9-42d1-9cbb-8d7e5b4911fd")
+				.param("token", "5b8ae80d-c34e-4aca-92c3-3962c425964c")
+				.param("key", "hot"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(1)).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}

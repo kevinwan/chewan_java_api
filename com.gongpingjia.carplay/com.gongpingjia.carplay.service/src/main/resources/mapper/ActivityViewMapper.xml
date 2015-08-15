@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.ActivityView">
+	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.ActivityView">
+		<result column="activityId" property="activityId" jdbcType="VARCHAR" />
+		<result column="publishTime" property="publishTime" jdbcType="BIGINT" />
+		<result column="start" property="start" jdbcType="BIGINT" />
+		<result column="introduction" property="introduction" jdbcType="VARCHAR" />
+		<result column="location" property="location" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="pay" property="pay" jdbcType="VARCHAR" />
+		<result column="totalSeat" property="totalSeat" jdbcType="INTEGER" />
+		<result column="holdingSeat" property="holdingSeat" jdbcType="INTEGER" />
+		<result column="userId" property="userId" jdbcType="VARCHAR" />
+		<result column="nickname" property="nickname" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="VARCHAR" />
+		<result column="age" property="age" jdbcType="BIGINT" />
+    	<result column="photo" property="photo" jdbcType="VARCHAR" />
+		<result column="drivingExperience" property="drivingExperience" jdbcType="BIGINT" />
+		<result column="carBrandLogo" property="carBrandLogo" jdbcType="VARCHAR" />
+		<result column="carModel" property="carModel" jdbcType="VARCHAR" />
+		<result column="price" property="price" jdbcType="DOUBLE" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="district" property="district" jdbcType="VARCHAR" />
+        <result column="distance" property="distance" jdbcType="DOUBLE" />
+        <result column="historyCount" property="historyCount" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="selectLatestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
+		SELECT
+			activity.id AS activityId,
+			createTime AS publishTime,
+			start,
+			ifnull(description, "") AS introduction,
+			location,
+			type,
+			paymentType AS pay,
+			resA.count AS totalSeat,
+			resB.count AS holdingSeat,
+			usr.userId AS userId,
+			usr.nickname,
+			usr.gender,
+			usr.age,
+			usr.photo,
+			usr.drivingExperience,
+			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR}, ifnull(car.brandLogo, "")),"") AS carBrandLogo,
+			ifnull(car.model, "") AS carModel,
+			ifnull(car.price, 0) AS price
+		FROM
+			activity
+		LEFT JOIN (SELECT activityId, count(1) AS count	FROM seat_reservation GROUP BY activityId) resA 
+			ON activity.id = resA.activityId
+		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB 
+			ON activity.id = resB.activityId
+		LEFT JOIN (SELECT id AS userId,	nickname, gender, (YEAR(sysdate()) - birthYear) AS age,
+			concat(#{assetUrl,jdbcType=VARCHAR}, photo, "?timestamp=",#{timestamp,jdbcType=BIGINT}) AS photo,
+			ifnull((YEAR(sysdate()) - drivingLicenseYear),	0) AS drivingExperience	FROM USER) usr ON activity.organizer = usr.userId
+		LEFT JOIN car ON car.userId = usr.userId
+		<where>
+			<if test="province != null">
+				and activity.province = #{province,jdbcType=VARCHAR}
+			</if>
+			<if test="city != null">
+				and activity.city = #{city,jdbcType=VARCHAR}
+			</if>
+			<if test="district != null">
+				and activity.district = #{district,jdbcType=VARCHAR}
+			</if>
+			<if test="type != null">
+				and activity.type = #{type,jdbcType=VARCHAR}
+			</if>
+			<if test="gender != null">
+				and usr.gender = #{gender,jdbcType=VARCHAR}
+			</if>
+			<if test="authenticate == '1'">
+				and carModel is not null
+			</if>
+			<if test="authenticate == '0'">
+				and carModel is null
+			</if>
+			<if test="carLevel == 'good' ">
+				and price > 30
+			</if>
+			<if test="carLevel == 'normal' ">
+				and BETWEEN 10 and 30
+			</if>
+		</where>
+		ORDER BY
+			publishTime DESC
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectNearbyActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
+		SELECT
+			activity.id AS activityId,
+			createTime AS publishTime,
+			start,
+			ifnull(description, "") AS introduction,
+			location,
+			type,
+			paymentType AS pay,
+			resA.count AS totalSeat,
+			resB.count AS holdingSeat,
+			user.id AS userId,
+			user.nickname,
+			user.gender,
+			(YEAR(sysdate()) - user.birthYear) age,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=", #{timestamp,jdbcType=BIGINT}) AS photo,
+			ifnull((YEAR(sysdate()) - user.drivingLicenseYear), 0) AS drivingExperience,
+			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR}, ifnull(car.brandLogo, "")),"") AS carBrandLogo,
+			ifnull(car.model, "") AS carModel,
+			ROUND(6378.138 * 2 * ASIN(SQRT(POW(SIN((#{latitude,jdbcType=DOUBLE} * PI() / 180 - latitude * PI() / 180) / 2),2) 
+					+ COS(#{latitude,jdbcType=DOUBLE} * PI() / 180) * COS(latitude * PI() / 180) * POW(SIN((#{longitude,jdbcType=DOUBLE} * PI() / 180 - longitude * PI() / 180) / 2), 2)
+					)) * 1000) AS distance,
+			ifnull(activity.province, "") AS province,
+			ifnull(activity.city, "") AS city,
+			ifnull(activity.district, "") AS district,
+			ifnull(price, 0) AS price
+		FROM
+			activity
+		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
+		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
+		LEFT JOIN user ON activity.organizer = user.id
+		LEFT JOIN car ON car.userId = user.id
+		WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+		<if test="province != null">
+			and activity.province = #{province,jdbcType=VARCHAR}
+		</if>
+		<if test="city != null">
+			and activity.city = #{city,jdbcType=VARCHAR}
+		</if>
+		<if test="district != null">
+			and activity.district = #{district,jdbcType=VARCHAR}
+		</if>
+		<if test="type != null">
+			and activity.type = #{type,jdbcType=VARCHAR}
+		</if>
+		<if test="gender != null">
+			and usr.gender = #{gender,jdbcType=VARCHAR}
+		</if>
+		<if test="authenticate == '1'">
+			and carModel is not null
+		</if>
+		<if test="authenticate == '0'">
+			and carModel is null
+		</if>
+		<if test="carLevel == 'good' ">
+			and price > 30
+		</if>
+		<if test="carLevel == 'normal' ">
+			and BETWEEN 10 and 30
+		</if>
+		HAVING
+			distance > 0
+		ORDER BY
+			distance
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectHottestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
+		SELECT
+			activity.id AS activityId,
+			activity.createTime AS publishTime,
+			activity.start,
+			ifnull(activity.description, "") AS introduction,
+			activity.location,
+			ifnull(activity.province, "") AS province,
+			ifnull(activity.city, "") AS city,
+			ifnull(activity.district, "") AS district,
+			activity.type,
+			activity.paymentType AS pay,
+			resA.count AS totalSeat,
+			resB.count AS holdingSeat,
+			user.id AS userId,
+			user.nickname,
+			user.gender,
+			(YEAR(sysdate()) - user.birthYear) AS age,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=", #{timestamp,jdbcType=BIGINT}) AS photo,
+			ifnull((YEAR(sysdate()) - user.drivingLicenseYear),0) AS drivingExperience,
+			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR}, ifnull(car.brandLogo, "")),"") AS carBrandLogo,
+			ifnull(ifnull(car.model, ""), "") AS carModel,
+			count(1) AS historyCount,
+			ifnull(price, 0) AS price
+		FROM
+			activity_view_history history
+		LEFT JOIN activity ON history.activityId = activity.id
+		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
+		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
+		LEFT JOIN user ON activity.organizer = user.id
+		LEFT JOIN car ON car.userId = user.id
+		<where>
+			<if test="province != null">
+				and activity.province = #{province,jdbcType=VARCHAR}
+			</if>
+			<if test="city != null">
+				and activity.city = #{city,jdbcType=VARCHAR}
+			</if>
+			<if test="district != null">
+				and activity.district = #{district,jdbcType=VARCHAR}
+			</if>
+			<if test="type != null">
+				and activity.type = #{type,jdbcType=VARCHAR}
+			</if>
+			<if test="gender != null">
+				and usr.gender = #{gender,jdbcType=VARCHAR}
+			</if>
+			<if test="authenticate == '1'">
+				and carModel is not null
+			</if>
+			<if test="authenticate == '0'">
+				and carModel is null
+			</if>
+			<if test="carLevel == 'good' ">
+				and price > 30
+			</if>
+			<if test="carLevel == 'normal' ">
+				and BETWEEN 10 and 30
+			</if>
+		</where>
+		GROUP BY
+			history.activityId
+		ORDER BY
+			historyCount DESC
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+	</select>
+	
+	<select id="selectActivityMembers" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			user.id AS userId,
+			user.nickname,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR}) AS photo
+		FROM
+			activity_member, user
+		WHERE
+			activity_member.userId = user.id
+			AND activity_member.activityId = #{activityId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectActivityCovers" resultType="java.lang.String" parameterType="java.util.Map">
+		SELECT 
+			concat(#{assetUrl,jdbcType=VARCHAR}, url) as original_pic, 
+			concat(#{assetUrl,jdbcType=VARCHAR}, url, #{photoPostfix,jdbcType=VARCHAR}) as thumbnail_pic 
+		FROM 
+			activity_cover 
+		WHERE activityId = #{activityId,jdbcType=VARCHAR} 
+		ORDER BY uploadTime
+	</select>
+
+</mapper>

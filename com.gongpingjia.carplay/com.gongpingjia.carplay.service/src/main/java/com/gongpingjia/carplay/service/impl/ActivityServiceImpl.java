@@ -21,6 +21,7 @@ import com.gongpingjia.carplay.common.enums.ApplicationStatus;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
@@ -29,6 +30,7 @@ import com.gongpingjia.carplay.dao.ActivityApplicationDao;
 import com.gongpingjia.carplay.dao.ActivityCoverDao;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
+import com.gongpingjia.carplay.dao.ActivityViewDao;
 import com.gongpingjia.carplay.dao.ApplicationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.SeatReservationDao;
@@ -37,6 +39,7 @@ import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityApplication;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
+import com.gongpingjia.carplay.po.ActivityView;
 import com.gongpingjia.carplay.po.ApplicationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.SeatReservation;
@@ -74,6 +77,9 @@ public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
 	private ApplicationChangeHistoryDao historyDao;
+
+	@Autowired
+	private ActivityViewDao activityViewDao;
 
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
@@ -441,8 +447,223 @@ public class ActivityServiceImpl implements ActivityService {
 			int config = PropertiesUtil.getProperty("activity.expired.default.days", 8);
 			return DateUtil.addTime(DateUtil.getDate(start), Calendar.DAY_OF_MONTH, config);
 		}
-
 		return end;
+	}
+
+	@Override
+	public ResponseDo getActivityList(HttpServletRequest request) throws ApiException {
+
+		checkCommonQueryParams(request);
+
+		Map<String, Object> param = buildQueryParam(request);
+
+		String key = request.getParameter("key");
+		LOG.debug("query activities from database");
+		List<ActivityView> activityList = new ArrayList<ActivityView>(0);
+		if (Constants.ACTIVITY_KEY_HOTTEST.equals(key)) {
+			activityList = activityViewDao.selectHottestActivities(param);
+		} else if (Constants.ACTIVITY_KEY_NEARBY.equals(key)) {
+			activityList = activityViewDao.selectNearbyActivities(param);
+		} else if (Constants.ACTIVITY_KEY_LATEST.equals(key)) {
+			activityList = activityViewDao.selectLatestActivities(param);
+		}
+
+		LOG.debug("Build response by activities");
+
+		List<Map<String, Object>> data = buildActivitiesData(activityList, request.getParameter("userId"));
+
+		LOG.debug("Return build data");
+		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	/**
+	 * 构造查询返回的数据对象
+	 * 
+	 * @param activityViewList
+	 *            查询的活动列表
+	 * @param userId
+	 *            请求中的用户ID
+	 * @return 返回数据对象data对象
+	 */
+	private List<Map<String, Object>> buildActivitiesData(List<ActivityView> activityViewList, String userId) {
+		LOG.debug("build response data by input activity list");
+		String photoPostfix = CommonUtil.getActivityPhotoPostfix();
+		String assetUrl = CommonUtil.getPhotoServer();
+
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(activityViewList.size());
+		for (ActivityView item : activityViewList) {
+			Map<String, Object> record = new HashMap<String, Object>();
+			record.put("activityId", item.getActivityId());
+			record.put("publishTime", item.getPublishTime());
+			record.put("start", item.getStart());
+			record.put("introduction", item.getIntroduction());
+			record.put("location", item.getLocation());
+			record.put("type", item.getType());
+			record.put("pay", item.getPay());
+
+			Map<String, Object> organizer = new HashMap<String, Object>();
+			organizer.put("userId", item.getUserId());
+			organizer.put("nickname", item.getNickname());
+			organizer.put("gender", item.getGender());
+			organizer.put("age", item.getAge());
+			organizer.put("photo", item.getPhoto() + photoPostfix);
+			organizer.put("carBrandLogo", item.getCarBrandLogo());
+			organizer.put("carModel", item.getCarModel());
+			organizer.put("drivingExperience", item.getDrivingExperience());
+
+			record.put("organizer", organizer);
+
+			record.put("totalSeat", item.getTotalSeat());
+
+			Map<String, Object> param = new HashMap<String, Object>(3, 1);
+			param.put("assetUrl", assetUrl);
+			param.put("photoPostfix", photoPostfix);
+			param.put("activityId", item.getActivityId());
+
+			List<Map<String, Object>> members = activityViewDao.selectActivityMembers(param);
+			record.put("members", members);
+			record.put("cover", activityViewDao.selectActivityCovers(param));
+
+			record.put("isOrganizer", isOrganizer(userId, item.getUserId()));
+			record.put("isMember", isMember(userId, item.getActivityId(), members));
+
+			result.add(record);
+		}
+
+		return result;
+	}
+
+	/**
+	 * 判断当前用户是否为活动的组织者
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param activityUserId
+	 *            活动创建者的用户ID
+	 * @return 是活动创建者返回1， 不是活动创建者返回0
+	 */
+	private String isOrganizer(String userId, String activityUserId) {
+		String isOrganizer = "0";
+		if (activityUserId.equals(userId)) {
+			isOrganizer = "1";
+		}
+		return isOrganizer;
+	}
+
+	/**
+	 * 判断当前用户是否为活动成员
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param activityId
+	 *            活动ID
+	 * @param members
+	 *            活动所有成员
+	 * @return 1代表已经是成员，2代表正在申请成为成员，0代表不是成员也没有提交申请
+	 */
+	private String isMember(String userId, String activityId, List<Map<String, Object>> members) {
+		String isMember = "0";
+		for (Map<String, Object> member : members) {
+			if (member.containsKey(userId)) {
+				isMember = "1";
+			}
+		}
+
+		Map<String, Object> appParam = new HashMap<String, Object>();
+		appParam.put("activityId", activityId);
+		appParam.put("userId", userId);
+		appParam.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
+		List<ActivityApplication> appList = applicationDao.selectByParam(appParam);
+
+		if (!appList.isEmpty()) {
+			// 在申请待处理中
+			isMember = "2";
+		}
+		return isMember;
+	}
+
+	/**
+	 * 根据请求参数 构造查询参数Map对象
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @return 返回构造好的参数Map
+	 * @throws ApiException
+	 */
+	private Map<String, Object> buildQueryParam(HttpServletRequest request) throws ApiException {
+		LOG.debug("build query param map by query parameters");
+		Map<String, Object> param = new HashMap<String, Object>(16, 1);
+		// 公共参数
+		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
+		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("timestamp", DateUtil.getTime());
+
+		// 请求参数
+		param.put("userId", request.getParameter("userId"));
+		param.put("longitude", request.getParameter("longitude"));
+		param.put("latitude", request.getParameter("latitude"));
+		param.put("city", request.getParameter("city"));
+		param.put("province", request.getParameter("province"));
+		param.put("district", request.getParameter("district"));
+		param.put("type", request.getParameter("type"));
+		param.put("gender", request.getParameter("gender"));
+		param.put("authenticate", request.getParameter("authenticate"));
+		param.put("carLevel", request.getParameter("carLevel"));
+		Integer ignore = TypeConverUtil.convertToInteger("ignore", request.getParameter("ignore"), false);
+		if (ignore == null) {
+			ignore = 0;
+		}
+		param.put("ignore", ignore);
+		Integer limit = TypeConverUtil.convertToInteger("limit", request.getParameter("limit"), false);
+		if (limit == null) {
+			limit = 20;
+		}
+		param.put("limit", limit);
+
+		return param;
+	}
+
+	/**
+	 * 获取活动信息，校验基本参数（注意：这里没有校验token是否有效）
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @throws ApiException
+	 *             业务异常，参数错误
+	 */
+	private void checkCommonQueryParams(HttpServletRequest request) throws ApiException {
+		LOG.debug("Begin check query parameters");
+		String key = request.getParameter("key");
+		String userId = request.getParameter("userId");
+		String token = request.getParameter("token");
+		String longitude = request.getParameter("longitude");
+		String latitude = request.getParameter("latitude");
+
+		if (!CommonUtil.isUUID(userId)) {
+			LOG.error("Input parameter userId: {} is not UUID", userId);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (!CommonUtil.isUUID(token)) {
+			LOG.error("Input parameter token: {} is not UUID", token);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (!Constants.ACTIVITY_KEY_LIST.contains(key)) {
+			LOG.error("Input parameter key: {} error", key);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (Constants.ACTIVITY_KEY_NEARBY.equals(key) && (longitude == null || latitude == null)) {
+			LOG.error("Input parameter is nearby, but with no longitude or latitude");
+			throw new ApiException("未能获取您的位置信息");
+		}
+
+		if (Constants.ACTIVITY_KEY_NEARBY.equals(key)) {
+			// 如果是查找附近的活动，需要输入经度和纬度，且为Double类型
+			TypeConverUtil.convertToDouble("longitude", longitude, true);
+			TypeConverUtil.convertToDouble("latitude", latitude, true);
+		}
 	}
 
 }

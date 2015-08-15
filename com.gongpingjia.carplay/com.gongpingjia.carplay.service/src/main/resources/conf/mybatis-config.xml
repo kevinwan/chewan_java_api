@@ -43,6 +43,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<package name="com.gongpingjia.carplay.po.UserSubscription" />
 		<package name="com.gongpingjia.carplay.po.UserSubscriptionKey" />
 		<package name="com.gongpingjia.carplay.po.Version" />
+		<package name="com.gongpingjia.carplay.po.ActivityView"/>
 	</typeAliases>
 
 	<!-- 映射map -->

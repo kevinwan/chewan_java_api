@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
@@ -27,6 +29,11 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 	@Override
 	public int updateByPrimaryKey(ActivityApplication record) {
 		return DASUtil.update(ActivityApplication.class.getName(), "updateByPrimaryKey", record);
+	}
+
+	@Override
+	public List<ActivityApplication> selectByParam(Object param) {
+		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByParam", param);
 	}
 
 }

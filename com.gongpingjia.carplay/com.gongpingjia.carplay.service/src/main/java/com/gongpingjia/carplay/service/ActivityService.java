@@ -27,4 +27,15 @@ public interface ActivityService {
 	 *             业务异常处理
 	 */
 	ResponseDo registerActivity(HttpServletRequest request) throws ApiException;
+
+	/**
+	 * 根据参数查询活动信息
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @return 响应结果
+	 * @throws ApiException
+	 *             业务异常处理
+	 */
+	ResponseDo getActivityList(HttpServletRequest request) throws ApiException;
 }

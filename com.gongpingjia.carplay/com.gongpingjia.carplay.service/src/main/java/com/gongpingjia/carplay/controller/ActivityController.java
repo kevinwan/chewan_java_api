@@ -68,4 +68,21 @@ public class ActivityController {
 		}
 	}
 
+	/**
+	 * 2.16 获取热门/附近/最新活动列表
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @return 返回响应结果
+	 */
+	@RequestMapping(value = "/activity/list", method = RequestMethod.GET)
+	public ResponseDo getActivityList(HttpServletRequest request) {
+		LOG.info("getActivityList begin");
+		try {
+			return activityService.getActivityList(request);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }
