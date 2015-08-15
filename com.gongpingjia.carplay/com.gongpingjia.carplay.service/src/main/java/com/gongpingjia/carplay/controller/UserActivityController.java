@@ -91,7 +91,7 @@ public class UserActivityController {
 			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 			
 		} catch (ApiException e) {
-			LOG.error("getUserPost(): ");
+			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("获取发布列表失败");
 		}
 	}
@@ -129,7 +129,7 @@ public class UserActivityController {
 			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error("getUserSubscribe(): ");
+			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("获取关注活动列表失败");
 		}
 	}
@@ -167,7 +167,7 @@ public class UserActivityController {
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error("getUserJoin(): ");
+			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("获取参加活动列表失败");
 		}
 	}

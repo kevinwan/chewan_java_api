@@ -17,6 +17,10 @@
 		from activity_application
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
+	
+	<select id="selectByCountOfActivityUserAndStatus" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select count(*) as count from activity_application where activityId = #{activityId,jdbcType=VARCHAR} and userId = #{userId,jdbcType=VARCHAR} and status = #{status,jdbcType=VARCHAR}	
+	</select>
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from
