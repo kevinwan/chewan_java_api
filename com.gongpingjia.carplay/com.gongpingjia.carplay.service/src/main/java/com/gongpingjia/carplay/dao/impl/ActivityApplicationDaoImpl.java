@@ -1,11 +1,14 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
+import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityApplication;
 
 @Service
@@ -34,6 +37,10 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 	@Override
 	public List<ActivityApplication> selectByParam(Object param) {
 		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByParam", param);
+	}
+
+	public List<LinkedHashMap<String, Long>> selectByCountOfActivityUserAndStatus(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByCountOfActivityUserAndStatus", param);
 	}
 
 }

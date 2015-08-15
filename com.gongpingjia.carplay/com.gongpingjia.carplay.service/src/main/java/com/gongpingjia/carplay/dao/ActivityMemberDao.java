@@ -19,4 +19,6 @@ public interface ActivityMemberDao {
 	int deleteByParam(ActivityMemberKey key);
 
 	List<LinkedHashMap<String, String>> selectByActivity(Map<String, Object> param);
+
+	List<LinkedHashMap<String, Object>> selectByUserId(Map<String, Object> param);
 }

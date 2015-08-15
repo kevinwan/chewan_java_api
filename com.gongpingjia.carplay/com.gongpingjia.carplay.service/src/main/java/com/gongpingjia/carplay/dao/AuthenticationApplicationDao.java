@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 
 public interface AuthenticationApplicationDao {
@@ -12,4 +15,6 @@ public interface AuthenticationApplicationDao {
 
 
     int updateByPrimaryKey(AuthenticationApplication record);
+    
+    List<AuthenticationApplication> selectByParam(Map<String, Object> param);
 }

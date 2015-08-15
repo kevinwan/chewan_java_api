@@ -1,6 +1,8 @@
 package com.gongpingjia.carplay.dao;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.gongpingjia.carplay.po.ActivityApplication;
 
@@ -15,4 +17,5 @@ public interface ActivityApplicationDao {
 
 	List<ActivityApplication> selectByParam(Object param);
 
+	List<LinkedHashMap<String, Long>> selectByCountOfActivityUserAndStatus(Map<String, Object> param);
 }

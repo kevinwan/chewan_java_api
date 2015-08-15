@@ -23,12 +23,16 @@ import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.ToolsUtils;
+import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
+import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
 import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
 import com.gongpingjia.carplay.dao.UserDao;
+import com.gongpingjia.carplay.po.AuthenticationApplication;
+import com.gongpingjia.carplay.po.AuthenticationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.EmchatAccount;
 import com.gongpingjia.carplay.po.PhoneVerification;
@@ -62,6 +66,12 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private CarDao carDao;
+	
+	@Autowired
+	private AuthenticationApplicationDao authenticationApplicationDao;
+	
+	@Autowired
+	private AuthenticationChangeHistoryDao authenticationChangeHistoryDao;
 	
 	@Override
 	public List<User> queryUsers() {
@@ -100,17 +110,15 @@ public class UserServiceImpl implements UserService {
 	    }
 	    
 	    //判断七牛上图片是否存在
-	    Boolean isPhotoExist;
 		try {
-			isPhotoExist = photoService.isExist(user.getPhoto());
+			if (!photoService.isExist(user.getPhoto())){
+		    	LOG.warn("photo not Exist");
+		    	return ResponseDo.buildFailureResponse("注册图片未上传");
+			}
 		} catch (ApiException e) {
-			//抛出异常则认为图片不存在
-			isPhotoExist = false;
+	    	LOG.warn("photo not Exist");
+	    	return ResponseDo.buildFailureResponse("注册图片未上传");
 		}
-	    if (isPhotoExist){
-	    	LOG.warn("photo Exist");
-	    	return ResponseDo.buildFailureResponse("注册图片已存在");
-	    }
 	    
 	    //判断用户是否注册过
 	    Map<String, Object> param = new HashMap<String, Object>();
@@ -239,6 +247,81 @@ public class UserServiceImpl implements UserService {
 	    
 		return ResponseDo.buildSuccessResponse(data);
 	}
+
+	@Override
+	public ResponseDo applyAuthentication(
+			AuthenticationApplication authen,String token,String userId) {
+		
+		//验证参数 
+	    if (!CommonUtil.isUUID(token) || !CommonUtil.isUUID(userId) || (authen.getDrivingexperience() > 50) 
+	    		|| (authen.getBrandlogo().indexOf("http://") < 0) || authen.getBrandlogo().lastIndexOf("/") <= 6 ) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //获取认证口令
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
+	    	LOG.warn("Token expired or token not correct");
+	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		}
+		
+		User user = userDao.selectByPrimaryKey(userId);
+		if (null == user){
+	    	LOG.warn("User not exist");
+	    	return ResponseDo.buildFailureResponse("用户不存在");
+		}
+		if (user.getIsauthenticated() != null && 0 != user.getIsauthenticated()){
+	    	LOG.warn("User already authenticated");
+	    	return ResponseDo.buildFailureResponse("用户已认证，请勿重复认证");
+		}
+		
+	    //判断七牛上图片是否存在
+		try {
+			if (!photoService.isExist(user.getPhoto())){
+		    	LOG.warn("photo not Exist");
+		    	return ResponseDo.buildFailureResponse("注册图片未上传");
+			}
+		} catch (ApiException e) {
+	    	LOG.warn("photo not Exist");
+	    	return ResponseDo.buildFailureResponse("注册图片未上传");
+		}
+	    
+		//是否已经提起认证处理
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("userId", userId);
+		List<AuthenticationApplication> authenticationApplications = authenticationApplicationDao.selectByParam(param);
+		if (null != authenticationApplications && authenticationApplications.size() > 0){
+	    	LOG.warn("already applied authentication");
+	    	return ResponseDo.buildFailureResponse("之前的认证申请仍在处理中");
+		}
+		
+		authen.setId(CodeGenerator.generatorId());
+		authen.setUserid(userId);
+		authen.setBrandlogo(authen.getBrandlogo().substring(authen.getBrandlogo().lastIndexOf('/') + 1));
+		authen.setStatus(Constants.ApplyAuthenticationStatus.STATUS_PENDING_PROCESSED);
+		authen.setCreatetime(DateUtil.getTime());
+		if (0 == authenticationApplicationDao.insert(authen)){
+	    	LOG.warn("Fail to insert into authentication_application table");
+	    	return ResponseDo.buildFailureResponse("未能成功申请认证");
+		}
+		AuthenticationChangeHistory authenHistory = new AuthenticationChangeHistory();
+		authenHistory.setId(CodeGenerator.generatorId());
+		authenHistory.setApplicationid(authen.getId());
+		authenHistory.setStatus(Constants.ApplyAuthenticationStatus.STATUS_PENDING_PROCESSED);
+		authenHistory.setTimestamp(DateUtil.getTime());
+		if (0 == authenticationChangeHistoryDao.insert(authenHistory)){
+	    	LOG.warn("Fail to insert into authentication_change_history table");
+	    	return ResponseDo.buildFailureResponse("添加认证申请历史记录失败");
+		}
+		
+		return ResponseDo.buildSuccessResponse("");
+	}
+	
 	
 	private ResponseDo checkPhoneVerification(String phone,String code){
 		

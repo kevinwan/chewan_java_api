@@ -16,8 +16,9 @@
 	</select>
 	
 	<select id="selectByActivity" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
-		select concat(#{AssetUrl}, url) as original_pic from
-		activity_cover where activityId=#{activityId}
+		select concat(#{AssetUrl,jdbcType=VARCHAR}, url) as original_pic 
+		from activity_cover 
+		where activityId=#{activityId,jdbcType=VARCHAR}
 		order by uploadTime 	
 	</select>
 

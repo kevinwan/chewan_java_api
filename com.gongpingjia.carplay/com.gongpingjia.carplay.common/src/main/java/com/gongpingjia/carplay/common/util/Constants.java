@@ -40,6 +40,30 @@ public class Constants {
 	 * 用户反馈图片Key值
 	 */
 	public static final String FEEDBACK_PHOTO_KEY = "asset/feedback/{0}.jpg";
+	
+	/**
+	 * 车主认证申请状态
+	 * @author Administrator
+	 *
+	 */
+	public interface ApplyAuthenticationStatus{
+		
+		/**
+		 * 待处理状态
+		 */
+		public static final String STATUS_PENDING_PROCESSED = "待处理";
+		
+		/**
+		 * 已同意状态
+		 */
+		public static final String STATUS_APPROVED = "已同意";
+		
+		/**
+		 * 已拒绝状态
+		 */
+		public static final String STATUS_DECLINED = "已拒绝";
+		
+	}
 
 	/**
 	 * 活动分享格式
