@@ -109,13 +109,33 @@ public class ActivityController {
 		}
 	}
 
+	/**
+	 * 2.18 获取活动评论
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @param ignore
+	 *            忽略行数
+	 * @param limit
+	 *            限制行数
+	 * @return 返回活动评论数据
+	 */
 	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.GET)
 	public ResponseDo getActivityComments(@PathVariable("activityId") String activityId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
-		
-		
-		return null;
+		LOG.info("getActivityComments begin");
+
+		try {
+			return activityService.getActivityComments(activityId, userId, token, ignore, limit);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 }

@@ -279,4 +279,28 @@
 		GROUP BY
 			reserv.carId
 	</select>
+	
+	<select id="selectActivityComments" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			acm.id AS commentId,
+			acm.userId,
+			crUser.nickname,
+			acm.createTime AS publishTime,
+			ifnull(acm.replyUserId,"") AS replyUserId,			
+			crUser.gender,
+			ifnull(rpUser.nickname,"") replyUserName,
+			(YEAR(sysdate()) - crUser.birthYear) AS age,
+			ifnull(acm.comment, "" ) AS comment,
+			concat(#{assetUrl,jdbcType=VARCHAR}, crUser.photo) AS photo
+		FROM
+			activity_comment acm 
+			LEFT JOIN user crUser ON acm.userId = crUser.id
+			LEFT JOIN user rpUser ON acm.replyUserId = rpUser.id
+		WHERE
+			acm.activityId = #{activityId,jdbcType=VARCHAR}
+		ORDER BY
+			publishTime
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+	</select>
+	
 </mapper>

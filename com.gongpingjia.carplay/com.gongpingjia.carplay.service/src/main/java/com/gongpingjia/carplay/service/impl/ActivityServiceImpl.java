@@ -901,11 +901,22 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	@Override
-	public ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit) throws ApiException {
-		
+	public ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit)
+			throws ApiException {
+
 		LOG.debug("Check input parameters");
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
-		
-		return null;
+		if (!CommonUtil.isUUID(activityId)) {
+			LOG.warn("Input parameter activityId is not an uuid, activityId:{}", activityId);
+			throw new ApiException("输入参数有误");
+		}
+
+		LOG.debug("Query comments from database");
+		Map<String, Object> param = new HashMap<String, Object>(4, 1);
+		param.put("activityId", activityId);
+		param.put("ignore", ignore);
+		param.put("limit", limit);
+		param.put("assetUrl", CommonUtil.getPhotoServer());
+
+		return ResponseDo.buildSuccessResponse(activityViewDao.selectActivityComments(param));
 	}
 }

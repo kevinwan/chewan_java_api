@@ -76,4 +76,12 @@ public interface ActivityViewDao {
 	 */
 	List<Map<String, Object>> selectReservSeatInfoByActivityId(String activityId);
 
+	/**
+	 * 根据请求参数，获取活动评论详情
+	 * 
+	 * @param param
+	 *            请求参数
+	 * @return 活动评论详情
+	 */
+	List<Map<String, Object>> selectActivityComments(Map<String, Object> param);
 }
