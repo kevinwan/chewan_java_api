@@ -43,6 +43,7 @@ import com.gongpingjia.carplay.po.ActivityApplication;
 import com.gongpingjia.carplay.po.ActivityComment;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
+import com.gongpingjia.carplay.po.ActivitySubscription;
 import com.gongpingjia.carplay.po.ActivityView;
 import com.gongpingjia.carplay.po.ActivityViewHistory;
 import com.gongpingjia.carplay.po.ApplicationChangeHistory;
@@ -962,6 +963,32 @@ public class ActivityServiceImpl implements ActivityService {
 		activityComment.setUserid(userId);
 		commentDao.insert(activityComment);
 
-		return ResponseDo.buildSuccessResponse("");
+		return ResponseDo.buildSuccessResponse();
+	}
+
+	@Override
+	public ResponseDo subscribeActivity(String activityId, String userId, String token) throws ApiException {
+		LOG.debug("Check input parameters");
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		if (!CommonUtil.isUUID(activityId)) {
+			LOG.warn("Input parameter activityId is not uuid, activityId:{}", activityId);
+			throw new ApiException("参数错误");
+		}
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null || userId.equals(activity.getOrganizer())) {
+			LOG.warn("No activity exist or user cannot focus on self create activity");
+			throw new ApiException("未找到活动，无法关注");
+		}
+
+		LOG.debug("Save activity subscription info");
+		ActivitySubscription subscription = new ActivitySubscription();
+		subscription.setActivityid(activityId);
+		subscription.setSubscribetime(DateUtil.getTime());
+		subscription.setUserid(userId);
+		subscriptionDao.insert(subscription);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 }

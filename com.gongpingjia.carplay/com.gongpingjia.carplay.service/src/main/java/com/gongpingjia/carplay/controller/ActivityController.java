@@ -146,10 +146,34 @@ public class ActivityController {
 			@RequestParam("userId") String userId, @RequestParam("token") String token,
 			@RequestParam(value = "replyUserId", required = false) String replyUserId,
 			@RequestParam("comment") String comment) {
-		LOG.info("publishComment before");
+		LOG.info("publishComment begin");
 
 		try {
 			return activityService.publishComment(activityId, userId, token, replyUserId, comment);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.24 关注活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 关注结果
+	 */
+	@RequestMapping(value = "/activity/{activityId}/subscribe", method = RequestMethod.POST)
+	public ResponseDo subscribeActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("subscribeActivity begin");
+
+		try {
+			return activityService.subscribeActivity(activityId, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

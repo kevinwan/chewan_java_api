@@ -19,7 +19,7 @@ public class ResponseDo {
 
 	}
 
-	public static ResponseDo buildSuccessResponse(Object data) {
+	public static ResponseDo buildSuccessResponse(Object... data) {
 		ResponseDo response = new ResponseDo();
 		response.result = 0;
 		response.errmsg = "";
@@ -33,7 +33,7 @@ public class ResponseDo {
 		return response;
 	}
 
-	public static ResponseDo buildSuccessResponse(String data) {
+	public static ResponseDo buildSuccessResponse(String... data) {
 		ResponseDo response = new ResponseDo();
 		response.result = 0;
 		response.errmsg = "";

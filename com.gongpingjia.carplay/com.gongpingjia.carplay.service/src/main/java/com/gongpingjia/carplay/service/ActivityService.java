@@ -91,4 +91,19 @@ public interface ActivityService {
 	 */
 	ResponseDo publishComment(String activityId, String userId, String token, String replyUserId, String comment)
 			throws ApiException;
+
+	/**
+	 * 关注活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 关注结果
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo subscribeActivity(String activityId, String userId, String token) throws ApiException;
 }
