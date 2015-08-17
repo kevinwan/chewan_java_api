@@ -15,7 +15,7 @@
 		and activityId = #{activityid,jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectByActivity" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+	<select id="selectByActivity" resultType="java.util.Map" parameterType="java.util.Map">
 		select user.id as userId,
 		user.nickname, concat(#{AssetUrl,jdbcType=VARCHAR}, user.photo) as photo from
 		activity_member, user where
@@ -23,7 +23,7 @@
 		activity_member.userId = user.id
 	</select>
 	
-	<select id="selectByUserId" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+	<select id="selectByUserId" resultType="java.util.Map" parameterType="java.util.Map">
 		select member.activityId, publishTime, start, introduction, location, type, pay, organizer, nickname, gender, 
          age, photo, ifnull(concat(#{gpjIMGUrl,jdbcType=VARCHAR} , car.carBrandLogo),"") as carBrandLogo, ifnull(car.carModel, '') 
          as carModel, drivingExperience, resA.count as totalSeat, resB.count as holdingSeat from activity_member member left join 

@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.service.impl;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,12 +53,12 @@ public class UserActivityServiceImpl implements UserActivityService {
 		param.put("organizer", userId1);
 		param.put("ignore", ignore);
 		param.put("limit", limit);
-		List<LinkedHashMap<String,Object>> activityList=activityDao.selectByOrganizer(param);
+		List<Map<String,Object>> activityList=activityDao.selectByOrganizer(param);
 		
 		List<Map<String,Object>> activityMapList = new ArrayList<>();
 		for(Map<String,Object> activity:activityList){
 			
-			Map<String,Object> map=new LinkedHashMap<>();
+			Map<String,Object> map=new HashMap<>();
 			map.put("activityId", activity.get("activityId"));
 			map.put("introduction", activity.get("introduction"));
 			map.put("location", activity.get("location"));
@@ -71,16 +70,16 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", IMGUrl);
-			List<LinkedHashMap<String,String>> membersList=memberDao.selectByActivity(param);
+			List<Map<String,String>> membersList=memberDao.selectByActivity(param);
 			map.put("members",membersList);
 			
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", IMGUrl);
-			List<LinkedHashMap<String,String>> coverList=coverDao.selectByActivity(param);
+			List<Map<String,String>> coverList=coverDao.selectByActivity(param);
 			
-			List<LinkedHashMap<String,String>> coverAllList=new ArrayList<>();
-			for(LinkedHashMap<String,String> cover:coverList){
+			List<Map<String,String>> coverAllList=new ArrayList<>();
+			for(Map<String, String> cover:coverList){
 				cover.put("original_pic", cover.get("original_pic"));
 				cover.put("thumbnail_pic", cover.get("original_pic")+"?imageView2/1/w/200");
 				coverAllList.add(cover);
@@ -105,17 +104,17 @@ public class UserActivityServiceImpl implements UserActivityService {
 		param.put("limit", limit);
 		param.put("gpjIMGUrl", gpjIMGUrl);
 		param.put("AssetUrl", AssetUrl);
-		List<LinkedHashMap<String,Object>> activityList=activitySubscriptionDao.selectByUserId(param);
+		List<Map<String,Object>> activityList=activitySubscriptionDao.selectByUserId(param);
 		
-		List<LinkedHashMap<String,Object>> activityMapList = new ArrayList<>();
+		List<Map<String,Object>> activityMapList = new ArrayList<>();
 		
-		LinkedHashMap<String,Object> activityLinkMap=new LinkedHashMap<>();
+		Map<String,Object> activityLinkMap=new HashMap<>();
 		
 		for(Map<String,Object> activity:activityList){
 			
 			activityLinkMap.put("activityId", activity.get("activityId"));
 			
-			LinkedHashMap<String,Object> organizermap=new LinkedHashMap<>();
+			Map<String,Object> organizermap=new HashMap<>();
 			organizermap.put("userId", activity.get("organizer"));
 			organizermap.put("nickname", activity.get("nickname"));
 			organizermap.put("gender", activity.get("gender"));
@@ -143,8 +142,8 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", AssetUrl);
-			List<LinkedHashMap<String,String>> membersLinkMap=memberDao.selectByActivity(param);
-			for(LinkedHashMap<String,String> member:membersLinkMap){
+			List<Map<String,String>> membersLinkMap=memberDao.selectByActivity(param);
+			for(Map<String,String> member:membersLinkMap){
 				if(member.get("userId").equals(userId2)){
 					activityLinkMap.put("isMember", 0);
 					break;
@@ -155,10 +154,10 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", AssetUrl);
-			List<LinkedHashMap<String,String>> coverList=coverDao.selectByActivity(param);
+			List<Map<String,String>> coverList=coverDao.selectByActivity(param);
 			
-			List<LinkedHashMap<String,String>> coverAllList=new ArrayList<>();
-			for(LinkedHashMap<String,String> cover:coverList){
+			List<Map<String,String>> coverAllList=new ArrayList<>();
+			for(Map<String,String> cover:coverList){
 				cover.put("original_pic", cover.get("original_pic"));
 				cover.put("thumbnail_pic", cover.get("original_pic")+"?imageView2/1/w/200");
 				coverAllList.add(cover);
@@ -184,11 +183,11 @@ public class UserActivityServiceImpl implements UserActivityService {
 		param.put("limit", limit);
 		param.put("gpjIMGUrl", gpjIMGUrl);
 		param.put("AssetUrl", AssetUrl);
-		List<LinkedHashMap<String,Object>> activityList=activityMemberDao.selectByUserId(param);
+		List<Map<String,Object>> activityList=activityMemberDao.selectByUserId(param);
 		
-		List<LinkedHashMap<String,Object>> activityMapList = new ArrayList<>();
+		List<Map<String,Object>> activityMapList = new ArrayList<>();
 		
-		LinkedHashMap<String,Object> activityLinkMap=new LinkedHashMap<>();
+		Map<String,Object> activityLinkMap=new HashMap<>();
 		
 		for(Map<String,Object> activity:activityList){
 			
@@ -202,7 +201,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			activityLinkMap.put("type", activity.get("type"));
 			activityLinkMap.put("pay", activity.get("pay"));
 			
-			LinkedHashMap<String,Object> organizermap=new LinkedHashMap<>();
+			Map<String,Object> organizermap=new HashMap<>();
 			organizermap.put("userId", activity.get("organizer"));
 			organizermap.put("nickname", activity.get("nickname"));
 			organizermap.put("gender", activity.get("gender"));
@@ -223,8 +222,8 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", AssetUrl);
-			List<LinkedHashMap<String,String>> membersLinkMap=memberDao.selectByActivity(param);
-			for(LinkedHashMap<String,String> member:membersLinkMap){
+			List<Map<String,String>> membersLinkMap=memberDao.selectByActivity(param);
+			for(Map<String,String> member:membersLinkMap){
 				if(member.get("userId").equals(userId2)){
 					activityLinkMap.put("isMember", 1);
 					break;
@@ -235,10 +234,10 @@ public class UserActivityServiceImpl implements UserActivityService {
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
 			param.put("AssetUrl", AssetUrl);
-			List<LinkedHashMap<String,String>> coverList=coverDao.selectByActivity(param);
+			List<Map<String,String>> coverList=coverDao.selectByActivity(param);
 			
-			List<LinkedHashMap<String,String>> coverAllList=new ArrayList<>();
-			for(LinkedHashMap<String,String> cover:coverList){
+			List<Map<String,String>> coverAllList=new ArrayList<>();
+			for(Map<String,String> cover:coverList){
 				cover.put("original_pic", cover.get("original_pic"));
 				cover.put("thumbnail_pic", cover.get("original_pic")+"?imageView2/1/w/200");
 				coverAllList.add(cover);
@@ -249,7 +248,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 				param.put("activityId", activity.get("activityId"));
 				param.put("userId", userId2);
 				param.put("status", STATUS_PENDING_PROCESSED);
-				List<LinkedHashMap<String,Long>> rows=activityApplicationDao.selectByCountOfActivityUserAndStatus(param);
+				List<Map<String,Long>> rows=activityApplicationDao.selectByCountOfActivityUserAndStatus(param);
 				if(rows.size()==0){
 					LOG.warn("Fail to get application count");
                     throw new ApiException("未能成功获取申请信息");

@@ -17,7 +17,7 @@
 	
 	
 	
-	<select id="selectByUserId" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+	<select id="selectByUserId" resultType="java.util.Map" parameterType="java.util.Map">
 		select subscription.activityId, organizer, publishTime, start, introduction, location, type, pay, nickname, gender, 
         age, photo, ifnull(concat(#{gpjIMGUrl,jdbcType=VARCHAR} , car.carBrandLogo),'') as carBrandLogo, 
         ifnull(car.carModel, '') as carModel, drivingExperience, resA.count as totalSeat, resB.count as holdingSeat from activity_subscription 

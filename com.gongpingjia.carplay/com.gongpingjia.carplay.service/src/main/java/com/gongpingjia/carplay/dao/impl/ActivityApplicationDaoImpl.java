@@ -1,6 +1,5 @@
 package com.gongpingjia.carplay.dao.impl;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByParam", param);
 	}
 
-	public List<LinkedHashMap<String, Long>> selectByCountOfActivityUserAndStatus(Map<String, Object> param) {
+	public List<Map<String, Long>> selectByCountOfActivityUserAndStatus(Map<String, Object> param) {
 		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByCountOfActivityUserAndStatus", param);
 	}
 

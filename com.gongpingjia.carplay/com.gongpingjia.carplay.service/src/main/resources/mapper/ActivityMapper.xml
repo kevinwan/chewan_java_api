@@ -38,7 +38,7 @@
 		where id =	#{id,jdbcType=VARCHAR}
 	</select>
 	
-	<select id="selectByOrganizer" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+	<select id="selectByOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
 		select
 		id as activityId, createTime as publishTime, ifnull(start, 0) as start,
 		ifnull(description, "") as introduction, location, paymentType as pay
