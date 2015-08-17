@@ -220,7 +220,7 @@ public class ActivityServiceImpl implements ActivityService {
 		Car car = carDao.selectByUserId(userId);
 		String carId = (car == null) ? null : car.getId();
 
-		List<SeatReservation> reservationList = new ArrayList<SeatReservation>();
+		List<SeatReservation> reservationList = new ArrayList<SeatReservation>(seat);
 		for (int i = 0; i < seat; i++) {
 			SeatReservation seatReserve = new SeatReservation();
 			seatReserve.setId(CodeGenerator.generatorId());
@@ -569,10 +569,10 @@ public class ActivityServiceImpl implements ActivityService {
 	 *            活动创建者的用户ID
 	 * @return 是活动创建者返回1， 不是活动创建者返回0
 	 */
-	private String isOrganizer(String userId, String activityUserId) {
-		String isOrganizer = "0";
+	private Integer isOrganizer(String userId, String activityUserId) {
+		Integer isOrganizer = 0;
 		if (activityUserId.equals(userId)) {
-			isOrganizer = "1";
+			isOrganizer = 1;
 		}
 		return isOrganizer;
 	}
@@ -588,11 +588,11 @@ public class ActivityServiceImpl implements ActivityService {
 	 *            活动所有成员
 	 * @return 1代表已经是成员，2代表正在申请成为成员，0代表不是成员也没有提交申请
 	 */
-	private String isMember(String userId, String activityId, List<Map<String, Object>> members) {
-		String isMember = "0";
+	private Integer isMember(String userId, String activityId, List<Map<String, Object>> members) {
+		Integer isMember = 0;
 		for (Map<String, Object> member : members) {
 			if (member.containsKey(userId)) {
-				isMember = "1";
+				isMember = 1;
 			}
 		}
 
@@ -604,7 +604,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		if (!appList.isEmpty()) {
 			// 在申请待处理中
-			isMember = "2";
+			isMember = 2;
 		}
 		return isMember;
 	}
@@ -704,6 +704,11 @@ public class ActivityServiceImpl implements ActivityService {
 
 		ParameterCheck.getInstance().checkUserInfo(userId, token);
 
+		if (getSeatReservations(activityId).isEmpty()) {
+			LOG.warn("Input parameter activityId no seat reservation, activityId:{}", activityId);
+			throw new ApiException("未能成功获取车座信息");
+		}
+
 		// 查询活动数据
 		Map<String, Object> data = buildActivityInfoData(activityId, userId);
 
@@ -712,6 +717,19 @@ public class ActivityServiceImpl implements ActivityService {
 
 		// 查询活动相关的数据
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	/**
+	 * 根据活动ID获取当前作为预定的信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @return 作为预定信息列表
+	 */
+	private List<SeatReservation> getSeatReservations(String activityId) {
+		Map<String, Object> seatParam = new HashMap<String, Object>(1);
+		seatParam.put("activityId", activityId);
+		return seatReservDao.selectListByParam(seatParam);
 	}
 
 	/**
@@ -772,7 +790,7 @@ public class ActivityServiceImpl implements ActivityService {
 		data.put("cover", covers);
 		data.put("isSubscribed", null);
 		data.put("isOrganizer", isOrganizer(userId, activity.getOrganizer()));
-		data.put("seatInfo", activity.getInitialseat());
+
 		data.put("isMember", isMember(userId, activity.getId(), members));
 		data.put("isModified", activity.getId());
 
@@ -784,7 +802,47 @@ public class ActivityServiceImpl implements ActivityService {
 		data.put("isModified", isModified(activity.getCreatetime(), activity.getLastmodifiedtime()));
 		data.put("isOver", isActivityOver(activity.getEndtime()));
 
+		data.put("seatInfo", buildSeateInfo(activityId));
+
 		return data;
+	}
+
+	/**
+	 * 构造SeatInfo信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @return
+	 */
+	private String buildSeateInfo(String activityId) {
+		List<SeatReservation> seatList = getSeatReservations(activityId);
+		int availableSeats = 0;
+		int noCarSeats = 0;
+		for (SeatReservation seat : seatList) {
+			if (seat.getUserid() == null) {
+				// 剩余空座位数
+				availableSeats++;
+			}
+			if (seat.getCarid() == null) {
+				// 有车的
+				noCarSeats++;
+			}
+		}
+
+		if (noCarSeats == 0) {
+			// 都有车
+			final String format = "{0}（{1}空座）";
+			StringBuilder build = new StringBuilder();
+			List<Map<String, Object>> seatInfoList = activityViewDao.selectReservSeatInfoByActivityId(activityId);
+			for (Map<String, Object> item : seatInfoList) {
+				build.append(MessageFormat.format(format, item.get("model"), item.get("count"))).append(",");
+			}
+			if (build.length() > 0) {
+				return build.substring(0, build.lastIndexOf(",")).toString();
+			}
+		}
+
+		return availableSeats + "个空座";
 	}
 
 	/**

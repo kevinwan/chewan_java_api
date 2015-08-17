@@ -22,7 +22,7 @@ public class GetActivityInfoTest extends BaseTest {
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.data.isOrganizer").value("1"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.isOrganizer").value(1))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
@@ -39,7 +39,7 @@ public class GetActivityInfoTest extends BaseTest {
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.data.isOrganizer").value("0"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.isOrganizer").value(0))
 				.andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());

@@ -67,4 +67,13 @@ public interface ActivityViewDao {
 	 */
 	Map<String, Object> selectActivityOrganizer(Map<String, Object> param);
 
+	/**
+	 * 根据活动ID获取各种车型空余作为信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @return 返回活动的车座空余信息
+	 */
+	List<Map<String, Object>> selectReservSeatInfoByActivityId(String activityId);
+
 }
