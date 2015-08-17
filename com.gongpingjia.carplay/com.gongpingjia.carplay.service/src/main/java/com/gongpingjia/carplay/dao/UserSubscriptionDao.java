@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.dao;
 
+import java.util.Map;
+
 import com.gongpingjia.carplay.po.UserSubscription;
 import com.gongpingjia.carplay.po.UserSubscriptionKey;
 
@@ -13,4 +15,6 @@ public interface UserSubscriptionDao {
 
 
     int updateByPrimaryKey(UserSubscription record);
+    
+    int subscriptionCount (Map<String, Object> param);
 }

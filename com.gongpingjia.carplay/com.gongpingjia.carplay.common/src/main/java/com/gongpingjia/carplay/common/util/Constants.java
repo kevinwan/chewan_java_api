@@ -64,6 +64,25 @@ public class Constants {
 		public static final String STATUS_DECLINED = "已拒绝";
 		
 	}
+	
+	/**
+	 * 个人详情（别人/自己）
+	 * @author Administrator
+	 *
+	 */
+	public interface UserLabel{
+		
+		/**
+		 * 自己
+		 */
+		public static final String USER_ME = "我";
+		
+		/**
+		 * 他人
+		 */
+		public static final String USER_OTHERS = "TA";
+		
+	}
 
 	/**
 	 * 活动分享格式

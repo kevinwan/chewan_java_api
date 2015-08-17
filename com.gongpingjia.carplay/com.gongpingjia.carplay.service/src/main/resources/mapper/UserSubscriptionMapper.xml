@@ -32,4 +32,10 @@
 		where fromUser = #{fromuser,jdbcType=VARCHAR}
 		and toUser = #{touser,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="subscriptionCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(1) as count from user_subscription 
+		where fromUser = #{interviewedUser,jdbcType=VARCHAR}
+              and toUser = #{visitorUser,jdbcType=VARCHAR}
+	</select>
 </mapper>

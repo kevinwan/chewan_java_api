@@ -21,7 +21,7 @@
 		<result column="registerTime" property="registertime" jdbcType="BIGINT" />
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
 	</resultMap>
-
+	
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
 		id, password, nickname, phone, gender, birthYear, birthMonth, birthDay, province,

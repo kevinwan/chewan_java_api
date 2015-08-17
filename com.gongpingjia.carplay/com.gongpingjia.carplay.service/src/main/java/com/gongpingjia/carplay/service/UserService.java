@@ -68,4 +68,14 @@ public interface UserService {
 	 */
 	ResponseDo applyAuthentication(AuthenticationApplication authenticationApplication,String token,String userId);
 	
+
+	/**
+	 * 个人详情
+	 * 
+	 * @param interviewedUser
+	 * @param visitorUser
+	 * @param token
+	 * @return
+	 */
+	ResponseDo userInfo(String interviewedUser, String visitorUser, String token);
 }

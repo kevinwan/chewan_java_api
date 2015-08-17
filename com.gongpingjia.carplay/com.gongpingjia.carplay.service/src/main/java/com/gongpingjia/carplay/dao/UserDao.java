@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.gongpingjia.carplay.po.User;
+import com.gongpingjia.carplay.po.UserInfo;
 
 public interface UserDao {
 	int deleteByPrimaryKey(String id);
@@ -15,4 +16,6 @@ public interface UserDao {
 	List<User> selectByParam(Map<String, Object> param);
 
 	int updateByPrimaryKey(User user);
+	
+	UserInfo userInfo(String userid);
 }

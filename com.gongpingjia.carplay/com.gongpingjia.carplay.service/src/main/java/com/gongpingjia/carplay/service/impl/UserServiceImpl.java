@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.ToolsUtils;
+import com.gongpingjia.carplay.dao.ActivityDao;
+import com.gongpingjia.carplay.dao.AlbumPhotoDao;
 import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
@@ -31,6 +34,8 @@ import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
 import com.gongpingjia.carplay.dao.UserDao;
+import com.gongpingjia.carplay.dao.UserSubscriptionDao;
+import com.gongpingjia.carplay.po.AlbumPhoto;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.AuthenticationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
@@ -39,6 +44,7 @@ import com.gongpingjia.carplay.po.PhoneVerification;
 import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserAlbum;
+import com.gongpingjia.carplay.po.UserInfo;
 import com.gongpingjia.carplay.service.UserService;
 
 @Service
@@ -72,6 +78,15 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private AuthenticationChangeHistoryDao authenticationChangeHistoryDao;
+	
+	@Autowired
+	private ActivityDao activityDao;
+	
+	@Autowired
+	private AlbumPhotoDao albumPhotoDao;
+	
+	@Autowired
+	private UserSubscriptionDao userSubscriptionDao;
 	
 	@Override
 	public List<User> queryUsers() {
@@ -322,6 +337,64 @@ public class UserServiceImpl implements UserService {
 		return ResponseDo.buildSuccessResponse("");
 	}
 	
+	@Override
+	public ResponseDo userInfo(String interviewedUser, String visitorUser,
+			String token) {
+		
+		Map<String, Object> param = new HashMap<String, Object>();
+		//验证参数 
+	    if (!CommonUtil.isUUID(interviewedUser) || !CommonUtil.isUUID(visitorUser) || !CommonUtil.isUUID(token)) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //获取活动组织者信息
+	    UserInfo userInfo = userDao.userInfo(interviewedUser);
+	    if (null == userInfo){
+	    	LOG.warn("Fail to get organizer info of activity");
+	    	return ResponseDo.buildFailureResponse("获取活动组织者信息失败");
+	    }
+	    
+	    param.put("userId", userInfo.getUserId());
+	    param.put("nickname", userInfo.getNickname());
+	    param.put("gender", userInfo.getGender());
+	    param.put("age", userInfo.getAge());
+	    param.put("photo", PropertiesUtil.getProperty("gongpingjia.person.pic.url", "") + 
+	    		userInfo.getPhoto() + "?imageView2/1/w/200&timestamp=" + DateUtil.getTime());
+	    param.put("carBrandLogo", userInfo.getCarBrandLogo());
+	    param.put("carModel", userInfo.getCarModel());
+	    param.put("drivingExperience", userInfo.getDrivingExperience());
+	    param.put("province", userInfo.getProvince());
+	    param.put("city", userInfo.getCity());
+	    param.put("district", userInfo.getDistrict());
+	    param.put("isAuthenticated", userInfo.getIsauthenticated());
+	    
+	    param.put("label", interviewedUser == visitorUser ? Constants.UserLabel.USER_ME : Constants.UserLabel.USER_OTHERS);
+	    
+	    param.put("postNumber", activityDao.activityPostNumber(interviewedUser));
+	    
+	    List<AlbumPhoto> albumPhotos = albumPhotoDao.selectAlbumPhotoUrl(interviewedUser);
+	    List<AlbumPhotoView> albumPhotoViewList = new ArrayList<UserServiceImpl.AlbumPhotoView>();
+	    if (null != albumPhotos && !albumPhotos.isEmpty()){
+	    	for (AlbumPhoto albumPhoto : albumPhotos){
+	    		AlbumPhotoView albumPhotoView = new AlbumPhotoView();
+	    		String url = albumPhoto.getUrl();
+	    		int idxStart = url.indexOf("/album/");
+	    		albumPhotoView.setPhotoId(url.substring(idxStart + 7, idxStart + 43));
+	    		albumPhotoView.setThumbnail_pic(url);
+	    	}
+	    }
+	    param.put("albumPhotos", albumPhotoViewList);
+	    
+	    Map<String, Object> subparam = new HashMap<String, Object>();
+	    subparam.put("interviewedUser", interviewedUser);
+	    subparam.put("visitorUser", visitorUser);
+	    int subCount = userSubscriptionDao.subscriptionCount(subparam);
+	    
+	    param.put("isSubscribed", (subCount == 0) ? 0 : 1);
+	    
+		return ResponseDo.buildSuccessResponse(param);
+	}
 	
 	private ResponseDo checkPhoneVerification(String phone,String code){
 		
@@ -360,5 +433,29 @@ public class UserServiceImpl implements UserService {
 			}
 			return ResponseDo.buildSuccessResponse(uuid);
 		}
+	}
+
+	class AlbumPhotoView{
+		
+		private String photoId;
+		
+		private String thumbnail_pic;
+
+		public String getPhotoId() {
+			return photoId;
+		}
+
+		public void setPhotoId(String photoId) {
+			this.photoId = photoId;
+		}
+
+		public String getThumbnail_pic() {
+			return thumbnail_pic;
+		}
+
+		public void setThumbnail_pic(String thumbnail_pic) {
+			this.thumbnail_pic = thumbnail_pic;
+		}
+
 	}
 }
