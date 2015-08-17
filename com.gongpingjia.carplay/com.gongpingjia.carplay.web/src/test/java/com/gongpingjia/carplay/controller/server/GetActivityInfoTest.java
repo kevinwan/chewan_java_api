@@ -12,7 +12,7 @@ public class GetActivityInfoTest extends BaseTest {
 
 	// 组织者
 	@Test
-	public void testGetActivityInfoTest() throws Exception {
+	public void testGetActivityInfo() throws Exception {
 		MvcResult result = mockMvc
 				.perform(
 						get("/activity/3683878a-833f-4527-bf06-04805f20f604/info")
@@ -29,7 +29,7 @@ public class GetActivityInfoTest extends BaseTest {
 
 	// 非组织者
 	@Test
-	public void testGetActivityInfoTest2() throws Exception {
+	public void testGetActivityInfo2() throws Exception {
 		MvcResult result = mockMvc
 				.perform(
 						get("/activity/3683878a-833f-4527-bf06-04805f20f604/info")

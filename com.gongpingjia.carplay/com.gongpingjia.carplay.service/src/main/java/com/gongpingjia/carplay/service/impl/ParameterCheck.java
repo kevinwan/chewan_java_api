@@ -68,6 +68,23 @@ public class ParameterCheck {
 	}
 
 	/**
+	 * 检查用户是否存在
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @return 用户存在返回true， 用户不存在返回false
+	 */
+	public boolean isUserExist(String userId) {
+		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
+		if (tokenVerify == null) {
+			LOG.warn("No user token exist in the system, userId:{}", userId);
+			return false;
+		}
+		
+		return true;
+	}
+
+	/**
 	 * 检查参数是否为空，为空抛出异常
 	 * 
 	 * @param paramName

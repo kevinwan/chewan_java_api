@@ -3,13 +3,11 @@ package com.gongpingjia.carplay.dao;
 import com.gongpingjia.carplay.po.ActivityComment;
 
 public interface ActivityCommentDao {
-    int deleteByPrimaryKey(String id);
+	int deleteByPrimaryKey(String id);
 
-    int insert(ActivityComment record);
+	int insert(ActivityComment record);
 
+	ActivityComment selectByPrimaryKey(String id);
 
-    ActivityComment selectByPrimaryKey(String id);
-
-
-    int updateByPrimaryKey(ActivityComment record);
+	int updateByPrimaryKey(ActivityComment record);
 }

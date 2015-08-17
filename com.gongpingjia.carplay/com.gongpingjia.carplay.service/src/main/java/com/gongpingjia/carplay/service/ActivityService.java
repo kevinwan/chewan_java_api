@@ -73,4 +73,22 @@ public interface ActivityService {
 	 */
 	ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit)
 			throws ApiException;
+
+	/**
+	 * 评论活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话token
+	 * @param replyUserId
+	 *            若不传，代表不回复任何用户
+	 * @param comment
+	 *            评论内容
+	 * @return 返回评论响应结果
+	 */
+	ResponseDo publishComment(String activityId, String userId, String token, String replyUserId, String comment)
+			throws ApiException;
 }

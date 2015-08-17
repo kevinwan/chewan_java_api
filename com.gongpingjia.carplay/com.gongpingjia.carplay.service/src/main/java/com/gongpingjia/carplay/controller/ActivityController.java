@@ -99,7 +99,8 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
 	public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+			@RequestParam(value = "userId", required = false) String userId,
+			@RequestParam(value = "token", required = false) String token) {
 		LOG.info("getActivityInfo begin");
 		try {
 			return activityService.getActivityInfo(activityId, userId, token);
@@ -126,13 +127,29 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.GET)
 	public ResponseDo getActivityComments(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
-			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+			@RequestParam(value = "userId", required = false) String userId,
+			@RequestParam(value = "token", required = false) String token,
+			@RequestParam(value = "ignore", defaultValue = "0", required = false) Integer ignore,
+			@RequestParam(value = "limit", defaultValue = "10", required = false) Integer limit) {
 		LOG.info("getActivityComments begin");
 
 		try {
 			return activityService.getActivityComments(activityId, userId, token, ignore, limit);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.POST)
+	public ResponseDo publishComment(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam(value = "replyUserId", required = false) String replyUserId,
+			@RequestParam("comment") String comment) {
+		LOG.info("publishComment before");
+
+		try {
+			return activityService.publishComment(activityId, userId, token, replyUserId, comment);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

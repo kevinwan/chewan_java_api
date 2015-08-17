@@ -27,6 +27,7 @@ import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
+import com.gongpingjia.carplay.dao.ActivityCommentDao;
 import com.gongpingjia.carplay.dao.ActivityCoverDao;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
@@ -39,6 +40,7 @@ import com.gongpingjia.carplay.dao.SeatReservationDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityApplication;
+import com.gongpingjia.carplay.po.ActivityComment;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
 import com.gongpingjia.carplay.po.ActivityView;
@@ -89,6 +91,9 @@ public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
 	private ActivitySubscriptionDao subscriptionDao;
+
+	@Autowired
+	private ActivityCommentDao commentDao;
 
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
@@ -918,5 +923,45 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("assetUrl", CommonUtil.getPhotoServer());
 
 		return ResponseDo.buildSuccessResponse(activityViewDao.selectActivityComments(param));
+	}
+
+	@Override
+	public ResponseDo publishComment(String activityId, String userId, String token, String replyUserId, String comment)
+			throws ApiException {
+
+		LOG.debug("Check input parameters");
+		if (!CommonUtil.isUUID(activityId)) {
+			LOG.warn("input parameter activityId is not uuid, activityId:{}", activityId);
+			throw new ApiException("参数错误");
+		}
+
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		if (!(replyUserId == null)) {
+			if (!CommonUtil.isUUID(replyUserId)) {
+				LOG.warn("input replyUserId is not uuid, replyUserId:{}", replyUserId);
+				throw new ApiException("参数错误");
+			}
+			if (userId.equals(replyUserId)) {
+				LOG.warn("input userId is the same with replyUserId, cannot reply self");
+				throw new ApiException("不能回复自己的评论");
+			}
+
+			if (!ParameterCheck.getInstance().isUserExist(replyUserId)) {
+				LOG.warn("Reply user is not exist");
+				throw new ApiException("回复的用户不存在");
+			}
+		}
+
+		ActivityComment activityComment = new ActivityComment();
+		activityComment.setId(CodeGenerator.generatorId());
+		activityComment.setActivityid(activityId);
+		activityComment.setComment(comment);
+		activityComment.setCreatetime(DateUtil.getTime());
+		activityComment.setReplyuserid(replyUserId);
+		activityComment.setUserid(userId);
+		commentDao.insert(activityComment);
+
+		return ResponseDo.buildSuccessResponse("");
 	}
 }
