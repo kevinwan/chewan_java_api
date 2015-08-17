@@ -9,21 +9,24 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 /**
-* 2.23	 我(TA)的参与
-*  @author zhou shuofu 
-* */
+ * 2.23 我(TA)的参与
+ * 
+ * @author zhou shuofu
+ */
 public class GetUserJoinTest extends BaseTest {
-	
+
 	@Test
 	public void testjoin() throws Exception {
-		
+		String userid1 = "ad5b9c52-2e48-40ed-89b6-26154355262f";
+		String userId2 = "082c79ac-1683-43ad-ab29-101faf80490c";
+		String token = "87836150-2529-4c82-b99e-0e0ad7261247";
 		MvcResult result = mockMvc
-				.perform(
-						get("/user/ad5b9c52-2e48-40ed-89b6-26154355262f/join?userId=5c19d977-1ed9-42d1-9cbb-8d7e5b4911fd&token=5b8ae80d-c34e-4aca-92c3-3962c425964c"))
+				.perform(get("/user/" + userid1 + "/join?").param("userId", userId2).param("token", token))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
-				.andDo(MockMvcResultHandlers.print()).andReturn();
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
+				.andReturn();
 
 		Assert.assertNull(result.getModelAndView());
 	}
