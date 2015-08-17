@@ -15,4 +15,5 @@ public interface ActivityDao {
 	int updateByPrimaryKey(Activity record);
 
 	List<Map<String, Object>> selectByOrganizer(Map<String, Object> param);
+	int activityPostNumber(String userid);
 }

@@ -107,4 +107,26 @@ public class UserInfoController {
 		return userService.applyAuthentication(authenticationApplication,token,userId);
 	}
 	
+	@RequestMapping(value = "/user/{interviewedUser}/info", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseDo userInfo(@PathVariable String interviewedUser,
+			@RequestParam(value = "userId") String visitorUser,
+			@RequestParam(value = "token") String token) {
+
+		LOG.debug("userInfo is called, request parameter produce:");
+		
+		return userService.userInfo(interviewedUser, visitorUser, token);
+	}
+	
+	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseDo userListen(@PathVariable String userId,
+			@RequestParam(value = "ignore",required = false) Integer ignore,
+			@RequestParam(value = "limit",required = false) Integer limit,
+			@RequestParam(value = "token") String token) {
+		
+		LOG.debug("userListen is called, request parameter produce:");
+		
+		return userService.userListen(userId, ignore, limit, token);
+	}
 }

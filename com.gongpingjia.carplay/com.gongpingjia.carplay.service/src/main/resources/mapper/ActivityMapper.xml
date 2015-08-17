@@ -104,4 +104,8 @@
 		invalid = #{invalid,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="activityPostNumber" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(1) from activity where organizer = #{userid,jdbcType=VARCHAR}
+	</select>
 </mapper>

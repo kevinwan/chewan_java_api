@@ -86,6 +86,24 @@ public class Constants {
 	public static final String ACTIVITY_KEY_LATEST = "latest";
 
 	/**
+	 * 个人详情（别人/自己）
+	 * @author Administrator
+	 *
+	 */
+	public interface UserLabel{
+		
+		/**
+		 * 自己
+		 */
+		public static final String USER_ME = "我";
+		
+		/**
+		 * 他人
+		 */
+		public static final String USER_OTHERS = "TA";
+		
+	}
+	/**
 	 * 活动列表Key值集合
 	 */
 	public static final List<String> ACTIVITY_KEY_LIST = Arrays.asList(Constants.ACTIVITY_KEY_HOTTEST,

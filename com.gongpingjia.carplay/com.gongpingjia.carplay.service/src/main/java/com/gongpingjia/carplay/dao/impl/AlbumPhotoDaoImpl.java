@@ -41,4 +41,9 @@ public class AlbumPhotoDaoImpl implements AlbumPhotoDao {
 		return DASUtil.selectOne(AlbumPhoto.class.getName(), "selectPhotosCoutByAlbumid", albumId);
 	}
 
+	@Override
+	public List<AlbumPhoto> selectAlbumPhotoUrl(String userId) {
+		return DASUtil.selectList(AlbumPhoto.class.getName(), "selectAlbumPhotoUrl", userId);
+	}
+
 }

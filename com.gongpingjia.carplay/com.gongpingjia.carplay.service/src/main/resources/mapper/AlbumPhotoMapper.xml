@@ -53,4 +53,13 @@
 		album_photo
 		where albumId = #{albumId,jdbcType=VARCHAR}
 	</select>
+	
+	<select id="selectAlbumPhotoUrl" resultMap="BaseResultMap" parameterType="java.lang.String">
+	
+		select url 
+		from user_album,album_photo 
+		where user_album.userId = #{userId,jdbcType=VARCHAR} 
+			and user_album.id = album_photo.albumId
+	
+	</select>
 </mapper>

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.User;
+import com.gongpingjia.carplay.po.UserInfo;
 
 @Service
 public class UserDaoImpl implements UserDao {
@@ -35,6 +36,16 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public int updateByPrimaryKey(User user) {
 		return DASUtil.update(User.class.getName(), "updateByPrimaryKey", user);
+	}
+
+	@Override
+	public UserInfo userInfo(String userid) {
+		return DASUtil.selectOne(UserInfo.class.getName(), "selectUserInfo", userid);
+	}
+
+	@Override
+	public List<UserInfo> userListenList(Map<String, Object> param) {
+		return DASUtil.selectList(UserInfo.class.getName(), "userListenList", param);
 	}
 
 }

@@ -16,4 +16,6 @@ public interface AlbumPhotoDao {
 	List<AlbumPhoto> selectListByAlbumid(String albumId);
 	
 	Integer selectPhotosCoutByAlbumid(String albumId);
+	
+	List<AlbumPhoto> selectAlbumPhotoUrl(String userId);
 }
