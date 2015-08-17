@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
@@ -26,17 +27,53 @@ public class MessageController {
 	@Autowired
 	private MessageService messageService;
 
+	/**
+	 * 2.26 获取申请列表
+	 * 
+	 * @param userId
+	 *            访问者的userId
+	 * @param request
+	 *            请求参数
+	 * 
+	 * @return 活动申请列表信息
+	 * 
+	 */
 	@RequestMapping(value = "/user/{userId}/application/list", method = RequestMethod.GET)
-	public ResponseDo getApplicationList(@PathVariable("userId") String userId, HttpServletRequest req) {
+	public ResponseDo getApplicationList(@PathVariable("userId") String userId, HttpServletRequest requset) {
 
-		LOG.debug("'=> getApplicationList");
-		String token = req.getParameter("token");
-		int ignore = req.getParameter("ignore") == null ? 0 : Integer.valueOf(req.getParameter("ignore"));
-		int limit = req.getParameter("limit") == null ? 10 : Integer.valueOf(req.getParameter("limit"));
+		LOG.debug("=> getApplicationList");
+		String token = requset.getParameter("token");
+		int ignore = requset.getParameter("ignore") == null ? 0 : Integer.valueOf(requset.getParameter("ignore"));
+		int limit = requset.getParameter("limit") == null ? 10 : Integer.valueOf(requset.getParameter("limit"));
 
 		try {
 			ParameterCheck.getInstance().checkUserInfo(userId, token);
-			return messageService.getApplicationList(userId, token, ignore, limit);
+			return messageService.getApplicationList(userId, ignore, limit);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.41 获取最新消息数
+	 * 
+	 * @param userId
+	 *            访问者的userId
+	 * @param token
+	 *            访问者的 token
+	 * 
+	 * @return 未读的消息数量和最新的一条消息信息
+	 * 
+	 */
+	@RequestMapping(value = "/user/{userId}/message/count", method = RequestMethod.GET)
+	public ResponseDo getMessageCount(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+
+		LOG.debug("=> getMessageCount");
+
+		try {
+			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			return messageService.getMessageCount(userId);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

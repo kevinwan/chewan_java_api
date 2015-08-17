@@ -17,45 +17,91 @@
 	</resultMap>
 
 
-	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
 		select
-		id, fromUser, toUser, type, content, extra1, extra2, extra3, remarks, isChecked,
+		id, fromUser, toUser, type, content, extra1,
+		extra2, extra3, remarks, isChecked,
 		isDeleted, createTime
 		from message
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
 
+	<select id="selectCountByUserAndTypeComment" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select count(*) as count from message where toUser =
+		#{userId,jdbcType=VARCHAR} and isChecked = 0
+		and type = #{type,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectCountByUserAndTypeNotComment" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select count(*) as count from message where toUser =
+		#{userId,jdbcType=VARCHAR} and isChecked = 0
+		and type is not null and type not like #{type,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectContentByUserAndTypeComment" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select ifnull(content, "") as Content from message where
+		toUser = #{userId,jdbcType=VARCHAR}
+		and isChecked = 0 and type = #{type,jdbcType=VARCHAR} order by createTime
+		desc limit 1
+	</select>
+
+	<select id="selectContentByUserAndTypeNotComment" resultType="java.util.Map"
+		parameterType="java.util.Map">
+		select ifnull(content, "") as Content
+		from message
+		where toUser = #{userId,jdbcType=VARCHAR}
+		and isChecked = 0 and type is not null
+		and type not like #{type,jdbcType=VARCHAR}
+		order by createTime desc limit 1
+	</select>
+
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-		delete from message
+		delete from
+		message
 		where id = #{id,jdbcType=VARCHAR}
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Message">
-		insert into message (id, fromUser, toUser,
+		insert into message (id,
+		fromUser, toUser,
 		type, content, extra1,
 		extra2, extra3, remarks,
 		isChecked, isDeleted, createTime
 		)
-		values (#{id,jdbcType=VARCHAR}, #{fromuser,jdbcType=VARCHAR}, #{touser,jdbcType=VARCHAR},
-		#{type,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{extra1,jdbcType=VARCHAR},
-		#{extra2,jdbcType=INTEGER}, #{extra3,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
-		#{ischecked,jdbcType=TINYINT}, #{isdeleted,jdbcType=TINYINT}, #{createtime,jdbcType=BIGINT}
+		values (#{id,jdbcType=VARCHAR},
+		#{fromuser,jdbcType=VARCHAR}, #{touser,jdbcType=VARCHAR},
+		#{type,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+		#{extra1,jdbcType=VARCHAR},
+		#{extra2,jdbcType=INTEGER},
+		#{extra3,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
+		#{ischecked,jdbcType=TINYINT}, #{isdeleted,jdbcType=TINYINT},
+		#{createtime,jdbcType=BIGINT}
 		)
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Message">
 		update message
-		set fromUser = #{fromuser,jdbcType=VARCHAR},
-		toUser = #{touser,jdbcType=VARCHAR},
+		set
+		fromUser = #{fromuser,jdbcType=VARCHAR},
+		toUser =
+		#{touser,jdbcType=VARCHAR},
 		type = #{type,jdbcType=VARCHAR},
-		content = #{content,jdbcType=VARCHAR},
+		content =
+		#{content,jdbcType=VARCHAR},
 		extra1 = #{extra1,jdbcType=VARCHAR},
 		extra2 = #{extra2,jdbcType=INTEGER},
-		extra3 = #{extra3,jdbcType=VARCHAR},
+		extra3 =
+		#{extra3,jdbcType=VARCHAR},
 		remarks = #{remarks,jdbcType=VARCHAR},
 		isChecked = #{ischecked,jdbcType=TINYINT},
-		isDeleted = #{isdeleted,jdbcType=TINYINT},
-		createTime = #{createtime,jdbcType=BIGINT}
+		isDeleted =
+		#{isdeleted,jdbcType=TINYINT},
+		createTime =
+		#{createtime,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
 </mapper>

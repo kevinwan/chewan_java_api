@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
@@ -26,7 +29,27 @@ public class MessageDaoImpl implements MessageDao {
 
 	@Override
 	public int updateByPrimaryKey(Message record) {
-		return DASUtil.save(Message.class.getName(), "updateByPrimaryKey", record);
+		return DASUtil.update(Message.class.getName(), "updateByPrimaryKey", record);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectCountByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectCountByUserAndTypeComment", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectCountByUserAndTypeNotComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectCountByUserAndTypeNotComment", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectContentByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectContentByUserAndTypeComment", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectContentByUserAndTypeNotComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectContentByUserAndTypeNotComment", param);
 	}
 
 }
