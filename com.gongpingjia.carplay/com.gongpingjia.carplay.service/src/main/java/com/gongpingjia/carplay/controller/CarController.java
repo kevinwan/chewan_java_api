@@ -12,6 +12,11 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.CarService;
 
+/**
+ * 2.6获取品牌 2.7获取车型
+ * 
+ * @author zhou shuofu
+ */
 @RestController
 public class CarController {
 	private static final Logger LOG = LoggerFactory.getLogger(VersionController.class);
@@ -22,12 +27,10 @@ public class CarController {
 	/**
 	 * 2.6 获取品牌
 	 * 
-	 * 。
-	 * 
 	 * @return 品牌信息
 	 */
 	@RequestMapping(value = "/car/brand", method = RequestMethod.GET)
-	public ResponseDo CarBrand() {
+	public ResponseDo carBrand() {
 
 		LOG.debug("car/brand is called, no request parameter");
 
@@ -37,13 +40,6 @@ public class CarController {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
-
-		// 1、定义服务层接口
-		// 定义restful名称，以及参数赋值
-		// 2、调用服务层方法，得到所需信息的data
-		// 3、将得到信息转为map对象
-		// 此处得到的carBrand为公平价返回的json数据
-		// 4、将信息封装为responseDo类，返回
 	}
 
 	/**
@@ -64,7 +60,5 @@ public class CarController {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
-
 	}
-
 }

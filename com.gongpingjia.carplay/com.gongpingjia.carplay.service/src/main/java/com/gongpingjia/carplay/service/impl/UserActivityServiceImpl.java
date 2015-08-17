@@ -21,7 +21,6 @@ import com.gongpingjia.carplay.dao.ActivityCoverDao;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
 import com.gongpingjia.carplay.dao.ActivitySubscriptionDao;
-import com.gongpingjia.carplay.dao.impl.ActivityApplicationDaoImpl;
 import com.gongpingjia.carplay.service.UserActivityService;
 
 @Service
@@ -51,14 +50,6 @@ public class UserActivityServiceImpl implements UserActivityService {
 	public ResponseDo getUserPost(String userId1, String userId2, String token, Integer ignore, Integer limit)
 			throws ApiException {
 		String IMGUrl = PropertiesUtil.getProperty("qiniu.server.url", "")+"asset";
-		
-		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
-		} catch (ApiException e) {
-			LOG.error("Token expired or token not correct");
-			throw new ApiException("口令已过期，请重新登录获取新口令");
-		}
-		
 		Map<String, Object> param = new HashMap<String, Object>(3, 1);
 		param.put("organizer", userId1);
 		param.put("ignore", ignore);
@@ -108,12 +99,6 @@ public class UserActivityServiceImpl implements UserActivityService {
 			throws ApiException {
 		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "")+"asset";
 		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
-		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
-		} catch (ApiException e) {
-			LOG.error("Token expired or token not correct");
-			throw new ApiException("口令已过期，请重新登录获取新口令");
-		}
 		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId1);
 		param.put("ignore", ignore);
@@ -193,12 +178,6 @@ public class UserActivityServiceImpl implements UserActivityService {
 		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "")+"asset";
 		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
 		String STATUS_PENDING_PROCESSED="待处理";
-		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
-		} catch (ApiException e) {
-			LOG.error("Token expired or token not correct");
-			throw new ApiException("口令已过期，请重新登录获取新口令");
-		}
 		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId1);
 		param.put("ignore", ignore);

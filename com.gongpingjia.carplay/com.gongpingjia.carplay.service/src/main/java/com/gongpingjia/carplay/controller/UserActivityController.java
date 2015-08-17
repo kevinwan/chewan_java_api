@@ -13,46 +13,16 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.service.UserActivityService;
-
+import com.gongpingjia.carplay.service.impl.ParameterCheck;
 
 /**
- * @author zhou shuofu
+ * 2.21 我(TA)的发布, 2.22 我(TA)的关注, 2.23 我(TA)的参与,
  * 
- * 2.21,2.22,2.23
- * 活动的发布，关注，参与
- * */
+ * @author zhou shuofu
+ */
+
 @RestController
 public class UserActivityController {
-	// 2.21 我(TA)的发布
-	/*
-	 * req,res $userId1,$userId2,$token,$ignore,$limit ResponseDO
-	 * getUserPost(1,2,3,4,5); 参数是否正确 ResponseDO
-	 * service.UserActivityService.getUserPost(1,2,3,4,5);
-	 * 
-	 * 校验token
-	 * 
-	 * 查询此人发布的活动(activityId,publishTime,start,introduction,location,pay) select
-	 * id as activityId, createTime as publishTime, ifnull(start, 0) as start,
-	 * ifnull(description, "") as introduction, location, paymentType as pay
-	 * from activity where organizer ='da51944f-ab85-4296-83f9-02603cb6937f'
-	 * order by publishTime desc limit 0,10
-	 * 
-	 * 转日期时间(publishDate,startDate)
-	 * 
-	 * 查询活动成员(members{userId,nickname,photo}) select user.id as userId,
-	 * user.nickname, concat('getAssetUrl()', user.photo) as photo from
-	 * activity_member, user where
-	 * activity_member.activityId='00ec5ff7-eaef-4ef1-a603-c6fb921cc49d' and
-	 * activity_member.userId = user.id
-	 * 
-	 * 查询活动图片(url) select concat('getAssetUrl() +', url) as url from
-	 * activity_cover where activityId='00ec5ff7-eaef-4ef1-a603-c6fb921cc49d'
-	 * order by uploadTime 转为缩放图(cover{thumbnail_pic})
-	 * 
-	 * 转为map
-	 * 
-	 * 返回responseDO
-	 */
 	private static final Logger LOG = LoggerFactory.getLogger(VersionController.class);
 
 	@Autowired
@@ -81,21 +51,21 @@ public class UserActivityController {
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
 		LOG.info("=> getUserPost");
-		
-		if (!CommonUtil.isUUID(userId1) || !CommonUtil.isUUID(userId2) || !CommonUtil.isUUID(token)) {
+
+		if (!CommonUtil.isUUID(userId1)) {
 			LOG.error("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
-			
+			ParameterCheck.getInstance().checkUserInfo(userId2, token);
 			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
-			
+
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
-			return ResponseDo.buildFailureResponse("获取发布列表失败");
+			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 2.22 我(TA)的关注
 	 * 
@@ -119,21 +89,21 @@ public class UserActivityController {
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
 		LOG.info("=> getUserSubscribe");
-		
-		if (!CommonUtil.isUUID(userId1) || !CommonUtil.isUUID(userId2) || !CommonUtil.isUUID(token)) {
+		if (!CommonUtil.isUUID(userId1)) {
 			LOG.error("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
+
 		try {
-			
+			ParameterCheck.getInstance().checkUserInfo(userId2, token);
 			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
-			return ResponseDo.buildFailureResponse("获取关注活动列表失败");
+			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 2.23 我(TA)的参与
 	 * 
@@ -157,19 +127,19 @@ public class UserActivityController {
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
 		LOG.info("=> getUserJoin");
-		
-		if (!CommonUtil.isUUID(userId1) || !CommonUtil.isUUID(userId2) || !CommonUtil.isUUID(token)) {
+
+		if (!CommonUtil.isUUID(userId1)) {
 			LOG.error("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
-			
+			ParameterCheck.getInstance().checkUserInfo(userId2, token);
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
-			return ResponseDo.buildFailureResponse("获取参加活动列表失败");
+			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 }
