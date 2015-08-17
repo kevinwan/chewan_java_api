@@ -42,4 +42,9 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 		return DASUtil.selectOne(ActivityView.class.getName(), "selectActivityOrganizer", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectReservSeatInfoByActivityId(String activityId) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectReservSeatInfoByActivityId", activityId);
+	}
+
 }

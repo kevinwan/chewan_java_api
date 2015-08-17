@@ -264,4 +264,19 @@
 		 FROM user LEFT JOIN car ON user.id = car.userId 
 		 WHERE user.id = #{userId,jdbcType=VARCHAR} 
 	</select>
+	
+	<select id="selectReservSeatInfoByActivityId" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			reserv.carId,
+			car.model,
+			count(1) as count
+		FROM
+			seat_reservation reserv
+		LEFT JOIN car ON reserv.carId = car.id
+		WHERE
+			reserv.userId IS NULL
+		AND reserv.activityId = #{activityId,jdbcType=VARCHAR} 
+		GROUP BY
+			reserv.carId
+	</select>
 </mapper>
