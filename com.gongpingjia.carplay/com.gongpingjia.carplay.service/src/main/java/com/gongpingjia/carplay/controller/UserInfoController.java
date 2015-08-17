@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
+import com.gongpingjia.carplay.po.UserSubscription;
 import com.gongpingjia.carplay.service.UserService;
 
 @RestController
@@ -128,5 +129,20 @@ public class UserInfoController {
 		LOG.debug("userListen is called, request parameter produce:");
 		
 		return userService.userListen(userId, ignore, limit, token);
+	}
+	
+	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseDo payAttention(@PathVariable String userId,
+			@RequestParam(value = "targetUserId") String targetUserId,
+			@RequestParam(value = "token") String token) {
+		
+		LOG.debug("userListen is called, request parameter produce:");
+		
+		UserSubscription userSubscription = new UserSubscription();
+		userSubscription.setFromuser(userId);
+		userSubscription.setTouser(targetUserId);
+		
+		return userService.payAttention(userSubscription, token);
 	}
 }

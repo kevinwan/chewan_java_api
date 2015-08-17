@@ -11,9 +11,8 @@ public interface UserSubscriptionDao {
     int insert(UserSubscription record);
 
 
-    UserSubscription selectByPrimaryKey(UserSubscriptionKey key);
-
-
+    UserSubscription selectByPrimaryKey(UserSubscription key);
+    
     int updateByPrimaryKey(UserSubscription record);
     
     int subscriptionCount (Map<String, Object> param);

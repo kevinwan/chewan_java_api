@@ -20,14 +20,12 @@ public class UserSubscriptionDaoImpl implements UserSubscriptionDao {
 
 	@Override
 	public int insert(UserSubscription record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.save(UserSubscription.class.getName(), "insert", record);
 	}
 
 	@Override
-	public UserSubscription selectByPrimaryKey(UserSubscriptionKey key) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserSubscription selectByPrimaryKey(UserSubscription key) {
+		return DASUtil.selectOne(UserSubscription.class.getName(), "selectByPrimaryKey", key);
 	}
 
 	@Override

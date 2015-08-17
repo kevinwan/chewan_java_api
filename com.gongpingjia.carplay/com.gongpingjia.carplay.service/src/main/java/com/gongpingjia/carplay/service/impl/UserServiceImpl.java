@@ -45,6 +45,7 @@ import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserAlbum;
 import com.gongpingjia.carplay.po.UserInfo;
+import com.gongpingjia.carplay.po.UserSubscription;
 import com.gongpingjia.carplay.service.UserService;
 
 @Service
@@ -427,6 +428,49 @@ public class UserServiceImpl implements UserService {
 		return ResponseDo.buildSuccessResponse(userInfos);
 	}
 	
+	@Override
+	public ResponseDo payAttention(UserSubscription userSubscription,
+			String token) {
+		//验证参数 
+	    if (!CommonUtil.isUUID(userSubscription.getFromuser()) || !CommonUtil.isUUID(token) 
+	    		|| !CommonUtil.isUUID(userSubscription.getTouser()) || userSubscription.getFromuser().equals(userSubscription.getTouser())) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //获取认证口令
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userSubscription.getFromuser());
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
+	    	LOG.warn("Token expired or token not correct");
+	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		}
+		
+		//关注用户是否存在
+		User user = userDao.selectByPrimaryKey(userSubscription.getTouser());
+		if (null == user){
+	    	LOG.warn("User not exist");
+	    	return ResponseDo.buildFailureResponse("关注用户不存在");
+		}
+		
+		//是否已关注
+		UserSubscription userSub = userSubscriptionDao.selectByPrimaryKey(userSubscription);
+		if (null != userSub){
+	    	LOG.warn("already listened to this person before");
+	    	return ResponseDo.buildFailureResponse("已关注该用户，请勿重复关注");
+		}
+		userSubscription.setSubscribetime(DateUtil.getTime());
+		//关注
+		if (0 == userSubscriptionDao.insert(userSubscription)){
+	    	LOG.warn("fail to listen to this persion");
+	    	return ResponseDo.buildFailureResponse("未能成功关注该用户");
+		}
+	    return ResponseDo.buildSuccessResponse("");
+	}
+	
 	private ResponseDo checkPhoneVerification(String phone,String code){
 		
 	    //验证验证码
@@ -489,4 +533,5 @@ public class UserServiceImpl implements UserService {
 		}
 
 	}
+
 }

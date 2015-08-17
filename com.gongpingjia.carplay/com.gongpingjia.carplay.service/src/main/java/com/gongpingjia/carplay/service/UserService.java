@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
+import com.gongpingjia.carplay.po.UserSubscription;
 
 @Service
 public interface UserService {
@@ -88,4 +89,14 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo userListen(String userId,Integer ignore,Integer limit,String token);
+	
+	/**
+	 * 关注
+	 * 
+	 * @param userId
+	 * @param targetUserId
+	 * @param token
+	 * @return
+	 */
+	ResponseDo payAttention(UserSubscription userSubscription,String token);
 }

@@ -55,7 +55,7 @@ public class UserTest extends BaseTest {
 	}
 	
 	@Test
-	public void forgetPassword() throws Exception {
+	public void testForgetPassword() throws Exception {
 		MvcResult result = mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/user/password")
@@ -72,7 +72,7 @@ public class UserTest extends BaseTest {
 	}
 	
 	@Test
-	public void applyAuthentication() throws Exception {
+	public void testApplyAuthentication() throws Exception {
 		MvcResult result = mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/user/ab3a32e3-c05e-4a40-98ec-6476ef89f05a/authentication?token=d82fbe5a-3f58-4c84-81a4-3d27224e8c53")
@@ -91,7 +91,7 @@ public class UserTest extends BaseTest {
 	}
 	
 	@Test
-	public void userInfo() throws Exception {
+	public void testUserInfo() throws Exception {
 		
 		MvcResult result = mockMvc.perform(get("/user/a3864fa5-35ad-408e-86a9-65b6c7f6472f/info?userId=ab3a32e3-c05e-4a40-98ec-6476ef89f05a&token=d82fbe5a-3f58-4c84-81a4-3d27224e8c53"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -103,7 +103,7 @@ public class UserTest extends BaseTest {
 	}
 	
 	@Test
-	public void userListen() throws Exception {
+	public void testUserListen() throws Exception {
 		
 		MvcResult result = mockMvc.perform(get("/user/ab3a32e3-c05e-4a40-98ec-6476ef89f05a/listen?token=d82fbe5a-3f58-4c84-81a4-3d27224e8c53"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
@@ -111,6 +111,21 @@ public class UserTest extends BaseTest {
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 
+		Assert.assertNull(result.getModelAndView());
+	}
+	
+	@Test
+	public void testPayAttention() throws Exception {
+		MvcResult result = mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/user/ab3a32e3-c05e-4a40-98ec-6476ef89f05a/listen?token=d82fbe5a-3f58-4c84-81a4-3d27224e8c53")
+								.param("targetUserId", "a3864fa5-35ad-408e-86a9-65b6c7f6472f"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								"application/json;charset=UTF-8"))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
 }
