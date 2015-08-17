@@ -53,4 +53,24 @@ public interface ActivityService {
 	 *             业务异常
 	 */
 	ResponseDo getActivityInfo(String activityId, String userId, String token) throws ApiException;
+
+	/**
+	 * 获取活动评论信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @param ignore
+	 *            忽略行数
+	 * @param limit
+	 *            限制获取行数
+	 * @return 返回查询活动评论结果信息
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit)
+			throws ApiException;
 }

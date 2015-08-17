@@ -56,6 +56,11 @@ public class ParameterCheck {
 			throw new ApiException("用户不存在");
 		}
 
+		if (!tokenVerify.equals(token)) {
+			LOG.error("User token response to userId in the system, token:{}", token);
+			throw new ApiException("输入参数有误");
+		}
+
 		if (tokenVerify.getExpire() < DateUtil.getTime()) {
 			LOG.error("User token is out of date, userId: {}", userId);
 			throw new ApiException("口令已过期，请重新登录获取新口令");

@@ -899,4 +899,13 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 		return covers;
 	}
+
+	@Override
+	public ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit) throws ApiException {
+		
+		LOG.debug("Check input parameters");
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		
+		return null;
+	}
 }

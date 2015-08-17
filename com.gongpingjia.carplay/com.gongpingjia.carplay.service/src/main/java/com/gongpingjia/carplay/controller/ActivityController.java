@@ -86,6 +86,17 @@ public class ActivityController {
 		}
 	}
 
+	/**
+	 * 2.17 获取活动详情
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 返回响应对象
+	 */
 	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
 	public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token) {
@@ -96,5 +107,15 @@ public class ActivityController {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
+	}
+
+	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.GET)
+	public ResponseDo getActivityComments(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+		
+		
+		return null;
 	}
 }
