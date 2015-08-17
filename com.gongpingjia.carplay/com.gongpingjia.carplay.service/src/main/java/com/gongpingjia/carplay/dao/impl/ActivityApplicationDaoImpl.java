@@ -41,4 +41,9 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByCountOfActivityUserAndStatus", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectByOrganizer(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityApplication.class.getName(),"selectByOrganizer", param);
+	}
+
 }

@@ -17,4 +17,6 @@ public interface ActivityApplicationDao {
 	List<ActivityApplication> selectByParam(Object param);
 
 	List<Map<String, Long>> selectByCountOfActivityUserAndStatus(Map<String, Object> param);
+
+	List<Map<String, Object>> selectByOrganizer(Map<String, Object> param);
 }

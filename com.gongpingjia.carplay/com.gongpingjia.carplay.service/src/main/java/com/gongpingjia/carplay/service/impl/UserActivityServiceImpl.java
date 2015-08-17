@@ -97,7 +97,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 	public ResponseDo getUserSubscribe(String userId1, String userId2, String token, Integer ignore, Integer limit)
 			throws ApiException {
 		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "")+"asset";
-		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
+		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
 		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId1);
 		param.put("ignore", ignore);
@@ -175,7 +175,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 	public ResponseDo getUserJoin(String userId1, String userId2, String token, Integer ignore, Integer limit)
 			throws ApiException {
 		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "")+"asset";
-		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
+		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
 		String STATUS_PENDING_PROCESSED="待处理";
 		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId1);
