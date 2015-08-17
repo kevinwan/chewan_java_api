@@ -35,7 +35,7 @@ public class HttpClientUtil {
 	 * @param params
 	 *            参数信息
 	 * @return 返回响应结果HttpResponse,记得用完关闭流
-	 * @throws ApiException 
+	 * @throws ApiException
 	 */
 	public static CloseableHttpResponse get(String httpUrl, Map<String, String> params, List<Header> headers,
 			String charSetName) throws ApiException {
@@ -82,7 +82,9 @@ public class HttpClientUtil {
 	 */
 	public static void close(CloseableHttpResponse response) {
 		try {
-			response.close();
+			if (response != null) {
+				response.close();
+			}
 		} catch (IOException e) {
 			LOG.error("Close http response failure");
 		}

@@ -25,6 +25,7 @@
 		<result column="district" property="district" jdbcType="VARCHAR" />
         <result column="distance" property="distance" jdbcType="DOUBLE" />
         <result column="historyCount" property="historyCount" jdbcType="INTEGER" />
+        <result column="endtime" property="endtime" jdbcType="BIGINT" />
 	</resultMap>
 	
 	<select id="selectLatestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
@@ -32,6 +33,7 @@
 			activity.id AS activityId,
 			createTime AS publishTime,
 			start,
+			endtime,
 			ifnull(description, "") AS introduction,
 			location,
 			type,
@@ -96,6 +98,7 @@
 			activity.id AS activityId,
 			createTime AS publishTime,
 			start,
+			endtime,
 			ifnull(description, "") AS introduction,
 			location,
 			type,
@@ -163,6 +166,7 @@
 			activity.id AS activityId,
 			activity.createTime AS publishTime,
 			activity.start,
+			activity.endtime,
 			ifnull(activity.description, "") AS introduction,
 			activity.location,
 			ifnull(activity.province, "") AS province,
@@ -237,7 +241,7 @@
 			AND activity_member.activityId = #{activityId,jdbcType=VARCHAR}
 	</select>
 	
-	<select id="selectActivityCovers" resultType="java.lang.String" parameterType="java.util.Map">
+	<select id="selectActivityCovers" resultType="java.util.Map" parameterType="java.util.Map">
 		SELECT 
 			concat(#{assetUrl,jdbcType=VARCHAR}, url) as original_pic, 
 			concat(#{assetUrl,jdbcType=VARCHAR}, url, #{photoPostfix,jdbcType=VARCHAR}) as thumbnail_pic 
@@ -247,4 +251,17 @@
 		ORDER BY uploadTime
 	</select>
 
+	<select id="selectActivityOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT 
+		    user.id as userId, 
+		    nickname, 
+		    gender, 
+		    (year(sysdate()) - birthYear) as age, 
+		    concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR}) AS photo,
+		    ifnull((year(sysdate()) - drivingLicenseYear), "") as drivingExperience, 
+		    concat(#{gpjImagePrefix,jdbcType=VARCHAR}, brandLogo) as carBrandLogo, 
+		    ifnull(car.model, "") as carModel 
+		 FROM user LEFT JOIN car ON user.id = car.userId 
+		 WHERE user.id = #{userId,jdbcType=VARCHAR} 
+	</select>
 </mapper>

@@ -15,31 +15,32 @@ public class ActivitySubscriptionDaoImpl implements ActivitySubscriptionDao {
 
 	@Override
 	public int deleteByPrimaryKey(ActivitySubscriptionKey key) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.delete(ActivitySubscription.class.getName(), "deleteByPrimaryKey", key);
 	}
 
 	@Override
 	public int insert(ActivitySubscription record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.save(ActivitySubscription.class.getName(), "insert", record);
 	}
 
 	@Override
 	public ActivitySubscription selectByPrimaryKey(ActivitySubscriptionKey key) {
-		// TODO Auto-generated method stub
-		return null;
+		return DASUtil.selectOne(ActivitySubscription.class.getName(), "selectByPrimaryKey", key);
 	}
 
 	@Override
 	public int updateByPrimaryKey(ActivitySubscription record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.update(ActivitySubscription.class.getName(), "updateByPrimaryKey", record);
 	}
 
 	@Override
 	public List<Map<String, Object>> selectByUserId(Map<String, Object> param) {
 		return DASUtil.selectList(ActivitySubscription.class.getName(), "selectByUserId", param);
+	}
+
+	@Override
+	public Integer selectCountByParam(Map<String, Object> param) {
+		return DASUtil.selectOne(ActivitySubscription.class.getName(), "selectCountByParam", param);
 	}
 
 }

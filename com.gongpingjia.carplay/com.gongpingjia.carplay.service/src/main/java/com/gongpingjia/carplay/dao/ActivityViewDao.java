@@ -57,4 +57,14 @@ public interface ActivityViewDao {
 	 * @return 返回查询的活动图片信息
 	 */
 	List<Map<String, Object>> selectActivityCovers(Map<String, Object> param);
+
+	/**
+	 * 获取活动组织者的车辆信息
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @return 查询结果信息
+	 */
+	Map<String, Object> selectActivityOrganizer(Map<String, Object> param);
+
 }

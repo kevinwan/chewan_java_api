@@ -85,4 +85,16 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
+	public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("getActivityInfo begin");
+		try {
+			return activityService.getActivityInfo(activityId, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

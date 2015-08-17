@@ -3,13 +3,11 @@ package com.gongpingjia.carplay.dao;
 import com.gongpingjia.carplay.po.ActivityViewHistory;
 
 public interface ActivityViewHistoryDao {
-    int deleteByPrimaryKey(String id);
+	int deleteByPrimaryKey(String id);
 
-    int insert(ActivityViewHistory record);
+	int insert(ActivityViewHistory record);
 
+	ActivityViewHistory selectByPrimaryKey(String id);
 
-    ActivityViewHistory selectByPrimaryKey(String id);
-
-
-    int updateByPrimaryKey(ActivityViewHistory record);
+	int updateByPrimaryKey(ActivityViewHistory record);
 }

@@ -37,4 +37,9 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityCovers", param);
 	}
 
+	@Override
+	public Map<String, Object> selectActivityOrganizer(Map<String, Object> param) {
+		return DASUtil.selectOne(ActivityView.class.getName(), "selectActivityOrganizer", param);
+	}
+
 }
