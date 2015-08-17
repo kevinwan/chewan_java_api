@@ -18,10 +18,10 @@
 	
 	
 	<select id="selectByUserId" resultType="java.util.Map" parameterType="java.util.Map">
-		select subscription.activityId, organizer, publishTime, start, introduction, location, type, pay, nickname, gender, 
+		select subscription.activityId, organizer, publishTime, start,endTime, introduction, location, type, pay, nickname, gender, 
         age, photo, ifnull(concat(#{gpjIMGUrl,jdbcType=VARCHAR} , car.carBrandLogo),'') as carBrandLogo, 
         ifnull(car.carModel, '') as carModel, drivingExperience, resA.count as totalSeat, resB.count as holdingSeat from activity_subscription 
-        subscription left join (select id as activityId, organizer, createTime as publishTime, start, ifnull(description, '') as introduction, 
+        subscription left join (select id as activityId, organizer, createTime as publishTime, start,endTime, ifnull(description, '') as introduction, 
         location, type, paymentType as pay from activity) act on subscription.activityId = act.activityId left join (select activityId, count(*) 
         as count from seat_reservation group by activityId) resA on act.activityId = resA.activityId left join(select activityId, count(*) as count 
         from seat_reservation where userId is not null group by activityId) resB on act.activityId = resB.activityId left join (select user.id as userId, 

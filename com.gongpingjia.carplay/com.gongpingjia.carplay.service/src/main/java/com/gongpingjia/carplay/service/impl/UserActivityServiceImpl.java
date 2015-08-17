@@ -66,6 +66,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			
 			map.put("publishDate",new SimpleDateFormat("MM.dd").format(DateUtil.getDate((Long)activity.get("publishTime"))));
 			map.put("startDate",(Long)activity.get("start"));
+			map.put("isOver", (Long)activity.get("endTime")<DateUtil.getTime()?1:0);
 			
 			param.clear();
 			param.put("activityId", activity.get("activityId"));
@@ -128,6 +129,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			
 			activityLinkMap.put("publishTime", activity.get("publishTime"));
 			activityLinkMap.put("start", activity.get("start"));
+			activityLinkMap.put("isOver", (Long)activity.get("endTime")<DateUtil.getTime()?1:0);
 			activityLinkMap.put("introduction", activity.get("introduction"));
 			activityLinkMap.put("location", activity.get("location"));
 			activityLinkMap.put("type", activity.get("type"));
@@ -196,6 +198,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			
 			activityLinkMap.put("publishTime", activity.get("publishTime"));
 			activityLinkMap.put("start", activity.get("start"));
+			activityLinkMap.put("isOver", (Long)activity.get("endTime")<DateUtil.getTime()?1:0);
 			activityLinkMap.put("introduction", activity.get("introduction"));
 			activityLinkMap.put("location", activity.get("location"));
 			activityLinkMap.put("type", activity.get("type"));

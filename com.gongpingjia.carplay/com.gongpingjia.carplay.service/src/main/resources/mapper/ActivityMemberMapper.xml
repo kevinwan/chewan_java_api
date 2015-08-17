@@ -24,10 +24,10 @@
 	</select>
 	
 	<select id="selectByUserId" resultType="java.util.Map" parameterType="java.util.Map">
-		select member.activityId, publishTime, start, introduction, location, type, pay, organizer, nickname, gender, 
+		select member.activityId, publishTime, start,endTime, introduction, location, type, pay, organizer, nickname, gender, 
          age, photo, ifnull(concat(#{gpjIMGUrl,jdbcType=VARCHAR} , car.carBrandLogo),"") as carBrandLogo, ifnull(car.carModel, '') 
          as carModel, drivingExperience, resA.count as totalSeat, resB.count as holdingSeat from activity_member member left join 
-         (select id as activityId, organizer, createTime as publishTime, start, ifnull(description, '') as introduction, location, 
+         (select id as activityId, organizer, createTime as publishTime, start,endTime, ifnull(description, '') as introduction, location, 
          type, paymentType as pay from activity) act on member.activityId = act.activityId left join (select activityId, count(*) 
          as count from seat_reservation group by activityId) resA on act.activityId = resA.activityId left join(select activityId, 
          count(*) as count from seat_reservation where userId is not null group by activityId) resB on act.activityId = resB.activityId 

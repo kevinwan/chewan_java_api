@@ -40,7 +40,7 @@
 	
 	<select id="selectByOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
 		select
-		id as activityId, createTime as publishTime, ifnull(start, 0) as start,
+		id as activityId, createTime as publishTime, ifnull(start, 0) as start,endTime,
 		ifnull(description, "") as introduction, location, paymentType as pay
 		from activity where organizer = #{organizer,jdbcType=VARCHAR}
 		order by publishTime desc limit #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}	

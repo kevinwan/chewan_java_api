@@ -25,7 +25,7 @@ public class MessageServiceImpl implements MessageService {
 
 	@Override
 	public ResponseDo getApplicationList(String userId, String token, int ignore, int limit) throws ApiException {
-
+		
 		String statusPendingProcessed = "待处理";
 		String assetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
 		String gpjImgUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
@@ -38,6 +38,9 @@ public class MessageServiceImpl implements MessageService {
 		param.put("assertUrl", assetUrl);
 		param.put("gpjImgUrl", gpjImgUrl);
 		List<Map<String, Object>> activityApplicationList = activityApplicationDao.selectByOrganizer(param);
+		
+		LOG.debug("select activityApplicationList");
+		
 		return ResponseDo.buildSuccessResponse(activityApplicationList);
 	}
 
