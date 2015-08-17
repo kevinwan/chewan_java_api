@@ -1,5 +1,11 @@
 package com.gongpingjia.carplay.po;
 
+/**
+ * 查看活动相关的类内容类，没有对应的数据表
+ * 
+ * @author licheng
+ *
+ */
 public class ActivityView {
 	private String activityId;
 
@@ -46,6 +52,8 @@ public class ActivityView {
 	private Double distance;
 
 	private Integer historyCount;
+
+	private Long endtime;
 
 	public String getActivityId() {
 		return activityId;
@@ -229,6 +237,14 @@ public class ActivityView {
 
 	public void setHistoryCount(Integer historyCount) {
 		this.historyCount = historyCount;
+	}
+
+	public Long getEndtime() {
+		return endtime;
+	}
+
+	public void setEndtime(Long endtime) {
+		this.endtime = endtime;
 	}
 
 }

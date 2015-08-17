@@ -30,7 +30,9 @@ import com.gongpingjia.carplay.dao.ActivityApplicationDao;
 import com.gongpingjia.carplay.dao.ActivityCoverDao;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
+import com.gongpingjia.carplay.dao.ActivitySubscriptionDao;
 import com.gongpingjia.carplay.dao.ActivityViewDao;
+import com.gongpingjia.carplay.dao.ActivityViewHistoryDao;
 import com.gongpingjia.carplay.dao.ApplicationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.SeatReservationDao;
@@ -40,6 +42,7 @@ import com.gongpingjia.carplay.po.ActivityApplication;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
 import com.gongpingjia.carplay.po.ActivityView;
+import com.gongpingjia.carplay.po.ActivityViewHistory;
 import com.gongpingjia.carplay.po.ApplicationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.SeatReservation;
@@ -80,6 +83,12 @@ public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
 	private ActivityViewDao activityViewDao;
+
+	@Autowired
+	private ActivityViewHistoryDao viewHistoryDao;
+
+	@Autowired
+	private ActivitySubscriptionDao subscriptionDao;
 
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
@@ -488,7 +497,6 @@ public class ActivityServiceImpl implements ActivityService {
 	private List<Map<String, Object>> buildActivitiesData(List<ActivityView> activityViewList, String userId) {
 		LOG.debug("build response data by input activity list");
 		String photoPostfix = CommonUtil.getActivityPhotoPostfix();
-		String assetUrl = CommonUtil.getPhotoServer();
 
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(activityViewList.size());
 		for (ActivityView item : activityViewList) {
@@ -515,22 +523,41 @@ public class ActivityServiceImpl implements ActivityService {
 
 			record.put("totalSeat", item.getTotalSeat());
 
-			Map<String, Object> param = new HashMap<String, Object>(3, 1);
-			param.put("assetUrl", assetUrl);
-			param.put("photoPostfix", photoPostfix);
-			param.put("activityId", item.getActivityId());
+			Map<String, Object> param = buildCommonQueryParam(item.getActivityId(), userId);
 
 			List<Map<String, Object>> members = activityViewDao.selectActivityMembers(param);
 			record.put("members", members);
-			record.put("cover", activityViewDao.selectActivityCovers(param));
+			record.put("cover", buildActivityCovers(param));
 
 			record.put("isOrganizer", isOrganizer(userId, item.getUserId()));
 			record.put("isMember", isMember(userId, item.getActivityId(), members));
+			record.put("isOver", isActivityOver(item.getEndtime()));
 
 			result.add(record);
 		}
 
 		return result;
+	}
+
+	/**
+	 * 构造与活动相关的查询条件参数
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * 
+	 * @return 返回构造的查询参数,如果存在多余的参数可以忽略
+	 */
+	private Map<String, Object> buildCommonQueryParam(String activityId, String userId) {
+		Map<String, Object> param = new HashMap<String, Object>(6, 1);
+		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("photoPostfix", CommonUtil.getActivityPhotoPostfix());
+		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
+		param.put("activityId", activityId);
+		param.put("userId", userId);
+
+		return param;
 	}
 
 	/**
@@ -666,4 +693,152 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 	}
 
+	@Override
+	public ResponseDo getActivityInfo(String activityId, String userId, String token) throws ApiException {
+
+		LOG.debug("Begin check input parameters");
+		if (!CommonUtil.isUUID(activityId)) {
+			LOG.warn("Input parameter activityId is not uuid, activityId:{}", activityId);
+			throw new ApiException("参数错误");
+		}
+
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		// 查询活动数据
+		Map<String, Object> data = buildActivityInfoData(activityId, userId);
+
+		LOG.debug("Record activity view history log");
+		saveActivityViewHistory(activityId, userId);
+
+		// 查询活动相关的数据
+		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	/**
+	 * 保存活动查看历史记录
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 */
+	private void saveActivityViewHistory(String activityId, String userId) {
+		ActivityViewHistory viewHistory = new ActivityViewHistory();
+		viewHistory.setActivityid(activityId);
+		viewHistory.setId(CodeGenerator.generatorId());
+		viewHistory.setUserid(userId);
+		viewHistory.setViewtime(DateUtil.getTime());
+		viewHistoryDao.insert(viewHistory);
+	}
+
+	/**
+	 * 构造返回的活动详情的信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @return 返回构造的数据信息
+	 */
+	private Map<String, Object> buildActivityInfoData(String activityId, String userId) {
+		LOG.debug("build activity datas");
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+
+		Map<String, Object> param = buildCommonQueryParam(activityId, userId);
+
+		List<Map<String, Object>> members = activityViewDao.selectActivityMembers(param);
+
+		List<Map<String, Object>> covers = buildActivityCovers(param);
+
+		Map<String, Object> organizer = activityViewDao.selectActivityOrganizer(param);
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("activityId", activity.getId());
+		data.put("publishTime", activity.getCreatetime());
+		data.put("introduction", CommonUtil.ifNull(activity.getDescription(), ""));
+		data.put("location", activity.getLocation());
+		data.put("start", activity.getStart());
+		data.put("end", activity.getEnd());
+		data.put("pay", activity.getPaymenttype());
+		data.put("longitude", CommonUtil.ifNull(activity.getLongitude(), "0"));
+		data.put("latitude", CommonUtil.ifNull(activity.getLatitude(), "0"));
+		data.put("province", CommonUtil.ifNull(activity.getProvince(), ""));
+		data.put("city", CommonUtil.ifNull(activity.getCity(), ""));
+		data.put("district", CommonUtil.ifNull(activity.getDistrict(), ""));
+		data.put("end", activity.getEnd());
+
+		data.put("organizer", organizer);
+		data.put("members", members);
+		data.put("cover", covers);
+		data.put("isSubscribed", null);
+		data.put("isOrganizer", isOrganizer(userId, activity.getOrganizer()));
+		data.put("seatInfo", activity.getInitialseat());
+		data.put("isMember", isMember(userId, activity.getId(), members));
+		data.put("isModified", activity.getId());
+
+		Map<String, Object> subParam = new HashMap<String, Object>(2, 1);
+		subParam.put("activityId", activityId);
+		subParam.put("userId", userId);
+		Integer subCount = subscriptionDao.selectCountByParam(subParam);
+		data.put("isSubscribed", subCount);
+		data.put("isModified", isModified(activity.getCreatetime(), activity.getLastmodifiedtime()));
+		data.put("isOver", isActivityOver(activity.getEndtime()));
+
+		return data;
+	}
+
+	/**
+	 * 检查活动是否修改过
+	 * 
+	 * @param createTime
+	 *            活动创建时间
+	 * @param modifiedTime
+	 *            活动修改时间
+	 * 
+	 * @return 如果活动没有修改返回0， 修改过返回1
+	 */
+	private Integer isModified(Long createTime, Long modifiedTime) {
+		Integer isModified = 0;
+
+		if (createTime == null || modifiedTime == null) {
+			return isModified;
+		}
+
+		if (!createTime.equals(modifiedTime)) {
+			isModified = 1;
+		}
+		return isModified;
+	}
+
+	/**
+	 * 根据活动endTime时间与当前比较，确认是否过期
+	 * 
+	 * @param endTime
+	 *            结束时间
+	 * @return 活动是否过期
+	 */
+	private Integer isActivityOver(Long endTime) {
+		Integer isOver = 0;
+		if (endTime < DateUtil.getTime()) {
+			isOver = 1;
+		}
+		return isOver;
+	}
+
+	/**
+	 * 构造活动信息的封面信息
+	 * 
+	 * @param param
+	 *            查询参数
+	 * @return 返回活动封面信息
+	 */
+	private List<Map<String, Object>> buildActivityCovers(Map<String, Object> param) {
+		List<Map<String, Object>> covers = activityViewDao.selectActivityCovers(param);
+		for (Map<String, Object> item : covers) {
+			String coverUrl = String.valueOf(item.get("original_pic"));
+			String coverId = coverUrl.substring(0, coverUrl.lastIndexOf("/"));
+			item.put("coverId", coverId.substring(coverId.lastIndexOf("/")));
+		}
+		return covers;
+	}
 }

@@ -51,4 +51,13 @@
 		where userId = #{userid,jdbcType=VARCHAR}
 		and activityId = #{activityid,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="selectCountByParam" resultType="java.lang.Integer" parameterType="java.util.Map">
+		SELECT 
+			count(1) 
+		FROM 
+			activity_subscription 
+		WHERE activityId = #{activityId,jdbcType=VARCHAR} 
+			and userId = #{userId,jdbcType=VARCHAR}
+	</select>
 </mapper>

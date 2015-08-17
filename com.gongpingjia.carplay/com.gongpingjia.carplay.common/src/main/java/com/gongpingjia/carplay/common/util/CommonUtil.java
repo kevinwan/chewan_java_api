@@ -90,4 +90,20 @@ public class CommonUtil {
 	public static String getActivityPhotoPostfix() {
 		return PropertiesUtil.getProperty("activity.photo.postfix", "&imageView2/1/w/200");
 	}
+
+	/**
+	 * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+	 * 
+	 * @param objectValue
+	 *            目标值
+	 * @param defaultValue
+	 *            默认值
+	 * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+	 */
+	public static Object ifNull(Object objectValue, Object defaultValue) {
+		if (objectValue == null) {
+			return defaultValue;
+		}
+		return objectValue;
+	}
 }
