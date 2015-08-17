@@ -43,7 +43,7 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 
 	@Override
 	public List<Map<String, Object>> selectByOrganizer(Map<String, Object> param) {
-		return DASUtil.selectList(ActivityApplication.class.getName(),"selectByOrganizer", param);
+		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByOrganizer", param);
 	}
 
 }

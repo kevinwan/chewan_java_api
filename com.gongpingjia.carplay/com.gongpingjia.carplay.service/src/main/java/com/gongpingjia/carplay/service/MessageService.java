@@ -4,7 +4,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
 public interface MessageService {
-	
+
 	/**
 	 * 2.26 获取申请列表
 	 * 
