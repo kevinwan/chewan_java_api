@@ -495,6 +495,48 @@ public class UserServiceImpl implements UserService {
 		return ResponseDo.buildSuccessResponse("");
 	}
 	
+	@Override
+	public ResponseDo alterUserInfo(User user, String token) {
+		
+		//验证参数 
+	    if (!CommonUtil.isUUID(user.getId()) || !CommonUtil.isUUID(token)) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //用户是否存在
+	    User userDB = userDao.selectByPrimaryKey(user.getId());
+	    if (null == userDB){
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+		
+	    //获取认证口令
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(user.getId());
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
+	    	LOG.warn("Token expired or token not correct");
+	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		}
+		
+		userDB.setNickname(user.getNickname());
+		userDB.setGender(user.getGender());
+		userDB.setProvince(user.getProvince());
+		userDB.setCity(user.getCity());
+		userDB.setDistrict(user.getDistrict());
+		userDB.setDrivinglicenseyear(user.getDrivinglicenseyear());
+		
+		//跟新用户信息
+		if (0 == userDao.updateByPrimaryKey(userDB)){
+	    	LOG.warn("Fail to update user info");
+	    	return ResponseDo.buildFailureResponse("未能成功更新用户信息");
+		}
+		return ResponseDo.buildSuccessResponse("");
+	}
+	
 	private ResponseDo checkPhoneVerification(String phone,String code){
 		
 	    //验证验证码

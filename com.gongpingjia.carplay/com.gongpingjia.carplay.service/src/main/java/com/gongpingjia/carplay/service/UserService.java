@@ -108,4 +108,13 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo unPayAttention(UserSubscription userSubscription,String token);
+	
+	/**
+	 * 变更我的信息
+	 * 
+	 * @param userSubscription
+	 * @param token
+	 * @return
+	 */
+	ResponseDo alterUserInfo(User user,String token);
 }

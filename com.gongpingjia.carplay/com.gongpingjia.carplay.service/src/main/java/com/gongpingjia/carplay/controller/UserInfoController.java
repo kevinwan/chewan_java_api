@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.controller;
 
+import java.util.Calendar;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,4 +164,29 @@ public class UserInfoController {
 		return userService.unPayAttention(userSubscription, token);
 	}
 
+	@RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseDo alterUserInfo(@PathVariable String userId,
+			@RequestParam(value = "nickname") String nickname,
+			@RequestParam(value = "gender") String gender,
+			@RequestParam(value = "drivingExperience") Integer drivingExperience,
+			@RequestParam(value = "province") String province,
+			@RequestParam(value = "city") String city,
+			@RequestParam(value = "district") String district,
+			@RequestParam(value = "token") String token) {
+
+		LOG.debug("alterUserInfo is called, request parameter produce:");
+		
+		User user = new User();
+		user.setId(userId);
+		user.setNickname(nickname);
+		user.setGender(gender);
+		user.setProvince(province);
+		user.setCity(city);
+		user.setDistrict(district);
+		user.setDrivinglicenseyear(Calendar.getInstance().get(Calendar.YEAR) - drivingExperience);
+		
+		return userService.alterUserInfo(user, token);
+	}
+	
 }

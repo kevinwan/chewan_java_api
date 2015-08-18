@@ -134,7 +134,7 @@ public class UploadController {
 	}
 	
 	/**
-	 * 2.10 行驶证上传
+	 * 更改头像
 	 * 
 	 * @param userId
 	 *            用户ID
