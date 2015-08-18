@@ -144,8 +144,7 @@ public class UserServiceImpl implements UserService {
 	    	LOG.warn("Phone already ed");
 	    	return ResponseDo.buildFailureResponse("该用户已注册");
 	    }
-	    String uuid = CodeGenerator.generatorId();
-	    user.setId(uuid);
+	    String uuid = user.getId();
 	    //注册用户
 	    userDao.insert(user);
 	    

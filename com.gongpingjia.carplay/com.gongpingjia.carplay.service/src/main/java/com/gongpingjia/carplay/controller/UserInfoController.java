@@ -42,6 +42,7 @@ public class UserInfoController {
 		LOG.debug("register is called, request parameter produce:");
 
 		User user = new User();
+		user.setId(photo);
 		user.setPhone(phone);
 		user.setPassword(password);
 		user.setNickname(nickname);
@@ -160,4 +161,5 @@ public class UserInfoController {
 		
 		return userService.unPayAttention(userSubscription, token);
 	}
+
 }

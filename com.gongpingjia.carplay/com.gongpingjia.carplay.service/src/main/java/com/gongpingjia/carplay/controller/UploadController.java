@@ -132,4 +132,26 @@ public class UploadController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+	
+	/**
+	 * 2.10 行驶证上传
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @return 返回结果对象
+	 */
+	@RequestMapping(value = "/user/{userId}/avatar", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	public ResponseDo reUploadUserPhoto(@PathVariable(value = "userId") String userId,
+			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+		LOG.info("reUploadUserPhoto attach size: {}", attach.getSize());
+
+		try {
+			return service.reUploadUserPhoto(userId, attach, request);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse("上传文件失败");
+		}
+	}
 }

@@ -78,4 +78,17 @@ public interface UploadService {
 	 *             业务异常信息
 	 */
 	ResponseDo uploadFeedbackPhoto(MultipartFile multiFile, HttpServletRequest request) throws ApiException;
+	
+	/**
+	 * 更改头像
+	 * 
+	 * @param multiFile
+	 *            反馈图片资源文件
+	 * @param request
+	 *            请求参数信息
+	 * @return 返回上传结果
+	 * @throws ApiException
+	 *             业务异常信息
+	 */
+	ResponseDo reUploadUserPhoto(String userId,MultipartFile multiFile, HttpServletRequest request) throws ApiException;
 }
