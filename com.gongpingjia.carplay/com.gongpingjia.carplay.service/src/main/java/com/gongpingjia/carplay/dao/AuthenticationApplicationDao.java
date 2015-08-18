@@ -17,4 +17,6 @@ public interface AuthenticationApplicationDao {
     int updateByPrimaryKey(AuthenticationApplication record);
     
     List<AuthenticationApplication> selectByParam(Map<String, Object> param);
+
+	List<Map<String, Object>> selectCarModelbyId(Map<String, Object> param);
 }

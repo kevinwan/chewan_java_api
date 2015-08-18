@@ -16,24 +16,26 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.controller.VersionController;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
+import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.MessageDao;
 import com.gongpingjia.carplay.service.MessageService;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 	private static final Logger LOG = LoggerFactory.getLogger(VersionController.class);
-
+	private String assetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
+	private String brandImgUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
 	@Autowired
 	private ActivityApplicationDao activityApplicationDao;
 
 	@Autowired
 	private MessageDao messageDao;
 
+	@Autowired
+	private AuthenticationApplicationDao authenticationApplicationDao;
+
 	@Override
 	public ResponseDo getApplicationList(String userId, int ignore, int limit) throws ApiException {
-
-		String assetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
-		String gpjImgUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
 
 		Map<String, Object> param = new HashMap<>(5, 1);
 		param.put("userId", userId);
@@ -41,7 +43,7 @@ public class MessageServiceImpl implements MessageService {
 		param.put("limit", limit);
 		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
 		param.put("assertUrl", assetUrl);
-		param.put("gpjImgUrl", gpjImgUrl);
+		param.put("gpjImgUrl", brandImgUrl);
 		List<Map<String, Object>> activityApplicationList = activityApplicationDao.selectByOrganizer(param);
 
 		LOG.debug("select activityApplicationList");
@@ -117,4 +119,53 @@ public class MessageServiceImpl implements MessageService {
 		return (String) messageCountList.get(0).get("Content");
 	}
 
+	@Override
+	public ResponseDo getMessageList(String userId, String type, int ignore, int limit) throws ApiException {
+		String typeflag = type.toString();
+
+		type = MessageType.COMMENT.getName();
+		Map<String, Object> param = new HashMap<>(6, 1);
+		param.put("userId", userId);
+		param.put("type", type);
+		param.put("ignore", ignore);
+		param.put("limit", limit);
+		param.put("brandImgUrl", brandImgUrl);
+		param.put("assetImgUrl", assetUrl);
+
+		List<Map<String, Object>> messageList;
+
+		if (typeflag.equals("comment")) {
+			messageList = messageDao.selectMessageListByUserAndTypeComment(param);
+
+			Map<String, Object> paramUp = new HashMap<>(2, 1);
+			paramUp.put("userId", userId);
+			paramUp.put("type", type);
+			messageDao.updateIsCheckedByUserAndTypeComment(paramUp);
+
+		} else if (typeflag.equals("application")) {
+			messageList = messageDao.selectMessageListByUserAndTypeNotComment(param);
+
+			Map<String, Object> paramUp = new HashMap<>(2, 1);
+			paramUp.put("userId", userId);
+			paramUp.put("type", type);
+			messageDao.updateIsCheckedByUserAndTypeCommentNotComment(paramUp);
+
+			for (int i = 0; i < messageList.size(); i++) {
+
+				if (messageList.get(i).get("type").equals(MessageType.AUTHENTICATION.getName())) {
+					Map<String, Object> paramModel = new HashMap<>(1, 1);
+					paramModel.put("applicationId", messageList.get(i).get("applicationId"));
+					List<Map<String, Object>> carModel = authenticationApplicationDao.selectCarModelbyId(paramModel);
+
+					if (carModel.size() > 0)
+						messageList.get(i).put("carModel", carModel.get(0).get("carModel"));
+				}
+			}
+		} else {
+			LOG.error("error： getMessageList ，the messageType is error");
+			messageList = null;
+			throw new ApiException("消息类型错误");
+		}
+		return ResponseDo.buildSuccessResponse(messageList);
+	}
 }

@@ -25,12 +25,25 @@ public interface MessageService {
 	 * 
 	 * @param userId
 	 *            访问者的userId
-	 * @param token
-	 *            访问者的 token
 	 * 
 	 * @return 未读的消息数量和最新的一条消息信息
 	 * 
 	 */
 	ResponseDo getMessageCount(String userId) throws ApiException;
+
+	/**
+	 * 2.42 获取消息列表
+	 * 
+	 * @param userId
+	 *            用户Id
+	 * @param type
+	 *            留言类型conmment 或 application
+	 * @param ignore
+	 *            返回结果将扔掉的条数, 不填默认为 0
+	 * @param limit
+	 *            返回的条数, 默认为 10
+	 * 
+	 */
+	ResponseDo getMessageList(String userId, String type, int ignore, int limit)throws ApiException ;
 
 }

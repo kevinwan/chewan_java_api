@@ -17,7 +17,9 @@ import com.gongpingjia.carplay.service.MessageService;
 import com.gongpingjia.carplay.service.impl.ParameterCheck;
 
 /**
+ * 消息message
  * 
+ * @author zhou shuofu
  * */
 @RestController
 public class MessageController {
@@ -39,12 +41,12 @@ public class MessageController {
 	 * 
 	 */
 	@RequestMapping(value = "/user/{userId}/application/list", method = RequestMethod.GET)
-	public ResponseDo getApplicationList(@PathVariable("userId") String userId, HttpServletRequest requset) {
+	public ResponseDo getApplicationList(@PathVariable("userId") String userId, HttpServletRequest request) {
 
 		LOG.debug("=> getApplicationList");
-		String token = requset.getParameter("token");
-		int ignore = requset.getParameter("ignore") == null ? 0 : Integer.valueOf(requset.getParameter("ignore"));
-		int limit = requset.getParameter("limit") == null ? 10 : Integer.valueOf(requset.getParameter("limit"));
+		String token = request.getParameter("token");
+		int ignore = request.getParameter("ignore") == null ? 0 : Integer.valueOf(request.getParameter("ignore"));
+		int limit = request.getParameter("limit") == null ? 10 : Integer.valueOf(request.getParameter("limit"));
 
 		try {
 			ParameterCheck.getInstance().checkUserInfo(userId, token);
@@ -80,5 +82,34 @@ public class MessageController {
 		}
 
 	}
+
+	/**
+	 * 2.42 获取消息列表
+	 * 
+	 * @param userId
+	 *            用户Id
+	 * @param request
+	 *            请求参数
+	 * @return 消息列表
+	 */
+	@RequestMapping(value = "/user/{userId}/message/list", method = RequestMethod.GET)
+	public ResponseDo getMessageList(@PathVariable("userId") String userId, HttpServletRequest request) {
+		LOG.debug("==> getMessageList");
+
+		String token = request.getParameter("token");
+		String type = request.getParameter("type");
+		int ignore = request.getParameter("ignore") == null ? 0 : Integer.valueOf(request.getParameter("ignore"));
+		int limit = request.getParameter("limit") == null ? 10 : Integer.valueOf(request.getParameter("limit"));
+
+		try {
+			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			return messageService.getMessageList(userId, type, ignore, limit);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+	
+	
 
 }

@@ -21,4 +21,12 @@ public interface MessageDao {
 	List<Map<String, Object>> selectContentByUserAndTypeComment(Map<String, Object> param);
 
 	List<Map<String, Object>> selectContentByUserAndTypeNotComment(Map<String, Object> param);
+
+	List<Map<String, Object>> selectMessageListByUserAndTypeComment(Map<String, Object> param);
+
+	List<Map<String, Object>> selectMessageListByUserAndTypeNotComment(Map<String, Object> param);
+
+	int updateIsCheckedByUserAndTypeComment(Map<String, Object> param);
+
+	int updateIsCheckedByUserAndTypeCommentNotComment(Map<String, Object> param);
 }

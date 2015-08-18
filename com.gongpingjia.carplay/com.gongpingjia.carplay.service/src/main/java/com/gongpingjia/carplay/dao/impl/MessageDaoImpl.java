@@ -52,4 +52,22 @@ public class MessageDaoImpl implements MessageDao {
 		return DASUtil.selectList(Message.class.getName(), "selectContentByUserAndTypeNotComment", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectMessageListByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectMessageListByUserAndTypeComment", param);
+	}
+	@Override
+	public List<Map<String, Object>> selectMessageListByUserAndTypeNotComment(Map<String, Object> param) {
+		return DASUtil.selectList(Message.class.getName(), "selectMessageListByUserAndTypeNotComment", param);
+	}
+	@Override
+	public int updateIsCheckedByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.update(Message.class.getName(), "updateIsCheckedByUserAndTypeComment", param);
+	}
+
+	@Override
+	public int updateIsCheckedByUserAndTypeCommentNotComment(Map<String, Object> param) {
+		return DASUtil.update(Message.class.getName(), "updateIsCheckedByUserAndTypeNotComment", param);
+	}
+
 }

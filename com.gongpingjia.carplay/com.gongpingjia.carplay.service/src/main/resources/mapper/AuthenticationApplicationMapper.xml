@@ -22,6 +22,10 @@
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
 
+	<select id="selectCarModelbyId" resultType="java.util.Map" parameterType="java.util.Map">
+		select ifnull(model, "") as carModel from authentication_application where id =#{applicationId,jdbcType=VARCHAR}
+	</select>
+
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from authentication_application
 		where id =

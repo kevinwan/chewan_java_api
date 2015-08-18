@@ -38,4 +38,9 @@ public class AuthenticationApplicationDaoImpl implements
 		return DASUtil.selectList(AuthenticationApplication.class.getName(), "selectByParam", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectCarModelbyId(Map<String, Object> param) {
+		return DASUtil.selectList(AuthenticationApplication.class.getName(), "selectCarModelbyId", param);
+	}
+
 }
