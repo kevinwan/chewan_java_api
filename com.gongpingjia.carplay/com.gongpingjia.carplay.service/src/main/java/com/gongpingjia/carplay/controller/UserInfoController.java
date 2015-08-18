@@ -145,4 +145,19 @@ public class UserInfoController {
 		
 		return userService.payAttention(userSubscription, token);
 	}
+	
+	@RequestMapping(value = "/user/{userId}/unlisten", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseDo unPayAttention(@PathVariable String userId,
+			@RequestParam(value = "targetUserId") String targetUserId,
+			@RequestParam(value = "token") String token) {
+		
+		LOG.debug("userListen is called, request parameter produce:");
+		
+		UserSubscription userSubscription = new UserSubscription();
+		userSubscription.setFromuser(userId);
+		userSubscription.setTouser(targetUserId);
+		
+		return userService.unPayAttention(userSubscription, token);
+	}
 }

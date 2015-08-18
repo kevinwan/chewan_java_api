@@ -471,6 +471,31 @@ public class UserServiceImpl implements UserService {
 	    return ResponseDo.buildSuccessResponse("");
 	}
 	
+	@Override
+	public ResponseDo unPayAttention(UserSubscription userSubscription,
+			String token) {
+		//验证参数 
+	    if (!CommonUtil.isUUID(userSubscription.getFromuser()) || !CommonUtil.isUUID(token) 
+	    		|| !CommonUtil.isUUID(userSubscription.getTouser()) || userSubscription.getFromuser().equals(userSubscription.getTouser())) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+		//是否已关注
+		UserSubscription userSub = userSubscriptionDao.selectByPrimaryKey(userSubscription);
+		if (null == userSub){
+	    	LOG.warn("cannot unlisten as not listened before");
+	    	return ResponseDo.buildFailureResponse("没有关注该用户，不能取消关注");
+		}
+		
+		if (0 == userSubscriptionDao.deleteByPrimaryKey(userSubscription)){
+	    	LOG.warn("fail to listen to this persion");
+	    	return ResponseDo.buildFailureResponse("未能成功取消对该用户的关注");
+		}
+
+		return ResponseDo.buildSuccessResponse("");
+	}
+	
 	private ResponseDo checkPhoneVerification(String phone,String code){
 		
 	    //验证验证码

@@ -14,8 +14,7 @@ public class UserSubscriptionDaoImpl implements UserSubscriptionDao {
 
 	@Override
 	public int deleteByPrimaryKey(UserSubscriptionKey key) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.delete(UserSubscription.class.getName(), "deleteByPrimaryKey", key);
 	}
 
 	@Override

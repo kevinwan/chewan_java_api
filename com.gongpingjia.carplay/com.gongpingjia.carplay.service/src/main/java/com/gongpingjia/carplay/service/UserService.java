@@ -99,4 +99,13 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo payAttention(UserSubscription userSubscription,String token);
+	
+	/**
+	 * 取消关注
+	 * 
+	 * @param userSubscription
+	 * @param token
+	 * @return
+	 */
+	ResponseDo unPayAttention(UserSubscription userSubscription,String token);
 }
