@@ -80,7 +80,7 @@ public class ParameterCheck {
 			LOG.warn("No user token exist in the system, userId:{}", userId);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -154,6 +154,23 @@ public class ParameterCheck {
 		} catch (NumberFormatException e) {
 			LOG.error("Paramter [{}={}] is not Integer type", paramName, paramValue);
 			LOG.error(e.getMessage(), e);
+			throw new ApiException("输入参数有误");
+		}
+	}
+
+	/**
+	 * 检查参数是否为UUID类型，如果不是抛出"输入参数有误异常"
+	 * 
+	 * @param paramName
+	 *            参数名称
+	 * @param value
+	 *            参数值
+	 * @throws ApiException
+	 *             业务异常信息
+	 */
+	public void checkParameterUUID(String paramName, String value) throws ApiException {
+		if ((!CommonUtil.isUUID(value))) {
+			LOG.error("Parameter {} is not correct format UUID string, paramValue:{}", paramName, value);
 			throw new ApiException("输入参数有误");
 		}
 	}

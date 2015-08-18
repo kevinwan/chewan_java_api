@@ -120,7 +120,25 @@ public interface ActivityService {
 	 *            出几个座位，不出座位传0
 	 * @return 返回加入结果信息
 	 * @throws ApiException
+	 *             业务异常
 	 */
 	ResponseDo joinActivity(String activityId, String userId, String token, Integer seat) throws ApiException;
 
+	/**
+	 * 同意/拒绝 活动申请
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @param action
+	 *            对申请的处理，0代表拒绝， 1代表同意
+	 * @return 返回处理结果
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo processApplication(String applicationId, String userId, String token, Integer action)
+			throws ApiException;
 }

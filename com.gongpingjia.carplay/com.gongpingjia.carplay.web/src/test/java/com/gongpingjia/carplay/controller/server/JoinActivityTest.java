@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 public class JoinActivityTest extends BaseTest {
 
@@ -29,6 +30,9 @@ public class JoinActivityTest extends BaseTest {
 				.param("userId", "ad5b9c52-2e48-40ed-89b6-26154355262f")
 				.param("token", "764102c5-bc5c-4bf0-89ae-a8371bca1151")
 				.param("seat", "5"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
 				.andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());
@@ -42,6 +46,9 @@ public class JoinActivityTest extends BaseTest {
 				.param("userId", "5c2595d0-f15f-4258-ac3e-87af05698232")
 				.param("token", "5a0b20bf-71f4-43e8-9abc-34da333b7b1d")
 				.param("seat", "5"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
 				.andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());

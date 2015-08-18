@@ -650,9 +650,7 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("authenticate", request.getParameter("authenticate"));
 		param.put("carLevel", request.getParameter("carLevel"));
 		Integer ignore = TypeConverUtil.convertToInteger("ignore", request.getParameter("ignore"), false);
-		if (ignore == null) {
-			ignore = 0;
-		}
+
 		param.put("ignore", ignore);
 		Integer limit = TypeConverUtil.convertToInteger("limit", request.getParameter("limit"), false);
 		if (limit == null) {
@@ -829,18 +827,8 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private String buildSeateInfo(String activityId) {
 		List<SeatReservation> seatList = getSeatReservations(activityId);
-		int availableSeats = 0;
-		int noCarSeats = 0;
-		for (SeatReservation seat : seatList) {
-			if (seat.getUserid() == null) {
-				// 剩余空座位数
-				availableSeats++;
-			}
-			if (seat.getCarid() == null) {
-				// 有车的
-				noCarSeats++;
-			}
-		}
+		int availableSeats = getAvailableSeats(seatList);
+		int noCarSeats = getNoCarSeats(seatList);
 
 		if (noCarSeats == 0) {
 			// 都有车
@@ -856,6 +844,42 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		return availableSeats + "个空座";
+	}
+
+	/**
+	 * 获取空余座位数, 如果没有空余作为数返回0
+	 * 
+	 * @param seatList
+	 *            作为预定列表
+	 * @return 返回空余座位数
+	 */
+	private int getAvailableSeats(List<SeatReservation> seatList) {
+		int availableSeats = 0;
+		for (SeatReservation seat : seatList) {
+			if (seat.getUserid() == null) {
+				// 剩余空座位数
+				availableSeats++;
+			}
+		}
+		return availableSeats;
+	}
+
+	/**
+	 * 获取没有车的座位数信息，如果预定人员都有车，则返回0
+	 * 
+	 * @param seatList
+	 *            作为列表
+	 * @return 返回没有车的座位数
+	 */
+	private int getNoCarSeats(List<SeatReservation> seatList) {
+		int noCarSeats = 0;
+		for (SeatReservation seat : seatList) {
+			if (seat.getCarid() == null) {
+				// 有车的
+				noCarSeats++;
+			}
+		}
+		return noCarSeats;
 	}
 
 	/**
@@ -1155,10 +1179,7 @@ public class ActivityServiceImpl implements ActivityService {
 			throws ApiException {
 		LOG.debug("Begin check input parameters");
 
-		if (!CommonUtil.isUUID(activityId)) {
-			LOG.warn("Input parameter activityId is not uuid, activityId:{}", activityId);
-			throw new ApiException("参数错误");
-		}
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
 
 		ParameterCheck.getInstance().checkUserInfo(userId, token);
 
@@ -1173,5 +1194,287 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("未找到活动，无法加入");
 		}
 		return activity;
+	}
+
+	@Override
+	public ResponseDo processApplication(String applicationId, String userId, String token, Integer action)
+			throws ApiException {
+
+		checkProcessParameters(applicationId, userId, token, action);
+
+		Map<String, Object> appActInfo = checkApplyInfo(applicationId, userId);
+
+		List<SeatReservation> seats = checkMemberSeatReservation(String.valueOf(appActInfo.get("activityId")));
+
+		Long current = DateUtil.getTime();
+
+		updateApplication(applicationId, action, current);
+
+		if (action == 1) {
+			// 批准了活动申请
+			updateSeatReservationInfo(applicationId, userId, appActInfo, seats, current);
+
+			addActivityMember(applicationId, userId, appActInfo, current);
+		}
+
+		return ResponseDo.buildSuccessResponse();
+	}
+
+	/**
+	 * 将申请人员添加到活动成员中
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param userId
+	 *            用户ID
+	 * @param appActInfo
+	 *            活动申请信息
+	 * @param current
+	 *            当前时间
+	 */
+	private void addActivityMember(String applicationId, String userId, Map<String, Object> appActInfo, Long current) {
+		LOG.debug("Begin add member to the activity");
+		String activityId = String.valueOf(appActInfo.get("activityId"));
+		String appliedUser = String.valueOf(appActInfo.get("appliedUser"));
+
+		ActivityMember member = new ActivityMember();
+		member.setActivityid(activityId);
+		member.setUserid(appliedUser);
+		member.setJointime(current);
+		memberDao.insert(member);
+
+		Message updateMessage = new Message();
+		updateMessage.setExtra3(applicationId);
+		updateMessage.setRemarks(ApplicationStatus.APPROVED.getName());
+		messageDao.updateRemarksByExtra3(updateMessage);
+
+		Message insertMessage = new Message();
+		insertMessage.setId(CodeGenerator.generatorId());
+		insertMessage.setFromuser(userId);
+		insertMessage.setTouser(appliedUser);
+		insertMessage.setType(MessageType.APPLICATION_RESULT.getName());
+		insertMessage.setContent(String.valueOf(appActInfo.get("introduction")));
+		insertMessage.setCreatetime(current);
+		insertMessage.setExtra1(activityId);
+		insertMessage.setExtra2(0);
+		insertMessage.setExtra3(applicationId);
+		messageDao.insert(insertMessage);
+	}
+
+	/**
+	 * 当同意申请人员加入时，更新座位预定信息
+	 * 
+	 * @param applicationId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param appActInfo
+	 *            活动申请信息
+	 * @param seats
+	 *            与活动相关的作为预定信息
+	 * @param current
+	 *            当前时间
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void updateSeatReservationInfo(String applicationId, String userId, Map<String, Object> appActInfo,
+			List<SeatReservation> seats, Long current) throws ApiException {
+		LOG.debug("Begin update seatReservation iformation");
+		String activityId = String.valueOf(appActInfo.get("activityId"));
+		int totalSeats = seats.size();
+		// 申请者能提供的座位数
+		int seatCount = TypeConverUtil.convertToInteger("seat", String.valueOf(appActInfo.get("seat")), false);
+
+		int noCarSeatCount = getNoCarSeats(seats);
+		// 申请人可以提供座位
+		if (seatCount > 0) {
+			LOG.debug("Application user can offer {} seats , applicationId:{}", seatCount, applicationId);
+			if (seatCount < noCarSeatCount) {
+				LOG.warn("Need to provide at least {} seats", noCarSeatCount);
+				throw new ApiException("该用户必须提供不少于 " + noCarSeatCount + " 个空座");
+			}
+
+			String appliedUser = String.valueOf(appActInfo.get("appliedUser"));
+			Car car = carDao.selectByUserId(appliedUser);
+			if (car == null) {
+				LOG.warn("Fail to find car of applied user");
+				throw new ApiException("未能成功返回该用户的车辆信息");
+			}
+
+			if (seatCount > car.getSeat()) {
+				LOG.warn("Fail to provide enough seats");
+				throw new ApiException("不能提供超出车座总数的座位");
+			}
+
+			if (noCarSeatCount > 0) {
+				// 车主，没有车的人 座位往后推
+				Map<String, Object> updateParam = new HashMap<String, Object>(2, 1);
+				updateParam.put("carId", car.getId());
+				updateParam.put("activityId", activityId);
+				seatReservDao.updateByOfferdCar(updateParam);
+			}
+
+			List<SeatReservation> reservList = new ArrayList<SeatReservation>();
+			// 有车的
+			reservList.add(buildSeatReservation(userId, activityId, current, car.getId(), 0));
+			// 没有车的
+			for (int i = noCarSeatCount + 1; i <= seatCount; ++i) {
+				reservList.add(buildSeatReservation(null, activityId, current, car.getId(), i));
+			}
+			seatReservDao.insert(reservList);
+		}
+
+		if (getAvailableSeats(seats) == 0) {
+			LOG.warn("No available seat for this user");
+			String errorMessage = "请选择“提供空座”的人加入活动";
+			if (noCarSeatCount == totalSeats) {
+				errorMessage = "还没有人提供车，" + errorMessage;
+			}
+			throw new ApiException(errorMessage);
+		}
+	}
+
+	/**
+	 * 构建座位预定对象
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param activityId
+	 *            活动ID
+	 * @param current
+	 *            当前时间
+	 * @param carId
+	 *            车主carID
+	 * @param index
+	 *            如果是车主的话，索引为0
+	 * @return 返回构建的对象
+	 */
+	private SeatReservation buildSeatReservation(String userId, String activityId, Long current, String carId,
+			Integer index) {
+		SeatReservation reservation = new SeatReservation();
+		reservation.setId(CodeGenerator.generatorId());
+		reservation.setActivityid(activityId);
+		reservation.setUserid(userId);
+		if (index == 0) {
+			reservation.setCreatetime(current);
+			reservation.setBooktime(current);
+		}
+		reservation.setCarid(carId);
+		reservation.setSeatindex(index);
+		return reservation;
+	}
+
+	/**
+	 * 根据审批结果更新application信息
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param action
+	 *            是否同意，0 拒绝，1同意
+	 * @param current
+	 *            当前时间
+	 */
+	private void updateApplication(String applicationId, Integer action, Long current) {
+		LOG.debug("Update application iformation");
+		ApplicationStatus targetStatus = ApplicationStatus.DECLINED;
+		if (action == 1) {
+			targetStatus = ApplicationStatus.APPROVED;
+		}
+		ActivityApplication application = applicationDao.selectByPrimaryKey(applicationId);
+		application.setStatus(targetStatus.getName());
+		applicationDao.updateByPrimaryKey(application);
+
+		ApplicationChangeHistory history = new ApplicationChangeHistory();
+		history.setId(CodeGenerator.generatorId());
+		history.setApplicationid(applicationId);
+		history.setStatus(targetStatus.getName());
+		history.setTimestamp(current);
+		historyDao.insert(history);
+	}
+
+	/**
+	 * 检查入参格式是否正确
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @param action
+	 *            是否同意
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void checkProcessParameters(String applicationId, String userId, String token, Integer action)
+			throws ApiException {
+		LOG.debug("Begin check input parameters");
+
+		ParameterCheck.getInstance().checkParameterUUID("applicationId", applicationId);
+
+		if (action != 0 && action != 1) {
+			LOG.warn("Input parameter action is 0 or 1, action:{}", action);
+			throw new ApiException("参数错误");
+		}
+
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+	}
+
+	/**
+	 * 检查申请信息业务上是否满足要求
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param userId
+	 *            用户ID
+	 * @return 返回申请信息
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private Map<String, Object> checkApplyInfo(String applicationId, String userId) throws ApiException {
+		LOG.debug("Check input parameter business logic");
+		Map<String, Object> param = new HashMap<String, Object>(3, 1);
+		param.put("applicationId", applicationId);
+		param.put("userId", userId);
+		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
+		List<Map<String, Object>> applicationActivitys = activityViewDao.selectActivityApplication(param);
+		if (applicationActivitys.isEmpty()) {
+			LOG.warn("The apploication activity not found");
+			throw new ApiException("未找到待处理的请求");
+		}
+
+		Map<String, Object> appActivity = applicationActivitys.get(0);
+		String appliedUser = String.valueOf(appActivity.get("appliedUser"));
+		if (userId.equals(appliedUser)) {
+			LOG.warn("Cannot process application of yourself");
+			throw new ApiException("不能处理自己提出的申请");
+		}
+		return appActivity;
+	}
+
+	/**
+	 * 检查成员是否已满达到座位预定数
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @return 返回
+	 * @throws ApiException
+	 */
+	private List<SeatReservation> checkMemberSeatReservation(String activityId) throws ApiException {
+		Map<String, Object> activityParam = new HashMap<String, Object>(1);
+		activityParam.put("activityId", activityId);
+		List<ActivityMember> members = memberDao.selectByParam(activityParam);
+		if (members.isEmpty()) {
+			LOG.warn("Fail to get total members");
+			throw new ApiException("获取成员信息失败");
+		}
+
+		List<SeatReservation> seats = getSeatReservations(activityId);
+		if (members.size() >= seats.size()) {
+			LOG.warn("Member count = {}, totalSeats = {}", members.size(), seats.size());
+			throw new ApiException("座位数已满");
+		}
+
+		return seats;
 	}
 }

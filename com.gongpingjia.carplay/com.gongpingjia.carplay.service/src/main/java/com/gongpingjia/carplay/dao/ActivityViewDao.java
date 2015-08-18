@@ -6,7 +6,7 @@ import java.util.Map;
 import com.gongpingjia.carplay.po.ActivityView;
 
 /**
- * 获取活动的信息
+ * 获取活动相关的信息
  * 
  * @author licheng
  *
@@ -84,4 +84,13 @@ public interface ActivityViewDao {
 	 * @return 活动评论详情
 	 */
 	List<Map<String, Object>> selectActivityComments(Map<String, Object> param);
+
+	/**
+	 * 获取活动相关的申请信息
+	 * 
+	 * @param param
+	 *            活动参数
+	 * @return 返回活动相关的信息集合
+	 */
+	List<Map<String, Object>> selectActivityApplication(Map<String, Object> param);
 }

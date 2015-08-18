@@ -29,4 +29,6 @@ public interface MessageDao {
 	int updateIsCheckedByUserAndTypeComment(Map<String, Object> param);
 
 	int updateIsCheckedByUserAndTypeCommentNotComment(Map<String, Object> param);
+
+	int updateRemarksByExtra3(Message record);
 }

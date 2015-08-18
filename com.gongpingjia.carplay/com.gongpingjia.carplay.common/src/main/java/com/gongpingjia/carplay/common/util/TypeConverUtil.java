@@ -36,7 +36,7 @@ public class TypeConverUtil {
 				throw new ApiException("参数错误");
 			}
 		}
-		return null;
+		return 0D;
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class TypeConverUtil {
 				throw new ApiException("参数错误");
 			}
 		}
-		return null;
+		return 0L;
 	}
 
 	/**
@@ -84,6 +84,6 @@ public class TypeConverUtil {
 				throw new ApiException("参数错误");
 			}
 		}
-		return null;
+		return 0;
 	}
 }

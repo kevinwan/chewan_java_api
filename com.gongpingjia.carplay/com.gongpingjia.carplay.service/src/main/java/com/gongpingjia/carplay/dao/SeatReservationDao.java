@@ -21,4 +21,6 @@ public interface SeatReservationDao {
 	int updateByReservationList(List<SeatReservation> paramList);
 	
 	Integer selectActivityJoinSeatCount(String activityId);
+	
+	int updateByOfferdCar(Map<String, Object> param);
 }

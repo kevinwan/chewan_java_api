@@ -94,8 +94,7 @@
 		fromUser, toUser,
 		type, content, extra1,
 		extra2, extra3, remarks,
-		isChecked, isDeleted, createTime
-		)
+		isChecked, isDeleted, createTime)
 		values (#{id,jdbcType=VARCHAR},
 		#{fromuser,jdbcType=VARCHAR}, #{touser,jdbcType=VARCHAR},
 		#{type,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
@@ -103,8 +102,7 @@
 		#{extra2,jdbcType=INTEGER},
 		#{extra3,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR},
 		#{ischecked,jdbcType=TINYINT}, #{isdeleted,jdbcType=TINYINT},
-		#{createtime,jdbcType=BIGINT}
-		)
+		#{createtime,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Message">
@@ -135,5 +133,11 @@
 	
 	<update id="updateIsCheckedByUserAndTypeNotComment" parameterType="java.util.Map">
 		update message set isChecked=1 where toUser=#{userId,jdbcType=VARCHAR} and type is not null and type not like #{type,jdbcType=VARCHAR}
+	</update>
+	
+	<update id="updateRemarksByExtra3" parameterType="java.util.Map">
+		UPDATE message 
+		SET remarks = #{remarks,jdbcType=VARCHAR}
+		WHERE extra3 = #{extra3,jdbcType=VARCHAR}
 	</update>
 </mapper>

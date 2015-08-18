@@ -27,7 +27,7 @@ public class ActivityController {
 	private static final Logger LOG = LoggerFactory.getLogger(ActivityController.class);
 
 	@Autowired
-	private ActivityService activityService;
+	private ActivityService service;
 
 	/**
 	 * 2.13 获取可提供的空座数
@@ -43,7 +43,7 @@ public class ActivityController {
 		LOG.info("getAvailableSeats with userId: {}", userId);
 
 		try {
-			return activityService.getAvailableSeats(userId, token);
+			return service.getAvailableSeats(userId, token);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -61,7 +61,7 @@ public class ActivityController {
 	public ResponseDo registerActivity(HttpServletRequest request) {
 		LOG.info("registerActivity begin");
 		try {
-			return activityService.registerActivity(request);
+			return service.registerActivity(request);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -79,7 +79,7 @@ public class ActivityController {
 	public ResponseDo getActivityList(HttpServletRequest request) {
 		LOG.info("getActivityList begin");
 		try {
-			return activityService.getActivityList(request);
+			return service.getActivityList(request);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -103,7 +103,7 @@ public class ActivityController {
 			@RequestParam(value = "token", required = false) String token) {
 		LOG.info("getActivityInfo begin");
 		try {
-			return activityService.getActivityInfo(activityId, userId, token);
+			return service.getActivityInfo(activityId, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -134,7 +134,7 @@ public class ActivityController {
 		LOG.info("getActivityComments begin");
 
 		try {
-			return activityService.getActivityComments(activityId, userId, token, ignore, limit);
+			return service.getActivityComments(activityId, userId, token, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -149,7 +149,7 @@ public class ActivityController {
 		LOG.info("publishComment begin");
 
 		try {
-			return activityService.publishComment(activityId, userId, token, replyUserId, comment);
+			return service.publishComment(activityId, userId, token, replyUserId, comment);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -173,7 +173,7 @@ public class ActivityController {
 		LOG.info("subscribeActivity begin");
 
 		try {
-			return activityService.subscribeActivity(activityId, userId, token);
+			return service.subscribeActivity(activityId, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -201,7 +201,34 @@ public class ActivityController {
 		LOG.info("joinActivity begin");
 
 		try {
-			return activityService.joinActivity(activityId, userId, token, seat);
+			return service.joinActivity(activityId, userId, token, seat);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.27 同意/拒绝 活动申请
+	 * 
+	 * @param applicationId
+	 *            申请ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @param action
+	 *            对申请的处理，0代表拒绝， 1代表同意
+	 * @return 返回处理结果
+	 */
+	@RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST)
+	public ResponseDo processApplication(@PathVariable("applicationId") String applicationId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam("action") Integer action) {
+		LOG.info("processApplication begin");
+
+		try {
+			return service.processApplication(applicationId, userId, token, action);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

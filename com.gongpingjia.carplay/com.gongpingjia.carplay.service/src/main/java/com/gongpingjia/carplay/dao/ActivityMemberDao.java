@@ -20,4 +20,6 @@ public interface ActivityMemberDao {
 	List<Map<String, String>> selectByActivity(Map<String, Object> param);
 
 	List<Map<String, Object>> selectByUserId(Map<String, Object> param);
+	
+	List<ActivityMember> selectByParam(Map<String, Object> param);
 }

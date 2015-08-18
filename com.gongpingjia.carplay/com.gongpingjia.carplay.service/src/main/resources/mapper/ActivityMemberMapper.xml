@@ -57,10 +57,8 @@
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.ActivityMember">
-		insert into activity_member (userId, activityId, joinTime
-		)
-		values (#{userid,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{jointime,jdbcType=BIGINT}
-		)
+		insert into activity_member (userId, activityId, joinTime)
+		values (#{userid,jdbcType=VARCHAR}, #{activityid,jdbcType=VARCHAR}, #{jointime,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.ActivityMember">
@@ -69,4 +67,18 @@
 		where userId = #{userid,jdbcType=VARCHAR}
 		and activityId = #{activityid,jdbcType=VARCHAR}
 	</update>
+	
+	<select id="selectByParam" parameterType="java.util.Map" resultType="com.gongpingjia.carplay.po.ActivityMember">
+		SELECT
+			userId, activityId, joinTime
+		FROM activity_member
+		<where>
+			<if test="userId != null">
+				AND userId = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="activityId != null">
+				AND activityId = #{activityId,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
 </mapper>

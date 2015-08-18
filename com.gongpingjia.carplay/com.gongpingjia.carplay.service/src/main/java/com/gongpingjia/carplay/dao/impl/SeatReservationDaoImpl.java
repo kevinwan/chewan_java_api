@@ -52,4 +52,9 @@ public class SeatReservationDaoImpl implements SeatReservationDao {
 		return DASUtil.selectOne(SeatReservation.class.getName(), "selectActivityJoinSeatCount", activityId);
 	}
 
+	@Override
+	public int updateByOfferdCar(Map<String, Object> param) {
+		return DASUtil.update(SeatReservation.class.getName(), "updateByOfferdCar", param);
+	}
+
 }

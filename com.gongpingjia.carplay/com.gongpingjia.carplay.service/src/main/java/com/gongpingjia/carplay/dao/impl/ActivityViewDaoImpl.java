@@ -52,4 +52,9 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityComments", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectActivityApplication(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityApplication", param);
+	}
+
 }

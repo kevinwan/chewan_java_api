@@ -303,4 +303,32 @@
 		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
 	</select>
 	
+	<select id="selectActivityApplication" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			application.id,
+			activity.id AS activityId,
+			ifnull(activity.description, "") AS introduction,
+			application.userId AS appliedUser,
+			application.status,
+			activity.organizer,
+			application.seat
+		FROM
+			activity_application application
+		JOIN activity ON application.activityId = activity.id
+		<where>
+			<if test="applicationId != null">
+				AND application.id = #{applicationId,jdbcType=VARCHAR}
+			</if>
+			<if test="activityId != null">
+				AND application.activityId = #{activityId,jdbcType=VARCHAR}
+			</if>
+			<if test="userId != null">
+				AND organizer = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="status != null">
+				AND status = #{status,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
 </mapper>

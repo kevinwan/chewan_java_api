@@ -63,4 +63,12 @@
 	<select id="selectActivityJoinSeatCount" resultType="java.lang.Integer" parameterType="java.lang.String">
 		select count(1) from seat_reservation where activityId = #{activityId,jdbcType=VARCHAR} and carid is null
 	</select>
+	
+	<update id="updateByOfferdCar" parameterType="java.util.Map">
+		UPDATE seat_reservation 
+			SET carId = #{carId,jdbcType=VARCHAR}, 
+			seatIndex = seatIndex + 1 
+		WHERE activityId = #{activityId,jdbcType=VARCHAR} 
+			and carId is null
+	</update>
 </mapper>

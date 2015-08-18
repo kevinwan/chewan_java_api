@@ -70,4 +70,9 @@ public class MessageDaoImpl implements MessageDao {
 		return DASUtil.update(Message.class.getName(), "updateIsCheckedByUserAndTypeNotComment", param);
 	}
 
+	@Override
+	public int updateRemarksByExtra3(Message record) {
+		return DASUtil.update(Message.class.getName(), "updateRemarksByExtra3", record);
+	}
+
 }
