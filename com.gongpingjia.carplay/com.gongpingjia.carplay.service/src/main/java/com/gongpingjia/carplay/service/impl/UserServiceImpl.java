@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional 
 	public ResponseDo register(User user, String code){
 		
 		Map<String, Object> data = new HashMap<String, Object>();
@@ -535,6 +534,61 @@ public class UserServiceImpl implements UserService {
 	    	return ResponseDo.buildFailureResponse("未能成功更新用户信息");
 		}
 		return ResponseDo.buildSuccessResponse("");
+	}
+	
+	@Override
+	public ResponseDo manageAlbumPhotos(String userId, String[] photos,
+			String token) {
+
+		//验证参数 
+	    if (!CommonUtil.isUUID(userId) || !CommonUtil.isUUID(token) || photos.length > 9) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //获取认证口令
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
+	    	LOG.warn("Token expired or token not correct");
+	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		}
+		
+		//获取用户相册
+		List<UserAlbum> userAlbums = userAlbumDao.selectListByUserId(userId);
+		if (null == userAlbums || userAlbums.isEmpty()){
+	    	LOG.warn("Fail to get user album");
+	    	return ResponseDo.buildFailureResponse("未能成功获取用户相册");
+		}
+		String albumId = userAlbums.get(0).getId();
+		//判断七牛上图片是否存在
+		try {
+			for (String photo : photos) {
+				if (!photoService.isExist(MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId,photo))) {
+					LOG.warn("photo not Exist");
+					return ResponseDo.buildFailureResponse("注册图片未上传");
+				}
+			}
+		} catch (ApiException e) {
+			LOG.warn("photo not Exist");
+			return ResponseDo.buildFailureResponse("注册图片未上传");
+		}
+		
+		//相册先删除再添加
+		albumPhotoDao.deleteByPrimaryKey(albumId);
+		for (String photo : photos){
+			AlbumPhoto albumPhoto = new AlbumPhoto();
+			albumPhoto.setId(photo);
+			albumPhoto.setAlbumid(albumId);
+			albumPhoto.setUploadtime(DateUtil.getTime());
+			albumPhoto.setUrl(MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId,photo));
+			albumPhotoDao.insert(albumPhoto);
+		}
+		
+		return ResponseDo.buildSuccessResponse(photos);
 	}
 	
 	private ResponseDo checkPhoneVerification(String phone,String code){

@@ -189,4 +189,15 @@ public class UserInfoController {
 		return userService.alterUserInfo(user, token);
 	}
 	
+	@RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseDo manageAlbumPhotos(@PathVariable String userId,
+			@RequestParam(value = "photos") String[] photos,
+			@RequestParam(value = "token") String token) {
+
+		LOG.debug("manageAlbumPhotos is called, request parameter produce:");
+		
+		return userService.manageAlbumPhotos(userId, photos, token);
+	}
+	
 }

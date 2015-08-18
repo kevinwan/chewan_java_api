@@ -117,4 +117,14 @@ public interface UserService {
 	 * @return
 	 */
 	ResponseDo alterUserInfo(User user,String token);
+	
+	/**
+	 * 编辑相册图片
+	 * 
+	 * @param userId
+	 * @param photos
+	 * @param token
+	 * @return
+	 */
+	ResponseDo manageAlbumPhotos(String userId,String[] photos,String token);
 }
