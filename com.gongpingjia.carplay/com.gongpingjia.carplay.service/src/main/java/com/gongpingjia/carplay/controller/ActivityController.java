@@ -179,4 +179,32 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 
+	 * 2.25 申请加入活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @param seat
+	 *            出几个座位，不出座位传0
+	 * @return 返回加入结果信息
+	 */
+	@RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST)
+	public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam("seat") Integer seat) {
+		LOG.info("joinActivity begin");
+
+		try {
+			return activityService.joinActivity(activityId, userId, token, seat);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

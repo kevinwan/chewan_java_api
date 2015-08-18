@@ -106,4 +106,21 @@ public interface ActivityService {
 	 *             业务异常
 	 */
 	ResponseDo subscribeActivity(String activityId, String userId, String token) throws ApiException;
+
+	/**
+	 * 申请加入活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @param seat
+	 *            出几个座位，不出座位传0
+	 * @return 返回加入结果信息
+	 * @throws ApiException
+	 */
+	ResponseDo joinActivity(String activityId, String userId, String token, Integer seat) throws ApiException;
+
 }

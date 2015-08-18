@@ -59,4 +59,8 @@
 			</if>
 		</where>
 	</select>
+	
+	<select id="selectActivityJoinSeatCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(1) from seat_reservation where activityId = #{activityId,jdbcType=VARCHAR} and carid is null
+	</select>
 </mapper>

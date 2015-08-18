@@ -47,4 +47,9 @@ public class SeatReservationDaoImpl implements SeatReservationDao {
 		return DASUtil.saveList(SeatReservation.class.getName(), "insert", recordList);
 	}
 
+	@Override
+	public Integer selectActivityJoinSeatCount(String activityId) {
+		return DASUtil.selectOne(SeatReservation.class.getName(), "selectActivityJoinSeatCount", activityId);
+	}
+
 }

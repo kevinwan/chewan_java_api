@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.enums.ApplicationStatus;
+import com.gongpingjia.carplay.common.enums.MessageType;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
@@ -36,6 +37,7 @@ import com.gongpingjia.carplay.dao.ActivityViewDao;
 import com.gongpingjia.carplay.dao.ActivityViewHistoryDao;
 import com.gongpingjia.carplay.dao.ApplicationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
+import com.gongpingjia.carplay.dao.MessageDao;
 import com.gongpingjia.carplay.dao.SeatReservationDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.Activity;
@@ -43,11 +45,13 @@ import com.gongpingjia.carplay.po.ActivityApplication;
 import com.gongpingjia.carplay.po.ActivityComment;
 import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
+import com.gongpingjia.carplay.po.ActivityMemberKey;
 import com.gongpingjia.carplay.po.ActivitySubscription;
 import com.gongpingjia.carplay.po.ActivityView;
 import com.gongpingjia.carplay.po.ActivityViewHistory;
 import com.gongpingjia.carplay.po.ApplicationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
+import com.gongpingjia.carplay.po.Message;
 import com.gongpingjia.carplay.po.SeatReservation;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -95,6 +99,9 @@ public class ActivityServiceImpl implements ActivityService {
 
 	@Autowired
 	private ActivityCommentDao commentDao;
+
+	@Autowired
+	private MessageDao messageDao;
 
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
@@ -990,5 +997,181 @@ public class ActivityServiceImpl implements ActivityService {
 		subscriptionDao.insert(subscription);
 
 		return ResponseDo.buildSuccessResponse();
+	}
+
+	@Override
+	public ResponseDo joinActivity(String activityId, String userId, String token, Integer seat) throws ApiException {
+		Activity activity = checkInputParameters(activityId, userId, token, seat);
+
+		LOG.debug("Check input parameters is satisfied business logic");
+		checkApplicationInfo(activityId, userId);
+
+		checkActivityMemberInfo(activityId, userId);
+
+		checkSeatInfo(activityId, userId, seat);
+
+		saveJoinApplication(userId, seat, activity);
+
+		return ResponseDo.buildSuccessResponse();
+	}
+
+	/**
+	 * 保存申请人申请信息，创建历史信息，创建相应的消息
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param seat
+	 *            申请人提供的作为信息
+	 * @param activity
+	 *            活动
+	 */
+	private void saveJoinApplication(String userId, Integer seat, Activity activity) {
+		LOG.debug("Begin save join application");
+		Long current = DateUtil.getTime();
+		ActivityApplication application = new ActivityApplication();
+		application.setActivityid(activity.getId());
+		application.setCreatetime(current);
+		application.setId(CodeGenerator.generatorId());
+		application.setSeat(seat);
+		application.setUserid(userId);
+		application.setStatus(ApplicationStatus.PENDING_PROCESSED.getName());
+		applicationDao.insert(application);
+
+		ApplicationChangeHistory history = new ApplicationChangeHistory();
+		history.setApplicationid(application.getId());
+		history.setId(CodeGenerator.generatorId());
+		history.setStatus(ApplicationStatus.PENDING_PROCESSED.getName());
+		history.setTimestamp(current);
+		historyDao.insert(history);
+
+		Message message = new Message();
+		message.setId(CodeGenerator.generatorId());
+		message.setFromuser(userId);
+		message.setTouser(activity.getOrganizer());
+		message.setType(MessageType.APPLICATION_PROCESS.getName());
+		message.setContent(activity.getDescription());
+		message.setCreatetime(current);
+		message.setExtra1(activity.getId());
+		message.setExtra2(seat);
+		message.setExtra3(application.getId());
+		messageDao.insert(message);
+	}
+
+	/**
+	 * 检查如果申请人提供车座，提供车座的数量是否与车主认证的车子信息匹配
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param seat
+	 *            提供的作为信息，如果为0则忽略
+	 * @throws ApiException
+	 *             检查车主提供信息是否合格，不合格抛出业务异常
+	 */
+	private void checkSeatInfo(String activityId, String userId, Integer seat) throws ApiException {
+		if (seat > 0) {
+			// 如果提供车辆
+			LOG.info("Join activity user offer car, userId:{}", userId);
+			Car car = carDao.selectByUserId(userId);
+			if (car == null) {
+				LOG.warn("Cannot obtain user cat infomation");
+				throw new ApiException("未能成功返回该用户的车辆信息");
+			}
+
+			if (seat > car.getSeat()) {
+				LOG.warn("Fail to provide enough seats");
+				throw new ApiException("不能提供超出车座总数的座位");
+			}
+
+			Integer noCarSeats = seatReservDao.selectActivityJoinSeatCount(activityId);
+			if (seat < noCarSeats) {
+				LOG.warn("Cannot provide enough seats for this activity");
+				throw new ApiException("您认证的车辆需要提供至少" + noCarSeats + "个空座才可以申请加入");
+			}
+		}
+	}
+
+	/**
+	 * 检查活动成员信息，主要是检查当前申请者是否已经是活动成员，不能重复申请
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void checkActivityMemberInfo(String activityId, String userId) throws ApiException {
+		ActivityMemberKey key = new ActivityMemberKey();
+		key.setActivityid(activityId);
+		key.setUserid(userId);
+		ActivityMember member = memberDao.selectByPrimaryKey(key);
+		if (member != null) {
+			LOG.warn("Already be a member");
+			throw new ApiException("已是成员，不能重复申请加入活动");
+		}
+	}
+
+	/**
+	 * 检查申请人员申请信息，主要防止重复申请
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void checkApplicationInfo(String activityId, String userId) throws ApiException {
+		Map<String, Object> param = new HashMap<String, Object>(3, 1);
+		param.put("userId", userId);
+		param.put("activityId", activityId);
+		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
+		List<ActivityApplication> applicationList = applicationDao.selectByParam(param);
+		if (!applicationList.isEmpty()) {
+			// 不为空表明已经申请过了
+			LOG.warn("already applied for this activity");
+			throw new ApiException("之前已申请过参加该活动，请勿重复申请");
+		}
+	}
+
+	/**
+	 * 检查输入参数是否正确，仅作参数的合法性基础校验
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @param seat
+	 *            能提供的作为数
+	 * @return 返回 活动信息
+	 * @throws ApiException
+	 *             参数校验不合法，抛业务异常
+	 */
+	private Activity checkInputParameters(String activityId, String userId, String token, Integer seat)
+			throws ApiException {
+		LOG.debug("Begin check input parameters");
+
+		if (!CommonUtil.isUUID(activityId)) {
+			LOG.warn("Input parameter activityId is not uuid, activityId:{}", activityId);
+			throw new ApiException("参数错误");
+		}
+
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		if (seat < 0 || seat > PropertiesUtil.getProperty("user.auth.car.max.seats", 5)) {
+			LOG.warn("Input parameter seat error, seat:{}", seat);
+			throw new ApiException("参数错误");
+		}
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.error("Activity is not found in the system, activityId:{}", activityId);
+			throw new ApiException("未找到活动，无法加入");
+		}
+		return activity;
 	}
 }
