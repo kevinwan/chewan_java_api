@@ -1477,4 +1477,41 @@ public class ActivityServiceImpl implements ActivityService {
 
 		return seats;
 	}
+
+	@Override
+	public ResponseDo getMemberAndSeatInfo(String activityId, String userId, String token) throws ApiException {
+
+		LOG.debug("Check input parameters");
+
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		LOG.debug("Query member car information");
+		Map<String, Object> param = new HashMap<String, Object>(4, 1);
+		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
+		param.put("photoPostfix", CommonUtil.getActivityPhotoPostfix());
+		param.put("activityId", activityId);
+		param.put("status", ApplicationStatus.APPROVED.getName());
+		List<Map<String, Object>> members = activityViewDao.selectActivityMemberCarInfo(param);
+		List<Map<String, Object>> cars = activityViewDao.selectActivityMemberCarInfo(param);
+		for (Map<String, Object> car : cars) {
+			param.put("carId", car.get("carId"));
+			List<Map<String, Object>> users = activityViewDao.selectSeatReservationInfo(param);
+			car.put("users", users);
+		}
+
+		Map<String, Object> activityShareInfo = activityViewDao.selectActivityShareInfo(param);
+		if(activityShareInfo == null){
+			activityShareInfo = new HashMap<String, Object>();
+		}
+		activityShareInfo.put("members", members);
+		activityShareInfo.put("cars", cars);
+		activityShareInfo.put("activityId", activityId);
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		activityShareInfo.putAll(buildShareData(activity.getOrganizer(), activity));
+
+		LOG.debug("Finished build response data");
+		return ResponseDo.buildSuccessResponse(activityShareInfo);
+	}
 }

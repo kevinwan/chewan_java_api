@@ -234,4 +234,27 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.28 获取车座/成员信息
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 返回结果响应对象
+	 */
+	@RequestMapping(value = "/activity/{activityId}/members", method = RequestMethod.GET)
+	public ResponseDo getMemberAndSeatInfo(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("getMemberAndSeatInfo begin");
+		try {
+			return service.getMemberAndSeatInfo(activityId, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

@@ -57,4 +57,24 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityApplication", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectActivityMemberCarInfo(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityMemberCarInfo", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectSeatReservationCarInfo(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectSeatReservationCarInfo", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectSeatReservationInfo(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectSeatReservationInfo", param);
+	}
+
+	@Override
+	public Map<String, Object> selectActivityShareInfo(Map<String, Object> param) {
+		return DASUtil.selectOne(ActivityView.class.getName(), "selectActivityShareInfo", param);
+	}
+
 }

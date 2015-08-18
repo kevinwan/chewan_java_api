@@ -93,4 +93,41 @@ public interface ActivityViewDao {
 	 * @return 返回活动相关的信息集合
 	 */
 	List<Map<String, Object>> selectActivityApplication(Map<String, Object> param);
+
+	/**
+	 * 获取活动成员信息列表
+	 * 
+	 * @param param
+	 *            活动参数
+	 * @return 返回活动成员信息列表
+	 */
+	List<Map<String, Object>> selectActivityMemberCarInfo(Map<String, Object> param);
+
+	/**
+	 * 获取活动座位预定的车次信息
+	 * 
+	 * @param param
+	 *            活动参数
+	 * @return 返回车次信息
+	 */
+	List<Map<String, Object>> selectSeatReservationCarInfo(Map<String, Object> param);
+
+	/**
+	 * 获取活动成员每辆车子 座位预定信息
+	 * 
+	 * @param param
+	 *            活动参数
+	 * @return 返回每辆车子 座位预定信息
+	 */
+	List<Map<String, Object>> selectSeatReservationInfo(Map<String, Object> param);
+
+	/**
+	 * 获取活动基本信息以及分享的一些信息
+	 * 
+	 * @param param
+	 *            活动参数
+	 * @return 返回活动基本信息
+	 */
+	Map<String, Object> selectActivityShareInfo(Map<String, Object> param);
+
 }

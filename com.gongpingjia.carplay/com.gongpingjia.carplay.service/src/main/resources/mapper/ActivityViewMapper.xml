@@ -331,4 +331,83 @@
 		</where>
 	</select>
 	
+	<select id="selectActivityMemberCarInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			user.id AS userId,
+			user.nickname,
+			user.gender,
+			(YEAR(sysdate()) - user.birthYear) age,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR}) AS photo,
+			ifnull((YEAR (sysdate()) - drivingLicenseYear), 0) AS drivingExperience,
+			concat(#{gpjImagePrefix,jdbcType=VARCHAR}, ifnull(car.brandLogo, "")) AS carBrandLogo,
+			ifnull(car.model, "") AS carModel,
+			ifnull(app.seat, 0) as seat,
+			car.id AS carId
+		FROM
+			activity_member member
+			LEFT JOIN user ON member.userId = user.id
+			LEFT JOIN car ON car.userId = user.id
+			LEFT JOIN activity_application app ON app.activityId = member.activityId AND app.userId = member.userId AND app.status = #{status,jdbcType=VARCHAR}
+		WHERE
+			member.activityId = #{activityId,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectSeatReservationCarInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			srv.carId,
+			srv.totalSeat,
+			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR},	car.brandLogo),"") AS carBrandLogo,
+			ifnull(car.model, "") AS carModel
+		FROM
+			(SELECT	carId, count(1) AS totalSeat FROM	seat_reservation
+				WHERE activityId = #{activityId,jdbcType=VARCHAR} GROUP BY carId
+			) srv
+		JOIN car ON srv.carId = car.id
+	</select>
+	
+	<select id="selectSeatReservationInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			reservation.userId,
+			user.nickname,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR} ) AS photo,
+			user.gender,
+			(YEAR(sysdate()) - user.birthYear) AS age,
+			reservation.seatIndex
+		FROM
+			seat_reservation reservation LEFT JOIN user ON reservation.userId = user.id
+		WHERE
+			reservation.userId IS NOT NULL
+		AND reservation.activityId = #{activityId,jdbcType=VARCHAR}
+		<if test="carId == null">
+			AND reservation.carId is null
+		</if>
+		<if test="carId != null">
+			AND reservation.carId = #{carId,jdbcType=VARCHAR}
+		</if>
+		ORDER BY
+			reservation.seatIndex
+	</select>
+	
+	<select id="selectActivityShareInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			resA.count AS totalSeat,
+			ifnull(resB.count, 0) AS availableSeat,
+			activity.title,
+			activity.description,
+			user.nickname,
+			concat(#{assetUrl,jdbcType=VARCHAR}, cover.url, #{photoPostfix,jdbcType=VARCHAR} ) AS imgUrl,
+			activity.location,
+			activity.start,
+			activity.paymentType AS pay
+		FROM
+			activity
+		LEFT JOIN ( SELECT activityId, count(1) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
+		LEFT JOIN ( SELECT activityId, count(1) AS count FROM seat_reservation WHERE userId IS NULL GROUP BY activityId) resB ON activity.id = resB.activityId
+		LEFT JOIN user ON user.id = activity.organizer
+		LEFT JOIN activity_cover cover ON cover.activityId = activity.id
+		WHERE
+			activity.id = #{activityId,jdbcType=VARCHAR}
+		LIMIT 1   
+	</select>
+	
 </mapper>
