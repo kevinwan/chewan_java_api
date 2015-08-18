@@ -76,7 +76,7 @@ public class MessageServiceImpl implements MessageService {
 	private String getCommentCount(String userId) throws ApiException {
 		Map<String, Object> param = new HashMap<>(2, 1);
 		param.put("userId", userId);
-		param.put("type", MessageType.MESSAGE_TYPE_COMMENT.getName());
+		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeComment(param);
 		if (messageCountList.size() == 0) {
 			LOG.error("Fail to get comment count");
@@ -88,7 +88,7 @@ public class MessageServiceImpl implements MessageService {
 	private String getApplicationCount(String userId) throws ApiException {
 		Map<String, Object> param = new HashMap<>(2, 1);
 		param.put("userId", userId);
-		param.put("type", MessageType.MESSAGE_TYPE_COMMENT.getName());
+		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeNotComment(param);
 		if (messageCountList.size() == 0) {
 			LOG.error("Fail to get application count");
@@ -100,7 +100,7 @@ public class MessageServiceImpl implements MessageService {
 	private String getCommentContent(String userId) {
 		Map<String, Object> param = new HashMap<>(2, 1);
 		param.put("userId", userId);
-		param.put("type", MessageType.MESSAGE_TYPE_COMMENT.getName());
+		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectContentByUserAndTypeComment(param);
 		if (messageCountList.size() == 0)
 			return "";
@@ -110,7 +110,7 @@ public class MessageServiceImpl implements MessageService {
 	private String getApplicationContent(String userId) {
 		Map<String, Object> param = new HashMap<>(2, 1);
 		param.put("userId", userId);
-		param.put("type", MessageType.MESSAGE_TYPE_COMMENT.getName());
+		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectContentByUserAndTypeNotComment(param);
 		if (messageCountList.size() == 0)
 			return "";
