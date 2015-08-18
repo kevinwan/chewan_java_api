@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.service.impl;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,21 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.enums.ApplicationStatus;
 import com.gongpingjia.carplay.common.enums.MessageType;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
+import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.controller.VersionController;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
+import com.gongpingjia.carplay.dao.FeedbackDao;
+import com.gongpingjia.carplay.dao.FeedbackPhotoDao;
 import com.gongpingjia.carplay.dao.MessageDao;
+import com.gongpingjia.carplay.dao.UserDao;
+import com.gongpingjia.carplay.po.Feedback;
+import com.gongpingjia.carplay.po.FeedbackPhoto;
+import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.MessageService;
 
 @Service
@@ -33,6 +44,18 @@ public class MessageServiceImpl implements MessageService {
 
 	@Autowired
 	private AuthenticationApplicationDao authenticationApplicationDao;
+
+	@Autowired
+	private UserDao userDao;
+
+	@Autowired
+	private FeedbackDao feedbackDao;
+
+	@Autowired
+	private FeedbackPhotoDao feedbackPhotoDao;
+
+	@Autowired
+	private PhotoService photoService;
 
 	@Override
 	public ResponseDo getApplicationList(String userId, int ignore, int limit) throws ApiException {
@@ -167,5 +190,42 @@ public class MessageServiceImpl implements MessageService {
 			throw new ApiException("消息类型错误");
 		}
 		return ResponseDo.buildSuccessResponse(messageList);
+	}
+
+	@Override
+	public ResponseDo submitFeedback(String userId, String content, String[] photos) throws ApiException {
+		User user = userDao.selectByPrimaryKey(userId);
+		String feedbackId = CodeGenerator.generatorId();
+		Feedback feedback = new Feedback();
+		feedback.setId(feedbackId);
+		feedback.setContent(content);
+		feedback.setCreatetime(DateUtil.getTime());
+		feedback.setNickname(user.getNickname());
+		feedback.setPhone(user.getPhone());
+		feedback.setUserid(user.getId());
+		int affectedRows = feedbackDao.insert(feedback);
+		if (affectedRows == 0) {
+			LOG.error("Fail to submit feedback");
+			throw new ApiException("提交反馈意见失败");
+		}
+		if (photos != null) {
+			for (String photo : photos) {
+				if (photoService.isExist(MessageFormat.format(Constants.FEEDBACK_PHOTO_KEY, photo))) {
+
+					FeedbackPhoto feedbackPhoto = new FeedbackPhoto();
+					feedbackPhoto.setFeedbackid(feedbackId);
+					feedbackPhoto.setId(photo);
+					feedbackPhoto.setUploadtime(DateUtil.getTime());
+					String url = "/feedback/" + photo + ".jpg";
+					feedbackPhoto.setUrl(url);
+					affectedRows = feedbackPhotoDao.insert(feedbackPhoto);
+					if (affectedRows == 0) {
+						LOG.error("Fail to insert into feedback_photo table");
+						throw new ApiException("未能成功插入反馈图片");
+					}
+				}
+			}
+		}
+		return ResponseDo.buildSuccessResponse("");
 	}
 }

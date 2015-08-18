@@ -46,4 +46,6 @@ public interface MessageService {
 	 */
 	ResponseDo getMessageList(String userId, String type, int ignore, int limit)throws ApiException ;
 
+	ResponseDo submitFeedback(String userId, String content, String[] photos)throws ApiException;
+
 }

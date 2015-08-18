@@ -20,7 +20,7 @@ import com.gongpingjia.carplay.service.impl.ParameterCheck;
  * 消息message
  * 
  * @author zhou shuofu
- * */
+ */
 @RestController
 public class MessageController {
 
@@ -109,7 +109,30 @@ public class MessageController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
-	
+
+	/**
+	 * 2.44 提交反馈信息
+	 * 
+	 * @param request
+	 *            请求参数
+	 * 
+	 * @return 提交成功
+	 */
+	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST)
+	public ResponseDo submitFeedback(HttpServletRequest request) {
+		LOG.debug("==> submitFeedback");
+
+		String userId = request.getParameter("userId");
+		String token = request.getParameter("token");
+		String content=request.getParameter("content");
+		String[] photos=request.getParameterValues("photos");
+		try {
+			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			return messageService.submitFeedback(userId,content, photos);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 
 }
