@@ -19,10 +19,12 @@ public interface SeatReservationDao {
 	List<SeatReservation> selectListByParam(Map<String, Object> param);
 
 	int updateByReservationList(List<SeatReservation> paramList);
-	
+
 	Integer selectActivityJoinSeatCount(String activityId);
-	
+
 	int updateByOfferdCar(Map<String, Object> param);
-	
+
 	int updateByTakeSeat(SeatReservation record);
+
+	int deleteByParam(Map<String, Object> param);
 }

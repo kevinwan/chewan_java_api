@@ -88,6 +88,23 @@
 		<if test="carid != null">
 			AND carId = #{carid,jdbcType=VARCHAR}
 		</if>
+		<if test="seatindex != null">
 			AND seatIndex = #{seatindex,jdbcType=INTEGER}
+		</if>
 	</update>
+	
+	<delete id="deleteByParam" parameterType="java.util.Map">
+		delete from seat_reservation
+		<where>
+			<if test="activityId != null">
+				AND activityId = #{activityId,jdbcType=VARCHAR}
+			</if>
+			<if test="carId != null">
+				AND carId = #{carId,jdbcType=VARCHAR}
+			</if>
+			<if test="userId != null">
+				AND userId = #{userId,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</delete>
 </mapper>

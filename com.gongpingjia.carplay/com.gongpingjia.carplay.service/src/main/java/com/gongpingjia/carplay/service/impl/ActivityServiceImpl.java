@@ -1602,4 +1602,45 @@ public class ActivityServiceImpl implements ActivityService {
 
 		return ResponseDo.buildSuccessResponse();
 	}
+
+	@Override
+	public ResponseDo removeMember(String activityId, String member, String userId, String token) throws ApiException {
+		LOG.debug("Begin check input parameters");
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		ParameterCheck.getInstance().checkParameterUUID("member", member);
+		if (userId.equals(member)) {
+			LOG.warn("User cannot pull self down");
+			throw new ApiException("活动创建者不能被移除");
+		}
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null || !activity.getOrganizer().equals(userId)) {
+			LOG.warn("not activity organizer, cannot remove member");
+			throw new ApiException("只有活动创建者可以移除成员");
+		}
+
+		ActivityMemberKey key = new ActivityMemberKey();
+		key.setActivityid(activityId);
+		key.setUserid(member);
+		memberDao.deleteByPrimaryKey(key);
+
+		Car car = carDao.selectByUserId(userId);
+		if (car != null) {
+			SeatReservation reservation = new SeatReservation();
+			reservation.setActivityid(activityId);
+			reservation.setBooktime(null);
+			reservation.setCarid(car.getId());
+			reservation.setUserid(null);
+			// 调用更新占座接口，设置对应的userID和Booktime字段为Null
+			seatReservDao.updateByTakeSeat(reservation);
+
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("activityId", activityId);
+			param.put("carId", car.getId());
+			seatReservDao.deleteByParam(param);
+		}
+
+		return ResponseDo.buildSuccessResponse();
+	}
 }

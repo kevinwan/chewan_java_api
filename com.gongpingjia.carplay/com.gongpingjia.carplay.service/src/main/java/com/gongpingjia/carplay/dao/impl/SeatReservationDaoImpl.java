@@ -62,4 +62,9 @@ public class SeatReservationDaoImpl implements SeatReservationDao {
 		return DASUtil.update(SeatReservation.class.getName(), "updateByTakeSeat", record);
 	}
 
+	@Override
+	public int deleteByParam(Map<String, Object> param) {
+		return DASUtil.delete(SeatReservation.class.getName(), "deleteByParam", param);
+	}
+
 }

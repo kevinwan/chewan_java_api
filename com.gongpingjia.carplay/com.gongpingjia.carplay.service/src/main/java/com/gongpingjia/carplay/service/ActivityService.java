@@ -194,4 +194,19 @@ public interface ActivityService {
 	 */
 	ResponseDo returnSeat(String activityId, String member, String userId, String token) throws ApiException;
 
+	/**
+	 * 移除成员
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param member
+	 *            活动中被移除的成员
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @return 返回被移除的结果
+	 * @throws 业务异常
+	 */
+	ResponseDo removeMember(String activityId, String member, String userId, String token) throws ApiException;
 }

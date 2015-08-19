@@ -312,4 +312,30 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.31 移除成员
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param member
+	 *            活动中被移除的成员
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @return 返回被移除的结果
+	 */
+	@RequestMapping(value = "/activity/{activityId}/member/remove", method = RequestMethod.POST)
+	public ResponseDo removeMember(@PathVariable("activityId") String activityId,
+			@RequestParam("member") String member, @RequestParam("userId") String userId,
+			@RequestParam("token") String token) {
+		LOG.info("removeMember begin");
+		try {
+			return service.removeMember(activityId, member, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }
