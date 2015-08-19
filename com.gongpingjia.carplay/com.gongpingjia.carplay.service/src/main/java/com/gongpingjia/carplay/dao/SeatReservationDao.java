@@ -24,5 +24,5 @@ public interface SeatReservationDao {
 	
 	int updateByOfferdCar(Map<String, Object> param);
 	
-	int updateByTakePullSeat(SeatReservation record);
+	int updateByTakeSeat(SeatReservation record);
 }

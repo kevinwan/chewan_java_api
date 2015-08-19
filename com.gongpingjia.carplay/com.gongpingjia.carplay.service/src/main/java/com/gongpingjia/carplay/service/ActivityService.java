@@ -176,4 +176,22 @@ public interface ActivityService {
 	 */
 	ResponseDo takeSeat(String activityId, String userId, String token, String carId, Integer seatIndex)
 			throws ApiException;
+
+	/**
+	 * 拉下座位
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param member
+	 *            活动中被拉下来的成员
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @return 返回被拉下来的结果
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo returnSeat(String activityId, String member, String userId, String token) throws ApiException;
+
 }

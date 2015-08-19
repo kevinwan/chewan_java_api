@@ -1558,12 +1558,47 @@ public class ActivityServiceImpl implements ActivityService {
 		reservation.setCarid(carId);
 		reservation.setSeatindex(seatIndex);
 		reservation.setUserid(userId);
-		int affectRows = seatReservDao.updateByTakePullSeat(reservation);
+		int affectRows = seatReservDao.updateByTakeSeat(reservation);
 
 		if (affectRows != 1) {
 			LOG.warn("fail to take seat");
 			throw new ApiException("未能成功占座");
 		}
+
+		return ResponseDo.buildSuccessResponse();
+	}
+
+	@Override
+	public ResponseDo returnSeat(String activityId, String member, String userId, String token) throws ApiException {
+		LOG.debug("Begin check input parameters");
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		ParameterCheck.getInstance().checkParameterUUID("member", member);
+		if (userId.equals(member)) {
+			LOG.warn("User cannot pull self down");
+			throw new ApiException("输入参数有误");
+		}
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null || !activity.getOrganizer().equals(userId)) {
+			LOG.warn("not activity organizer, cannot perform return seat");
+			throw new ApiException("只有活动创建者可以将成员拉下座位");
+		}
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("activityId", activityId);
+		param.put("userId", member); // 这里是user需要拉下其他成员
+		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
+		if (seatList.isEmpty()) {
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
+			throw new ApiException("未能成功拉下座位");
+		}
+
+		LOG.debug("Begin update seat reservation");
+		SeatReservation seatReservation = seatList.get(0);
+		seatReservation.setBooktime(null);
+		seatReservation.setUserid(null);
+		seatReservDao.updateByPrimaryKey(seatReservation);
 
 		return ResponseDo.buildSuccessResponse();
 	}

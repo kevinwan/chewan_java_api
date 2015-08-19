@@ -286,4 +286,30 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.30 拉下座位
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param member
+	 *            活动中被拉下来的成员
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            会话Token
+	 * @return 返回被拉下来的结果
+	 */
+	@RequestMapping(value = "/activity/{activityId}/seat/return", method = RequestMethod.POST)
+	public ResponseDo returnSeat(@PathVariable("activityId") String activityId, @RequestParam("member") String member,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("returnSeat beging");
+
+		try {
+			return service.returnSeat(activityId, member, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

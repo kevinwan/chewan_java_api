@@ -75,7 +75,7 @@
 			and carId is null
 	</update>
 	
-	<update id="updateByTakePullSeat" parameterType="com.gongpingjia.carplay.po.SeatReservation">
+	<update id="updateByTakeSeat" parameterType="com.gongpingjia.carplay.po.SeatReservation">
 		UPDATE seat_reservation
 		SET 
 			userId = #{userid,jdbcType=VARCHAR},

@@ -175,7 +175,7 @@ public class PhoneServiceImpl implements PhoneService {
 		PhoneVerification phoneVerify = new PhoneVerification();
 		phoneVerify.setPhone(phone);
 		phoneVerify.setCode(verifyCode);
-		phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.HOUR,
+		phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
 				PropertiesUtil.getProperty("message.effective.seconds", 7200)));
 
 		if (existPhoneVerify == null) {
@@ -184,7 +184,5 @@ public class PhoneServiceImpl implements PhoneService {
 			phoneDao.updateByPrimaryKey(phoneVerify);
 		}
 	}
-
-
 
 }
