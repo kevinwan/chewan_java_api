@@ -41,18 +41,17 @@ public class MessageController {
 	 * 
 	 */
 	@RequestMapping(value = "/user/{userId}/application/list", method = RequestMethod.GET)
-	public ResponseDo getApplicationList(@PathVariable("userId") String userId, HttpServletRequest request) {
+	public ResponseDo getApplicationList(@PathVariable("userId") String userId, @RequestParam("token") String token,
+			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
 		LOG.debug("=> getApplicationList");
-		String token = request.getParameter("token");
-		int ignore = request.getParameter("ignore") == null ? 0 : Integer.valueOf(request.getParameter("ignore"));
-		int limit = request.getParameter("limit") == null ? 10 : Integer.valueOf(request.getParameter("limit"));
 
 		try {
 			ParameterCheck.getInstance().checkUserInfo(userId, token);
 			return messageService.getApplicationList(userId, ignore, limit);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -153,7 +152,7 @@ public class MessageController {
 
 		try {
 			ParameterCheck.getInstance().checkUserInfo(userId, token);
-			return messageService.removeMessages(userId,messages);
+			return messageService.removeMessages(userId, messages);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

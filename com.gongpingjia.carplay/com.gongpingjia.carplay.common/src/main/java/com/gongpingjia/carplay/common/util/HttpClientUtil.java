@@ -61,13 +61,13 @@ public class HttpClientUtil {
 
 			response = httpclient.execute(httpGet);
 		} catch (ClientProtocolException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("请求异常");
 		} catch (IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("请求异常");
 		} catch (URISyntaxException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("请求异常");
 		}
 

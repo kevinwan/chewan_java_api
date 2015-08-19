@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.json.JSONObject;
+
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicHeader;
@@ -16,8 +18,6 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.CarService;
-
-import net.sf.json.JSONObject;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -32,21 +32,18 @@ public class CarServiceImpl implements CarService {
 	public ResponseDo getCarBrand() throws ApiException {
 
 		JSONObject json = new JSONObject();
-		try {
-			String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
-			Header header = new BasicHeader("Accept", "application/json");
+		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
+		Header header = new BasicHeader("Accept", "application/json");
 
-			CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(),
-					Arrays.asList(header), "UTF-8");
+		LOG.debug("Begin request gongpingjia server");
+		CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(),
+				Arrays.asList(header), "UTF-8");
 
-			String data = HttpClientUtil.parseResponse(response);
-			json = JSONObject.fromObject(data);
+		String data = HttpClientUtil.parseResponse(response);
+		json = JSONObject.fromObject(data);
 
-			HttpClientUtil.close(response);
-		} catch (Exception e) {
-			LOG.error("Failed to get brand information");
-			throw new ApiException("未能成功获取品牌信息");
-		}
+		HttpClientUtil.close(response);
+
 		return ResponseDo.buildSuccessResponse(json);
 	}
 
@@ -58,28 +55,24 @@ public class CarServiceImpl implements CarService {
 	 * @return 此品牌的车型信息
 	 */
 	public ResponseDo getCarModel(String brand) throws ApiException {
-		if (brand.equals(""))
+		if (brand.equals("")) {
+			LOG.warn("Input brand is empty, brand:{}", brand);
 			throw new ApiException("请输入品牌信息");
+		}
 
 		JSONObject json = new JSONObject();
 
-		try {
+		Map<String, String> params = new HashMap<String, String>(1, 1);
+		params.put("brand", brand);
 
-			Map<String, String> params = new HashMap<String, String>(1, 1);
-			params.put("brand", brand);
+		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
+		Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
+		CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, params, Arrays.asList(header), "GBK");
 
-			String gpjUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
-			Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
-			CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, params, Arrays.asList(header), "GBK");
+		String data = HttpClientUtil.parseResponse(response);
+		json = JSONObject.fromObject(data);
 
-			String data = HttpClientUtil.parseResponse(response);
-			json = JSONObject.fromObject(data);
-
-			HttpClientUtil.close(response);
-		} catch (Exception e) {
-			LOG.error("Failed to get model information");
-			throw new ApiException("未能成功获取车型信息");
-		}
+		HttpClientUtil.close(response);
 
 		return ResponseDo.buildSuccessResponse(json);
 	}

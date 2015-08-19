@@ -36,7 +36,7 @@ public class CarController {
 
 		try {
 			return service.getCarBrand();
-		} catch (Exception e) {
+		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
