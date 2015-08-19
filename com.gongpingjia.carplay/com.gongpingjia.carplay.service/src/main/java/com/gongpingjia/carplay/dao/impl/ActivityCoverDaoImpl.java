@@ -42,4 +42,9 @@ public class ActivityCoverDaoImpl implements ActivityCoverDao {
 		return DASUtil.selectList(ActivityCover.class.getName(),"selectByActivity", param);
 	}
 
+	@Override
+	public int deleteByActivityId(String activityId) {
+		return DASUtil.delete(ActivityCover.class.getName(), "deleteByActivityId", activityId);
+	}
+
 }

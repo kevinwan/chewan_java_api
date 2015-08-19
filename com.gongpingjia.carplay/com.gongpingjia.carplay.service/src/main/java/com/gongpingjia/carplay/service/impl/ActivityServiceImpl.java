@@ -380,6 +380,27 @@ public class ActivityServiceImpl implements ActivityService {
 		Activity activity = new Activity();
 		activity.setId(activityId);
 		activity.setOrganizer(request.getParameter("userId"));
+		buildActivityCommon(request, current, activity);
+		activity.setCreatetime(current);
+		LOG.debug("Save activity");
+		activityDao.insert(activity);
+
+		return activity;
+	}
+
+	/**
+	 * 根据请求参数构造Activity活动对象公共部分属性
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @param current
+	 *            当前时间
+	 * @param activity
+	 *            活动对象
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void buildActivityCommon(HttpServletRequest request, Long current, Activity activity) throws ApiException {
 		activity.setType(request.getParameter("type"));
 		activity.setDescription(request.getParameter("introduction"));
 		activity.setLocation(request.getParameter("location"));
@@ -410,12 +431,7 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setDistrict(user.getDistrict());
 		}
 
-		activity.setCreatetime(current);
 		activity.setLastmodifiedtime(current);
-		LOG.debug("Save activity");
-		activityDao.insert(activity);
-
-		return activity;
 	}
 
 	/**
@@ -1687,5 +1703,37 @@ public class ActivityServiceImpl implements ActivityService {
 		seatReservDao.updateByQuitActivity(quitParam);
 
 		return ResponseDo.buildSuccessResponse();
+	}
+
+	@Override
+	public ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
+			throws ApiException {
+
+		checkActivityParam(request);
+
+		// 只有活动的创建者才能编辑活动
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Activity is not exist, which activityId:{}", activityId);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (!activity.getOrganizer().equals(userId)) {
+			LOG.warn("Fail to find activity");
+			throw new ApiException("只有活动创建者可以编辑活动");
+		}
+
+		LOG.debug("refresh data");
+		coverDao.deleteByActivityId(activityId);
+
+		Long current = DateUtil.getTime();
+		buildActivityCommon(request, current, activity);
+		activityDao.updateByPrimaryKey(activity);
+
+		saveActivityCovers(request, activityId, current);
+
+		Map<String, String> data = buildShareData(userId, activity);
+
+		return ResponseDo.buildSuccessResponse(data);
 	}
 }

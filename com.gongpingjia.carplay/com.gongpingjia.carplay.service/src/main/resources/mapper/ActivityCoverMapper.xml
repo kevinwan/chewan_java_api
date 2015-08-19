@@ -39,4 +39,9 @@
 		uploadTime = #{uploadtime,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
+	
+	<delete id="deleteByActivityId" parameterType="java.lang.String">
+		delete from activity_cover
+		where activityId = #{activityId,jdbcType=VARCHAR}
+	</delete>
 </mapper>

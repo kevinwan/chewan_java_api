@@ -363,4 +363,29 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.33 编辑活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @param request
+	 *            编辑活动的请求参数
+	 * @return 返回编辑结果
+	 */
+	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.POST)
+	public ResponseDo alterActivityInfo(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
+		LOG.info("alterActivityInfo begin");
+		try {
+			return service.alterActivityInfo(activityId, userId, token, request);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

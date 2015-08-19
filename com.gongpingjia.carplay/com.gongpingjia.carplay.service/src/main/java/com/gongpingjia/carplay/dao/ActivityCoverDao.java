@@ -18,4 +18,5 @@ public interface ActivityCoverDao {
 
 	List<Map<String, String>> selectByActivity(Map<String, Object> param);
 
+	int deleteByActivityId(String activityId);
 }
