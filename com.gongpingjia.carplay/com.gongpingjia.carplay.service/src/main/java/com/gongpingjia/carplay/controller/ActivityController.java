@@ -388,4 +388,27 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.45 取消关注活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @return 返回结果对象
+	 */
+	@RequestMapping(value = "/activity/{activityId}/unsubscribe", method = RequestMethod.POST)
+	public ResponseDo unsubscribeActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("unsubscribeActivity begin");
+		try {
+			return service.unsubscribeActivity(activityId, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

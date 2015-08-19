@@ -242,4 +242,19 @@ public interface ActivityService {
 	 */
 	ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
 			throws ApiException;
+
+	/**
+	 * 取消关注活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @return 返回结果对象
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo unsubscribeActivity(String activityId, String userId, String token) throws ApiException;
 }

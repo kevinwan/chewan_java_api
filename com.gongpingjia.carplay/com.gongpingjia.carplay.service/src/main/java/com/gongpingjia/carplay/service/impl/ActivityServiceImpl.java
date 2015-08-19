@@ -47,6 +47,7 @@ import com.gongpingjia.carplay.po.ActivityCover;
 import com.gongpingjia.carplay.po.ActivityMember;
 import com.gongpingjia.carplay.po.ActivityMemberKey;
 import com.gongpingjia.carplay.po.ActivitySubscription;
+import com.gongpingjia.carplay.po.ActivitySubscriptionKey;
 import com.gongpingjia.carplay.po.ActivityView;
 import com.gongpingjia.carplay.po.ActivityViewHistory;
 import com.gongpingjia.carplay.po.ApplicationChangeHistory;
@@ -1735,5 +1736,32 @@ public class ActivityServiceImpl implements ActivityService {
 		Map<String, String> data = buildShareData(userId, activity);
 
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	@Override
+	public ResponseDo unsubscribeActivity(String activityId, String userId, String token) throws ApiException {
+		LOG.debug("Check input parameters");
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Cannot find activity with acitityId:{}", activityId);
+			throw new ApiException("未找到活动，无法取消关注");
+		}
+
+		if (activity.getOrganizer().equals(userId)) {
+			// 不能取消关注自己创建的活动
+			LOG.warn("Organizer cannot quit activity create by self, activityId:{}", activityId);
+			throw new ApiException("未找到活动，无法取消关注");
+		}
+
+		LOG.debug("Begin delete subscription data");
+		ActivitySubscriptionKey key = new ActivitySubscriptionKey();
+		key.setActivityid(activityId);
+		key.setUserid(userId);
+		subscriptionDao.deleteByPrimaryKey(key);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 }
