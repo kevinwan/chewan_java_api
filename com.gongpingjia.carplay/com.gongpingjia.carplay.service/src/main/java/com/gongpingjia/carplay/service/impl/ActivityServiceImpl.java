@@ -1514,4 +1514,57 @@ public class ActivityServiceImpl implements ActivityService {
 		LOG.debug("Finished build response data");
 		return ResponseDo.buildSuccessResponse(activityShareInfo);
 	}
+
+	@Override
+	public ResponseDo takeSeat(String activityId, String userId, String token, String carId, Integer seatIndex)
+			throws ApiException {
+		LOG.debug("Begin check input parameters");
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+
+		if (!StringUtils.isEmpty(carId)) {
+			ParameterCheck.getInstance().checkParameterUUID("carId", carId);
+		} else {
+			carId = null;
+		}
+
+		if (seatIndex < 1) {
+			LOG.debug("Input parameter seatIndex:{} is not correct", seatIndex);
+			throw new ApiException("输入参数有误");
+		}
+
+		Map<String, Object> param = new HashMap<String, Object>(4, 1);
+		param.put("activityId", activityId);
+		param.put("userId", userId);
+		List<ActivityMember> members = memberDao.selectByParam(param);
+		if (members.isEmpty()) {
+			// 非活动成员，不能占座
+			LOG.warn("only member has privilege of taking seat");
+			throw new ApiException("只有活动成员才可以占座");
+
+		}
+
+		List<SeatReservation> alreadyTakeSeats = seatReservDao.selectListByParam(param);
+		if (!alreadyTakeSeats.isEmpty()) {
+			// 说明已经占过座位了，不能重复抢座
+			LOG.warn("cannot take seat if already had a seat in the same activity");
+			throw new ApiException("不能在一个活动中重复占座");
+		}
+
+		LOG.debug("update seat reservation iformation");
+		SeatReservation reservation = new SeatReservation();
+		reservation.setActivityid(activityId);
+		reservation.setBooktime(DateUtil.getTime());
+		reservation.setCarid(carId);
+		reservation.setSeatindex(seatIndex);
+		reservation.setUserid(userId);
+		int affectRows = seatReservDao.updateByTakePullSeat(reservation);
+
+		if (affectRows != 1) {
+			LOG.warn("fail to take seat");
+			throw new ApiException("未能成功占座");
+		}
+
+		return ResponseDo.buildSuccessResponse();
+	}
 }

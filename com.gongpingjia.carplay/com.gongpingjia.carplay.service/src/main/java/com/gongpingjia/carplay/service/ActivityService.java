@@ -157,4 +157,23 @@ public interface ActivityService {
 	 */
 	ResponseDo getMemberAndSeatInfo(String activityId, String userId, String token) throws ApiException;
 
+	/**
+	 * 立即抢座
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @param carId
+	 *            车辆ID
+	 * @param seatIndex
+	 *            座位索引
+	 * @return 返回抢座结果
+	 * @throws ApiException
+	 *             抛出业务异常信息
+	 */
+	ResponseDo takeSeat(String activityId, String userId, String token, String carId, Integer seatIndex)
+			throws ApiException;
 }

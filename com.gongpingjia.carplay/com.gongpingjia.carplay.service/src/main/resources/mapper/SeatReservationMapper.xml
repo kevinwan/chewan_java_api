@@ -52,10 +52,13 @@
 				and activityId = #{activityId,jdbcType=VARCHAR}
 			</if>
 			<if test="carId != null">
-				and carId = #{carid,jdbcType=VARCHAR}
+				and carId = #{carId,jdbcType=VARCHAR}
 			</if>
 			<if test="userId != null">
-				and userId = #{userid,jdbcType=VARCHAR}
+				and userId = #{userId,jdbcType=VARCHAR}
+			</if>
+			<if test="seatIndex != null">
+				and seatIndex = #{seatIndex,jdbcType=INTEGER}
 			</if>
 		</where>
 	</select>
@@ -70,5 +73,21 @@
 			seatIndex = seatIndex + 1 
 		WHERE activityId = #{activityId,jdbcType=VARCHAR} 
 			and carId is null
+	</update>
+	
+	<update id="updateByTakePullSeat" parameterType="com.gongpingjia.carplay.po.SeatReservation">
+		UPDATE seat_reservation
+		SET 
+			userId = #{userid,jdbcType=VARCHAR},
+		    bookTime = #{booktime,jdbcType=BIGINT}
+		WHERE
+			activityId = #{activityid,jdbcType=VARCHAR}
+		<if test="carid == null">
+			AND carId IS NULL
+		</if>
+		<if test="carid != null">
+			AND carId = #{carid,jdbcType=VARCHAR}
+		</if>
+			AND seatIndex = #{seatindex,jdbcType=INTEGER}
 	</update>
 </mapper>

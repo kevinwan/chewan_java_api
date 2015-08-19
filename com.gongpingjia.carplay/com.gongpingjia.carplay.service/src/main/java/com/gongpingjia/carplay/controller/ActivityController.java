@@ -257,4 +257,33 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.29 立即抢座
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @param carId
+	 *            车辆ID
+	 * @param seatIndex
+	 *            座位索引
+	 * @return 返回抢座结果
+	 */
+	@RequestMapping(value = "/activity/{activityId}/seat/take", method = RequestMethod.POST)
+	public ResponseDo takeSeat(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestParam("carId") String carId,
+			@RequestParam("seatIndex") Integer seatIndex) {
+		LOG.info("takeSeat begin");
+
+		try {
+			return service.takeSeat(activityId, userId, token, carId, seatIndex);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

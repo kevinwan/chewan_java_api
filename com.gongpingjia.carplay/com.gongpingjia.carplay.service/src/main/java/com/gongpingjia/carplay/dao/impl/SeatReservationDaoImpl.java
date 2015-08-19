@@ -57,4 +57,9 @@ public class SeatReservationDaoImpl implements SeatReservationDao {
 		return DASUtil.update(SeatReservation.class.getName(), "updateByOfferdCar", param);
 	}
 
+	@Override
+	public int updateByTakePullSeat(SeatReservation record) {
+		return DASUtil.update(SeatReservation.class.getName(), "updateByTakePullSeat", record);
+	}
+
 }
