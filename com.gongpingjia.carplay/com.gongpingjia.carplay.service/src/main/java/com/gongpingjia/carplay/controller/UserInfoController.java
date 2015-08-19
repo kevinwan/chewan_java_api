@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
@@ -26,8 +25,24 @@ public class UserInfoController {
 	@Autowired
 	private UserService userService;
 	
+	/**
+	 * 2.5注册
+	 * 
+	 * @param phone 手机号
+	 * @param code 验证码
+	 * @param password 密码 (6-16位字符的 MD5 加密)
+	 * @param nickname 昵称
+	 * @param gender 性别： “男” 或 “女”
+	 * @param birthYear 出生年
+	 * @param birthMonth 出生月 
+	 * @param birthDay 出生日
+	 * @param province 省份名，例如 “江苏”
+	 * @param city 城市名，例如 “南京”
+	 * @param district 区域名，例如 “栖霞区”
+	 * @param photo 该 photo的uuid
+	 * @return 注册结果
+	 */
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
-	@ResponseBody
 	public ResponseDo register(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "code") String code,
 			@RequestParam(value = "password") String password,
@@ -60,8 +75,14 @@ public class UserInfoController {
 		return userService.register(user, code);
 	}
 	
+	/**
+	 * 2.8登录
+	 * 
+	 * @param phone 手机号
+	 * @param password 密码
+	 * @return 登陆结果
+	 */
 	@RequestMapping(value = "/user/login", method = RequestMethod.POST)
-	@ResponseBody
 	public ResponseDo loginUser(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "password") String password) {
 
@@ -74,8 +95,15 @@ public class UserInfoController {
 		return userService.loginUser(user);
 	}
 	
+	/**
+	 * 2.9	忘记密码
+	 * 
+	 * @param phone 手机号
+	 * @param code 验证码
+	 * @param password 密码 (MD5加密后的值)
+	 * @return 忘记密码结果
+	 */
 	@RequestMapping(value = "/user/password", method = RequestMethod.POST)
-	@ResponseBody
 	public ResponseDo forgetPassword(@RequestParam(value = "phone") String phone,
 			@RequestParam(value = "code") String code,
 			@RequestParam(value = "password") String password) {
@@ -89,15 +117,26 @@ public class UserInfoController {
 		return userService.forgetPassword(user, code);
 	}
 	
+	/**
+	 * 2.11	车主认证申请
+	 * 
+	 * @param token token
+	 * @param drivingExperience 驾龄， 例如 2 代表两年驾龄
+	 * @param carBrand 车辆品牌中文名称，例如 “奥迪”
+	 * @param carBrandLogo 车辆品牌Logo地址
+	 * @param carModel 车型， 例如 “奥迪A4L”
+	 * @param slug 车型API返回结果的slug字段,例如 dazhong-cc
+	 * @param userId 用户uuid
+	 * @return 认证结果
+	 */
 	@RequestMapping(value = "/user/{userId}/authentication", method = RequestMethod.POST)
-	@ResponseBody
 	public ResponseDo applyAuthentication(@RequestParam(value = "token") String token,
 			@RequestParam(value = "drivingExperience") Integer drivingExperience,
 			@RequestParam(value = "carBrand") String carBrand,
 			@RequestParam(value = "carBrandLogo") String carBrandLogo,
 			@RequestParam(value = "carModel") String carModel,
 			@RequestParam(value = "slug") String slug,
-			@PathVariable String userId) {
+			@PathVariable(value = "userId") String userId) {
 
 		LOG.debug("applyAuthentication is called, request parameter produce:");
 
@@ -111,9 +150,16 @@ public class UserInfoController {
 		return userService.applyAuthentication(authenticationApplication,token,userId);
 	}
 	
+	/**
+	 * 2.20	 个人详情
+	 * 
+	 * @param interviewedUser 被访问用户的userId
+	 * @param visitorUser 访问者的userId
+	 * @param token token
+	 * @return 个人详情返回结果
+	 */
 	@RequestMapping(value = "/user/{interviewedUser}/info", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseDo userInfo(@PathVariable String interviewedUser,
+	public ResponseDo userInfo(@PathVariable(value = "interviewedUser") String interviewedUser,
 			@RequestParam(value = "userId") String visitorUser,
 			@RequestParam(value = "token") String token) {
 
@@ -122,9 +168,17 @@ public class UserInfoController {
 		return userService.userInfo(interviewedUser, visitorUser, token);
 	}
 	
+	/**
+	 * 2.34	 我关注的人
+	 * 
+	 * @param userId 用户uuid
+	 * @param ignore 返回结果将扔掉的条数, 不填默认为 0
+	 * @param limit 返回的条数,  默认为 10
+	 * @param token token
+	 * @return 我关注的人返回结果
+	 */
 	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseDo userListen(@PathVariable String userId,
+	public ResponseDo userListen(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "ignore",required = false) Integer ignore,
 			@RequestParam(value = "limit",required = false) Integer limit,
 			@RequestParam(value = "token") String token) {
@@ -134,9 +188,16 @@ public class UserInfoController {
 		return userService.userListen(userId, ignore, limit, token);
 	}
 	
+	/**
+	 * 2.35	 关注其他用户
+	 * 
+	 * @param userId 用户uuid
+	 * @param targetUserId 要关注的用户id
+	 * @param token token
+	 * @return 关注其他用户返回结果
+	 */
 	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseDo payAttention(@PathVariable String userId,
+	public ResponseDo payAttention(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "targetUserId") String targetUserId,
 			@RequestParam(value = "token") String token) {
 		
@@ -149,9 +210,16 @@ public class UserInfoController {
 		return userService.payAttention(userSubscription, token);
 	}
 	
+	/**
+	 * 2.36	 取消关注其他用户
+	 * 
+	 * @param userId 用户uuid
+	 * @param targetUserId 要取消关注的用户id
+	 * @param token token
+	 * @return 取消关注其他用户返回结果
+	 */
 	@RequestMapping(value = "/user/{userId}/unlisten", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseDo unPayAttention(@PathVariable String userId,
+	public ResponseDo unPayAttention(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "targetUserId") String targetUserId,
 			@RequestParam(value = "token") String token) {
 		
@@ -164,9 +232,21 @@ public class UserInfoController {
 		return userService.unPayAttention(userSubscription, token);
 	}
 
+	/**
+	 * 2.38	 变更我的信息
+	 * 
+	 * @param userId 用户uuid
+	 * @param nickname 用户昵称
+	 * @param gender 性别 ， 男 或 女
+	 * @param drivingExperience 驾龄， 例如 2 代表两年驾龄
+	 * @param province 省份
+	 * @param city 城市
+	 * @param district 区名
+	 * @param token token
+	 * @return 变更我的信息返回结果
+	 */
 	@RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseDo alterUserInfo(@PathVariable String userId,
+	public ResponseDo alterUserInfo(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "nickname") String nickname,
 			@RequestParam(value = "gender") String gender,
 			@RequestParam(value = "drivingExperience") Integer drivingExperience,
@@ -189,9 +269,16 @@ public class UserInfoController {
 		return userService.alterUserInfo(user, token);
 	}
 	
+	/**
+	 * 2.40	 编辑相册图片
+	 * 
+	 * @param userId 用户uuid
+	 * @param photos 相册图片id 数组，长度最大为9
+	 * @param token token
+	 * @return 编辑相册图片返回结果
+	 */
 	@RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST)
-	@ResponseBody
-	public ResponseDo manageAlbumPhotos(@PathVariable String userId,
+	public ResponseDo manageAlbumPhotos(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "photos") String[] photos,
 			@RequestParam(value = "token") String token) {
 

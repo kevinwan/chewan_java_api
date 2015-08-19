@@ -17,16 +17,25 @@
 	</resultMap>
 	
 	<select id="selectUserInfo" resultMap="UserInfoMap" parameterType="java.lang.String">
-		select user.id as userId, nickname, gender, (year(sysdate()) - birthYear) as age, photo, ifnull(brandLogo, "") as brandLogo, ifnull(carModel, "") as carModel,
-        ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, province, city, district, isAuthenticated from user left join (select brandLogo, model as carModel, userId from car) as CAR on user.id = CAR.userId
-        where user.id = #{userid,jdbcType=VARCHAR}
+		select 
+			user.id as userId, nickname, gender, (year(sysdate()) - birthYear) as age, photo, ifnull(brandLogo, "") as brandLogo, ifnull(carModel, "") as carModel,ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, province, city, district, isAuthenticated 
+		from user 
+			left join (select brandLogo, model as carModel, userId 
+							from car) as CAR on user.id = CAR.userId
+        where 
+        	user.id = #{userid,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="userListenList" resultMap="UserInfoMap" parameterType="java.util.Map">
-		select toUser as userId, nickname, gender, age, photo, drivingExperience, carBrandLogo, carModel from user_subscription subscription left join (select user.id as userId,
-		nickname, gender, (year(sysdate()) - birthYear) as age, photo,ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience from user) usr on subscription.toUser=usr.userId
-        left join (select ifnull(brandLogo, "") as carBrandLogo, ifnull(model, "") as carModel, userId from car) car on car.userId= usr.userId 
-        where subscription.fromUser = #{userId,jdbcType=VARCHAR} 
+		select 
+			toUser as userId, nickname, gender, age, photo, drivingExperience, carBrandLogo, carModel 
+		from user_subscription subscription 
+			left join (select user.id as userId,nickname, gender, (year(sysdate()) - birthYear) as age, photo,ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience 
+						from user) usr on subscription.toUser=usr.userId
+        	left join (select ifnull(brandLogo, "") as carBrandLogo, ifnull(model, "") as carModel, userId 
+        					from car) car on car.userId= usr.userId 
+        where 
+        	subscription.fromUser = #{userId,jdbcType=VARCHAR} 
         order by subscription.subscribeTime 
         desc limit #{ignore,jdbcType=INTEGER} , #{limit,jdbcType=INTEGER}
 	</select>

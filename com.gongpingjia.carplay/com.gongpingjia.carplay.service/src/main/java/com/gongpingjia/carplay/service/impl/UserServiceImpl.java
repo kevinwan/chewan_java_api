@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
@@ -88,24 +87,6 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private UserSubscriptionDao userSubscriptionDao;
-	
-	@Override
-	public List<User> queryUsers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public User findUser(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int saveUser(User user) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public ResponseDo register(User user, String code){
@@ -359,7 +340,7 @@ public class UserServiceImpl implements UserService {
 	    param.put("gender", userInfo.getGender());
 	    param.put("age", userInfo.getAge());
 	    param.put("photo", PropertiesUtil.getProperty("gongpingjia.person.pic.url", "") + 
-	    		userInfo.getPhoto() + "?imageView2/1/w/200&timestamp=" + DateUtil.getTime());
+	    		userInfo.getPhoto() + CommonUtil.getActivityPhotoPostfix() + "&timestamp=" + DateUtil.getTime());
 	    param.put("carBrandLogo", userInfo.getCarBrandLogo());
 	    param.put("carModel", userInfo.getCarModel());
 	    param.put("drivingExperience", userInfo.getDrivingExperience());

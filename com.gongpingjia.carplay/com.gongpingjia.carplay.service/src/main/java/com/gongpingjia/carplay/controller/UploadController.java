@@ -134,7 +134,7 @@ public class UploadController {
 	}
 	
 	/**
-	 * 更改头像
+	 * 2.37 更改头像
 	 * 
 	 * @param userId
 	 *            用户ID
