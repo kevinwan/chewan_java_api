@@ -27,4 +27,8 @@ public interface SeatReservationDao {
 	int updateByTakeSeat(SeatReservation record);
 
 	int deleteByParam(Map<String, Object> param);
+	
+	List<String> selectCarIdsByActivityId(String activityId);
+	
+	int updateByQuitActivity(Map<String, Object> param); 
 }

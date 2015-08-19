@@ -209,4 +209,19 @@ public interface ActivityService {
 	 * @throws 业务异常
 	 */
 	ResponseDo removeMember(String activityId, String member, String userId, String token) throws ApiException;
+
+	/**
+	 * 退出活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 返回退出结果信息
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	ResponseDo quitActivity(String activityId, String userId, String token) throws ApiException;
 }

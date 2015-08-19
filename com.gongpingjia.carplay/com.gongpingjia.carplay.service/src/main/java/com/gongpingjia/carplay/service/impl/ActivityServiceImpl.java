@@ -1643,4 +1643,49 @@ public class ActivityServiceImpl implements ActivityService {
 
 		return ResponseDo.buildSuccessResponse();
 	}
+
+	@Override
+	public ResponseDo quitActivity(String activityId, String userId, String token) throws ApiException {
+		LOG.debug("Begin check input parameters");
+		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		ParameterCheck.getInstance().checkUserInfo(userId, token);
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Activity is not exist with activityId:{}", activityId);
+			throw new ApiException("活动不存在");
+		}
+
+		if (activity.getOrganizer().equals(userId)) {
+			LOG.warn("Activity creator cannot exist activity");
+			throw new ApiException("活动创建者不能退出活动");
+		}
+
+		Car car = carDao.selectByUserId(userId);
+		if (car != null) {
+			List<String> activityCars = seatReservDao.selectCarIdsByActivityId(activityId);
+			if (activityCars.contains(car.getId()) && activityCars.size() == 1) {
+				LOG.debug("The only exist car cannot quit the activity");
+				throw new ApiException("最后一辆车的车主不能退出活动");
+			}
+
+			Map<String, Object> param = new HashMap<String, Object>(2, 1);
+			param.put("activityId", activityId);
+			param.put("carId", car.getId());
+			seatReservDao.deleteByParam(param);
+		}
+
+		LOG.debug("update data");
+		ActivityMemberKey key = new ActivityMemberKey();
+		key.setActivityid(activityId);
+		key.setUserid(userId);
+		memberDao.deleteByPrimaryKey(key);
+
+		Map<String, Object> quitParam = new HashMap<String, Object>(2, 1);
+		quitParam.put("activityId", activityId);
+		quitParam.put("userId", userId);
+		seatReservDao.updateByQuitActivity(quitParam);
+
+		return ResponseDo.buildSuccessResponse();
+	}
 }

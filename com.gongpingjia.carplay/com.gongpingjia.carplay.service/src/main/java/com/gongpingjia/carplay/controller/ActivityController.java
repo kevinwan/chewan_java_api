@@ -338,4 +338,29 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.32 退出活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话token
+	 * @return 返回退出结果信息
+	 * 
+	 */
+	@RequestMapping(value = "/activity/{activityId}/quit", method = RequestMethod.POST)
+	public ResponseDo quitActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+		LOG.info("quitActivity begin");
+
+		try {
+			return service.quitActivity(activityId, userId, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

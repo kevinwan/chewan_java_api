@@ -107,4 +107,22 @@
 			</if>
 		</where>
 	</delete>
+	
+	<select id="selectCarIdsByActivityId" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT 
+			distinct carId 
+		FROM 
+			seat_reservation 
+		WHERE 
+			activityId = #{activityId,jdbcType=VARCHAR} 
+			AND carId IS NOT NULL
+	</select>
+	
+	<update id="updateByQuitActivity" parameterType="com.gongpingjia.carplay.po.SeatReservation">
+		UPDATE seat_reservation
+		SET 
+			userId = NULL, bookTime = NULL
+		WHERE
+			activityId = #{activityId,jdbcType=VARCHAR}	AND userId = #{userId,jdbcType=VARCHAR}
+	</update>
 </mapper>
