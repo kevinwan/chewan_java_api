@@ -327,7 +327,7 @@ public class ActivityServiceImpl implements ActivityService {
 		String[] covers = request.getParameterValues("cover");
 		if (covers == null || covers.length < 1
 				|| covers.length > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
-			LOG.error("Input covers length is {}, out of the range", covers.length);
+			LOG.error("Input covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
 			throw new ApiException("输入参数有误");
 		}
 
@@ -1502,7 +1502,7 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		Map<String, Object> activityShareInfo = activityViewDao.selectActivityShareInfo(param);
-		if(activityShareInfo == null){
+		if (activityShareInfo == null) {
 			activityShareInfo = new HashMap<String, Object>();
 		}
 		activityShareInfo.put("members", members);

@@ -6,6 +6,11 @@ import org.springframework.context.ApplicationContextAware;
 public class BeanUtil implements ApplicationContextAware {
 	private static ApplicationContext context;
 
+	/**
+	 * Spring注入的时候，会调用接口的该方法，注入context对象
+	 * ==暂时理解为Findbugs误报==
+	 */
+	@Override
 	public void setApplicationContext(ApplicationContext context) {
 		BeanUtil.context = context;
 	}
