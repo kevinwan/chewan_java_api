@@ -124,15 +124,41 @@ public class MessageController {
 
 		String userId = request.getParameter("userId");
 		String token = request.getParameter("token");
-		String content=request.getParameter("content");
-		String[] photos=request.getParameterValues("photos");
+		String content = request.getParameter("content");
+		String[] photos = request.getParameterValues("photos");
 		try {
 			ParameterCheck.getInstance().checkUserInfo(userId, token);
-			return messageService.submitFeedback(userId,content, photos);
+			return messageService.submitFeedback(userId, content, photos);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
 
+	/**
+	 * 2.47批量删除消息
+	 * 
+	 * @param request
+	 *            请求参数
+	 *
+	 * @return 删除成功
+	 */
+	@RequestMapping(value = "/message/remove", method = RequestMethod.POST)
+	public ResponseDo removeMessages(HttpServletRequest request) {
+		LOG.debug("==> removeMessages");
+
+		String userId = request.getParameter("userId");
+		String token = request.getParameter("token");
+		String[] messages = request.getParameterValues("messages");
+
+		try {
+			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			return messageService.removeMessages(userId,messages);
+		} catch (ApiException e) {
+			LOG.error(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+	
+	
 }

@@ -31,4 +31,8 @@ public interface MessageDao {
 	int updateIsCheckedByUserAndTypeCommentNotComment(Map<String, Object> param);
 
 	int updateRemarksByExtra3(Message record);
+
+	Message selectByMeesageIdAndUserId(Map<String, Object> param);
+
+	int updateIsDeletedByMessageId(String messageId);
 }

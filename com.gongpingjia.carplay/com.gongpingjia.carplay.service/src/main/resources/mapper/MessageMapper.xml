@@ -83,6 +83,14 @@
 	    message.createTime desc limit #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
 	</select>
 	
+	<select id="selectByMeesageIdAndUserId" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select 
+		id, fromUser, toUser, type, content, extra1,
+		extra2, extra3, remarks, isChecked,isDeleted, createTime 
+		from message where id = #{messageId,jdbcType=VARCHAR} 
+		and toUser =#{userId,jdbcType=VARCHAR} and isDeleted = 0
+	</select>
+	
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from
 		message
@@ -140,4 +148,9 @@
 		SET remarks = #{remarks,jdbcType=VARCHAR}
 		WHERE extra3 = #{extra3,jdbcType=VARCHAR}
 	</update>
+	
+	<update id="updateIsDeletedByMessageId" parameterType="java.lang.String">
+		update message set isDeleted=1 where id=#{messageId,jdbcType=VARCHAR}
+	</update>
+	
 </mapper>

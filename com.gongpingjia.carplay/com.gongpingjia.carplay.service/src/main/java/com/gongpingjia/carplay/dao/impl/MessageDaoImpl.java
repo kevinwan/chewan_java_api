@@ -56,10 +56,12 @@ public class MessageDaoImpl implements MessageDao {
 	public List<Map<String, Object>> selectMessageListByUserAndTypeComment(Map<String, Object> param) {
 		return DASUtil.selectList(Message.class.getName(), "selectMessageListByUserAndTypeComment", param);
 	}
+
 	@Override
 	public List<Map<String, Object>> selectMessageListByUserAndTypeNotComment(Map<String, Object> param) {
 		return DASUtil.selectList(Message.class.getName(), "selectMessageListByUserAndTypeNotComment", param);
 	}
+
 	@Override
 	public int updateIsCheckedByUserAndTypeComment(Map<String, Object> param) {
 		return DASUtil.update(Message.class.getName(), "updateIsCheckedByUserAndTypeComment", param);
@@ -73,6 +75,16 @@ public class MessageDaoImpl implements MessageDao {
 	@Override
 	public int updateRemarksByExtra3(Message record) {
 		return DASUtil.update(Message.class.getName(), "updateRemarksByExtra3", record);
+	}
+
+	@Override
+	public Message selectByMeesageIdAndUserId(Map<String, Object> param) {
+		return DASUtil.selectOne(Message.class.getName(), "selectByMeesageIdAndUserId", param);
+	}
+
+	@Override
+	public int updateIsDeletedByMessageId(String messageId) {
+		return DASUtil.update(Message.class.getName(), "updateIsDeletedByMessageId",messageId);
 	}
 
 }

@@ -28,6 +28,7 @@ import com.gongpingjia.carplay.dao.MessageDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.Feedback;
 import com.gongpingjia.carplay.po.FeedbackPhoto;
+import com.gongpingjia.carplay.po.Message;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.MessageService;
 
@@ -218,12 +219,36 @@ public class MessageServiceImpl implements MessageService {
 					feedbackPhoto.setUploadtime(DateUtil.getTime());
 					String url = "/feedback/" + photo + ".jpg";
 					feedbackPhoto.setUrl(url);
+					//feedbackPhotoDao.deleteByPrimaryKey(photo);
 					affectedRows = feedbackPhotoDao.insert(feedbackPhoto);
 					if (affectedRows == 0) {
 						LOG.error("Fail to insert into feedback_photo table");
 						throw new ApiException("未能成功插入反馈图片");
 					}
 				}
+			}
+		}
+		return ResponseDo.buildSuccessResponse("");
+	}
+
+	@Override
+	public ResponseDo removeMessages(String userId, String[] messages) throws ApiException {
+		for (String messageId : messages) {
+
+			Map<String, Object> param = new HashMap<>();
+			param.put("messageId", messageId);
+			param.put("userId", userId);
+			Message message = messageDao.selectByMeesageIdAndUserId(param);
+
+			if (message == null) {
+				LOG.error("Message not found : {}", messageId);
+				throw new ApiException("未找到该消息");
+			}
+
+			int affeced = messageDao.updateIsDeletedByMessageId(messageId);
+			if (affeced == 0) {
+				LOG.error("Fail to delete message :{}", messageId);
+				throw new ApiException("未能成功删除消息");
 			}
 		}
 		return ResponseDo.buildSuccessResponse("");

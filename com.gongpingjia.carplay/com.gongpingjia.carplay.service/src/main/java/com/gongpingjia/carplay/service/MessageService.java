@@ -44,8 +44,34 @@ public interface MessageService {
 	 *            返回的条数, 默认为 10
 	 * 
 	 */
-	ResponseDo getMessageList(String userId, String type, int ignore, int limit)throws ApiException ;
+	ResponseDo getMessageList(String userId, String type, int ignore, int limit) throws ApiException;
 
-	ResponseDo submitFeedback(String userId, String content, String[] photos)throws ApiException;
+	/**
+	 * 2.44 提交反馈信息
+	 * 
+	 * @param userId
+	 *            用户ID
+	 * @param content
+	 *            反馈信息
+	 * 
+	 * @param photos
+	 *            反馈图片id
+	 * 
+	 * @return 提交成功
+	 */
+	ResponseDo submitFeedback(String userId, String content, String[] photos) throws ApiException;
+
+	/**
+	 * 2.47批量删除消息
+	 * 
+	 * @param userId
+	 *            用户Id
+	 * 
+	 * @param messages
+	 *            消息ID
+	 *
+	 * @return 删除成功
+	 */
+	ResponseDo removeMessages(String userId, String[] messages) throws ApiException;
 
 }
