@@ -582,7 +582,7 @@ public class UserServiceImpl implements UserService {
 	    } else if (!code.equals(phoneVerification.getCode())){
 	    	LOG.warn("Code not correct,phone : " + phone + ". error code :" + code);
 	    	return ResponseDo.buildFailureResponse("验证码错误");
-	    } else if (phoneVerification.getExpire() < new Date().getTime()/1000){
+	    } else if (phoneVerification.getExpire() < new Date().getTime()){
 	    	LOG.warn("Code expired");
 	    	return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
 	    }
