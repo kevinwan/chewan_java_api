@@ -159,6 +159,5 @@ public class MessageController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
-	
+
 }

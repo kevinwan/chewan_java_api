@@ -128,7 +128,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			activityLinkMap.put("organizer", organizermap);
 			
 			activityLinkMap.put("publishTime", activity.get("publishTime"));
-			activityLinkMap.put("start", activity.get("start"));
+			activityLinkMap.put("start", (Long)activity.get("start")!=0?activity.get("start"):"不确定");
 			activityLinkMap.put("isOver", (Long)activity.get("endTime")<DateUtil.getTime()?1:0);
 			activityLinkMap.put("introduction", activity.get("introduction"));
 			activityLinkMap.put("location", activity.get("location"));
@@ -197,7 +197,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			
 			
 			activityLinkMap.put("publishTime", activity.get("publishTime"));
-			activityLinkMap.put("start", activity.get("start"));
+			activityLinkMap.put("start", (Long)activity.get("start")!=0?activity.get("start"):"不确定");
 			activityLinkMap.put("isOver", (Long)activity.get("endTime")<DateUtil.getTime()?1:0);
 			activityLinkMap.put("introduction", activity.get("introduction"));
 			activityLinkMap.put("location", activity.get("location"));

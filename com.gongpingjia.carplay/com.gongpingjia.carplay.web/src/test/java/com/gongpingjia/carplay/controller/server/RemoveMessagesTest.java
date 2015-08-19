@@ -22,8 +22,7 @@ public class RemoveMessagesTest extends BaseTest {
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=utf-8"))
 				//.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
-				.andDo(MockMvcResultHandlers.print())
-				.andReturn();
+				.andDo(MockMvcResultHandlers.print()).andReturn();
 
 		Assert.assertNull(result.getModelAndView());
 

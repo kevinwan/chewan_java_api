@@ -219,7 +219,7 @@ public class MessageServiceImpl implements MessageService {
 					feedbackPhoto.setUploadtime(DateUtil.getTime());
 					String url = "/feedback/" + photo + ".jpg";
 					feedbackPhoto.setUrl(url);
-					//feedbackPhotoDao.deleteByPrimaryKey(photo);
+					feedbackPhotoDao.deleteByPrimaryKey(photo);
 					affectedRows = feedbackPhotoDao.insert(feedbackPhoto);
 					if (affectedRows == 0) {
 						LOG.error("Fail to insert into feedback_photo table");
