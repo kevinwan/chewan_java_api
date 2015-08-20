@@ -236,7 +236,7 @@ public class UploadServiceImpl implements UploadService {
 		LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
 		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, userId);
-		return uploadPhoto(data, userId, key, false);
+		return uploadPhoto(data, userId, key, true);
 
 	}
 }

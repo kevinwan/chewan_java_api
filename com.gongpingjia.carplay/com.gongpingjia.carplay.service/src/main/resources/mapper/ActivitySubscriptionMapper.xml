@@ -18,17 +18,54 @@
 	
 	
 	<select id="selectByUserId" resultType="java.util.Map" parameterType="java.util.Map">
-		select subscription.activityId, organizer, publishTime, start,endTime, introduction, location, type, pay, nickname, gender, 
-        age, photo, ifnull(concat(#{gpjIMGUrl,jdbcType=VARCHAR} , car.carBrandLogo),'') as carBrandLogo, 
-        ifnull(car.carModel, '') as carModel, drivingExperience, resA.count as totalSeat, resB.count as holdingSeat from activity_subscription 
-        subscription left join (select id as activityId, organizer, createTime as publishTime, start,endTime, ifnull(description, '') as introduction, 
-        location, type, paymentType as pay from activity) act on subscription.activityId = act.activityId left join (select activityId, count(*) 
-        as count from seat_reservation group by activityId) resA on act.activityId = resA.activityId left join(select activityId, count(*) as count 
-        from seat_reservation where userId is not null group by activityId) resB on act.activityId = resB.activityId left join (select user.id as userId, 
-        nickname, gender, (year(sysdate()) - birthYear) as age, concat(#{AssetUrl,jdbcType=VARCHAR}, photo) as photo, ifnull((year(sysdate()) - drivingLicenseYear), 
-        0) as drivingExperience from user) usr on act.organizer = usr.userId left join (select ifnull(brandLogo, '') as carBrandLogo, ifnull(model, '') as 
-        carModel, userId from car) car on car.userId = usr.userId where subscription.userId = #{userId,jdbcType=VARCHAR} order by publishTime desc 
-        limit  #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}	
+		SELECT
+			subscription.activityId,
+			activity.createTime AS publishTime,
+			activity.start,
+			activity.endTime,
+			ifnull(activity.description, '') AS introduction,
+			activity.location,
+			activity.type,
+			activity.paymentType AS pay,
+			activity.organizer,
+			`user`.nickname,
+			`user`.gender,
+			(YEAR (sysdate()) - `user`.birthYear) AS age,
+			concat(#{AssetUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
+			IFNULL(CONCAT(#{gpjIMGUrl,jdbcType=VARCHAR}, car.brandLogo),'') AS carBrandLogo,
+			IFNULL(car.model,'') AS carModel,
+			IFNULL((YEAR(sysdate())-`user`.drivingLicenseYear),0) AS drivingExperience,
+			resA.count AS totalSeat,
+			resB.count AS holdingSeat
+		FROM
+			activity_subscription subscription
+		LEFT JOIN activity ON subscription.activityId = activity.id
+		LEFT JOIN (
+			SELECT
+				activityId,
+				count(*) AS count
+			FROM
+				seat_reservation
+			GROUP BY
+				activityId
+		) resA ON activity.id = resA.activityId
+		LEFT JOIN (
+			SELECT
+				activityId,
+				count(*) AS count
+			FROM
+				seat_reservation
+			WHERE
+				userId IS NOT NULL
+			GROUP BY
+				activityId
+		) resB ON activity.id = resB.activityId
+		LEFT JOIN `user` ON activity.organizer = `user`.id
+		LEFT JOIN car ON car.userId = `user`.id
+		WHERE
+			subscription.userId = #{userId,jdbcType=VARCHAR}
+		ORDER BY publishTime DESC
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}	
 	
 	</select>
 	

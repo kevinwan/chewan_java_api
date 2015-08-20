@@ -19,22 +19,35 @@
 	</select>
 	
 	<select id="selectByCountOfActivityUserAndStatus" resultType="java.util.Map" parameterType="java.util.Map">
-		select count(*) as count from activity_application where activityId = #{activityId,jdbcType=VARCHAR} and userId = #{userId,jdbcType=VARCHAR} and status = #{status,jdbcType=VARCHAR}	
+		SELECT
+			count(*) AS count
+		FROM
+			activity_application
+		WHERE
+			activityId = #{activityId,jdbcType=VARCHAR} and userId = #{userId,jdbcType=VARCHAR} and status = #{status,jdbcType=VARCHAR}	
 	</select>
 
 	<select id="selectByOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
-		select applicationId, status, b.nickname, b.gender, b.age, b.photo,ifnull(b.carBrandLogo, "") as carBrandLogo,
-		activity.title,ifnull(application.seat, 0) as seat 
-		from activity 
-        right join (select id as applicationId, activityId, userId, seat, createTime, status 
-        from  activity_application) application on activity.id = application.activityId 
-        left join (select id, nickname, gender, (year(sysdate()) - birthYear) 
-        as age, concat(#{assertUrl,jdbcType=VARCHAR}, photo) as photo, concat(#{gpjImgUrl,jdbcType=VARCHAR}, brandLogo) as carBrandLogo 
-        from user left join 
-        (select ifnull(brandLogo, "") as brandLogo, userId from car) c on user.id = c.userId) 
-        b on application.userId = b.id 
-        where activity.organizer = #{userId,jdbcType=VARCHAR} and application.status = #{status,jdbcType=VARCHAR} 
-        order by application.createTime desc limit #{ignore,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+		SELECT
+			application.id AS applicationId,
+			application.status,
+			USER .nickname,
+			USER .gender,
+			(YEAR (sysdate()) - `user`.birthYear) AS age,
+			concat(#{assertUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
+			IFNULL(CONCAT(#{gpjImgUrl,jdbcType=VARCHAR}, car.brandLogo),'') AS carBrandLogo,
+			activity.title,
+			IFNULL(application.seat, 0) AS seat
+		FROM
+			activity
+		RIGHT JOIN activity_application application ON activity.id = application.activityId
+		LEFT JOIN `user` ON application.userId = `user`.id
+		LEFT JOIN car ON `user`.id = car.userId
+		WHERE 
+			activity.organizer = #{userId,jdbcType=VARCHAR}
+		AND application.`status` = #{status,jdbcType=VARCHAR} 
+		ORDER BY application.createTime DESC
+		LIMIT #{ignore,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
 	</select>
 	
 	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.util.Map">

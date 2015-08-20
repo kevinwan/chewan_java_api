@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
 	    emchatAccount.setUserid(userId);
 	    emchatAccount.setPassword(user.getPassword());
 	    emchatAccount.setRegistertime(DateUtil.getTime());
-	    emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getNickname()));
+	    emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getId()));
 	    emchatAccountDao.insert(emchatAccount);
 	    
 	    UserAlbum userAlbum = new UserAlbum();
