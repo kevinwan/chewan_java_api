@@ -63,6 +63,9 @@ public class ActivityServiceImpl implements ActivityService {
 	private static final Logger LOG = LoggerFactory.getLogger(ActivityServiceImpl.class);
 
 	@Autowired
+	private ParameterChecker checker;
+
+	@Autowired
 	private CarDao carDao;
 
 	@Autowired
@@ -107,7 +110,7 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		LOG.debug("Query car list by userId");
 		Car car = carDao.selectByUserId(userId);
@@ -350,15 +353,14 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private void checkActivityParam(HttpServletRequest request) throws ApiException {
 		LOG.debug("Check input parameters");
-		ParameterCheck check = ParameterCheck.getInstance();
 		String userId = request.getParameter("userId");
 		String token = request.getParameter("token");
-		check.checkUserInfo(userId, token);
-		check.checkParameterEmpty("type", request.getParameter("type"));
-		check.checkParameterEmpty("introduction", request.getParameter("introduction"));
-		check.checkParameterEmpty("location", request.getParameter("location"));
-		check.checkParameterEmpty("pay", request.getParameter("pay"));
-		check.checkParameterLongType("start", request.getParameter("start"));
+		checker.checkUserInfo(userId, token);
+		checker.checkParameterEmpty("type", request.getParameter("type"));
+		checker.checkParameterEmpty("introduction", request.getParameter("introduction"));
+		checker.checkParameterEmpty("location", request.getParameter("location"));
+		checker.checkParameterEmpty("pay", request.getParameter("pay"));
+		checker.checkParameterLongType("start", request.getParameter("start"));
 
 		checkActivityCover(request);
 		checkActivityAddress(request);
@@ -730,7 +732,7 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("参数错误");
 		}
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		if (getSeatReservations(activityId).isEmpty()) {
 			LOG.warn("Input parameter activityId no seat reservation, activityId:{}", activityId);
@@ -984,7 +986,7 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("参数错误");
 		}
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		if (!(replyUserId == null)) {
 			if (!CommonUtil.isUUID(replyUserId)) {
@@ -996,7 +998,7 @@ public class ActivityServiceImpl implements ActivityService {
 				throw new ApiException("不能回复自己的评论");
 			}
 
-			if (!ParameterCheck.getInstance().isUserExist(replyUserId)) {
+			if (!checker.isUserExist(replyUserId)) {
 				LOG.warn("Reply user is not exist");
 				throw new ApiException("回复的用户不存在");
 			}
@@ -1017,7 +1019,7 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo subscribeActivity(String activityId, String userId, String token) throws ApiException {
 		LOG.debug("Check input parameters");
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		if (!CommonUtil.isUUID(activityId)) {
 			LOG.warn("Input parameter activityId is not uuid, activityId:{}", activityId);
@@ -1196,9 +1198,9 @@ public class ActivityServiceImpl implements ActivityService {
 			throws ApiException {
 		LOG.debug("Begin check input parameters");
 
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		checker.checkParameterUUID("activityId", activityId);
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		if (seat < 0 || seat > PropertiesUtil.getProperty("user.auth.car.max.seats", 5)) {
 			LOG.warn("Input parameter seat error, seat:{}", seat);
@@ -1427,14 +1429,14 @@ public class ActivityServiceImpl implements ActivityService {
 			throws ApiException {
 		LOG.debug("Begin check input parameters");
 
-		ParameterCheck.getInstance().checkParameterUUID("applicationId", applicationId);
+		checker.checkParameterUUID("applicationId", applicationId);
 
 		if (action != 0 && action != 1) {
 			LOG.warn("Input parameter action is 0 or 1, action:{}", action);
 			throw new ApiException("参数错误");
 		}
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 	}
 
 	/**
@@ -1500,8 +1502,8 @@ public class ActivityServiceImpl implements ActivityService {
 
 		LOG.debug("Check input parameters");
 
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkParameterUUID("activityId", activityId);
+		checker.checkUserInfo(userId, token);
 
 		LOG.debug("Query member car information");
 		Map<String, Object> param = new HashMap<String, Object>(4, 1);
@@ -1536,11 +1538,11 @@ public class ActivityServiceImpl implements ActivityService {
 	public ResponseDo takeSeat(String activityId, String userId, String token, String carId, Integer seatIndex)
 			throws ApiException {
 		LOG.debug("Begin check input parameters");
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
+		checker.checkUserInfo(userId, token);
+		checker.checkParameterUUID("activityId", activityId);
 
 		if (!StringUtils.isEmpty(carId)) {
-			ParameterCheck.getInstance().checkParameterUUID("carId", carId);
+			checker.checkParameterUUID("carId", carId);
 		} else {
 			carId = null;
 		}
@@ -1588,13 +1590,13 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo returnSeat(String activityId, String member, String userId, String token) throws ApiException {
 		LOG.debug("Begin check input parameters");
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
-		ParameterCheck.getInstance().checkParameterUUID("member", member);
+		checker.checkParameterUUID("activityId", activityId);
+		checker.checkParameterUUID("member", member);
 		if (userId.equals(member)) {
 			LOG.warn("User cannot pull self down");
 			throw new ApiException("输入参数有误");
 		}
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
 		if (activity == null || !activity.getOrganizer().equals(userId)) {
@@ -1623,13 +1625,13 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo removeMember(String activityId, String member, String userId, String token) throws ApiException {
 		LOG.debug("Begin check input parameters");
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
-		ParameterCheck.getInstance().checkParameterUUID("member", member);
+		checker.checkParameterUUID("activityId", activityId);
+		checker.checkParameterUUID("member", member);
 		if (userId.equals(member)) {
 			LOG.warn("User cannot pull self down");
 			throw new ApiException("活动创建者不能被移除");
 		}
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
 		if (activity == null || !activity.getOrganizer().equals(userId)) {
@@ -1664,8 +1666,8 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo quitActivity(String activityId, String userId, String token) throws ApiException {
 		LOG.debug("Begin check input parameters");
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkParameterUUID("activityId", activityId);
+		checker.checkUserInfo(userId, token);
 
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
 		if (activity == null) {
@@ -1741,8 +1743,8 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo unsubscribeActivity(String activityId, String userId, String token) throws ApiException {
 		LOG.debug("Check input parameters");
-		ParameterCheck.getInstance().checkParameterUUID("activityId", activityId);
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkParameterUUID("activityId", activityId);
+		checker.checkUserInfo(userId, token);
 
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
 		if (activity == null) {

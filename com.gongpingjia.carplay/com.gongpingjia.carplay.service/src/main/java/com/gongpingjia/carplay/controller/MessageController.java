@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.MessageService;
-import com.gongpingjia.carplay.service.impl.ParameterCheck;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 
 /**
  * 消息message
@@ -28,6 +28,9 @@ public class MessageController {
 
 	@Autowired
 	private MessageService messageService;
+
+	@Autowired
+	private ParameterChecker checker;
 
 	/**
 	 * 2.26 获取申请列表
@@ -48,7 +51,7 @@ public class MessageController {
 		LOG.debug("=> getApplicationList");
 
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			checker.checkUserInfo(userId, token);
 			return messageService.getApplicationList(userId, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -73,7 +76,7 @@ public class MessageController {
 		LOG.debug("=> getMessageCount");
 
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			checker.checkUserInfo(userId, token);
 			return messageService.getMessageCount(userId);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
@@ -101,7 +104,7 @@ public class MessageController {
 		int limit = request.getParameter("limit") == null ? 10 : Integer.valueOf(request.getParameter("limit"));
 
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			checker.checkUserInfo(userId, token);
 			return messageService.getMessageList(userId, type, ignore, limit);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
@@ -126,7 +129,7 @@ public class MessageController {
 		String content = request.getParameter("content");
 		String[] photos = request.getParameterValues("photos");
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			checker.checkUserInfo(userId, token);
 			return messageService.submitFeedback(userId, content, photos);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);
@@ -151,7 +154,7 @@ public class MessageController {
 		String[] messages = request.getParameterValues("messages");
 
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId, token);
+			checker.checkUserInfo(userId, token);
 			return messageService.removeMessages(userId, messages);
 		} catch (ApiException e) {
 			LOG.error(e.getMessage(), e);

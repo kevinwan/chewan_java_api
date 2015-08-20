@@ -2,13 +2,14 @@ package com.gongpingjia.carplay.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
-import com.gongpingjia.carplay.dao.impl.TokenVerificationDaoImpl;
 import com.gongpingjia.carplay.po.TokenVerification;
 
 /**
@@ -17,21 +18,13 @@ import com.gongpingjia.carplay.po.TokenVerification;
  * @author licheng
  *
  */
-public class ParameterCheck {
+@Service
+public class ParameterChecker {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ParameterCheck.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ParameterChecker.class);
 
-	private static ParameterCheck instance = new ParameterCheck();
-
+	@Autowired
 	private TokenVerificationDao tokenDao;
-
-	private ParameterCheck() {
-		tokenDao = new TokenVerificationDaoImpl();
-	}
-
-	public static ParameterCheck getInstance() {
-		return instance;
-	}
 
 	/**
 	 * 检查传入的参数userID和token的合格性，以及token是否过期

@@ -13,7 +13,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.service.UserActivityService;
-import com.gongpingjia.carplay.service.impl.ParameterCheck;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 
 /**
  * 2.21 我(TA)的发布, 2.22 我(TA)的关注, 2.23 我(TA)的参与,
@@ -27,6 +27,9 @@ public class UserActivityController {
 
 	@Autowired
 	private UserActivityService userActivityService;
+
+	@Autowired
+	private ParameterChecker checker;
 
 	/**
 	 * 2.21 我(TA)的发布
@@ -57,7 +60,7 @@ public class UserActivityController {
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
+			checker.checkUserInfo(userId2, token);
 			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
@@ -95,7 +98,7 @@ public class UserActivityController {
 		}
 
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
+			checker.checkUserInfo(userId2, token);
 			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
@@ -133,7 +136,7 @@ public class UserActivityController {
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
-			ParameterCheck.getInstance().checkUserInfo(userId2, token);
+			checker.checkUserInfo(userId2, token);
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {

@@ -33,6 +33,9 @@ public class UploadServiceImpl implements UploadService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UploadServiceImpl.class);
 
+	@Autowired
+	private ParameterChecker checker;
+
 	/**
 	 * 图片上传
 	 */
@@ -66,7 +69,7 @@ public class UploadServiceImpl implements UploadService {
 		String id = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, id);
 
-		return uploadPhoto(data, id, key,false);
+		return uploadPhoto(data, id, key, false);
 	}
 
 	/**
@@ -82,7 +85,7 @@ public class UploadServiceImpl implements UploadService {
 	 * @throws ApiException
 	 *             义务异常
 	 */
-	private ResponseDo uploadPhoto(byte[] data, String photoId, String key,boolean override) throws ApiException {
+	private ResponseDo uploadPhoto(byte[] data, String photoId, String key, boolean override) throws ApiException {
 		Map<String, String> result = photoService.upload(data, key, override);
 		LOG.debug("Upload result: {}", result);
 		if ("success".equalsIgnoreCase(result.get("result"))) {
@@ -95,7 +98,7 @@ public class UploadServiceImpl implements UploadService {
 			return ResponseDo.buildFailureResponse("上传失败");
 		}
 	}
-	
+
 	/**
 	 * 获取上传文件的byte数组，准备向图片资源服务器上传
 	 * 
@@ -152,12 +155,12 @@ public class UploadServiceImpl implements UploadService {
 
 		String token = request.getParameter("token");
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		byte[] data = buildFileBytes(multiFile);
 		String key = MessageFormat.format(Constants.LICENSE_PHOTO_KEY, userId);
 
-		return uploadPhoto(data, userId, key,false);
+		return uploadPhoto(data, userId, key, false);
 	}
 
 	@Override
@@ -166,13 +169,13 @@ public class UploadServiceImpl implements UploadService {
 		String userId = request.getParameter("userId");
 		String token = request.getParameter("token");
 
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 		byte[] data = buildFileBytes(multiFile);
 
 		String coverUuid = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.COVER_PHOTO_KEY, coverUuid);
 
-		return uploadPhoto(data, coverUuid, key,false);
+		return uploadPhoto(data, coverUuid, key, false);
 	}
 
 	@Override
@@ -181,7 +184,7 @@ public class UploadServiceImpl implements UploadService {
 
 		String token = request.getParameter("token");
 		// 1.参数校验
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
+		checker.checkUserInfo(userId, token);
 
 		LOG.debug("check user album exist or not");
 		// 2.检查数据库信息
@@ -205,7 +208,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		String photoId = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId, photoId);
-		return uploadPhoto(data, photoId, key,false);
+		return uploadPhoto(data, photoId, key, false);
 	}
 
 	@Override
@@ -215,25 +218,25 @@ public class UploadServiceImpl implements UploadService {
 		LOG.debug("begin upload feedback photo , photoId:{}", photoId);
 
 		String key = MessageFormat.format(Constants.FEEDBACK_PHOTO_KEY, photoId);
-		return uploadPhoto(data, photoId, key,false);
+		return uploadPhoto(data, photoId, key, false);
 	}
 
 	@Override
-	public ResponseDo reUploadUserPhoto(String userId,MultipartFile multiFile,
-			HttpServletRequest request) throws ApiException {
-		
+	public ResponseDo reUploadUserPhoto(String userId, MultipartFile multiFile, HttpServletRequest request)
+			throws ApiException {
+
 		LOG.debug("reUploadUserPhoto to server, userId:{}", userId);
-		
+
 		String token = request.getParameter("token");
-		//参数校验
-		ParameterCheck.getInstance().checkUserInfo(userId, token);
-		
-		//重新上传图片
+		// 参数校验
+		checker.checkUserInfo(userId, token);
+
+		// 重新上传图片
 		byte[] data = buildFileBytes(multiFile);
 		LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
 		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, userId);
-		return uploadPhoto(data, userId, key,false);
-		
+		return uploadPhoto(data, userId, key, false);
+
 	}
 }

@@ -25,7 +25,7 @@ import com.gongpingjia.carplay.service.UserActivityService;
 @Service
 public class UserActivityServiceImpl implements UserActivityService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ParameterCheck.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ParameterChecker.class);
 
 	@Autowired
 	private ActivityDao activityDao;
