@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
@@ -18,6 +20,7 @@ public interface MessageService {
 	 * @return 活动申请列表信息
 	 * 
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getApplicationList(String userId, int ignore, int limit) throws ApiException;
 
 	/**
@@ -29,6 +32,7 @@ public interface MessageService {
 	 * @return 未读的消息数量和最新的一条消息信息
 	 * 
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getMessageCount(String userId) throws ApiException;
 
 	/**
@@ -44,6 +48,7 @@ public interface MessageService {
 	 *            返回的条数, 默认为 10
 	 * 
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getMessageList(String userId, String type, int ignore, int limit) throws ApiException;
 
 	/**
@@ -59,6 +64,7 @@ public interface MessageService {
 	 * 
 	 * @return 提交成功
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo submitFeedback(String userId, String content, String[] photos) throws ApiException;
 
 	/**
@@ -72,6 +78,7 @@ public interface MessageService {
 	 *
 	 * @return 删除成功
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo removeMessages(String userId, String[] messages) throws ApiException;
 
 }

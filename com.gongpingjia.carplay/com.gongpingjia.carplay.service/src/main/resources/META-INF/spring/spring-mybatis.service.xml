@@ -50,8 +50,10 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager" mode="proxy" proxy-target-class="false" />
 
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+
+<!-- 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="get*" read-only="true" />
 			<tx:method name="query*" read-only="true" />
@@ -64,6 +66,6 @@
 		<aop:pointcut id="serviceMethods"
 			expression="execution(* com.gongpingjia.*.service.impl.*.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods" />
-	</aop:config>
+	</aop:config> -->
 
 </beans>

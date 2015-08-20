@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
@@ -17,6 +18,7 @@ public interface UserService {
 	 * @param code
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo register(User user, String code);
 	
 	/**
@@ -25,6 +27,7 @@ public interface UserService {
 	 * @param user
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo loginUser(User user);
 	
 	/**
@@ -34,6 +37,7 @@ public interface UserService {
 	 * @param code
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo forgetPassword(User user, String code);
 	
 	/**
@@ -42,6 +46,7 @@ public interface UserService {
 	 * @param authenticationApplication
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo applyAuthentication(AuthenticationApplication authenticationApplication,String token,String userId);
 	
 	/**
@@ -52,6 +57,7 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo userInfo(String interviewedUser, String visitorUser, String token);
 	
 	/**
@@ -63,6 +69,7 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo userListen(String userId,Integer ignore,Integer limit,String token);
 	
 	/**
@@ -73,6 +80,7 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo payAttention(UserSubscription userSubscription,String token);
 	
 	/**
@@ -82,6 +90,7 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo unPayAttention(UserSubscription userSubscription,String token);
 	
 	/**
@@ -91,6 +100,7 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo alterUserInfo(User user,String token);
 	
 	/**
@@ -101,5 +111,6 @@ public interface UserService {
 	 * @param token
 	 * @return
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo manageAlbumPhotos(String userId,String[] photos,String token);
 }

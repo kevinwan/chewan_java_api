@@ -2,6 +2,8 @@ package com.gongpingjia.carplay.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
@@ -15,6 +17,7 @@ public interface ActivityService {
 	 *            会话token
 	 * @return 返回查询结果信息
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getAvailableSeats(String userId, String token) throws ApiException;
 
 	/**
@@ -26,6 +29,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常处理
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo registerActivity(HttpServletRequest request) throws ApiException;
 
 	/**
@@ -37,6 +41,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常处理
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getActivityList(HttpServletRequest request) throws ApiException;
 
 	/**
@@ -52,6 +57,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getActivityInfo(String activityId, String userId, String token) throws ApiException;
 
 	/**
@@ -71,6 +77,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getActivityComments(String activityId, String userId, String token, Integer ignore, Integer limit)
 			throws ApiException;
 
@@ -89,6 +96,7 @@ public interface ActivityService {
 	 *            评论内容
 	 * @return 返回评论响应结果
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo publishComment(String activityId, String userId, String token, String replyUserId, String comment)
 			throws ApiException;
 
@@ -105,6 +113,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo subscribeActivity(String activityId, String userId, String token) throws ApiException;
 
 	/**
@@ -122,6 +131,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo joinActivity(String activityId, String userId, String token, Integer seat) throws ApiException;
 
 	/**
@@ -139,6 +149,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo processApplication(String applicationId, String userId, String token, Integer action)
 			throws ApiException;
 
@@ -155,6 +166,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getMemberAndSeatInfo(String activityId, String userId, String token) throws ApiException;
 
 	/**
@@ -174,6 +186,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             抛出业务异常信息
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo takeSeat(String activityId, String userId, String token, String carId, Integer seatIndex)
 			throws ApiException;
 
@@ -192,6 +205,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo returnSeat(String activityId, String member, String userId, String token) throws ApiException;
 
 	/**
@@ -208,6 +222,7 @@ public interface ActivityService {
 	 * @return 返回被移除的结果
 	 * @throws 业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo removeMember(String activityId, String member, String userId, String token) throws ApiException;
 
 	/**
@@ -223,6 +238,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo quitActivity(String activityId, String userId, String token) throws ApiException;
 
 	/**
@@ -240,6 +256,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
 			throws ApiException;
 
@@ -256,5 +273,6 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo unsubscribeActivity(String activityId, String userId, String token) throws ApiException;
 }

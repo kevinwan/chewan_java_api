@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
@@ -21,6 +23,7 @@ public interface UserActivityService {
 	 * 
 	 * @return 活动发布列表信息
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getUserPost(String userId1, String userId2, String token, Integer ignore, Integer limit) throws ApiException;
 
 	
@@ -40,6 +43,7 @@ public interface UserActivityService {
 	 * 
 	 * @return 活动关注活动列表信息
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getUserSubscribe(String userId1, String userId2, String token, Integer ignore, Integer limit)throws ApiException;
 
 
@@ -59,6 +63,7 @@ public interface UserActivityService {
 	 * 
 	 * @return 活动参加的活动列表信息
 	 */
+	@Transactional(readOnly = true)
 	ResponseDo getUserJoin(String userId1, String userId2, String token, Integer ignore, Integer limit)throws ApiException;
 
 }
