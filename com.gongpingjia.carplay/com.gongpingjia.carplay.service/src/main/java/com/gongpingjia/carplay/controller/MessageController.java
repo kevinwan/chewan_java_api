@@ -95,13 +95,10 @@ public class MessageController {
 	 * @return 消息列表
 	 */
 	@RequestMapping(value = "/user/{userId}/message/list", method = RequestMethod.GET)
-	public ResponseDo getMessageList(@PathVariable("userId") String userId, HttpServletRequest request) {
+	public ResponseDo getMessageList(@PathVariable("userId") String userId, @RequestParam("token") String token,
+			@RequestParam("type") String type, @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 		LOG.debug("==> getMessageList");
-
-		String token = request.getParameter("token");
-		String type = request.getParameter("type");
-		int ignore = request.getParameter("ignore") == null ? 0 : Integer.valueOf(request.getParameter("ignore"));
-		int limit = request.getParameter("limit") == null ? 10 : Integer.valueOf(request.getParameter("limit"));
 
 		try {
 			checker.checkUserInfo(userId, token);
@@ -121,13 +118,11 @@ public class MessageController {
 	 * @return 提交成功
 	 */
 	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST)
-	public ResponseDo submitFeedback(HttpServletRequest request) {
+	public ResponseDo submitFeedback(@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam("content") String content, @RequestParam("photos") String[] photos) {
+
 		LOG.debug("==> submitFeedback");
 
-		String userId = request.getParameter("userId");
-		String token = request.getParameter("token");
-		String content = request.getParameter("content");
-		String[] photos = request.getParameterValues("photos");
 		try {
 			checker.checkUserInfo(userId, token);
 			return messageService.submitFeedback(userId, content, photos);
@@ -146,12 +141,9 @@ public class MessageController {
 	 * @return 删除成功
 	 */
 	@RequestMapping(value = "/message/remove", method = RequestMethod.POST)
-	public ResponseDo removeMessages(HttpServletRequest request) {
+	public ResponseDo removeMessages(@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestParam("messages") String[] messages) {
 		LOG.debug("==> removeMessages");
-
-		String userId = request.getParameter("userId");
-		String token = request.getParameter("token");
-		String[] messages = request.getParameterValues("messages");
 
 		try {
 			checker.checkUserInfo(userId, token);
