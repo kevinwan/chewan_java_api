@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
-@Transactional
 public interface ActivityService {
 	/**
 	 * 获取可提供的空座位数

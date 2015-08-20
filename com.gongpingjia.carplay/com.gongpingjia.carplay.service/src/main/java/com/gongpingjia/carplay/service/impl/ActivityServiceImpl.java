@@ -166,7 +166,7 @@ public class ActivityServiceImpl implements ActivityService {
 		Long current = DateUtil.getTime();
 
 		Activity activity = saveActivity(request, activityId, current);
-
+		
 		saveActivityCovers(request, activityId, current);
 
 		saveActivityMember(userId, activityId, current);
