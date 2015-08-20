@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.service.impl;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -570,7 +569,7 @@ public class UserServiceImpl implements UserService {
 	    } else if (!code.equals(phoneVerification.getCode())){
 	    	LOG.warn("Code not correct,phone : " + phone + ". error code :" + code);
 	    	return ResponseDo.buildFailureResponse("验证码错误");
-	    } else if (phoneVerification.getExpire() < new Date().getTime()){
+	    } else if (phoneVerification.getExpire() < DateUtil.getTime()){
 	    	LOG.warn("Code expired");
 	    	return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
 	    }
