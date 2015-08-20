@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
 		
 		Map<String, Object> data = new HashMap<String, Object>();
 		//验证参数 
-	    if (!CommonUtil.isPhoneNumber(user.getPhone()) || (code.length() != 4) || !CommonUtil.isUUID(user.getPhoto())) {
+	    if (!CommonUtil.isPhoneNumber(user.getPhone()) || !CommonUtil.isUUID(user.getPhoto())) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseDo forgetPassword(User user, String code) {
 		Map<String, Object> data = new HashMap<String, Object>();
 		//验证参数 
-	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) || (code.length() != 4) ) {
+	    if (!ToolsUtils.isPhoneNumber(user.getPhone()) ) {
 	    	LOG.warn("invalid params");
 	    	return ResponseDo.buildFailureResponse("输入参数有误");
 	    }
