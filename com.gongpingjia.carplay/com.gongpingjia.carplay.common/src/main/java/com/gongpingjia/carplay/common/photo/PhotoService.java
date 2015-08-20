@@ -41,7 +41,7 @@ public interface PhotoService {
 	 *            图片资源文件Key值
 	 * @return 存在返回true，不存在返回false
 	 */
-	boolean isExist(String key) throws ApiException;
+	boolean isExist(String key);
 
 	/**
 	 * 移动文件

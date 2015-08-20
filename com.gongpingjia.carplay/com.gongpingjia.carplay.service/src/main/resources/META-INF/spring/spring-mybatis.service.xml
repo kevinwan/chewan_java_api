@@ -45,7 +45,7 @@
 
 	<!-- spring与mybatis整合配置，扫描所有dao -->
 	<bean id="userMapper" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.njjg.demo.dao"></property>
+		<property name="basePackage" value="com.gongpingjia.carplay.dao"></property>
 	</bean>
 
 	<!-- 对数据源进行事务管理 -->
