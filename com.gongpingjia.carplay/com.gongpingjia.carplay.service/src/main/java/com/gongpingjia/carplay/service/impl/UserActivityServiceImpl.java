@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
@@ -83,7 +84,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			List<Map<String, String>> coverAllList = new ArrayList<>();
 			for (Map<String, String> cover : coverList) {
 				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + "?imageView2/1/w/200");
+				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
 				coverAllList.add(cover);
 			}
 			map.put("cover", coverAllList);
@@ -161,7 +162,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			List<Map<String, String>> coverAllList = new ArrayList<>();
 			for (Map<String, String> cover : coverList) {
 				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + "?imageView2/1/w/200");
+				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
 				coverAllList.add(cover);
 			}
 			activityLinkMap.put("cover", coverAllList);
@@ -240,7 +241,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			List<Map<String, String>> coverAllList = new ArrayList<>();
 			for (Map<String, String> cover : coverList) {
 				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + "?imageView2/1/w/200");
+				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
 				coverAllList.add(cover);
 			}
 			activityLinkMap.put("cover", coverAllList);
