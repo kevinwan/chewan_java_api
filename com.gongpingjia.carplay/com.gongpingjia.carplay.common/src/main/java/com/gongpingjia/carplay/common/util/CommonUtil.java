@@ -37,13 +37,13 @@ public class CommonUtil {
 	public static boolean isPhoneNumber(String phone) {
 		LOG.debug("Check phone number: {}", phone);
 		if (StringUtils.isEmpty(phone)) {
-			LOG.error("phone number is empty");
+			LOG.warn("phone number is empty");
 			return false;
 		}
 
 		// 手机号必须为长度为11的数字字符串
 		if (!PHONE_PATTERN.matcher(phone).matches()) {
-			LOG.error("phone number is not a number sequence which length is 11");
+			LOG.warn("phone number is not a number sequence which length is 11");
 			return false;
 		}
 

@@ -56,7 +56,7 @@ public class UserActivityController {
 		LOG.info("=> getUserPost");
 
 		if (!CommonUtil.isUUID(userId1)) {
-			LOG.error("invalid params");
+			LOG.warn("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
@@ -64,7 +64,7 @@ public class UserActivityController {
 			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -93,7 +93,7 @@ public class UserActivityController {
 
 		LOG.info("=> getUserSubscribe");
 		if (!CommonUtil.isUUID(userId1)) {
-			LOG.error("invalid params");
+			LOG.warn("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
@@ -102,7 +102,7 @@ public class UserActivityController {
 			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -132,7 +132,7 @@ public class UserActivityController {
 		LOG.info("=> getUserJoin");
 
 		if (!CommonUtil.isUUID(userId1)) {
-			LOG.error("invalid params");
+			LOG.warn("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
@@ -140,7 +140,7 @@ public class UserActivityController {
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

@@ -105,7 +105,7 @@ public class MessageServiceImpl implements MessageService {
 		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeComment(param);
 		if (messageCountList.size() == 0) {
-			LOG.error("Fail to get comment count");
+			LOG.warn("Fail to get comment count");
 			throw new ApiException("未能获取发给该用户的留言数");
 		}
 		return String.valueOf(messageCountList.get(0).get("count"));
@@ -117,7 +117,7 @@ public class MessageServiceImpl implements MessageService {
 		param.put("type", MessageType.COMMENT.getName());
 		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeNotComment(param);
 		if (messageCountList.size() == 0) {
-			LOG.error("Fail to get application count");
+			LOG.warn("Fail to get application count");
 			throw new ApiException("未能获取发给该用户的活动申请数");
 		}
 		return String.valueOf(messageCountList.get(0).get("count"));
@@ -186,7 +186,7 @@ public class MessageServiceImpl implements MessageService {
 				}
 			}
 		} else {
-			LOG.error("error： getMessageList ，the messageType is error");
+			LOG.warn("error： getMessageList ，the messageType is error");
 			messageList = null;
 			throw new ApiException("消息类型错误");
 		}
@@ -206,7 +206,7 @@ public class MessageServiceImpl implements MessageService {
 		feedback.setUserid(user.getId());
 		int affectedRows = feedbackDao.insert(feedback);
 		if (affectedRows == 0) {
-			LOG.error("Fail to submit feedback");
+			LOG.warn("Fail to submit feedback");
 			throw new ApiException("提交反馈意见失败");
 		}
 		if (photos != null) {
@@ -222,7 +222,7 @@ public class MessageServiceImpl implements MessageService {
 					feedbackPhotoDao.deleteByPrimaryKey(photo);
 					affectedRows = feedbackPhotoDao.insert(feedbackPhoto);
 					if (affectedRows == 0) {
-						LOG.error("Fail to insert into feedback_photo table");
+						LOG.warn("Fail to insert into feedback_photo table");
 						throw new ApiException("未能成功插入反馈图片");
 					}
 				}

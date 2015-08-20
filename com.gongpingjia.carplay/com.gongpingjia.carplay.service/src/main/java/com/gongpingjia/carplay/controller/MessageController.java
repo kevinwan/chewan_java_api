@@ -77,7 +77,7 @@ public class MessageController {
 			checker.checkUserInfo(userId, token);
 			return messageService.getMessageCount(userId);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 
@@ -102,7 +102,8 @@ public class MessageController {
 			checker.checkUserInfo(userId, token);
 			return messageService.getMessageList(userId, type, ignore, limit);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -125,7 +126,7 @@ public class MessageController {
 			checker.checkUserInfo(userId, token);
 			return messageService.submitFeedback(userId, content, photos);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -147,7 +148,7 @@ public class MessageController {
 			checker.checkUserInfo(userId, token);
 			return messageService.removeMessages(userId, messages);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

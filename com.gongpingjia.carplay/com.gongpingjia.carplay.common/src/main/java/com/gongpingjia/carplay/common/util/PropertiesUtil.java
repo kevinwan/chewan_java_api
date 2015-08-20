@@ -54,15 +54,15 @@ public class PropertiesUtil {
 			inReader = new InputStreamReader(inStream, "UTF-8");
 			properties.load(inReader);
 		} catch (FileNotFoundException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 		} catch (IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 		} finally {
 			if (inReader != null) {
 				try {
 					inReader.close();
 				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
+					LOG.warn(e.getMessage(), e);
 				}
 			}
 
@@ -70,7 +70,7 @@ public class PropertiesUtil {
 				try {
 					inStream.close();
 				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
+					LOG.warn(e.getMessage(), e);
 				}
 			}
 		}
@@ -105,7 +105,7 @@ public class PropertiesUtil {
 		try {
 			value = Integer.valueOf(prop);
 		} catch (NumberFormatException e) {
-			LOG.error("Parse config property failure, property name: {}", propName, e);
+			LOG.warn("Parse config property failure, property name: {}", propName, e);
 		}
 		return value;
 	}

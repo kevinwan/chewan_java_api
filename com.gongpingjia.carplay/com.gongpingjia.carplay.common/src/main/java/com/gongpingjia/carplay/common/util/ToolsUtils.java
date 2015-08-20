@@ -20,13 +20,13 @@ public class ToolsUtils {
 	public static Boolean isPhoneNumber(String phone) {
 		LOG.debug("isPhoneNumber phone :" + phone);
 		if (StringUtils.isEmpty(phone)) {
-			LOG.error("phone number is empty");
+			LOG.warn("phone number is empty");
 			return false;
 		}
 
 		// 手机号必须为长度为11的数字字符串
 		if (!phone.matches("^[0-9]{11}$")) {
-			LOG.error("phone number is not a number sequence which length is 11");
+			LOG.warn("phone number is not a number sequence which length is 11");
 			return false;
 		}
 

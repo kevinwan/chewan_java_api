@@ -62,13 +62,13 @@ public class PhotoManager implements PhotoService {
 		} catch (QiniuException e) {
 			Response res = e.response;
 			// 请求失败时简单状态信息
-			LOG.error(res.toString());
-			LOG.error(e.getMessage(), e);
+			LOG.warn(res.toString());
+			LOG.warn(e.getMessage(), e);
 			try {
 				// 响应的文本信息
-				LOG.error(res.bodyString());
+				LOG.warn(res.bodyString());
 			} catch (QiniuException e1) {
-				LOG.error(e.getMessage(), e);
+				LOG.warn(e.getMessage(), e);
 			}
 			throw new ApiException("未能成功上传至服务器");
 		}
@@ -82,7 +82,7 @@ public class PhotoManager implements PhotoService {
 		try {
 			instance.getBucketManager().delete(instance.getBucket(), key);
 		} catch (QiniuException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("删除文件失败");
 		}
 	}
@@ -94,7 +94,7 @@ public class PhotoManager implements PhotoService {
 		try {
 			fileInfo = instance.getBucketManager().stat(instance.getBucket(), key);
 		} catch (QiniuException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			// throw new ApiException("查找文件失败");
 		}
 		return fileInfo != null;
@@ -106,7 +106,7 @@ public class PhotoManager implements PhotoService {
 		try {
 			instance.getBucketManager().move(instance.getBucket(), key, instance.getBucket(), targetKey);
 		} catch (QiniuException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("移动文件失败");
 		}
 	}
@@ -117,7 +117,7 @@ public class PhotoManager implements PhotoService {
 		try {
 			instance.getBucketManager().rename(instance.getBucket(), oldname, newname);
 		} catch (QiniuException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("移动重命名失败");
 		}
 	}

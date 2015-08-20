@@ -126,14 +126,14 @@ public class UploadServiceImpl implements UploadService {
 			fileContent = out.toByteArray();
 
 		} catch (IOException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("上传文件失败");
 		} finally {
 			if (bis != null) {
 				try {
 					bis.close();
 				} catch (IOException e) {
-					LOG.error("Close BufferedInputStream bis failure at finally");
+					LOG.warn("Close BufferedInputStream bis failure at finally");
 				}
 			}
 
@@ -141,7 +141,7 @@ public class UploadServiceImpl implements UploadService {
 				try {
 					out.close();
 				} catch (IOException e) {
-					LOG.error("Close ByteArrayOutputStream out failure at finally");
+					LOG.warn("Close ByteArrayOutputStream out failure at finally");
 				}
 			}
 		}
@@ -190,7 +190,7 @@ public class UploadServiceImpl implements UploadService {
 		// 2.检查数据库信息
 		List<UserAlbum> userAlbumList = userAlbumDao.selectListByUserId(userId);
 		if (userAlbumList.isEmpty()) {
-			LOG.error("get userAlbum by userId return empty result");
+			LOG.warn("get userAlbum by userId return empty result");
 			throw new ApiException("获取相册失败");
 		}
 		UserAlbum userAlbum = userAlbumList.get(0);

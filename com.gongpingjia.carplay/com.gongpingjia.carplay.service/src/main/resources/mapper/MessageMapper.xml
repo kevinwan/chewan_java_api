@@ -60,27 +60,68 @@
 	</select>
 
 	<select id="selectMessageListByUserAndTypeComment" resultType="java.util.Map" parameterType="java.util.Map">
-		select id as messageId, ifnull(extra1, "") as activityId, type, fromUser as userId, photo, nickname, age, gender, 
-	    ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.carBrandLogo), "") as carBrandLogo, ifnull(car.carModel, "") as carModel, drivingExperience, 
-	    content, ifnull(extra2, 0) as seat, ifnull(extra3, "") as applicationId, createTime, ifnull(remarks, "") as remarks 
-	    from message left join (select user.id as userId, nickname, (year(sysdate()) - birthYear) as age, 
-	    concat(#{assetImgUrl,jdbcType=VARCHAR}, photo, "?imageView2/1/w/200") 
-	    as photo, ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, gender from user) usr on usr.userId = message.fromUser 
-	    left join (select ifnull(brandLogo, "") as carBrandLogo, ifnull(model, "") as carModel, userId from car) car on car.userId = usr.userId 
-	    where message.toUser = #{userId,jdbcType=VARCHAR} and message.type = #{type,jdbcType=VARCHAR} and message.isDeleted = 0 order by 
-	    message.createTime desc limit #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+		SELECT
+			message.id AS messageId,
+			ifnull(message.extra1, "") AS activityId,
+			message.type,
+			message.fromUser AS userId,
+			concat(
+			#{assetImgUrl,jdbcType=VARCHAR}, user.photo, "?imageView2/1/w/200") AS photo,
+			USER .nickname,
+			(YEAR (sysdate()) - USER .birthYear) AS age,
+			USER .gender,
+			ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.brandLogo), "") as carBrandLogo,
+			ifnull(car.model, "") AS carModel,
+			ifnull((YEAR (sysdate()) - USER .drivingLicenseYear),0) AS drivingExperience,
+			message.content,
+			ifnull(message.extra2, 0) AS seat,
+			ifnull(message.extra3, "") AS applicationId,
+			message.createTime,
+			ifnull(message.remarks, "") AS remarks
+		FROM
+				message
+		LEFT JOIN USER ON USER .id = message.fromUser
+		LEFT JOIN car ON car.userId = USER .id
+		WHERE
+			message.toUser = #{userId,jdbcType=VARCHAR} 
+		AND message.type = #{type,jdbcType=VARCHAR} 
+		AND message.isDeleted = 0
+		ORDER BY
+			message.createTime DESC
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
 	</select>
 	
 	<select id="selectMessageListByUserAndTypeNotComment" resultType="java.util.Map" parameterType="java.util.Map">
-		select id as messageId, ifnull(extra1, "") as activityId, type, fromUser as userId, photo, nickname, age, gender, 
-	    ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.carBrandLogo), "") as carBrandLogo, ifnull(car.carModel, "") as carModel, drivingExperience, 
-	    content, ifnull(extra2, 0) as seat, ifnull(extra3, "") as applicationId, createTime, ifnull(remarks, "") as remarks 
-	    from message left join (select user.id as userId, nickname, (year(sysdate()) - birthYear) as age, 
-	    concat(#{assetImgUrl,jdbcType=VARCHAR}, photo, "?imageView2/1/w/200") 
-	    as photo, ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, gender from user) usr on usr.userId = message.fromUser 
-	    left join (select ifnull(brandLogo, "") as carBrandLogo, ifnull(model, "") as carModel, userId from car) car on car.userId = usr.userId 
-	    where message.toUser = #{userId,jdbcType=VARCHAR} and message.type is not null and message.type not like   #{type,jdbcType=VARCHAR} and message.isDeleted = 0 order by 
-	    message.createTime desc limit #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+		SELECT
+			message.id AS messageId,
+			ifnull(message.extra1, "") AS activityId,
+			message.type,
+			message.fromUser AS userId,
+			concat(
+			#{assetImgUrl,jdbcType=VARCHAR}, user.photo, "?imageView2/1/w/200") AS photo,
+			USER .nickname,
+			(YEAR (sysdate()) - USER .birthYear) AS age,
+			USER .gender,
+			ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.brandLogo), "") as carBrandLogo,
+			ifnull(car.model, "") AS carModel,
+			ifnull((YEAR (sysdate()) - USER .drivingLicenseYear),0) AS drivingExperience,
+			message.content,
+			ifnull(message.extra2, 0) AS seat,
+			ifnull(message.extra3, "") AS applicationId,
+			message.createTime,
+			ifnull(message.remarks, "") AS remarks
+		FROM
+				message
+		LEFT JOIN USER ON USER .id = message.fromUser
+		LEFT JOIN car ON car.userId = USER .id
+		WHERE
+			message.toUser = #{userId,jdbcType=VARCHAR}
+		AND	message.type IS NOT NULL 
+		AND message.type NOT LIKE  #{type,jdbcType=VARCHAR}
+		AND message.isDeleted = 0
+		ORDER BY
+			message.createTime DESC
+		LIMIT #{ignore,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
 	</select>
 	
 	<select id="selectByMeesageIdAndUserId" resultMap="BaseResultMap" parameterType="java.util.Map">

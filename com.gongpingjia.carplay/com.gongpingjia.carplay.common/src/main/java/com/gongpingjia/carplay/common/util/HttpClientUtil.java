@@ -86,7 +86,7 @@ public class HttpClientUtil {
 				response.close();
 			}
 		} catch (IOException e) {
-			LOG.error("Close http response failure");
+			LOG.warn("Close http response failure");
 		}
 	}
 
@@ -103,9 +103,9 @@ public class HttpClientUtil {
 			try {
 				return EntityUtils.toString(entity);
 			} catch (ParseException e) {
-				LOG.error("Convert response entity to String failure with ParseException");
+				LOG.warn("Convert response entity to String failure with ParseException");
 			} catch (IOException e) {
-				LOG.error("Convert response entity to String failure with IOException");
+				LOG.warn("Convert response entity to String failure with IOException");
 			}
 		}
 		return "";

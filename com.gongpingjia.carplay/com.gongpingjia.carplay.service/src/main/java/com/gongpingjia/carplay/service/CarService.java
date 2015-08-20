@@ -4,7 +4,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
 public interface CarService {
-	
+
 	/**
 	 * 获取名牌信息
 	 * 
@@ -13,7 +13,6 @@ public interface CarService {
 	 */
 	ResponseDo getCarBrand() throws ApiException;
 
-	
 	/**
 	 * 通过品牌获取车型
 	 * 

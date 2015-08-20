@@ -125,8 +125,8 @@ public class ParameterChecker {
 		try {
 			Long.valueOf(paramValue);
 		} catch (NumberFormatException e) {
-			LOG.error("Paramter [{}={}] is not Long type", paramName, paramValue);
-			LOG.error(e.getMessage(), e);
+			LOG.warn("Paramter [{}={}] is not Long type", paramName, paramValue);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("输入参数有误");
 		}
 	}
@@ -145,8 +145,8 @@ public class ParameterChecker {
 		try {
 			Integer.valueOf(paramValue);
 		} catch (NumberFormatException e) {
-			LOG.error("Paramter [{}={}] is not Integer type", paramName, paramValue);
-			LOG.error(e.getMessage(), e);
+			LOG.warn("Paramter [{}={}] is not Integer type", paramName, paramValue);
+			LOG.warn(e.getMessage(), e);
 			throw new ApiException("输入参数有误");
 		}
 	}
