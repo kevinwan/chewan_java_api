@@ -45,7 +45,7 @@ public class ActivityController {
 		try {
 			return service.getAvailableSeats(userId, token);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -63,7 +63,7 @@ public class ActivityController {
 		try {
 			return service.registerActivity(request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -81,7 +81,7 @@ public class ActivityController {
 		try {
 			return service.getActivityList(request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

@@ -34,7 +34,7 @@ public class VersionController {
 		try {
 			return service.getVersion(product);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage());
+			LOG.warn(e.getMessage());
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

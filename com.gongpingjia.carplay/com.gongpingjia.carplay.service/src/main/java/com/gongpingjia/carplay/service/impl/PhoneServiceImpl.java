@@ -45,7 +45,7 @@ public class PhoneServiceImpl implements PhoneService {
 	public ResponseDo sendVerification(String phone, int type) throws ApiException {
 
 		if (!CommonUtil.isPhoneNumber(phone)) {
-			LOG.error("Phone number is not correct format");
+			LOG.warn("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
 		}
 
@@ -55,17 +55,17 @@ public class PhoneServiceImpl implements PhoneService {
 			// 注册流程
 			if (users.size() > 0) {
 				// 用户已经存在，手机号不能重复注册
-				LOG.error("Phone number is already registed");
+				LOG.warn("Phone number is already registed");
 				throw new ApiException("手机号已被注册");
 			}
 		} else if (type == 1) {
 			// 忘记密码流程
 			if (users.size() == 0) {
-				LOG.error("User is not exist");
+				LOG.warn("User is not exist");
 				throw new ApiException("用户不存在");
 			}
 		} else {
-			LOG.error("Request parameter type is not 1 or 0");
+			LOG.warn("Request parameter type is not 1 or 0");
 			throw new ApiException("参数错误");
 		}
 
@@ -81,33 +81,33 @@ public class PhoneServiceImpl implements PhoneService {
 	@Override
 	public ResponseDo verify(String phone, String code) throws ApiException {
 		if (!CommonUtil.isPhoneNumber(phone)) {
-			LOG.error("Phone number is not correct format");
+			LOG.warn("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
 		}
 		if (StringUtils.isEmpty(code)) {
-			LOG.error("Parameter code is empty");
+			LOG.warn("Parameter code is empty");
 			throw new ApiException("输入参数有误");
 		}
 
 		List<User> userList = getUserList(phone);
 		if (userList.size() > 0) {
-			LOG.error("User with phone number is already registed, phone: {}", phone);
+			LOG.warn("User with phone number is already registed, phone: {}", phone);
 			throw new ApiException("该用户已注册");
 		}
 
 		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
 		if (phoneVerify == null) {
-			LOG.error("Phone number is not exist in the phone verification table");
+			LOG.warn("Phone number is not exist in the phone verification table");
 			throw new ApiException("未能获取该手机的验证码");
 		}
 
 		if (!code.equals(phoneVerify.getCode())) {
-			LOG.error("Phone verify code is not corrected");
+			LOG.warn("Phone verify code is not corrected");
 			throw new ApiException("未能获取该手机的验证码");
 		}
 
 		if (phoneVerify.getExpire() < DateUtil.getTime()) {
-			LOG.error("Phone verify code is expired, please re acquisition");
+			LOG.warn("Phone verify code is expired, please re acquisition");
 			throw new ApiException("该验证码已过期，请重新获取验证码");
 		}
 

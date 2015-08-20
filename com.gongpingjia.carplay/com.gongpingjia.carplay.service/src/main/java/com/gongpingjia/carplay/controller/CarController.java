@@ -37,7 +37,7 @@ public class CarController {
 		try {
 			return service.getCarBrand();
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -57,7 +57,7 @@ public class CarController {
 		try {
 			return service.getCarModel(brand);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

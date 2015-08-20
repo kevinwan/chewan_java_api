@@ -42,7 +42,7 @@ public class UploadController {
 		try {
 			return service.uploadUserPhoto(attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
 		}
 	}
@@ -64,7 +64,7 @@ public class UploadController {
 		try {
 			return service.uploadLicensePhoto(userId, attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
 		}
 	}
@@ -84,7 +84,7 @@ public class UploadController {
 		try {
 			return service.uploadCoverPhoto(attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -108,7 +108,7 @@ public class UploadController {
 		try {
 			return service.uploadAlbumPhoto(userId, attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -128,7 +128,7 @@ public class UploadController {
 		try {
 			return service.uploadFeedbackPhoto(attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -150,7 +150,7 @@ public class UploadController {
 		try {
 			return service.reUploadUserPhoto(userId, attach, request);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
 		}
 	}

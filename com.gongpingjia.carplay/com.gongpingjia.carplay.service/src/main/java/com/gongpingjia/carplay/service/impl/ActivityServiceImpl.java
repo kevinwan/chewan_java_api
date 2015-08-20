@@ -295,7 +295,7 @@ public class ActivityServiceImpl implements ActivityService {
 		Car car = carDao.selectByUserId(userId);
 		Integer seat = Integer.valueOf(request.getParameter("seat"));
 		if (seat > getMaxCarSeat(car) || seat < getMinCarSeat()) {
-			LOG.error("The offered car seat is override range");
+			LOG.warn("The offered car seat is override range");
 			throw new ApiException("提供的空座数超出范围");
 		}
 	}
@@ -313,7 +313,7 @@ public class ActivityServiceImpl implements ActivityService {
 		// 要么省市区全部都不为空，要么地址不为空，当二者都为空的时候需要报错
 		if ((StringUtils.isEmpty(request.getParameter("province")) || StringUtils.isEmpty(request.getParameter("city")) || StringUtils
 				.isEmpty(request.getParameter("district"))) && StringUtils.isEmpty(request.getParameter("address"))) {
-			LOG.error("Province, city and district cannot be empty, or the same with address");
+			LOG.warn("Province, city and district cannot be empty, or the same with address");
 			throw new ApiException("输入参数有误");
 		}
 	}
@@ -331,13 +331,13 @@ public class ActivityServiceImpl implements ActivityService {
 		String[] covers = request.getParameterValues("cover");
 		if (covers == null || covers.length < 1
 				|| covers.length > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
-			LOG.error("Input covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
+			LOG.warn("Input covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
 			throw new ApiException("输入参数有误");
 		}
 
 		for (String coverId : covers) {
 			if (!photoService.isExist(MessageFormat.format(Constants.COVER_PHOTO_KEY, coverId))) {
-				LOG.error("Activity cover is not exist");
+				LOG.warn("Activity cover is not exist");
 				throw new ApiException("输入参数有误");
 			}
 		}
@@ -697,22 +697,22 @@ public class ActivityServiceImpl implements ActivityService {
 		String latitude = request.getParameter("latitude");
 
 		if (!CommonUtil.isUUID(userId)) {
-			LOG.error("Input parameter userId: {} is not UUID", userId);
+			LOG.warn("Input parameter userId: {} is not UUID", userId);
 			throw new ApiException("输入参数有误");
 		}
 
 		if (!CommonUtil.isUUID(token)) {
-			LOG.error("Input parameter token: {} is not UUID", token);
+			LOG.warn("Input parameter token: {} is not UUID", token);
 			throw new ApiException("输入参数有误");
 		}
 
 		if (!Constants.ACTIVITY_KEY_LIST.contains(key)) {
-			LOG.error("Input parameter key: {} error", key);
+			LOG.warn("Input parameter key: {} error", key);
 			throw new ApiException("输入参数有误");
 		}
 
 		if (Constants.ACTIVITY_KEY_NEARBY.equals(key) && (longitude == null || latitude == null)) {
-			LOG.error("Input parameter is nearby, but with no longitude or latitude");
+			LOG.warn("Input parameter is nearby, but with no longitude or latitude");
 			throw new ApiException("未能获取您的位置信息");
 		}
 
@@ -1209,7 +1209,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
 		if (activity == null) {
-			LOG.error("Activity is not found in the system, activityId:{}", activityId);
+			LOG.warn("Activity is not found in the system, activityId:{}", activityId);
 			throw new ApiException("未找到活动，无法加入");
 		}
 		return activity;

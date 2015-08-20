@@ -46,7 +46,7 @@ public class PhoneController {
 		try {
 			return service.sendVerification(phone, type);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage(), e);
+			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
@@ -70,7 +70,7 @@ public class PhoneController {
 		try {
 			return service.verify(phone, code);
 		} catch (ApiException e) {
-			LOG.error(e.getMessage());
+			LOG.warn(e.getMessage());
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}

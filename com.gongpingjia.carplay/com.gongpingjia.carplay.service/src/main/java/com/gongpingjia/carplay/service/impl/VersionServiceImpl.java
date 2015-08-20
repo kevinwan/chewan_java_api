@@ -24,7 +24,7 @@ public class VersionServiceImpl implements VersionService {
 		LOG.debug("Request parameter product: {}", product);
 		Version version = dao.selectByPrimaryKey(product);
 		if (version == null) {
-			LOG.error("No version info exist, product: {}", product);
+			LOG.warn("No version info exist, product: {}", product);
 			throw new ApiException("获取版本信息失败");
 		}
 		return ResponseDo.buildSuccessResponse(version);
