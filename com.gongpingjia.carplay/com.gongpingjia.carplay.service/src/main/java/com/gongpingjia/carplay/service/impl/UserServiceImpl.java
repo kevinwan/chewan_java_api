@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 	    		
 	    		//获取用户授权信息
 	    		ResponseDo tokenResponseDo = getUserToken(userData.getId());
-	    		if (1 == tokenResponseDo.getResult()){
+	    		if (tokenResponseDo.isFailure()){
 	    			return tokenResponseDo;
 	    		}
 	    		data.put("token", tokenResponseDo.getData());
@@ -233,7 +233,7 @@ public class UserServiceImpl implements UserService {
 		
 		//获取用户授权信息
 		ResponseDo tokenResponseDo = getUserToken(upUser.getId());
-		if (1 == tokenResponseDo.getResult()){
+		if (tokenResponseDo.isFailure()){
 			return tokenResponseDo;
 		}
 		data.put("userId", upUser.getId());
