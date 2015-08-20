@@ -590,7 +590,7 @@ public class UserServiceImpl implements UserService {
 		} else {
 			String uuid = CodeGenerator.generatorId();
 		    tokenVerification.setToken(uuid);
-		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, Constants.TOKEN_OVER_DATE));
+		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, PropertiesUtil.getProperty("gongpingjia.token.over.date", 7)));
 			if (0 == tokenVerificationDao.updateByPrimaryKey(tokenVerification)){
 		    	LOG.warn("Fail to update new token and expire info");
 		    	return ResponseDo.buildFailureResponse("更新用户授权信息失败");
