@@ -57,7 +57,7 @@ public class ActivityController {
 	 *            请求
 	 * @return 返回响应结果对象
 	 */
-	@RequestMapping(value = "/activity/register", method = RequestMethod.POST)
+	@RequestMapping(value = "/activity/register", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseDo registerActivity(HttpServletRequest request) {
 		LOG.info("registerActivity begin");
 		try {

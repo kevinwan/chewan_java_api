@@ -13,15 +13,10 @@
     http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<!-- 默认扫描的包路径 -->
-	<context:component-scan base-package="com.gongpingjia.carplay" />
+	<context:component-scan base-package="com.gongpingjia.carplay.controller" />
 
 	<!-- 添加注解驱动 -->
 	<mvc:annotation-driven />
-
-	<!-- <bean id="commonInterceptor" class="com.gongpingjia.carplay.interceptor.CommonInterceptor" 
-		/> <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"> 
-		<property name="interceptors"> <list> <ref bean="commonInterceptor" /> </list> 
-		</property> </bean> -->
 
 	<mvc:interceptors>
 		<!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->

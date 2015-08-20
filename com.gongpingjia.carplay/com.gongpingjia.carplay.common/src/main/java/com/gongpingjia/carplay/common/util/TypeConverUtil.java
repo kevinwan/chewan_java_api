@@ -31,8 +31,8 @@ public class TypeConverUtil {
 			return Double.valueOf(param);
 		} catch (NumberFormatException e) {
 			LOG.warn("Parameter {} is not Double type, which value is {}", paramName, param);
-			LOG.warn(e.getMessage(), e);
 			if (throwException) {
+				LOG.warn(e.getMessage(), e);
 				throw new ApiException("参数错误");
 			}
 		}
@@ -55,8 +55,8 @@ public class TypeConverUtil {
 			return Long.valueOf(param);
 		} catch (NumberFormatException e) {
 			LOG.warn("Parameter {} is not Long type, which value is {}", paramName, param);
-			LOG.warn(e.getMessage(), e);
 			if (throwException) {
+				LOG.warn(e.getMessage(), e);
 				throw new ApiException("参数错误");
 			}
 		}
@@ -79,8 +79,8 @@ public class TypeConverUtil {
 			return Integer.valueOf(param);
 		} catch (NumberFormatException e) {
 			LOG.warn("Parameter {} is not Integer type, which value is {}", paramName, param);
-			LOG.warn(e.getMessage(), e);
 			if (throwException) {
+				LOG.warn(e.getMessage(), e);
 				throw new ApiException("参数错误");
 			}
 		}

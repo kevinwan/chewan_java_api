@@ -180,6 +180,15 @@ public class ActivityServiceImpl implements ActivityService {
 		return ResponseDo.buildSuccessResponse(data);
 	}
 
+	/**
+	 * 根据活动构建分享的信息
+	 * 
+	 * @param userId
+	 *            活动创建者
+	 * @param activity
+	 *            活动信息
+	 * @return 返回构造的分享信息的Map
+	 */
 	private Map<String, String> buildShareData(String userId, Activity activity) {
 		User user = userDao.selectByPrimaryKey(userId);
 		Map<String, String> data = new HashMap<String, String>(5, 1);
