@@ -124,18 +124,18 @@ public class UserServiceImpl implements UserService {
 	    	LOG.warn("Phone already ed");
 	    	return ResponseDo.buildFailureResponse("该用户已注册");
 	    }
-	    String uuid = user.getId();
+	    String userId = user.getId();
 	    //注册用户
 	    userDao.insert(user);
 	    
 	    TokenVerification tokenVerification = new TokenVerification();
-	    tokenVerification.setUserid(uuid);
+	    tokenVerification.setUserid(userId);
 	    tokenVerification.setToken(CodeGenerator.generatorId());
 	    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
 	    tokenVerificationDao.insert(tokenVerification);
 	    
 	    EmchatAccount emchatAccount = new EmchatAccount();
-	    emchatAccount.setUserid(uuid);
+	    emchatAccount.setUserid(userId);
 	    emchatAccount.setPassword(user.getPassword());
 	    emchatAccount.setRegistertime(DateUtil.getTime());
 	    emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getNickname()));
@@ -143,11 +143,11 @@ public class UserServiceImpl implements UserService {
 	    
 	    UserAlbum userAlbum = new UserAlbum();
 	    userAlbum.setId(CodeGenerator.generatorId());
-	    userAlbum.setUserid(uuid);
+	    userAlbum.setUserid(userId);
 	    userAlbum.setCreatetime(DateUtil.getTime());
 	    userAlbumDao.insert(userAlbum);
 	    
-	    data.put("userId", uuid);
+	    data.put("userId", userId);
 	    data.put("token", tokenVerification.getToken());
 		return ResponseDo.buildSuccessResponse(data);
 	}
@@ -247,22 +247,10 @@ public class UserServiceImpl implements UserService {
 	public ResponseDo applyAuthentication(
 			AuthenticationApplication authen,String token,String userId) {
 		
-		//验证参数 
-	    if (!CommonUtil.isUUID(token) || !CommonUtil.isUUID(userId) || (authen.getDrivingexperience() > 50) 
-	    		|| (authen.getBrandlogo().indexOf("http://") < 0) || authen.getBrandlogo().lastIndexOf("/") <= 6 ) {
-	    	LOG.warn("invalid params");
-	    	return ResponseDo.buildFailureResponse("输入参数有误");
-	    }
-	    
-	    //获取认证口令
-		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
-		if (null == tokenVerification){
-	    	LOG.warn("Fail to get token and expire info from token_verification");
-	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
-		}
-		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
-	    	LOG.warn("Token expired or token not correct");
-	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		//参数验证
+		ResponseDo paramRes = applyAuthenticationParam( authen, token, userId);
+		if (null != paramRes){
+			return paramRes;
 		}
 		
 		User user = userDao.selectByPrimaryKey(userId);
@@ -602,13 +590,34 @@ public class UserServiceImpl implements UserService {
 		} else {
 			String uuid = CodeGenerator.generatorId();
 		    tokenVerification.setToken(uuid);
-		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
+		    tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, Constants.TOKEN_OVER_DATE));
 			if (0 == tokenVerificationDao.updateByPrimaryKey(tokenVerification)){
 		    	LOG.warn("Fail to update new token and expire info");
 		    	return ResponseDo.buildFailureResponse("更新用户授权信息失败");
 			}
 			return ResponseDo.buildSuccessResponse(uuid);
 		}
+	}
+	
+	private ResponseDo applyAuthenticationParam(AuthenticationApplication authen,String token,String userId){
+		//验证参数 
+	    if (!CommonUtil.isUUID(token) || !CommonUtil.isUUID(userId) || (authen.getDrivingexperience() > 50) 
+	    		|| (authen.getBrandlogo().indexOf("http://") < 0) || authen.getBrandlogo().lastIndexOf("/") <= 6 ) {
+	    	LOG.warn("invalid params");
+	    	return ResponseDo.buildFailureResponse("输入参数有误");
+	    }
+	    
+	    //获取认证口令
+		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
+		if (null == tokenVerification){
+	    	LOG.warn("Fail to get token and expire info from token_verification");
+	    	return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+		}
+		if (tokenVerification.getExpire() <= DateUtil.getTime() || !token.equals(tokenVerification.getToken())){
+	    	LOG.warn("Token expired or token not correct");
+	    	return ResponseDo.buildFailureResponse("口令已过期，请重新登录获取新口令");
+		}
+		return null;
 	}
 
 	class AlbumPhotoView{

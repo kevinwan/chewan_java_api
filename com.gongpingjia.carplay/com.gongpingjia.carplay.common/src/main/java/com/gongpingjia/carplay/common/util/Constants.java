@@ -108,4 +108,9 @@ public class Constants {
 	 */
 	public static final List<String> ACTIVITY_KEY_LIST = Arrays.asList(Constants.ACTIVITY_KEY_HOTTEST,
 			Constants.ACTIVITY_KEY_LATEST, Constants.ACTIVITY_KEY_NEARBY);
+	
+	/**
+	 * Token过期天数
+	 */
+	public static final Integer TOKEN_OVER_DATE = 7;
 }
