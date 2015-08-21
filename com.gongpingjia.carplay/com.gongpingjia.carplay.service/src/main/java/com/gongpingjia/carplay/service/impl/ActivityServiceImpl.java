@@ -2,7 +2,6 @@ package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -166,7 +165,7 @@ public class ActivityServiceImpl implements ActivityService {
 		Long current = DateUtil.getTime();
 
 		Activity activity = saveActivity(request, activityId, current);
-		
+
 		saveActivityCovers(request, activityId, current);
 
 		saveActivityMember(userId, activityId, current);
@@ -198,10 +197,11 @@ public class ActivityServiceImpl implements ActivityService {
 		data.put("shareTitle", MessageFormat.format(PropertiesUtil.getProperty("activity.share.title", ""),
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.ACTIVITY_SHARE_DATE_FORMAT);
+
 		data.put(
 				"shareContent",
-				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
-						Arrays.asList(date, activity.getLocation(), activity.getPaymenttype())));
+				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
+						activity.getLocation(), activity.getPaymenttype() }));
 		return data;
 	}
 

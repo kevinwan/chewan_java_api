@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.common.exception;
 
+import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,15 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(PersistenceException.class)
 	public final ResponseEntity<?> handleNestedServletException(NestedServletException ex, WebRequest request) {
 		LOG.warn("Handle NestedServletException, it is database mapping exception");
+		LOG.error(ex.getMessage(), ex);
+		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
+		HttpHeaders headers = new HttpHeaders();
+		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
+	}
+	
+	@ExceptionHandler(BindingException.class)
+	public final ResponseEntity<?> handleBindingException(BindingException ex, WebRequest request){
+		LOG.warn("Handle BindingException, it is database mapping exception");
 		LOG.error(ex.getMessage(), ex);
 		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
 		HttpHeaders headers = new HttpHeaders();

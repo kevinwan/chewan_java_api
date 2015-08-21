@@ -15,7 +15,8 @@
     http://www.springframework.org/schema/util 
     http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:component-scan base-package="com.gongpingjia.carplay.service,com.gongpingjia.carplay.dao" />
+	<context:component-scan
+		base-package="com.gongpingjia.carplay.dao, com.gongpingjia.carplay.service" />
 	<context:annotation-config />
 
 	<!-- 引入jdbc配置文件 -->
@@ -23,14 +24,19 @@
 
 	<bean id="beanUtil" class="com.gongpingjia.carplay.common.util.BeanUtil" />
 
-	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${jdbc_driverClassName}" />
+	<!-- org.springframework.jdbc.datasource.DriverManagerDataSource -->
+	<bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
+		<property name="driver" value="${jdbc_driverClassName}" />
 		<property name="url" value="${jdbc_url}" />
 		<property name="username" value="${jdbc_username}" />
 		<property name="password" value="${jdbc_password}" />
+		<property name="poolMaximumActiveConnections" value="${jdbc_maxActive}" />
+		<property name="poolMaximumCheckoutTime" value="${jdbc_maxCheckOutTime}" />
+		<property name="poolMaximumIdleConnections" value="${jdbc_maxIdle}" />
+		<property name="poolTimeToWait" value="${jdbc_maxWait}" />
+		<property name="poolPingEnabled" value="${jdbc_pingEnabled}"/>
 		<!-- 连接属性 -->
-		<property name="connectionProperties">
+		<property name="driverProperties">
 			<value>clientEncoding=UTF-8</value>
 		</property>
 	</bean>
@@ -43,15 +49,11 @@
 	</bean>
 	<!-- configLocation为mybatis属性 mapperLocations为所有mapper -->
 
-	<!-- spring与mybatis整合配置，扫描所有dao -->
-	<bean id="userMapper" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.gongpingjia.carplay.dao"></property>
-	</bean>
-
 	<!-- 对数据源进行事务管理 -->
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"></property>
 	</bean>
-	<tx:annotation-driven transaction-manager="transactionManager" mode="proxy" proxy-target-class="false" />
+	<tx:annotation-driven transaction-manager="transactionManager"
+		mode="proxy" proxy-target-class="false" />
 </beans>
