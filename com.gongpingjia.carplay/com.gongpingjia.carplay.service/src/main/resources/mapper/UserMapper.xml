@@ -47,7 +47,7 @@
 		id, password, nickname, phone, gender, birthYear, birthMonth, birthDay, province,
 		city, district, photo, drivingLicenseYear, drivingLicensePhoto, isAuthenticated,
 		credit, registerTime, wechatId, wechatName, wechatPhoto, qqId, qqName, qqPhoto, sinaWeiboId, 
-    		sinaWeiboName, sinaWeiboPhoto, role, extraInfo, invalid
+    		sinaWeiboName, sinaWeiboPhoto, role,  invalid
 		from user
 		where 1 = 1
 		<if test="id != null">
