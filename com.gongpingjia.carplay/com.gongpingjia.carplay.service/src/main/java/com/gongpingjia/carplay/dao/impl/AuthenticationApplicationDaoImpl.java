@@ -10,8 +10,7 @@ import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 
 @Service
-public class AuthenticationApplicationDaoImpl implements
-		AuthenticationApplicationDao {
+public class AuthenticationApplicationDaoImpl implements AuthenticationApplicationDao {
 
 	@Override
 	public int deleteByPrimaryKey(String id) {

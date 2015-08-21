@@ -17,6 +17,18 @@
 		from activity_comment
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
+	
+	<select id="selectAuthorAndOrganizerByCommentId" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			activity_comment.id,
+			activity_comment.userId AS author,
+			activity.organizer
+		FROM
+			activity_comment
+		LEFT JOIN activity ON activity_comment.activityId = activity.id
+		WHERE
+			activity_comment.id = #{commentId,jdbcType=VARCHAR}
+	</select>
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from activity_comment

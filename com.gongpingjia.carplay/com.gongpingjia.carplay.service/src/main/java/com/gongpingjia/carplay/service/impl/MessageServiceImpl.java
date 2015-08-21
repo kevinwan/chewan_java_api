@@ -16,11 +16,13 @@ import com.gongpingjia.carplay.common.enums.MessageType;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.controller.VersionController;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
+import com.gongpingjia.carplay.dao.ActivityCommentDao;
 import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.FeedbackDao;
 import com.gongpingjia.carplay.dao.FeedbackPhotoDao;
@@ -57,6 +59,9 @@ public class MessageServiceImpl implements MessageService {
 
 	@Autowired
 	private PhotoService photoService;
+
+	@Autowired
+	private ActivityCommentDao activityCommentDao;
 
 	@Override
 	public ResponseDo getApplicationList(String userId, int ignore, int limit) throws ApiException {
@@ -249,6 +254,38 @@ public class MessageServiceImpl implements MessageService {
 			if (affeced == 0) {
 				LOG.error("Fail to delete message :{}", messageId);
 				throw new ApiException("未能成功删除消息");
+			}
+		}
+		return ResponseDo.buildSuccessResponse("");
+	}
+
+	@Override
+	public ResponseDo removeComments(String userId, String[] comments) throws ApiException {
+		for (String commentId : comments) {
+			if (!CommonUtil.isUUID(commentId)) {
+				LOG.warn("invalid comment id{}", commentId);
+				throw new ApiException("评论id 格式有误");
+			}
+
+			Map<String, Object> param = new HashMap<>();
+			param.put("commentId", commentId);
+			List<Map<String, Object>> commentinfo = activityCommentDao.selectAuthorAndOrganizerByCommentId(param);
+
+			if (commentinfo.size() == 0) {
+				LOG.warn("Fail to get comment author and activity organizer");
+				throw new ApiException("未能获取该评论消息");
+			}
+
+			if (!commentinfo.get(0).get("author").equals(userId)
+					&& !commentinfo.get(0).get("organizer").equals(userId)) {
+				LOG.warn("'Only organizer or author can delete this comment");
+				throw new ApiException("只有活动管理员或评论发布者有权删除该条评论");
+			}
+
+			int affeced = activityCommentDao.deleteByPrimaryKey(commentId);
+			if (affeced == 0) {
+				LOG.error("Fail to delete comment :{}", commentId);
+				throw new ApiException("未能成功删除评论");
 			}
 		}
 		return ResponseDo.buildSuccessResponse("");

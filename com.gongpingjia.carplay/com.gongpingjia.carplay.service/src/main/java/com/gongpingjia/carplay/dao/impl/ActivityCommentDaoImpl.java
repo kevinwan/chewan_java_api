@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
@@ -27,6 +30,11 @@ public class ActivityCommentDaoImpl implements ActivityCommentDao {
 	@Override
 	public int updateByPrimaryKey(ActivityComment record) {
 		return DASUtil.update(ActivityComment.class.getName(), "updateByPrimaryKey", record);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectAuthorAndOrganizerByCommentId(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityComment.class.getName(), "selectAuthorAndOrganizerByCommentId", param);
 	}
 
 }

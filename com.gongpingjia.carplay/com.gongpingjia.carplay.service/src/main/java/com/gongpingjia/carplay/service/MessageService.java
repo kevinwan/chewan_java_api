@@ -81,4 +81,19 @@ public interface MessageService {
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo removeMessages(String userId, String[] messages) throws ApiException;
 
+	/**
+	 * 2.48批量删除评论
+	 * 
+	 * @param userId
+	 *            用户Id
+	 * 
+	 * @param comments
+	 *            评论ID
+	 *
+	 * @return 删除成功
+	 * @throws ApiException 
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	ResponseDo removeComments(String userId, String[] comments) throws ApiException;
+
 }
