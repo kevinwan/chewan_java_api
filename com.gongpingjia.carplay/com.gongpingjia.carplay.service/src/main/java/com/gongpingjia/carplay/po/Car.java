@@ -17,6 +17,8 @@ public class Car {
 
     private Integer seat;
 
+    private String extrainfo;
+
     private String invalid;
 
     public String getId() {
@@ -81,6 +83,14 @@ public class Car {
 
     public void setSeat(Integer seat) {
         this.seat = seat;
+    }
+
+    public String getExtrainfo() {
+        return extrainfo;
+    }
+
+    public void setExtrainfo(String extrainfo) {
+        this.extrainfo = extrainfo;
     }
 
     public String getInvalid() {

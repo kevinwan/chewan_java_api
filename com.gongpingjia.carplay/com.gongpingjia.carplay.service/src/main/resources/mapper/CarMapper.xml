@@ -10,12 +10,13 @@
     		<result column="price" property="price" jdbcType="DOUBLE" />
 		<result column="color" property="color" jdbcType="VARCHAR" />
 		<result column="seat" property="seat" jdbcType="INTEGER" />
+    		<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
-		id, userId, brand, brandLogo, model, price, color, seat, invalid
+		id, userId, brand, brandLogo, model, price, color, seat, extraInfo, invalid
 		from car
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -28,11 +29,10 @@
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Car">
 		insert into car (id, userId, brand,
 		brandLogo, model, price,
-		color, seat, invalid
-		)
+		color, seat, extraInfo, invalid)
 		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{brand,jdbcType=VARCHAR},
       		#{brandlogo,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, 
-		#{color,jdbcType=VARCHAR}, #{seat,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR}
+		#{color,jdbcType=VARCHAR}, #{seat,jdbcType=INTEGER}, #{extrainfo,jdbcType=VARCHAR}, #{invalid,jdbcType=VARCHAR}
 		)
 	</insert>
 
@@ -45,13 +45,14 @@
       		price = #{price,jdbcType=DOUBLE},
 		color = #{color,jdbcType=VARCHAR},
 		seat = #{seat,jdbcType=INTEGER},
+      		extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		invalid = #{invalid,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
 	
 	<select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
-		id, userId, brand, brandLogo, model, price, color, seat, invalid
+		id, userId, brand, brandLogo, model, price, color, seat, extraInfo, invalid
 		from car 
 		where userId = #{userId,jdbcType=VARCHAR}		
 	</select>

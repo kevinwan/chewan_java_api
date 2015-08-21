@@ -19,6 +19,8 @@ public class AuthenticationApplication {
 
     private String status;
 
+    private String photo;
+
     private Long createtime;
 
     public String getId() {
@@ -91,6 +93,14 @@ public class AuthenticationApplication {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public Long getCreatetime() {

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gongpingjia.carplay.po.DrivingLicense" >
+  <resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.DrivingLicense" >
+    <id column="userId" property="userid" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="plate" property="plate" jdbcType="VARCHAR" />
+    <result column="vehicleType" property="vehicletype" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="model" property="model" jdbcType="VARCHAR" />
+    <result column="vehicleNumber" property="vehiclenumber" jdbcType="VARCHAR" />
+    <result column="engineNumber" property="enginenumber" jdbcType="VARCHAR" />
+    <result column="registerTime" property="registertime" jdbcType="BIGINT" />
+    <result column="issueTime" property="issuetime" jdbcType="BIGINT" />
+  </resultMap>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+	    userId, name, plate, vehicleType, address, model, vehicleNumber, engineNumber, registerTime, 
+	    issueTime
+    from driving_license
+    where userId = #{userid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from driving_license
+    where userId = #{userid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.gongpingjia.carplay.po.DrivingLicense" >
+    insert into driving_license (userId, name, plate, 
+      vehicleType, address, model, 
+      vehicleNumber, engineNumber, registerTime, 
+      issueTime)
+    values (#{userid,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{plate,jdbcType=VARCHAR}, 
+      #{vehicletype,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, 
+      #{vehiclenumber,jdbcType=VARCHAR}, #{enginenumber,jdbcType=VARCHAR}, #{registertime,jdbcType=BIGINT}, 
+      #{issuetime,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.DrivingLicense" >
+    update driving_license
+    set name = #{name,jdbcType=VARCHAR},
+      plate = #{plate,jdbcType=VARCHAR},
+      vehicleType = #{vehicletype,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      model = #{model,jdbcType=VARCHAR},
+      vehicleNumber = #{vehiclenumber,jdbcType=VARCHAR},
+      engineNumber = #{enginenumber,jdbcType=VARCHAR},
+      registerTime = #{registertime,jdbcType=BIGINT},
+      issueTime = #{issuetime,jdbcType=BIGINT}
+    where userId = #{userid,jdbcType=VARCHAR}
+  </update>
+</mapper>

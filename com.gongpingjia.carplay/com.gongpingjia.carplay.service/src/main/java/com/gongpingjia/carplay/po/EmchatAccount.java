@@ -5,6 +5,8 @@ public class EmchatAccount {
 
     private String username;
 
+    private String nickname;
+
     private String password;
 
     private Long registertime;
@@ -25,6 +27,14 @@ public class EmchatAccount {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getPassword() {

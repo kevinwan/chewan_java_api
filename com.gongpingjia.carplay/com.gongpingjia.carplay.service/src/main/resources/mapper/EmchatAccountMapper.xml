@@ -4,14 +4,15 @@
 	<resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.EmchatAccount">
 		<id column="userId" property="userid" jdbcType="VARCHAR" />
 		<result column="username" property="username" jdbcType="VARCHAR" />
+    	<result column="nickname" property="nickname" jdbcType="VARCHAR" />
 		<result column="password" property="password" jdbcType="VARCHAR" />
 		<result column="registerTime" property="registertime" jdbcType="BIGINT" />
-    		<result column="activateTime" property="activatetime" jdbcType="BIGINT" />
+    	<result column="activateTime" property="activatetime" jdbcType="BIGINT" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
-		userId, username, password,
+		userId, username, nickname, password,
 		registerTime, activateTime
 		from emchat_account
 		where userId = #{userid,jdbcType=VARCHAR}
@@ -24,20 +25,20 @@
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.EmchatAccount">
-		insert into emchat_account (userId, username, password,
+		insert into emchat_account (userId, username, nickname,  password,
       		registerTime, activateTime)
 		values
-		(#{userid,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+		(#{userid,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
 		#{registertime,jdbcType=BIGINT}, #{activatetime,jdbcType=BIGINT})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.EmchatAccount">
 		update emchat_account
 		set username = #{username,jdbcType=VARCHAR},
+      		nickname = #{nickname,jdbcType=VARCHAR},
 		password = #{password,jdbcType=VARCHAR},
 		registerTime = #{registertime,jdbcType=BIGINT},
       		activateTime = #{activatetime,jdbcType=BIGINT}
-		where userId =
-		#{userid,jdbcType=VARCHAR}
+		where userId =	#{userid,jdbcType=VARCHAR}
 	</update>
 </mapper>

@@ -35,6 +35,28 @@ public class User {
 
     private Long registertime;
 
+    private String wechatid;
+
+    private String wechatname;
+
+    private String wechatphoto;
+
+    private String qqid;
+
+    private String qqname;
+
+    private String qqphoto;
+
+    private String sinaweiboid;
+
+    private String sinaweiboname;
+
+    private String sinaweibophoto;
+
+    private String role;
+
+    private String extrainfo;
+
     private String invalid;
 
     public String getId() {
@@ -171,6 +193,94 @@ public class User {
 
     public void setRegistertime(Long registertime) {
         this.registertime = registertime;
+    }
+
+    public String getWechatid() {
+        return wechatid;
+    }
+
+    public void setWechatid(String wechatid) {
+        this.wechatid = wechatid;
+    }
+
+    public String getWechatname() {
+        return wechatname;
+    }
+
+    public void setWechatname(String wechatname) {
+        this.wechatname = wechatname;
+    }
+
+    public String getWechatphoto() {
+        return wechatphoto;
+    }
+
+    public void setWechatphoto(String wechatphoto) {
+        this.wechatphoto = wechatphoto;
+    }
+
+    public String getQqid() {
+        return qqid;
+    }
+
+    public void setQqid(String qqid) {
+        this.qqid = qqid;
+    }
+
+    public String getQqname() {
+        return qqname;
+    }
+
+    public void setQqname(String qqname) {
+        this.qqname = qqname;
+    }
+
+    public String getQqphoto() {
+        return qqphoto;
+    }
+
+    public void setQqphoto(String qqphoto) {
+        this.qqphoto = qqphoto;
+    }
+
+    public String getSinaweiboid() {
+        return sinaweiboid;
+    }
+
+    public void setSinaweiboid(String sinaweiboid) {
+        this.sinaweiboid = sinaweiboid;
+    }
+
+    public String getSinaweiboname() {
+        return sinaweiboname;
+    }
+
+    public void setSinaweiboname(String sinaweiboname) {
+        this.sinaweiboname = sinaweiboname;
+    }
+
+    public String getSinaweibophoto() {
+        return sinaweibophoto;
+    }
+
+    public void setSinaweibophoto(String sinaweibophoto) {
+        this.sinaweibophoto = sinaweibophoto;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getExtrainfo() {
+        return extrainfo;
+    }
+
+    public void setExtrainfo(String extrainfo) {
+        this.extrainfo = extrainfo;
     }
 
     public String getInvalid() {

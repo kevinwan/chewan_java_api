@@ -11,13 +11,14 @@
 		<result column="slug" property="slug" jdbcType="VARCHAR" />
     		<result column="price" property="price" jdbcType="DOUBLE" />
 		<result column="status" property="status" jdbcType="VARCHAR" />
+    		<result column="photo" property="photo" jdbcType="VARCHAR" />
 		<result column="createTime" property="createtime" jdbcType="BIGINT" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
 		id, userId, drivingExperience,
-		brand, brandLogo, model, slug, price, status, createTime
+		brand, brandLogo, model, slug, price, status, photo, createTime
 		from authentication_application
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -28,41 +29,34 @@
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
 		delete from authentication_application
-		where id =
-		#{id,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.AuthenticationApplication">
-		insert into authentication_application (id, userId, drivingExperience,
-		brand,
-		brandLogo, model,
-		slug, price,status, createTime
-		)
-		values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR},
-		#{drivingexperience,jdbcType=INTEGER},
-		#{brand,jdbcType=VARCHAR}, #{brandlogo,jdbcType=VARCHAR},
-		#{model,jdbcType=VARCHAR},
-		#{slug,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, #{status,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT}
-		)
-	</insert>
+    	    insert into authentication_application (id, userId, drivingExperience, 
+	      brand, brandLogo, model, 
+	      slug, price, status, 
+	      photo, createTime)
+	    values (#{id,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{drivingexperience,jdbcType=INTEGER}, 
+	      #{brand,jdbcType=VARCHAR}, #{brandlogo,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, 
+	      #{slug,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, #{status,jdbcType=VARCHAR}, 
+	      #{photo,jdbcType=VARCHAR}, #{createtime,jdbcType=BIGINT})
+      	</insert>
 
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.AuthenticationApplication">
 		update authentication_application
-		set userId =
-		#{userid,jdbcType=VARCHAR},
+		set userId = #{userid,jdbcType=VARCHAR},
 		drivingExperience = #{drivingexperience,jdbcType=INTEGER},
-		brand =
-		#{brand,jdbcType=VARCHAR},
+		brand =	#{brand,jdbcType=VARCHAR},
 		brandLogo = #{brandlogo,jdbcType=VARCHAR},
 		model = #{model,jdbcType=VARCHAR},
-		slug =
-		#{slug,jdbcType=VARCHAR},
+		slug =	#{slug,jdbcType=VARCHAR},
  		price = #{price,jdbcType=DOUBLE},
 		status = #{status,jdbcType=VARCHAR},
+      		photo = #{photo,jdbcType=VARCHAR},
 		createTime = #{createtime,jdbcType=BIGINT}
-		where id =
-		#{id,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
 	</update>
 	
 	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.util.Map">

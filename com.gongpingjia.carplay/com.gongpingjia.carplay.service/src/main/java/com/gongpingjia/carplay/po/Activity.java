@@ -45,6 +45,12 @@ public class Activity {
 
     private String extraserviceid;
 
+    private String emchatgroupid;
+
+    private String category;
+
+    private Integer membersize;
+
     private String invalid;
 
     public String getId() {
@@ -221,6 +227,30 @@ public class Activity {
 
     public void setExtraserviceid(String extraserviceid) {
         this.extraserviceid = extraserviceid;
+    }
+
+    public String getEmchatgroupid() {
+        return emchatgroupid;
+    }
+
+    public void setEmchatgroupid(String emchatgroupid) {
+        this.emchatgroupid = emchatgroupid;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getMembersize() {
+        return membersize;
+    }
+
+    public void setMembersize(Integer membersize) {
+        this.membersize = membersize;
     }
 
     public String getInvalid() {

@@ -15,7 +15,7 @@
 		<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
 		<result column="start" property="start" jdbcType="BIGINT" />
 		<result column="end" property="end" jdbcType="BIGINT" />
-    	<result column="endTime" property="endtime" jdbcType="BIGINT" />
+    		<result column="endTime" property="endtime" jdbcType="BIGINT" />
 		<result column="location" property="location" jdbcType="VARCHAR" />
 		<result column="longitude" property="longitude" jdbcType="DOUBLE" />
 		<result column="latitude" property="latitude" jdbcType="DOUBLE" />
@@ -24,6 +24,9 @@
 		<result column="createTime" property="createtime" jdbcType="BIGINT" />
 		<result column="lastModifiedTime" property="lastmodifiedtime" jdbcType="BIGINT" />
 		<result column="extraServiceId" property="extraserviceid" jdbcType="VARCHAR" />
+    		<result column="emchatGroupId" property="emchatgroupid" jdbcType="VARCHAR" />
+    		<result column="category" property="category" jdbcType="VARCHAR" />
+   		<result column="memberSize" property="membersize" jdbcType="INTEGER" />
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
 	</resultMap>
 
@@ -33,9 +36,9 @@
 		province, city, district, address, title, description,
 		extraInfo, start, end, endTime, location, longitude, latitude,
 		paymentType, initialSeat, createTime,
-		lastModifiedTime, extraServiceId, invalid
+		lastModifiedTime, extraServiceId, emchatGroupId, category, memberSize, invalid
 		from activity
-		where id =	#{id,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=VARCHAR}
 	</select>
 	
 	<select id="selectByOrganizer" resultType="java.util.Map" parameterType="java.util.Map">
@@ -52,29 +55,24 @@
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.Activity">
-		insert into activity (id, organizer, photo,
-		type, province, city,
-		district,
-		address, title,
-		description, extraInfo, start,
-		end, endTime, location, longitude,
-		latitude, paymentType, initialSeat,
-		createTime,
-		lastModifiedTime, extraServiceId,
-		invalid)
-		values (#{id,jdbcType=VARCHAR}, #{organizer,jdbcType=VARCHAR},
-		#{photo,jdbcType=VARCHAR},
-		#{type,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR},
-		#{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
-		#{description,jdbcType=VARCHAR},
-		#{extrainfo,jdbcType=VARCHAR}, #{start,jdbcType=BIGINT},
-		#{end,jdbcType=BIGINT}, #{endtime,jdbcType=BIGINT}, #{location,jdbcType=VARCHAR},
-		#{longitude,jdbcType=DOUBLE},
-		#{latitude,jdbcType=DOUBLE}, #{paymenttype,jdbcType=VARCHAR},
-		#{initialseat,jdbcType=INTEGER},
-		#{createtime,jdbcType=BIGINT}, #{lastmodifiedtime,jdbcType=BIGINT},
-		#{extraserviceid,jdbcType=VARCHAR},
-		#{invalid,jdbcType=VARCHAR})
+	insert into activity (id, organizer, photo, 
+      type, province, city, 
+      district, address, title, 
+      description, extraInfo, start, 
+      end, endTime, location, 
+      longitude, latitude, paymentType, 
+      initialSeat, createTime, lastModifiedTime, 
+      extraServiceId, emchatGroupId, category, 
+      memberSize, invalid)
+    values (#{id,jdbcType=VARCHAR}, #{organizer,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR}, 
+      #{type,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
+      #{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{extrainfo,jdbcType=VARCHAR}, #{start,jdbcType=BIGINT}, 
+      #{end,jdbcType=BIGINT}, #{endtime,jdbcType=BIGINT}, #{location,jdbcType=VARCHAR}, 
+      #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE}, #{paymenttype,jdbcType=VARCHAR}, 
+      #{initialseat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT}, #{lastmodifiedtime,jdbcType=BIGINT}, 
+      #{extraserviceid,jdbcType=VARCHAR}, #{emchatgroupid,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, 
+      #{membersize,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Activity">
@@ -91,16 +89,18 @@
 		extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		start = #{start,jdbcType=BIGINT},
 		end = #{end,jdbcType=BIGINT},
-      	endTime = #{endtime,jdbcType=BIGINT},
+      		endTime = #{endtime,jdbcType=BIGINT},
 		location = #{location,jdbcType=VARCHAR},
 		longitude =	#{longitude,jdbcType=DOUBLE},
 		latitude = #{latitude,jdbcType=DOUBLE},
 		paymentType = #{paymenttype,jdbcType=VARCHAR},
 		initialSeat = #{initialseat,jdbcType=INTEGER},
 		createTime = #{createtime,jdbcType=BIGINT},
-		lastModifiedTime =
-		#{lastmodifiedtime,jdbcType=BIGINT},
+		lastModifiedTime = #{lastmodifiedtime,jdbcType=BIGINT},
 		extraServiceId = #{extraserviceid,jdbcType=VARCHAR},
+      		emchatGroupId = #{emchatgroupid,jdbcType=VARCHAR},
+      		category = #{category,jdbcType=VARCHAR},
+      		memberSize = #{membersize,jdbcType=INTEGER},
 		invalid = #{invalid,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>

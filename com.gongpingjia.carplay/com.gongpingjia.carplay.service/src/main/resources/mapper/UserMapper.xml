@@ -19,6 +19,17 @@
 		<result column="isAuthenticated" property="isauthenticated" jdbcType="TINYINT" />
 		<result column="credit" property="credit" jdbcType="INTEGER" />
 		<result column="registerTime" property="registertime" jdbcType="BIGINT" />
+	   	<result column="wechatId" property="wechatid" jdbcType="VARCHAR" />
+	    	<result column="wechatName" property="wechatname" jdbcType="VARCHAR" />
+	    	<result column="wechatPhoto" property="wechatphoto" jdbcType="VARCHAR" />
+	    	<result column="qqId" property="qqid" jdbcType="VARCHAR" />
+	    	<result column="qqName" property="qqname" jdbcType="VARCHAR" />
+	    	<result column="qqPhoto" property="qqphoto" jdbcType="VARCHAR" />
+	    	<result column="sinaWeiboId" property="sinaweiboid" jdbcType="VARCHAR" />
+	    	<result column="sinaWeiboName" property="sinaweiboname" jdbcType="VARCHAR" />
+	    	<result column="sinaWeiboPhoto" property="sinaweibophoto" jdbcType="VARCHAR" />
+	    	<result column="role" property="role" jdbcType="VARCHAR" />
+	    	<result column="extraInfo" property="extrainfo" jdbcType="VARCHAR" />
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
 	</resultMap>
 
@@ -35,7 +46,8 @@
 		select
 		id, password, nickname, phone, gender, birthYear, birthMonth, birthDay, province,
 		city, district, photo, drivingLicenseYear, drivingLicensePhoto, isAuthenticated,
-		credit, registerTime, invalid
+		credit, registerTime, wechatId, wechatName, wechatPhoto, qqId, qqName, qqPhoto, sinaWeiboId, 
+    		sinaWeiboName, sinaWeiboPhoto, role, extraInfo, invalid
 		from user
 		where 1 = 1
 		<if test="id != null">
@@ -57,14 +69,22 @@
 		city, district, photo,
 		drivingLicenseYear, drivingLicensePhoto,
 		isAuthenticated, credit, registerTime,
-		invalid)
+	        wechatId, wechatName, wechatPhoto, 
+	        qqId, qqName, qqPhoto, 
+	        sinaWeiboId, sinaWeiboName, sinaWeiboPhoto, 
+	        role, extraInfo, invalid
+	      )
 		values (#{id,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR},
 		#{phone,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR}, #{birthyear,jdbcType=INTEGER},
 		#{birthmonth,jdbcType=INTEGER}, #{birthday,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR},
 		#{city,jdbcType=VARCHAR}, #{district,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR},
 		#{drivinglicenseyear,jdbcType=INTEGER}, #{drivinglicensephoto,jdbcType=VARCHAR},
 		#{isauthenticated,jdbcType=TINYINT}, #{credit,jdbcType=INTEGER}, #{registertime,jdbcType=BIGINT},
-		#{invalid,jdbcType=VARCHAR})
+	        #{wechatid,jdbcType=VARCHAR}, #{wechatname,jdbcType=VARCHAR}, #{wechatphoto,jdbcType=VARCHAR}, 
+	        #{qqid,jdbcType=VARCHAR}, #{qqname,jdbcType=VARCHAR}, #{qqphoto,jdbcType=VARCHAR}, 
+	        #{sinaweiboid,jdbcType=VARCHAR}, #{sinaweiboname,jdbcType=VARCHAR}, #{sinaweibophoto,jdbcType=VARCHAR}, 
+	        #{role,jdbcType=VARCHAR}, #{extrainfo,jdbcType=VARCHAR}, #{invalid,jdbcType=VARCHAR}
+	      )
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.User">
@@ -85,6 +105,17 @@
 		isAuthenticated = #{isauthenticated,jdbcType=TINYINT},
 		credit = #{credit,jdbcType=INTEGER},
 		registerTime = #{registertime,jdbcType=BIGINT},
+	        wechatId = #{wechatid,jdbcType=VARCHAR},
+	        wechatName = #{wechatname,jdbcType=VARCHAR},
+	        wechatPhoto = #{wechatphoto,jdbcType=VARCHAR},
+	        qqId = #{qqid,jdbcType=VARCHAR},
+	        qqName = #{qqname,jdbcType=VARCHAR},
+	        qqPhoto = #{qqphoto,jdbcType=VARCHAR},
+	        sinaWeiboId = #{sinaweiboid,jdbcType=VARCHAR},
+	        sinaWeiboName = #{sinaweiboname,jdbcType=VARCHAR},
+	        sinaWeiboPhoto = #{sinaweibophoto,jdbcType=VARCHAR},
+	        role = #{role,jdbcType=VARCHAR},
+	        extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		invalid = #{invalid,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>

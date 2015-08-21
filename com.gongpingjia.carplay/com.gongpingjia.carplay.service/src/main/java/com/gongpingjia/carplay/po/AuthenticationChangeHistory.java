@@ -7,7 +7,7 @@ public class AuthenticationChangeHistory {
 
     private String status;
 
-    private String remark;
+    private String remarks;
 
     private Long timestamp;
 
@@ -35,12 +35,12 @@ public class AuthenticationChangeHistory {
         this.status = status;
     }
 
-    public String getRemark() {
-        return remark;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public Long getTimestamp() {
