@@ -17,9 +17,9 @@ public class GetUserSubscribeTest extends BaseTest {
 
 	@Test
 	public void testUserSubscribe() throws Exception {
-		String userid1 = "123fec64-dd98-4a84-adee-7d1e0a950704";
-		String userId2 = "082c79ac-1683-43ad-ab29-101faf80490c";
-		String token = "87836150-2529-4c82-b99e-0e0ad7261247";
+		String userid1 = "7da6fac1-c360-449b-8b19-5231d8fa9b0a";
+		String userId2 = "7da6fac1-c360-449b-8b19-5231d8fa9b0a";
+		String token = "0b5815d8-865e-4c30-8632-647b488e90bb";
 		MvcResult result = mockMvc
 				.perform(get("/user/" + userid1 + "/subscribe").param("userId", userId2).param("token", token))
 				.andExpect(MockMvcResultMatchers.status().isOk())

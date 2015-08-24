@@ -263,7 +263,7 @@ public class MessageServiceImpl implements MessageService {
 	public ResponseDo removeComments(String userId, String[] comments) throws ApiException {
 		for (String commentId : comments) {
 			if (!CommonUtil.isUUID(commentId)) {
-				LOG.warn("invalid comment id{}", commentId);
+				LOG.warn("invalid comment id {}", commentId);
 				throw new ApiException("评论id 格式有误");
 			}
 

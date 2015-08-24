@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.enums.ApplicationStatus;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
@@ -49,14 +50,18 @@ public class UserActivityServiceImpl implements UserActivityService {
 	@Override
 	public ResponseDo getUserPost(String userId1, String userId2, String token, Integer ignore, Integer limit)
 			throws ApiException {
-		String IMGUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
+
+		// 根据发布人查找活动列表
 		Map<String, Object> param = new HashMap<String, Object>(3, 1);
 		param.put("organizer", userId1);
 		param.put("ignore", ignore);
 		param.put("limit", limit);
 		List<Map<String, Object>> activityList = activityDao.selectByOrganizer(param);
 
+		// 将要返回的list
 		List<Map<String, Object>> activityMapList = new ArrayList<>();
+
+		// 遍历活动列表
 		for (Map<String, Object> activity : activityList) {
 
 			Map<String, Object> map = new HashMap<>();
@@ -64,30 +69,12 @@ public class UserActivityServiceImpl implements UserActivityService {
 			map.put("introduction", activity.get("introduction"));
 			map.put("location", activity.get("location"));
 			map.put("pay", activity.get("pay"));
-
 			map.put("publishDate",
 					new SimpleDateFormat("MM.dd").format(DateUtil.getDate((Long) activity.get("publishTime"))));
 			map.put("startDate", (Long) activity.get("start"));
 			map.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
 
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", IMGUrl);
-			List<Map<String, String>> membersList = memberDao.selectByActivity(param);
-			map.put("members", membersList);
-
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", IMGUrl);
-			List<Map<String, String>> coverList = coverDao.selectByActivity(param);
-
-			List<Map<String, String>> coverAllList = new ArrayList<>();
-			for (Map<String, String> cover : coverList) {
-				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
-				coverAllList.add(cover);
-			}
-			map.put("cover", coverAllList);
+			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
 
 			activityMapList.add(map);
 		}
@@ -108,14 +95,17 @@ public class UserActivityServiceImpl implements UserActivityService {
 		param.put("AssetUrl", AssetUrl);
 		List<Map<String, Object>> activityList = activitySubscriptionDao.selectByUserId(param);
 
+		// 将要返回的list
 		List<Map<String, Object>> activityMapList = new ArrayList<>();
 
-		Map<String, Object> activityLinkMap = new HashMap<>();
-
+		// 遍历活动列表
 		for (Map<String, Object> activity : activityList) {
 
-			activityLinkMap.put("activityId", activity.get("activityId"));
+			Map<String, Object> map = new HashMap<>();
 
+			map.put("activityId", activity.get("activityId"));
+
+			// 存入发布人的信息
 			Map<String, Object> organizermap = new HashMap<>();
 			organizermap.put("userId", activity.get("organizer"));
 			organizermap.put("nickname", activity.get("nickname"));
@@ -125,49 +115,22 @@ public class UserActivityServiceImpl implements UserActivityService {
 			organizermap.put("carBrandLogo", activity.get("carBrandLogo"));
 			organizermap.put("carModel", activity.get("carModel"));
 			organizermap.put("drivingExperience", activity.get("drivingExperience"));
+			map.put("organizer", organizermap);
 
-			activityLinkMap.put("organizer", organizermap);
+			map.put("publishTime", activity.get("publishTime"));
+			map.put("start", (Long) activity.get("start") != 0 ? activity.get("start") : "不确定");
+			map.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
+			map.put("introduction", activity.get("introduction"));
+			map.put("location", activity.get("location"));
+			map.put("type", activity.get("type"));
+			map.put("pay", activity.get("pay"));
+			map.put("totalSeat", activity.get("totalSeat"));
+			map.put("holdingSeat", activity.get("holdingSeat"));
+			map.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
 
-			activityLinkMap.put("publishTime", activity.get("publishTime"));
-			activityLinkMap.put("start", (Long) activity.get("start") != 0 ? activity.get("start") : "不确定");
-			activityLinkMap.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
-			activityLinkMap.put("introduction", activity.get("introduction"));
-			activityLinkMap.put("location", activity.get("location"));
-			activityLinkMap.put("type", activity.get("type"));
-			activityLinkMap.put("pay", activity.get("pay"));
+			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
 
-			activityLinkMap.put("totalSeat", activity.get("totalSeat"));
-			activityLinkMap.put("holdingSeat", activity.get("holdingSeat"));
-
-			activityLinkMap.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
-			activityLinkMap.put("isMember", 0);
-
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", AssetUrl);
-			List<Map<String, String>> membersLinkMap = memberDao.selectByActivity(param);
-			for (Map<String, String> member : membersLinkMap) {
-				if (member.get("userId").equals(userId2)) {
-					activityLinkMap.put("isMember", 0);
-					break;
-				}
-			}
-			activityLinkMap.put("members", membersLinkMap);
-
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", AssetUrl);
-			List<Map<String, String>> coverList = coverDao.selectByActivity(param);
-
-			List<Map<String, String>> coverAllList = new ArrayList<>();
-			for (Map<String, String> cover : coverList) {
-				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
-				coverAllList.add(cover);
-			}
-			activityLinkMap.put("cover", coverAllList);
-
-			activityMapList.add(activityLinkMap);
+			activityMapList.add(map);
 		}
 
 		return ResponseDo.buildSuccessResponse(activityMapList);
@@ -178,7 +141,7 @@ public class UserActivityServiceImpl implements UserActivityService {
 			throws ApiException {
 		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
 		String gpjIMGUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
-		String STATUS_PENDING_PROCESSED = "待处理";
+
 		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId1);
 		param.put("ignore", ignore);
@@ -189,19 +152,18 @@ public class UserActivityServiceImpl implements UserActivityService {
 
 		List<Map<String, Object>> activityMapList = new ArrayList<>();
 
-		Map<String, Object> activityLinkMap = new HashMap<>();
-
 		for (Map<String, Object> activity : activityList) {
+			Map<String, Object> map = new HashMap<>();
 
-			activityLinkMap.put("activityId", activity.get("activityId"));
+			map.put("activityId", activity.get("activityId"));
 
-			activityLinkMap.put("publishTime", activity.get("publishTime"));
-			activityLinkMap.put("start", (Long) activity.get("start") != 0 ? activity.get("start") : "不确定");
-			activityLinkMap.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
-			activityLinkMap.put("introduction", activity.get("introduction"));
-			activityLinkMap.put("location", activity.get("location"));
-			activityLinkMap.put("type", activity.get("type"));
-			activityLinkMap.put("pay", activity.get("pay"));
+			map.put("publishTime", activity.get("publishTime"));
+			map.put("start", (Long) activity.get("start") != 0 ? activity.get("start") : "不确定");
+			map.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
+			map.put("introduction", activity.get("introduction"));
+			map.put("location", activity.get("location"));
+			map.put("type", activity.get("type"));
+			map.put("pay", activity.get("pay"));
 
 			Map<String, Object> organizermap = new HashMap<>();
 			organizermap.put("userId", activity.get("organizer"));
@@ -212,57 +174,100 @@ public class UserActivityServiceImpl implements UserActivityService {
 			organizermap.put("carBrandLogo", activity.get("carBrandLogo"));
 			organizermap.put("carModel", activity.get("carModel"));
 			organizermap.put("drivingExperience", activity.get("drivingExperience"));
+			map.put("organizer", organizermap);
+			map.put("totalSeat", activity.get("totalSeat"));
+			map.put("holdingSeat", activity.get("holdingSeat"));
+			map.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
 
-			activityLinkMap.put("organizer", organizermap);
-
-			activityLinkMap.put("totalSeat", activity.get("totalSeat"));
-			activityLinkMap.put("holdingSeat", activity.get("holdingSeat"));
-
-			activityLinkMap.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
-			activityLinkMap.put("isMember", 0);
-
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", AssetUrl);
-			List<Map<String, String>> membersLinkMap = memberDao.selectByActivity(param);
-			for (Map<String, String> member : membersLinkMap) {
-				if (member.get("userId").equals(userId2)) {
-					activityLinkMap.put("isMember", 1);
-					break;
-				}
-			}
-			activityLinkMap.put("members", membersLinkMap);
-
-			param.clear();
-			param.put("activityId", activity.get("activityId"));
-			param.put("AssetUrl", AssetUrl);
-			List<Map<String, String>> coverList = coverDao.selectByActivity(param);
-
-			List<Map<String, String>> coverAllList = new ArrayList<>();
-			for (Map<String, String> cover : coverList) {
-				cover.put("original_pic", cover.get("original_pic"));
-				cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
-				coverAllList.add(cover);
-			}
-			activityLinkMap.put("cover", coverAllList);
-			if (activityLinkMap.get("isMember").equals(0)) {
-				param.clear();
-				param.put("activityId", activity.get("activityId"));
-				param.put("userId", userId2);
-				param.put("status", STATUS_PENDING_PROCESSED);
-				List<Map<String, Long>> rows = activityApplicationDao.selectByCountOfActivityUserAndStatus(param);
-				if (rows.size() == 0) {
-					LOG.warn("Fail to get application count");
-					throw new ApiException("未能成功获取申请信息");
-				}
-				activityLinkMap.put("isMember", rows.get(0).get("count") > 0 ? 2 : 0);
-			}
-
-			activityMapList.add(activityLinkMap);
+			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
+			activityMapList.add(map);
 		}
 
 		return ResponseDo.buildSuccessResponse(activityMapList);
 
+	}
+
+	/**
+	 * 查看是否是活动成员
+	 * 
+	 * @param activityId
+	 *            活动id
+	 * 
+	 * @param membersListMap
+	 *            此活动的成员列表
+	 * 
+	 * @param userId2
+	 *            查看的这个ID
+	 * 
+	 * @return 0代表不是成员也没有提交申请，1代表已经是成员，2代表正在申请成为成员
+	 */
+	public int isMember(String activityId, List<Map<String, String>> membersListMap, String userId2)
+			throws ApiException {
+		int isMember = 0;
+
+		for (Map<String, String> member : membersListMap) {
+			if (member.get("userId").equals(userId2)) {
+				isMember = 1;
+				break;
+			}
+		}
+		if (isMember == 0) {
+			Map<String, Object> param = new HashMap<String, Object>(5, 1);
+			param.put("activityId", activityId);
+			param.put("userId", userId2);
+			param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
+			List<Map<String, Long>> rows = activityApplicationDao.selectByCountOfActivityUserAndStatus(param);
+			if (rows.size() == 0) {
+				LOG.warn("Fail to get application count");
+				throw new ApiException("未能成功获取申请信息");
+			}
+			isMember = rows.get(0).get("count") > 0 ? 2 : 0;
+		}
+
+		return isMember;
+	}
+
+	/**
+	 * 查找活动成员与封面
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * 
+	 * @param userId2
+	 *            访问者的Id
+	 * 
+	 * @return 活动成员与活动封面的map结果
+	 */
+	public Map<String, Object> membersAndCovers(String activityId, String userId2) throws ApiException {
+
+		Map<String, Object> map = new HashMap<>();
+		String AssetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
+
+		// 根据活动，查找活动成员
+		Map<String, Object> param2 = new HashMap<String, Object>(2, 1);
+		param2.put("activityId", activityId);
+		param2.put("AssetUrl", AssetUrl);
+		List<Map<String, String>> membersList = memberDao.selectByActivity(param2);
+
+		map.put("members", membersList);
+
+		map.put("isMember", isMember(activityId, membersList, userId2));
+		// 根据活动，查找活动封面
+		Map<String, Object> param3 = new HashMap<String, Object>(2, 1);
+		param3.put("activityId", activityId);
+		param3.put("AssetUrl", AssetUrl);
+		List<Map<String, String>> coverList = coverDao.selectByActivity(param3);
+
+		// 处理活动封面
+		List<Map<String, String>> coverAllList = new ArrayList<>();
+		for (Map<String, String> cover : coverList) {
+			cover.put("original_pic", cover.get("original_pic"));
+			cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
+			coverAllList.add(cover);
+		}
+		map.put("cover", coverAllList);
+
+		return map;
 	}
 
 }

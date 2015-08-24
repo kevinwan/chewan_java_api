@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class GetUserJoinTest extends BaseTest {
 	@Test
 	public void testjoin() throws Exception {
-		String userid1 = "ad5b9c52-2e48-40ed-89b6-26154355262f";
+		String userid1 = "889fb8cf-a4e6-49ec-9c17-be2ea28e0cb0";
 		String userId2 = "082c79ac-1683-43ad-ab29-101faf80490c";
 		String token = "87836150-2529-4c82-b99e-0e0ad7261247";
 		MvcResult result = mockMvc

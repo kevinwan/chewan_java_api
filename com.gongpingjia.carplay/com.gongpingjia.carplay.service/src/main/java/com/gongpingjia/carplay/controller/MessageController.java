@@ -38,8 +38,10 @@ public class MessageController {
 	 * @param token
 	 *            访问者的token
 	 * @param ignore
+	 *            返回结果将扔掉的条数，例如是 1000， 代表前1000条记录不考虑。 不填默认为 0
 	 * 
 	 * @param limit
+	 *            返回的条数。不填默认为 10
 	 * 
 	 * @return 活动申请列表信息
 	 * 
@@ -94,7 +96,7 @@ public class MessageController {
 	 * @param token
 	 * 
 	 * @param type
-	 *            消息类型，comment与application
+	 *            消息类型，只能是comment或application
 	 * 
 	 * @param ignore
 	 * 
@@ -147,7 +149,7 @@ public class MessageController {
 		try {
 			if (content == null || (photos != null && photos.length > 3)) {
 				LOG.warn("invalid params");
-				throw new ApiException("请输入需要反馈的信息");
+				throw new ApiException("反馈信息的参数错误");
 			}
 			checker.checkUserInfo(userId, token);
 			return messageService.submitFeedback(userId, content, photos);

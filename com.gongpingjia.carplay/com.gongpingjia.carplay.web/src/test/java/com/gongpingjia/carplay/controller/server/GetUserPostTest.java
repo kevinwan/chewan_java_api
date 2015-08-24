@@ -17,9 +17,9 @@ public class GetUserPostTest extends BaseTest {
 
 	@Test
 	public void testUserPost() throws Exception {
-		String userid1 = "ad5b9c52-2e48-40ed-89b6-26154355262f";
-		String userId2 = "082c79ac-1683-43ad-ab29-101faf80490c";
-		String token = "87836150-2529-4c82-b99e-0e0ad7261247";
+		String userid1 = "7da6fac1-c360-449b-8b19-5231d8fa9b0a";
+		String userId2 = "7da6fac1-c360-449b-8b19-5231d8fa9b0a";
+		String token = "0b5815d8-865e-4c30-8632-647b488e90bb";
 
 		MvcResult result = mockMvc
 				.perform(get("/user/" + userid1 + "/post").param("userId", userId2).param("token", token))
