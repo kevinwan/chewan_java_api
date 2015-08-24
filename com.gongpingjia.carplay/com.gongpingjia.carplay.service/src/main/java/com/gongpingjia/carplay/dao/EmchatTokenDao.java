@@ -10,4 +10,6 @@ public interface EmchatTokenDao {
 	EmchatToken selectByPrimaryKey(String application);
 
 	int updateByPrimaryKey(EmchatToken record);
+	
+	EmchatToken selectFirstOne();
 }

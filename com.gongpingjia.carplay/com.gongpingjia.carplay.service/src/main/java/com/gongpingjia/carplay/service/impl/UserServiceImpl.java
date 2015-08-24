@@ -2,16 +2,23 @@ package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
@@ -28,6 +35,7 @@ import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
+import com.gongpingjia.carplay.dao.EmchatTokenDao;
 import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
@@ -38,6 +46,7 @@ import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.AuthenticationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.EmchatAccount;
+import com.gongpingjia.carplay.po.EmchatToken;
 import com.gongpingjia.carplay.po.PhoneVerification;
 import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
@@ -90,39 +99,19 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ParameterChecker checker;
 
+	@Autowired
+	private ChatThirdPartyService chatThirdService;
+
+	@Autowired
+	private EmchatTokenDao emchatTokenDao;
+
 	@Override
-	public ResponseDo register(User user, String code) {
-		LOG.debug("Begin check input parameters of register");
-		// 验证参数
-		if (!CommonUtil.isPhoneNumber(user.getPhone()) || !CommonUtil.isUUID(user.getPhoto())) {
-			LOG.warn("invalid params");
-			return ResponseDo.buildFailureResponse("输入参数有误");
-		}
-		user.setPhoto(MessageFormat.format(Constants.USER_PHOTO_KEY, user.getPhoto()));
+	public ResponseDo register(User user, HttpServletRequest request) throws ApiException {
+		checkRegisterParameters(user, request);
 
-		// 验证验证码
-		ResponseDo failureResponse = checkPhoneVerification(user.getPhone(), code);
-		if (null != failureResponse) {
-			return failureResponse;
-		}
-
-		// 判断七牛上图片是否存在
-		if (!photoService.isExist(user.getPhoto())) {
-			LOG.warn("photo not Exist");
-			return ResponseDo.buildFailureResponse("注册图片未上传");
-		}
-
-		// 判断用户是否注册过
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("phone", user.getPhone());
-		List<User> users = userDao.selectByParam(param);
-		if (users.size() > 0) {
-			LOG.warn("Phone already registed");
-			return ResponseDo.buildFailureResponse("该用户已注册");
-		}
 		String userId = user.getId();
 
-		LOG.debug("save data");
+		LOG.debug("Save register data begin");
 		// 注册用户
 		userDao.insert(user);
 
@@ -132,6 +121,12 @@ public class UserServiceImpl implements UserService {
 		tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
 		tokenVerificationDao.insert(tokenVerification);
 
+		UserAlbum userAlbum = new UserAlbum();
+		userAlbum.setId(CodeGenerator.generatorId());
+		userAlbum.setUserid(userId);
+		userAlbum.setCreatetime(DateUtil.getTime());
+		userAlbumDao.insert(userAlbum);
+
 		EmchatAccount emchatAccount = new EmchatAccount();
 		emchatAccount.setUserid(userId);
 		emchatAccount.setPassword(user.getPassword());
@@ -139,16 +134,197 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getId()));
 		emchatAccountDao.insert(emchatAccount);
 
-		UserAlbum userAlbum = new UserAlbum();
-		userAlbum.setId(CodeGenerator.generatorId());
-		userAlbum.setUserid(userId);
-		userAlbum.setCreatetime(DateUtil.getTime());
-		userAlbumDao.insert(userAlbum);
+		// 注册环信用户
+		LOG.debug("Register emchat user by call remote service");
+		Map<String, String> chatUser = new HashMap<String, String>(2, 1);
+		chatUser.put("username", emchatAccount.getUsername());
+		chatUser.put("password", emchatAccount.getPassword());
+
+		JSONObject result = chatThirdService.registerChatUser(getChatToken(), Arrays.asList(chatUser));
+		if (!result.isEmpty()) {
+			// 不为空说明注册成功
+			emchatAccount.setActivatetime(DateUtil.getTime());
+			emchatAccountDao.updateByPrimaryKey(emchatAccount);
+		} else {
+			LOG.warn("Create emchat user failure");
+			throw new ApiException("未能成功创建环信用户");
+		}
 
 		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		data.put("userId", userId);
 		data.put("token", tokenVerification.getToken());
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	/**
+	 * 获取应用的Token
+	 * 
+	 * @return 应用Token字符串
+	 */
+	private String getChatToken() {
+		EmchatToken token = emchatTokenDao.selectFirstOne();
+		if (token != null) {
+			if (token.getExpire() > DateUtil.getTime()) {
+				// 如果token时间大于当前时间表示没有过期，直接返回
+				return token.getToken();
+			}
+		}
+
+		// token不存在或者过期，需要重新获取
+		JSONObject json = chatThirdService.getApplicationToken();
+		EmchatToken refresh = new EmchatToken();
+		refresh.setApplication(json.getString("application"));
+		refresh.setExpire(DateUtil.getTime() + json.getLong("expires_in"));
+		refresh.setToken(json.getString("access_token"));
+		if (token == null) {
+			emchatTokenDao.insert(refresh);
+		} else {
+			emchatTokenDao.updateByPrimaryKey(refresh);
+		}
+		return refresh.getToken();
+	}
+
+	private void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException {
+		LOG.debug("Begin check input parameters of register");
+
+		// 验证参数
+		if (!CommonUtil.isUUID(user.getPhoto())) {
+			LOG.warn("Invalid params photo:{}", user.getPhoto());
+			throw new ApiException("输入参数有误");
+		}
+		user.setPhoto(MessageFormat.format(Constants.USER_PHOTO_KEY, user.getPhoto()));
+
+		boolean phoneRegister = isPhoneRegister(request);
+		boolean snsRegister = isSnsRegister(request);
+
+		if (!phoneRegister && !snsRegister) {
+			// 既不是Phone注册，也不是第三方SNS注册，需要报输入参数有误
+			LOG.warn("Invalid params, it is neither phone register, nore sns register");
+			throw new ApiException("输入参数有误");
+		}
+
+		checkPhoneRegister(phoneRegister, request);
+
+		// 判断七牛上图片是否存在
+		if (!photoService.isExist(user.getPhoto())) {
+			LOG.warn("photo not Exist");
+			throw new ApiException("注册图片未上传");
+		}
+
+		refreshUserBySnsRegister(user, snsRegister, request);
+	}
+
+	/**
+	 * 根据第三方注册的信息，刷新用户信息
+	 * 
+	 * @param user
+	 * @param snsRegister
+	 * @param request
+	 */
+	private void refreshUserBySnsRegister(User user, boolean snsRegister, HttpServletRequest request) {
+		if (snsRegister) {
+			// SNS注册 刷新用户信息
+			String snsChannel = request.getParameter("snsChannel");
+			LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
+			if (Constants.CHANNEL_WECHAT.equals(snsChannel)) {
+				user.setWechatid(request.getParameter("snsUid"));
+				user.setWechatname(request.getParameter("snsUserName"));
+				user.setWechatphoto(user.getPhoto());
+			} else if (Constants.CHANNEL_QQ.equals(snsChannel)) {
+				user.setQqid(request.getParameter("snsUid"));
+				user.setQqname(request.getParameter("snsUserName"));
+				user.setQqphoto(user.getPhoto());
+			} else if (Constants.CHANNEL_SINA_WEIBO.equals(snsChannel)) {
+				user.setSinaweiboid(request.getParameter("snsUid"));
+				user.setSinaweiboname(request.getParameter("snsUserName"));
+				user.setSinaweibophoto(user.getPhoto());
+			}
+		} else {
+			user.setPhone(request.getParameter("phone"));
+			user.setPassword(request.getParameter("password"));
+		}
+	}
+
+	private void checkPhoneRegister(boolean phoneRegister, HttpServletRequest request) throws ApiException {
+		if (phoneRegister) {
+			String phone = request.getParameter("phone");
+			if (!CommonUtil.isPhoneNumber(phone)) {
+				LOG.warn("Phone number:{} is not correct format", phone);
+				throw new ApiException("输入参数有误");
+			}
+
+			ResponseDo response = checkPhoneVerification(phone, request.getParameter("code"));
+			if (response.isFailure()) {
+				throw new ApiException(response.getErrmsg());
+			}
+
+			// 判断用户是否注册过
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("phone", phone);
+			List<User> users = userDao.selectByParam(param);
+			if (users.size() > 0) {
+				LOG.warn("Phone already registed");
+				throw new ApiException("该手机号已注册");
+			}
+		}
+	}
+
+	/**
+	 * 判断是否为手机注册
+	 * 
+	 * @param request
+	 *            请求
+	 * @return 手机注册返回true
+	 */
+	private boolean isPhoneRegister(HttpServletRequest request) {
+		String phone = request.getParameter("phone");
+		if (StringUtils.isEmpty(phone)) {
+			return false;
+		}
+
+		String code = request.getParameter("code");
+		if (StringUtils.isEmpty(code)) {
+			return false;
+		}
+
+		String password = request.getParameter("password");
+		if (StringUtils.isEmpty(password)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * 判读是否为第三方注册
+	 * 
+	 * @param request
+	 *            请求参数
+	 * @return 第三方注册，返回true
+	 */
+	private boolean isSnsRegister(HttpServletRequest request) {
+		String snsUid = request.getParameter("snsUid");
+		if (StringUtils.isEmpty(snsUid)) {
+			return false;
+		}
+
+		String snsUserName = request.getParameter("snsUserName");
+		if (StringUtils.isEmpty(snsUserName)) {
+			return false;
+		}
+
+		String snsChannel = request.getParameter("snsChannel");
+		if (StringUtils.isEmpty(snsChannel)) {
+			return false;
+		}
+
+		if (!Constants.CHANNEL_LIST.contains(snsChannel)) {
+			// 检查Channel是否包含在Channel——List中
+			LOG.warn("Input channel:{} is not in the channel list", snsChannel);
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -211,7 +387,7 @@ public class UserServiceImpl implements UserService {
 
 		// 验证验证码
 		ResponseDo failureResponse = checkPhoneVerification(user.getPhone(), code);
-		if (null != failureResponse) {
+		if (failureResponse.isFailure()) {
 			return failureResponse;
 		}
 
@@ -532,7 +708,7 @@ public class UserServiceImpl implements UserService {
 			LOG.warn("Code expired");
 			return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
 		}
-		return null;
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	private ResponseDo getUserToken(String userId) {

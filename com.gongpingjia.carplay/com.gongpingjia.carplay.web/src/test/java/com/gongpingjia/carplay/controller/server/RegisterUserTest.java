@@ -7,7 +7,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-public class UserRegisterTest extends BaseTest {
+public class RegisterUserTest extends BaseTest {
 
 	@Test
 	public void testUserRegister() throws Exception {
@@ -25,7 +25,7 @@ public class UserRegisterTest extends BaseTest {
 								.param("province", "江苏省")
 								.param("city", "南京市")
 								.param("district", "栖霞区")
-								.param("photo", "846de312-306c-4916-91c1-a5e69b158014"))
+								.param("photo", "412bac09-b9a0-46b5-a283-7442fa1eb76c"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(

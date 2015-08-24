@@ -89,6 +89,20 @@ public class PropertiesUtil {
 	public static String getProperty(String propName, String defaultValue) {
 		return config.getProperty(propName, defaultValue);
 	}
+	
+	/**
+	 * 获取配置属性的值
+	 * 
+	 * @param propName
+	 *            属性名称
+	 * @param defaultValue
+	 *            默认值
+	 * @return 返回属性值
+	 */
+	public static boolean getProperty(String propName, boolean defaultValue) {
+		String prop = config.getProperty(propName, String.valueOf(defaultValue));
+		return Boolean.valueOf(prop);
+	}
 
 	/**
 	 * 获取配置属性的值

@@ -16,6 +16,21 @@ public class DASUtil {
 
 	private static SqlSessionFactory sessionFactory = BeanUtil.getBean("sqlSessionFactory", SqlSessionFactory.class);
 
+	public static <T> List<T> selectList(String sqlName) {
+		List<T> list = new ArrayList<T>(0);
+		SqlSession session = null;
+		try {
+			session = sessionFactory.openSession();
+			list = session.selectList(sqlName);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return list;
+	}
+
 	public static <T> List<T> selectList(String sqlName, Object param) {
 		List<T> list = new ArrayList<T>(0);
 		SqlSession session = null;
@@ -35,6 +50,10 @@ public class DASUtil {
 		return selectList(packageName + "." + sqlName, param);
 	}
 
+	public static <T> List<T> selectList(String packageName, String sqlName) {
+		return selectList(packageName + "." + sqlName);
+	}
+
 	public static <T> T selectOne(String sqlName, Object param) {
 		T result = null;
 		SqlSession session = null;
@@ -48,6 +67,25 @@ public class DASUtil {
 		}
 
 		return result;
+	}
+
+	public static <T> T selectOne(String sqlName) {
+		T result = null;
+		SqlSession session = null;
+		try {
+			session = sessionFactory.openSession();
+			result = session.selectOne(sqlName);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		return result;
+	}
+
+	public static <T> T selectOne(String packageName, String sqlName) {
+		return selectOne(packageName + "." + sqlName);
 	}
 
 	public static <T> T selectOne(String packageName, String sqlName, Object param) {

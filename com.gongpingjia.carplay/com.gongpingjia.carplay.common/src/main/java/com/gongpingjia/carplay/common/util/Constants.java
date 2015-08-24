@@ -40,29 +40,30 @@ public class Constants {
 	 * 用户反馈图片Key值
 	 */
 	public static final String FEEDBACK_PHOTO_KEY = "asset/feedback/{0}.jpg";
-	
+
 	/**
 	 * 车主认证申请状态
+	 * 
 	 * @author Administrator
 	 *
 	 */
-	public interface ApplyAuthenticationStatus{
-		
+	public interface ApplyAuthenticationStatus {
+
 		/**
 		 * 待处理状态
 		 */
 		public static final String STATUS_PENDING_PROCESSED = "待处理";
-		
+
 		/**
 		 * 已同意状态
 		 */
 		public static final String STATUS_APPROVED = "已同意";
-		
+
 		/**
 		 * 已拒绝状态
 		 */
 		public static final String STATUS_DECLINED = "已拒绝";
-		
+
 	}
 
 	/**
@@ -87,30 +88,53 @@ public class Constants {
 
 	/**
 	 * 个人详情（别人/自己）
+	 * 
 	 * @author Administrator
 	 *
 	 */
-	public interface UserLabel{
-		
+	public interface UserLabel {
+
 		/**
 		 * 自己
 		 */
 		public static final String USER_ME = "我";
-		
+
 		/**
 		 * 他人
 		 */
 		public static final String USER_OTHERS = "TA";
-		
+
 	}
+
 	/**
 	 * 活动列表Key值集合
 	 */
 	public static final List<String> ACTIVITY_KEY_LIST = Arrays.asList(Constants.ACTIVITY_KEY_HOTTEST,
 			Constants.ACTIVITY_KEY_LATEST, Constants.ACTIVITY_KEY_NEARBY);
-	
+
 	/**
 	 * Token过期天数
 	 */
 	public static final Integer TOKEN_OVER_DATE = 7;
+
+	/**
+	 * 第三方注册登录渠道--qq
+	 */
+	public static final String CHANNEL_QQ = "qq";
+
+	/**
+	 * 第三方注册登录渠道--微信
+	 */
+	public static final String CHANNEL_WECHAT = "wechat";
+
+	/**
+	 * 第三方注册登录渠道--新浪微博
+	 */
+	public static final String CHANNEL_SINA_WEIBO = "sinaWeibo";
+
+	/**
+	 * 第三方注册登录渠道--QQ，微博，微信
+	 */
+	public static final List<String> CHANNEL_LIST = Arrays.asList(Constants.CHANNEL_WECHAT, Constants.CHANNEL_QQ,
+			Constants.CHANNEL_SINA_WEIBO);
 }

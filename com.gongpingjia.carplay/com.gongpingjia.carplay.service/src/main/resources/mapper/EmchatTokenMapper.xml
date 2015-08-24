@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.gongpingjia.carplay.dao.EmchatTokenMapper" >
+<mapper namespace="com.gongpingjia.carplay.po.EmchatToken" >
   <resultMap id="BaseResultMap" type="com.gongpingjia.carplay.po.EmchatToken" >
     <id column="application" property="application" jdbcType="VARCHAR" />
     <result column="token" property="token" jdbcType="VARCHAR" />
@@ -28,4 +28,12 @@
       expire = #{expire,jdbcType=BIGINT}
     where application = #{application,jdbcType=VARCHAR}
   </update>
+  
+  <select id="selectFirstOne" resultMap="BaseResultMap">
+  	SELECT
+		application, token, expire
+	FROM
+		emchat_token
+	LIMIT 0, 1
+  </select>
 </mapper>

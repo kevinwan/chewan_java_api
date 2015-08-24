@@ -1,9 +1,12 @@
 package com.gongpingjia.carplay.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserSubscription;
@@ -15,11 +18,12 @@ public interface UserService {
 	 * 注册用户
 	 * 
 	 * @param user
-	 * @param code
+	 * @param request
 	 * @return
+	 * @throws ApiException 
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo register(User user, String code);
+	ResponseDo register(User user, HttpServletRequest request) throws ApiException;
 	
 	/**
 	 * 用户登录
