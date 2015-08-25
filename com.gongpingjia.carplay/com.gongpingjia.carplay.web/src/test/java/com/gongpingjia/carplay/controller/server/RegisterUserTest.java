@@ -14,8 +14,8 @@ public class RegisterUserTest extends BaseTest {
 		MvcResult result = mockMvc
 				.perform(
 						MockMvcRequestBuilders.post("/user/register")
-								.param("phone", "18951650021")
-								.param("code", "2302")
+								.param("phone", "12345678910")
+								.param("code", "1100")
 								.param("password", "e10adc3949ba59abbe56e057f20f883e")
 								.param("nickname", "孔明")
 								.param("gender", "男")
