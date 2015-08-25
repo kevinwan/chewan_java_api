@@ -49,13 +49,23 @@
 		credit, registerTime, wechatId, wechatName, wechatPhoto, qqId, qqName, qqPhoto, sinaWeiboId, 
     	sinaWeiboName, sinaWeiboPhoto, role, extraInfo, invalid
 		from user
-		where 1 = 1
-		<if test="id != null">
-        	and id = #{id,jdbcType=VARCHAR}
-     	</if>
-		<if test="phone != null">
-        	and phone = #{phone,jdbcType=VARCHAR}
-     	</if>
+		<where>
+			<if test="id != null">
+	        	and id = #{id,jdbcType=VARCHAR}
+	     	</if>
+			<if test="phone != null">
+	        	and phone = #{phone,jdbcType=VARCHAR}
+	     	</if>
+	     	<if test="qqId != null">
+	     		and qqId = #{qqId,jdbcType=VARCHAR}
+	     	</if>
+	     	<if test="wechatId != null">
+	     		and wechatId = #{wechatId,jdbcType=VARCHAR}
+	     	</if>
+	     	<if test="sinaWeiboId != null">
+	     		and sinaWeiboId = #{sinaWeiboId,jdbcType=VARCHAR}
+	     	</if>
+		</where>
 	</select>
 	
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">

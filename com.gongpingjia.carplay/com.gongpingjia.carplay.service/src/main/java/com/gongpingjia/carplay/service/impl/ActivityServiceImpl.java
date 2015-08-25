@@ -27,6 +27,7 @@ import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
@@ -1868,5 +1869,49 @@ public class ActivityServiceImpl implements ActivityService {
 		subscriptionDao.deleteByPrimaryKey(key);
 
 		return ResponseDo.buildSuccessResponse();
+	}
+
+	@Override
+	public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url)
+			throws ApiException {
+		LOG.debug("Check input parameters");
+
+		if (!Constants.Channel.CHANNEL_LIST.contains(channel)) {
+			// Channel不在范围内
+			LOG.warn("Input channel is not in the list, input channel:{}", channel);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (!isPassSignCheck(uid, channel, sign)) {
+			// 检查sign不通过
+			LOG.warn("Input sign correct");
+			throw new ApiException("输入参数有误");
+		}
+
+		LOG.debug("Save data begin");
+		Map<String, Object> param = new HashMap<String, Object>(1);
+		param.put(channel + "Id", uid);
+		List<User> users = userDao.selectByParam(param);
+		if (users.isEmpty()) {
+			// 没有找到对应的已经存在的用户，注册新用户
+			LOG.debug("No exist user in the system, register new user");
+			
+			
+		}
+
+		return ResponseDo.buildSuccessResponse();
+	}
+
+	private boolean isPassSignCheck(String uid, String channel, String sign) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(uid);
+		builder.append(channel);
+		builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
+
+		String pass = EncoderHandler.encodeByMD5(builder.toString());
+		if (pass.equals(sign)) {
+			return true;
+		}
+		return false;
 	}
 }

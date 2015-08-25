@@ -2,7 +2,6 @@ package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -137,8 +136,7 @@ public class UserServiceImpl implements UserService {
 		chatUser.put("username", emchatAccount.getUsername());
 		chatUser.put("password", emchatAccount.getPassword());
 
-		JSONObject result = chatThirdService
-				.registerChatUser(chatCommonService.getChatToken(), Arrays.asList(chatUser));
+		JSONObject result = chatThirdService.registerChatUser(chatCommonService.getChatToken(), chatUser);
 		if (result.isEmpty()) {
 			LOG.warn("Create emchat user failure");
 			throw new ApiException("未能成功创建环信用户");
@@ -213,7 +211,7 @@ public class UserServiceImpl implements UserService {
 			StringBuilder builder = new StringBuilder();
 			builder.append(user.getId());
 			builder.append(snsChannel);
-			builder.append(PropertiesUtil.getProperty("user.password.bundle.id", "com.gongpingjia.carplay"));
+			builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
 			user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
 		} else {
 			user.setPhone(request.getParameter("phone"));

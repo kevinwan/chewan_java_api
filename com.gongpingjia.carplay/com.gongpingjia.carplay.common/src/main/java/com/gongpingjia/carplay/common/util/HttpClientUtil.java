@@ -13,7 +13,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -154,24 +153,6 @@ public class HttpClientUtil {
 			objectNode.put(param.getKey(), param.getValue());
 		}
 		return post(httpUrl, objectNode.toString(), headers, charSetName);
-	}
-
-	/**
-	 * 调用HTTP的Post请求
-	 * 
-	 * @param <T>
-	 * 
-	 * @param httpUrl
-	 *            请求URL
-	 * @param params
-	 *            参数信息
-	 * @return 返回响应结果HttpResponse,记得用完关闭流
-	 * @throws ApiException
-	 */
-	public static <T> CloseableHttpResponse post(String httpUrl, List<T> params, List<Header> headers,
-			String charSetName) throws ApiException {
-		JSONArray jsonArray = JSONArray.fromObject(params);
-		return post(httpUrl, jsonArray.toString(), headers, charSetName);
 	}
 
 	/**
@@ -356,4 +337,22 @@ public class HttpClientUtil {
 
 		return response;
 	}
+
+//	public static void main(String[] args) throws ApiException, ParseException, IOException {
+//		ObjectNode objectNode = jsonFactory.objectNode();
+//		objectNode.put("username", "bebe84c777c3308d53ad81efda2d3365");
+//		objectNode.put("password", "e10adc3949ba59abbe56e057f20f883e");
+//
+//		List<Header> headers = new ArrayList<Header>(2);
+//		headers.add(new BasicHeader("Content-Type", "application/json"));
+//		headers.add(new BasicHeader("Authorization",
+//				"Bearer YWMterwfoEsOEeWcnQPhxKXuVQAAAVCZQBpQvnlmA3ZdjXXVz6gnv_Czb3Ar1cU"));
+//
+//		CloseableHttpResponse response = post("https://a1.easemob.com/gongpingjia/carplayapp/users",
+//				objectNode.toString(), headers, "UTF-8");
+//		System.out.println(response.getStatusLine());
+//		System.out.println(response.getEntity().toString());
+//		System.out.println(EntityUtils.toString(response.getEntity()));
+//		close(response);
+//	}
 }

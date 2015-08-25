@@ -34,7 +34,7 @@
 		<property name="poolMaximumCheckoutTime" value="${jdbc_maxCheckOutTime}" />
 		<property name="poolMaximumIdleConnections" value="${jdbc_maxIdle}" />
 		<property name="poolTimeToWait" value="${jdbc_maxWait}" />
-		<property name="poolPingEnabled" value="${jdbc_pingEnabled}"/>
+		<property name="poolPingEnabled" value="${jdbc_pingEnabled}" />
 		<!-- 连接属性 -->
 		<property name="driverProperties">
 			<value>clientEncoding=UTF-8</value>
@@ -53,6 +53,8 @@
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"></property>
+		<!-- 允许事务的嵌套 -->
+		<property name="nestedTransactionAllowed" value="true"></property>
 	</bean>
 	<tx:annotation-driven transaction-manager="transactionManager"
 		mode="proxy" proxy-target-class="false" />

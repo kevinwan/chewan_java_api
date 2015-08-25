@@ -56,28 +56,26 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject registerChatUser(String token, List<Map<String, String>> userList) {
+	public JSONObject registerChatUser(String token, Map<String, String> userMap) {
 		LOG.debug("Begin register chat user");
 		StringBuilder httpUrl = buildRequestUrl();
 		httpUrl.append("users");
-
-		List<User> userParams = new ArrayList<User>(userList.size());
-		for (Map<String, String> map : userList) {
-			userParams.add(new User(map.get("username"), map.get("password")));
-		}
 
 		List<Header> headers = buildCommonHeaders(token);
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), userParams, headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), userMap, headers, "UTF-8");
 			if (HttpClientUtil.isStatusOK(response)) {
 				// 只有在返回为200 的情况向才解析结果
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
 		} catch (ApiException e) {
 			LOG.error(e.getMessage());
-		} finally {
+		}catch (Exception e) {
+			e.printStackTrace();
+		} 
+		finally {
 			HttpClientUtil.close(response);
 		}
 		return new JSONObject();

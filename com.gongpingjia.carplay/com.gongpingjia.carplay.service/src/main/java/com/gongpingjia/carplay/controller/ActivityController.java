@@ -411,4 +411,35 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+
+	/**
+	 * 2.49 三方登录
+	 * 
+	 * @param uid
+	 *            三方登录返回的用户唯一标识
+	 * @param channel
+	 *            wechat 、qq 或 sinaWeibo
+	 * @param sign
+	 *            API签名，计算方法为 MD5(uid + channel + BundleID) 其中，BundleID 为
+	 *            com.gongpingjia.carplay
+	 * 
+	 * @param username
+	 *            三方登录返回的用户昵称
+	 * @param url
+	 *            三方登录返回的用户头像地址
+	 * @return 返回登录结果
+	 */
+	@RequestMapping(value = "/sns/login", method = RequestMethod.POST)
+	public ResponseDo snsLogin(@RequestParam("uid") String uid, @RequestParam("channel") String channel,
+			@RequestParam("sign") String sign, @RequestParam(value = "username", required = false) String username,
+			@RequestParam(value = "url", required = false) String url) {
+		LOG.info("snsLogin begin");
+
+		try {
+			return service.snsLogin(uid, channel, sign, username, url);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
 }

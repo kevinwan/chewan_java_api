@@ -18,11 +18,11 @@ public interface ChatThirdPartyService {
 	 * 
 	 * @param token
 	 *            授权用户token
-	 * @param userList
+	 * @param userMap
 	 *            用户username， password键值对列表
 	 * @return 返回注册结果信息
 	 */
-	JSONObject registerChatUser(String token, List<Map<String, String>> userList);
+	JSONObject registerChatUser(String token, Map<String, String> userMap);
 
 	/**
 	 * 创建聊天组
