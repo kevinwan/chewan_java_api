@@ -216,7 +216,7 @@ public class MessageServiceImpl implements MessageService {
 		}
 		if (photos != null) {
 			for (String photo : photos) {
-				if (photoService.isExist(MessageFormat.format(Constants.FEEDBACK_PHOTO_KEY, photo))) {
+				if (photoService.isExist(MessageFormat.format(Constants.PhotoKey.FEEDBACK_KEY, photo))) {
 
 					FeedbackPhoto feedbackPhoto = new FeedbackPhoto();
 					feedbackPhoto.setFeedbackid(feedbackId);

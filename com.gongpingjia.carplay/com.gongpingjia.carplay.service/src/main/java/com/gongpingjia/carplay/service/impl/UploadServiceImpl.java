@@ -67,7 +67,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 
 		String id = CodeGenerator.generatorId();
-		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, id);
+		String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
 
 		return uploadPhoto(data, id, key, false);
 	}
@@ -158,7 +158,7 @@ public class UploadServiceImpl implements UploadService {
 		checker.checkUserInfo(userId, token);
 
 		byte[] data = buildFileBytes(multiFile);
-		String key = MessageFormat.format(Constants.LICENSE_PHOTO_KEY, userId);
+		String key = MessageFormat.format(Constants.PhotoKey.LICENSE_KEY, userId);
 
 		return uploadPhoto(data, userId, key, false);
 	}
@@ -173,7 +173,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 
 		String coverUuid = CodeGenerator.generatorId();
-		String key = MessageFormat.format(Constants.COVER_PHOTO_KEY, coverUuid);
+		String key = MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverUuid);
 
 		return uploadPhoto(data, coverUuid, key, false);
 	}
@@ -207,7 +207,7 @@ public class UploadServiceImpl implements UploadService {
 		// 3.上传个人相册图片
 		byte[] data = buildFileBytes(multiFile);
 		String photoId = CodeGenerator.generatorId();
-		String key = MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId, photoId);
+		String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photoId);
 		return uploadPhoto(data, photoId, key, false);
 	}
 
@@ -217,7 +217,7 @@ public class UploadServiceImpl implements UploadService {
 		String photoId = CodeGenerator.generatorId();
 		LOG.debug("begin upload feedback photo , photoId:{}", photoId);
 
-		String key = MessageFormat.format(Constants.FEEDBACK_PHOTO_KEY, photoId);
+		String key = MessageFormat.format(Constants.PhotoKey.FEEDBACK_KEY, photoId);
 		return uploadPhoto(data, photoId, key, false);
 	}
 
@@ -235,7 +235,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
-		String key = MessageFormat.format(Constants.USER_PHOTO_KEY, userId);
+		String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, userId);
 		return uploadPhoto(data, userId, key, true);
 
 	}

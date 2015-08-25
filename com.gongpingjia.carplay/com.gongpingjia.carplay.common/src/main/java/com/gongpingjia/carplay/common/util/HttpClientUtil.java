@@ -22,8 +22,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
@@ -288,5 +290,70 @@ public class HttpClientUtil {
 		}
 
 		return response.getStatusLine().getStatusCode() == 200;
+	}
+
+	public static CloseableHttpResponse put(String httpUrl, String paramString, List<Header> headers, String charSetName)
+			throws ApiException {
+		LOG.debug("Request url:{}", httpUrl);
+		LOG.debug("Request params:{}", paramString);
+
+		CloseableHttpResponse response = null;
+
+		try {
+			URIBuilder uriBuilder = new URIBuilder(httpUrl);
+			uriBuilder.setCharset(Charset.forName(charSetName));
+
+			HttpPut httpPut = new HttpPut(uriBuilder.build());
+
+			for (Header header : headers) {
+				httpPut.addHeader(header);
+			}
+
+			httpPut.setEntity(new StringEntity(paramString, charSetName));
+
+			response = httpClient.execute(httpPut);
+		} catch (ClientProtocolException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		} catch (IOException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		} catch (URISyntaxException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		}
+
+		return response;
+	}
+
+	public static CloseableHttpResponse delete(String httpUrl, List<Header> headers, String charSetName)
+			throws ApiException {
+		LOG.debug("Request url:{}", httpUrl);
+
+		CloseableHttpResponse response = null;
+
+		try {
+			URIBuilder uriBuilder = new URIBuilder(httpUrl);
+			uriBuilder.setCharset(Charset.forName(charSetName));
+
+			HttpDelete httpDelete = new HttpDelete(uriBuilder.build());
+
+			for (Header header : headers) {
+				httpDelete.addHeader(header);
+			}
+
+			response = httpClient.execute(httpDelete);
+		} catch (ClientProtocolException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		} catch (IOException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		} catch (URISyntaxException e) {
+			LOG.warn(e.getMessage(), e);
+			throw new ApiException("请求异常");
+		}
+
+		return response;
 	}
 }

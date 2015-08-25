@@ -9,12 +9,15 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.enums.ApplicationStatus;
 import com.gongpingjia.carplay.common.enums.MessageType;
@@ -106,6 +109,12 @@ public class ActivityServiceImpl implements ActivityService {
 	@Autowired
 	private MessageDao messageDao;
 
+	@Autowired
+	private ChatThirdPartyService chatThirdService;
+
+	@Autowired
+	private ChatCommonService chatCommonService;
+
 	@Override
 	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
 
@@ -174,9 +183,36 @@ public class ActivityServiceImpl implements ActivityService {
 
 		saveActivityApplication(request.getParameter("seat"), activityId, userId, current);
 
+		// 创建环信聊天群,更新活动字段
+		createEmchatGroup(activity);
+
 		Map<String, String> data = buildShareData(userId, activity);
 
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	/**
+	 * 根据活动信息创建聊天群
+	 * 
+	 * @param activity
+	 *            活动信息
+	 * @throws ApiException
+	 *             创建群聊失败时
+	 */
+	private void createEmchatGroup(Activity activity) throws ApiException {
+		LOG.debug("Begin create chat group");
+		JSONObject json = chatThirdService.createChatGroup(chatCommonService.getChatToken(), activity.getTitle(),
+				activity.getId().replace("-", "_"), chatCommonService.getUsernameByUserid(activity.getOrganizer()),
+				null);
+		if (json.isEmpty()) {
+			LOG.warn("Failed to create chat group");
+			throw new ApiException("Create chat group failure");
+		}
+
+		// 完成群组创建之后，创建群聊组
+		activity.setEmchatgroupid(json.getJSONObject("data").getString("groupid"));
+		activity.setMembersize(json.getJSONObject("data").getInt("maxusers"));
+		activityDao.updateByPrimaryKey(activity);
 	}
 
 	/**
@@ -281,7 +317,7 @@ public class ActivityServiceImpl implements ActivityService {
 			ActivityCover activityCover = new ActivityCover();
 			activityCover.setId(CodeGenerator.generatorId());
 			activityCover.setActivityid(activityId);
-			activityCover.setUrl(MessageFormat.format(Constants.COVER_PHOTO_KEY, coverId));
+			activityCover.setUrl(MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverId));
 			activityCover.setUploadtime(current);
 			activityCovers.add(activityCover);
 		}
@@ -345,7 +381,7 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		for (String coverId : covers) {
-			if (!photoService.isExist(MessageFormat.format(Constants.COVER_PHOTO_KEY, coverId))) {
+			if (!photoService.isExist(MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverId))) {
 				LOG.warn("Activity cover is not exist");
 				throw new ApiException("输入参数有误");
 			}
@@ -394,6 +430,7 @@ public class ActivityServiceImpl implements ActivityService {
 		activity.setOrganizer(request.getParameter("userId"));
 		buildActivityCommon(request, current, activity);
 		activity.setCreatetime(current);
+		activity.setCategory(Constants.ActivityCatalog.COMMON);
 		LOG.debug("Save activity");
 		activityDao.insert(activity);
 
@@ -510,11 +547,11 @@ public class ActivityServiceImpl implements ActivityService {
 		String key = request.getParameter("key");
 		LOG.debug("query activities from database");
 		List<ActivityView> activityList = new ArrayList<ActivityView>(0);
-		if (Constants.ACTIVITY_KEY_HOTTEST.equals(key)) {
+		if (Constants.ActivityKey.HOTTEST.equals(key)) {
 			activityList = activityViewDao.selectHottestActivities(param);
-		} else if (Constants.ACTIVITY_KEY_NEARBY.equals(key)) {
+		} else if (Constants.ActivityKey.NEARBY.equals(key)) {
 			activityList = activityViewDao.selectNearbyActivities(param);
-		} else if (Constants.ACTIVITY_KEY_LATEST.equals(key)) {
+		} else if (Constants.ActivityKey.LATEST.equals(key)) {
 			activityList = activityViewDao.selectLatestActivities(param);
 		}
 
@@ -715,17 +752,17 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("输入参数有误");
 		}
 
-		if (!Constants.ACTIVITY_KEY_LIST.contains(key)) {
+		if (!Constants.ActivityKey.KEY_LIST.contains(key)) {
 			LOG.warn("Input parameter key: {} error", key);
 			throw new ApiException("输入参数有误");
 		}
 
-		if (Constants.ACTIVITY_KEY_NEARBY.equals(key) && (longitude == null || latitude == null)) {
+		if (Constants.ActivityKey.NEARBY.equals(key) && (longitude == null || latitude == null)) {
 			LOG.warn("Input parameter is nearby, but with no longitude or latitude");
 			throw new ApiException("未能获取您的位置信息");
 		}
 
-		if (Constants.ACTIVITY_KEY_NEARBY.equals(key)) {
+		if (Constants.ActivityKey.NEARBY.equals(key)) {
 			// 如果是查找附近的活动，需要输入经度和纬度，且为Double类型
 			TypeConverUtil.convertToDouble("longitude", longitude, true);
 			TypeConverUtil.convertToDouble("latitude", latitude, true);
@@ -1243,9 +1280,46 @@ public class ActivityServiceImpl implements ActivityService {
 			updateSeatReservationInfo(applicationId, userId, appActInfo, seats, current);
 
 			addActivityMember(applicationId, userId, appActInfo, current);
+
+			addSingleMemberIntoGroup(String.valueOf(appActInfo.get("activityId")),
+					String.valueOf(appActInfo.get("appliedUser")));
 		}
 
 		return ResponseDo.buildSuccessResponse();
+	}
+
+	private void addSingleMemberIntoGroup(String activityId, String applicationUserId) throws ApiException {
+		LOG.debug("Add user:{} into chat member group, activityId:{}", applicationUserId, activityId);
+
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+
+		JSONObject json = chatThirdService.addUserToChatGroup(chatCommonService.getChatToken(),
+				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(applicationUserId));
+		if (json.isEmpty()) {
+			LOG.warn("Add user to chat group failure, groupId:{}", activity.getEmchatgroupid());
+			throw new ApiException("加入群聊失败");
+		}
+
+		// 检查结果 重复添加也是返回成功的
+		boolean result = json.getJSONObject("data").getBoolean("result");
+		if (!result) {
+			// 添加用户失败
+			LOG.warn("Add user to chat group failure, chat serrver response:{}", json.toString());
+			throw new ApiException("加入群聊失败");
+		}
+
+		// 发送消息
+		LOG.debug("Send message after add user");
+		User user = userDao.selectByPrimaryKey(applicationUserId);
+		final String format = "欢迎 '{0}' 加入活动";
+		String textMessage = MessageFormat.format(format, user.getNickname());
+
+		JSONObject sendResult = chatThirdService.sendChatGroupTextMessage(chatCommonService.getChatToken(),
+				chatCommonService.getUsernameByUserid(user.getId()), activity.getEmchatgroupid(), textMessage);
+		if (sendResult.isEmpty()) {
+			LOG.warn("Send messge failure, result:{}", sendResult.toString());
+			throw new ApiException("未能成功发送文本消息");
+		}
 	}
 
 	/**
@@ -1669,6 +1743,16 @@ public class ActivityServiceImpl implements ActivityService {
 			seatReservDao.deleteByParam(param);
 		}
 
+		LOG.debug("Begin remove member from chat group");
+		// 将用户从聊天群组中移除
+		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
+				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(member));
+		if (json.isEmpty()) {
+			// 移除用户失败
+			LOG.warn("Remove member:{} from chat group failure, groupId:{}", member, activity.getEmchatgroupid());
+			throw new ApiException("未能将该成员退出群聊");
+		}
+
 		return ResponseDo.buildSuccessResponse();
 	}
 
@@ -1713,6 +1797,16 @@ public class ActivityServiceImpl implements ActivityService {
 		quitParam.put("activityId", activityId);
 		quitParam.put("userId", userId);
 		seatReservDao.updateByQuitActivity(quitParam);
+
+		LOG.debug("Begin remove member from chat group");
+		// 将用户从聊天群组中移除
+		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
+				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(userId));
+		if (json.isEmpty()) {
+			// 移除用户失败
+			LOG.warn("Remove member:{} from chat group failure, groupId:{}", userId, activity.getEmchatgroupid());
+			throw new ApiException("未能将该成员退出群聊");
+		}
 
 		return ResponseDo.buildSuccessResponse();
 	}

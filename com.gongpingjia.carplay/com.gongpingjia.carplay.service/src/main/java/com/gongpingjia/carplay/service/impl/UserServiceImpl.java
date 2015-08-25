@@ -35,7 +35,6 @@ import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
-import com.gongpingjia.carplay.dao.EmchatTokenDao;
 import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
@@ -46,7 +45,6 @@ import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.AuthenticationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.EmchatAccount;
-import com.gongpingjia.carplay.po.EmchatToken;
 import com.gongpingjia.carplay.po.PhoneVerification;
 import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
@@ -103,7 +101,7 @@ public class UserServiceImpl implements UserService {
 	private ChatThirdPartyService chatThirdService;
 
 	@Autowired
-	private EmchatTokenDao emchatTokenDao;
+	private ChatCommonService chatCommonService;
 
 	@Override
 	public ResponseDo register(User user, HttpServletRequest request) throws ApiException {
@@ -131,8 +129,7 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setUserid(userId);
 		emchatAccount.setPassword(user.getPassword());
 		emchatAccount.setRegistertime(DateUtil.getTime());
-		emchatAccount.setUsername(EncoderHandler.encodeByMD5(user.getId()));
-		emchatAccountDao.insert(emchatAccount);
+		emchatAccount.setUsername(chatCommonService.getUsernameByUserid(user.getId()));
 
 		// 注册环信用户
 		LOG.debug("Register emchat user by call remote service");
@@ -140,48 +137,21 @@ public class UserServiceImpl implements UserService {
 		chatUser.put("username", emchatAccount.getUsername());
 		chatUser.put("password", emchatAccount.getPassword());
 
-		JSONObject result = chatThirdService.registerChatUser(getChatToken(), Arrays.asList(chatUser));
-		if (!result.isEmpty()) {
-			// 不为空说明注册成功
-			emchatAccount.setActivatetime(DateUtil.getTime());
-			emchatAccountDao.updateByPrimaryKey(emchatAccount);
-		} else {
+		JSONObject result = chatThirdService
+				.registerChatUser(chatCommonService.getChatToken(), Arrays.asList(chatUser));
+		if (result.isEmpty()) {
 			LOG.warn("Create emchat user failure");
 			throw new ApiException("未能成功创建环信用户");
 		}
+
+		// 不为空说明注册成功
+		emchatAccount.setActivatetime(DateUtil.getTime());
+		emchatAccountDao.insert(emchatAccount);
 
 		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		data.put("userId", userId);
 		data.put("token", tokenVerification.getToken());
 		return ResponseDo.buildSuccessResponse(data);
-	}
-
-	/**
-	 * 获取应用的Token
-	 * 
-	 * @return 应用Token字符串
-	 */
-	private String getChatToken() {
-		EmchatToken token = emchatTokenDao.selectFirstOne();
-		if (token != null) {
-			if (token.getExpire() > DateUtil.getTime()) {
-				// 如果token时间大于当前时间表示没有过期，直接返回
-				return token.getToken();
-			}
-		}
-
-		// token不存在或者过期，需要重新获取
-		JSONObject json = chatThirdService.getApplicationToken();
-		EmchatToken refresh = new EmchatToken();
-		refresh.setApplication(json.getString("application"));
-		refresh.setExpire(DateUtil.getTime() + json.getLong("expires_in"));
-		refresh.setToken(json.getString("access_token"));
-		if (token == null) {
-			emchatTokenDao.insert(refresh);
-		} else {
-			emchatTokenDao.updateByPrimaryKey(refresh);
-		}
-		return refresh.getToken();
 	}
 
 	private void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException {
@@ -192,7 +162,7 @@ public class UserServiceImpl implements UserService {
 			LOG.warn("Invalid params photo:{}", user.getPhoto());
 			throw new ApiException("输入参数有误");
 		}
-		user.setPhoto(MessageFormat.format(Constants.USER_PHOTO_KEY, user.getPhoto()));
+		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
 
 		boolean phoneRegister = isPhoneRegister(request);
 		boolean snsRegister = isSnsRegister(request);
@@ -226,19 +196,25 @@ public class UserServiceImpl implements UserService {
 			// SNS注册 刷新用户信息
 			String snsChannel = request.getParameter("snsChannel");
 			LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
-			if (Constants.CHANNEL_WECHAT.equals(snsChannel)) {
+			if (Constants.Channel.WECHAT.equals(snsChannel)) {
 				user.setWechatid(request.getParameter("snsUid"));
 				user.setWechatname(request.getParameter("snsUserName"));
 				user.setWechatphoto(user.getPhoto());
-			} else if (Constants.CHANNEL_QQ.equals(snsChannel)) {
+			} else if (Constants.Channel.QQ.equals(snsChannel)) {
 				user.setQqid(request.getParameter("snsUid"));
 				user.setQqname(request.getParameter("snsUserName"));
 				user.setQqphoto(user.getPhoto());
-			} else if (Constants.CHANNEL_SINA_WEIBO.equals(snsChannel)) {
+			} else if (Constants.Channel.SINA_WEIBO.equals(snsChannel)) {
 				user.setSinaweiboid(request.getParameter("snsUid"));
 				user.setSinaweiboname(request.getParameter("snsUserName"));
 				user.setSinaweibophoto(user.getPhoto());
 			}
+			// 设置第三方登录密码
+			StringBuilder builder = new StringBuilder();
+			builder.append(user.getId());
+			builder.append(snsChannel);
+			builder.append(PropertiesUtil.getProperty("user.password.bundle.id", "com.gongpingjia.carplay"));
+			user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
 		} else {
 			user.setPhone(request.getParameter("phone"));
 			user.setPassword(request.getParameter("password"));
@@ -318,7 +294,7 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 
-		if (!Constants.CHANNEL_LIST.contains(snsChannel)) {
+		if (!Constants.Channel.CHANNEL_LIST.contains(snsChannel)) {
 			// 检查Channel是否包含在Channel——List中
 			LOG.warn("Input channel:{} is not in the channel list", snsChannel);
 			return false;
@@ -674,7 +650,7 @@ public class UserServiceImpl implements UserService {
 		String albumId = userAlbums.get(0).getId();
 		// 判断七牛上图片是否存在
 		for (String photo : photos) {
-			if (!photoService.isExist(MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId, photo))) {
+			if (!photoService.isExist(MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photo))) {
 				LOG.warn("photo not Exist");
 				return ResponseDo.buildFailureResponse("注册图片未上传");
 			}
@@ -687,7 +663,7 @@ public class UserServiceImpl implements UserService {
 			albumPhoto.setId(photo);
 			albumPhoto.setAlbumid(albumId);
 			albumPhoto.setUploadtime(DateUtil.getTime());
-			albumPhoto.setUrl(MessageFormat.format(Constants.USER_ALBUM_PHOTO_KEY, userId, photo));
+			albumPhoto.setUrl(MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photo));
 			albumPhotoDao.insert(albumPhoto);
 		}
 

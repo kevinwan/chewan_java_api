@@ -66,9 +66,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			userParams.add(new User(map.get("username"), map.get("password")));
 		}
 
-		List<Header> headers = new ArrayList<Header>(2);
-		headers.add(new BasicHeader("Content-Type", "application/json"));
-		headers.add(new BasicHeader("Authorization", MessageFormat.format(AUTH_HEADER_FORMAT, token)));
+		List<Header> headers = buildCommonHeaders(token);
 
 		CloseableHttpResponse response = null;
 		try {
@@ -110,9 +108,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 		json.put("owner", owner);
 		json.put("members", members);
 
-		List<Header> headers = new ArrayList<Header>(2);
-		headers.add(new BasicHeader("Content-Type", "application/json"));
-		headers.add(new BasicHeader("Authorization", MessageFormat.format(AUTH_HEADER_FORMAT, token)));
+		List<Header> headers = buildCommonHeaders(token);
 
 		CloseableHttpResponse response = null;
 		try {
@@ -125,6 +121,150 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 		} finally {
 			HttpClientUtil.close(response);
 		}
+		return new JSONObject();
+	}
+
+	private List<Header> buildCommonHeaders(String token) {
+		List<Header> headers = new ArrayList<Header>(2);
+		headers.add(new BasicHeader("Content-Type", "application/json"));
+		headers.add(new BasicHeader("Authorization", MessageFormat.format(AUTH_HEADER_FORMAT, token)));
+		return headers;
+	}
+
+	@Override
+	public JSONObject modifyChatGroup(String token, String groupId, String groupName, String description) {
+		LOG.debug("Modify chat group, groupId:{}", groupId);
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("chatgroups").append("/").append(groupId);
+
+		JSONObject json = new JSONObject();
+		json.put("groupname", groupName);
+		json.put("desc", description);
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.put(httpUrl.toString(), json.toString(), headers, "UTF-8");
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			HttpClientUtil.close(response);
+		}
+
+		return new JSONObject();
+	}
+
+	@Override
+	public JSONObject deleteChatGroup(String token, String groupId) {
+		LOG.debug("Delete chat group, groupId:{}", groupId);
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("chatgroups").append("/").append(groupId);
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.delete(httpUrl.toString(), headers, "UTF-8");
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			HttpClientUtil.close(response);
+		}
+
+		return new JSONObject();
+	}
+
+	@Override
+	public JSONObject addUserToChatGroup(String token, String groupId, String username) {
+		LOG.debug("Begin add user to chat group");
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("chatgroups").append("/").append(groupId).append("/");
+		httpUrl.append("users").append("/").append(username);
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.post(httpUrl.toString(), "", headers, "UTF-8");
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			HttpClientUtil.close(response);
+		}
+
+		return new JSONObject();
+	}
+
+	@Override
+	public JSONObject deleteUserFromChatGroup(String token, String groupId, String username) {
+		LOG.debug("Delete user from chat group, groupId:{}, username:{}", groupId, username);
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("chatgroups").append("/").append(groupId).append("/");
+		httpUrl.append("users").append("/").append(username);
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.delete(httpUrl.toString(), headers, "UTF-8");
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			HttpClientUtil.close(response);
+		}
+
+		return new JSONObject();
+	}
+
+	@Override
+	public JSONObject sendChatGroupTextMessage(String token, String username, String groupId, String textMessage) {
+		LOG.debug("Send text message to chat group with groupId:{}", groupId);
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("messages");
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		JSONObject json = new JSONObject();
+		json.put("target_type", "chatgroups");
+		json.put("target", groupId);
+
+		JSONObject msg = new JSONObject();
+		msg.put("type", "txt");
+		msg.put("msg", textMessage);
+
+		json.put("msg", msg);
+		json.put("from", username);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, "UTF-8");
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+		} catch (ApiException e) {
+			LOG.error(e.getMessage());
+		} finally {
+			HttpClientUtil.close(response);
+		}
+
 		return new JSONObject();
 	}
 

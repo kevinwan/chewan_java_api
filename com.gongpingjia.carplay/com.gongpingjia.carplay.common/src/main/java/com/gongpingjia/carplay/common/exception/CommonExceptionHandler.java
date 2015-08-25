@@ -60,10 +60,19 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpHeaders headers = new HttpHeaders();
 		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
 	}
-	
+
 	@ExceptionHandler(BindingException.class)
-	public final ResponseEntity<?> handleBindingException(BindingException ex, WebRequest request){
+	public final ResponseEntity<?> handleBindingException(BindingException ex, WebRequest request) {
 		LOG.warn("Handle BindingException, it is database mapping exception");
+		LOG.error(ex.getMessage(), ex);
+		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
+		HttpHeaders headers = new HttpHeaders();
+		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public final ResponseEntity<?> handleRuntimeException(RuntimeException ex, WebRequest request) {
+		LOG.warn("Handle RuntimeException, it is database mapping exception");
 		LOG.error(ex.getMessage(), ex);
 		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
 		HttpHeaders headers = new HttpHeaders();

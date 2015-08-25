@@ -19,7 +19,7 @@ public class RegisterActivityTest extends BaseTest {
 		MvcResult result = mockMvc
 				.perform(
 						MockMvcRequestBuilders
-								.post("/activity/register?userId=28e190e0-a1c2-433b-bd76-39ac1aa91536&token=a8103bb1-f9fd-49b1-a0e8-896fca148fb6")
+								.post("/activity/register?userId=412bac09-b9a0-46b5-a283-7442fa1eb76c&token=206c0f41-4f65-4bf4-ba38-5a11ca03ad36")
 								.param("type", "旅行")
 								.param("introduction", "DD活动期间晴空万里，道路通畅")
 								.param("cover", "4d51a321-f953-4623-b7ab-abd4fb858e77")
