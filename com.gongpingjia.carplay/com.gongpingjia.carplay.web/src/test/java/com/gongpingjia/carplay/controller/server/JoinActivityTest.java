@@ -13,10 +13,10 @@ public class JoinActivityTest extends BaseTest {
 	@Test
 	public void testJoinActivity() throws Exception {
 		MvcResult result = mockMvc.perform(
-				MockMvcRequestBuilders.post("/activity/1a479aea-7d9f-4bf7-bbc6-ac9b362a6b7b/join")
-				.param("userId", "a2b0fac5-d2b1-4293-a016-8ebafbfd07c1")
-				.param("token", "1c55a53c-38af-47a0-af56-00e7eaa30afa")
-				.param("seat", "5"))
+				MockMvcRequestBuilders.post("/activity/7ff0e9b5-0937-4815-97d3-6da0c588face/join")
+				.param("userId", "846de312-306c-4916-91c1-a5e69b158014")
+				.param("token", "2537271f-3063-45cf-bcff-27cdd35d97e0")
+				.param("seat", "0"))
 				.andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());

@@ -14,9 +14,9 @@ public class ProcessApplicationTest extends BaseTest {
 	public void testProcessApplication() throws Exception {
 		MvcResult result = mockMvc
 				.perform(
-						MockMvcRequestBuilders.post("/application/05b30819-09a9-40a6-876d-d106147a6261/process")
-								.param("userId", "123fec64-dd98-4a84-adee-7d1e0a950704")
-								.param("token", "cb1c20ad-e4b9-4980-907b-08f287c6ff68").param("action", "1"))
+						MockMvcRequestBuilders.post("/application/6561ad65-5d98-4bc0-8faf-b88844579f3c/process")
+								.param("userId", "412bac09-b9a0-46b5-a283-7442fa1eb76c")
+								.param("token", "206c0f41-4f65-4bf4-ba38-5a11ca03ad36").param("action", "1"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
