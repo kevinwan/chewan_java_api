@@ -29,7 +29,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	private static final String AUTH_HEADER_FORMAT = "Bearer {0}";
 
 	@Override
-	public JSONObject getApplicationToken() {
+	public JSONObject getApplicationToken() throws ApiException {
 		LOG.debug("Begin get ApplicationToken from chat server");
 		StringBuilder httpUrl = buildRequestUrl();
 		httpUrl.append("token");
@@ -48,8 +48,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -57,7 +55,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject registerChatUser(String token, Map<String, String> userMap) {
+	public JSONObject registerChatUser(String token, Map<String, String> userMap) throws ApiException {
 		LOG.debug("Begin register chat user");
 		StringBuilder httpUrl = buildRequestUrl();
 		httpUrl.append("users");
@@ -71,12 +69,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 				// 只有在返回为200 的情况向才解析结果
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
-		}catch (Exception e) {
-			e.printStackTrace();
-		} 
-		finally {
+		} finally {
 			HttpClientUtil.close(response);
 		}
 		return new JSONObject();
@@ -92,7 +85,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 	@Override
 	public JSONObject createChatGroup(String token, String groupName, String description, String owner,
-			List<String> members) {
+			List<String> members) throws ApiException {
 		LOG.debug("Begin create chat group");
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -115,8 +108,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -131,7 +122,8 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject modifyChatGroup(String token, String groupId, String groupName, String description) {
+	public JSONObject modifyChatGroup(String token, String groupId, String groupName, String description)
+			throws ApiException {
 		LOG.debug("Modify chat group, groupId:{}", groupId);
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -149,8 +141,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -159,7 +149,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject deleteChatGroup(String token, String groupId) {
+	public JSONObject deleteChatGroup(String token, String groupId) throws ApiException {
 		LOG.debug("Delete chat group, groupId:{}", groupId);
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -173,8 +163,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -183,7 +171,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject addUserToChatGroup(String token, String groupId, String username) {
+	public JSONObject addUserToChatGroup(String token, String groupId, String username) throws ApiException {
 		LOG.debug("Begin add user to chat group");
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -198,8 +186,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -208,7 +194,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject deleteUserFromChatGroup(String token, String groupId, String username) {
+	public JSONObject deleteUserFromChatGroup(String token, String groupId, String username) throws ApiException {
 		LOG.debug("Delete user from chat group, groupId:{}, username:{}", groupId, username);
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -223,8 +209,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
@@ -233,7 +217,8 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 	}
 
 	@Override
-	public JSONObject sendChatGroupTextMessage(String token, String username, String groupId, String textMessage) {
+	public JSONObject sendChatGroupTextMessage(String token, String username, String groupId, String textMessage)
+			throws ApiException {
 		LOG.debug("Send text message to chat group with groupId:{}", groupId);
 
 		StringBuilder httpUrl = buildRequestUrl();
@@ -258,12 +243,36 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
-		} catch (ApiException e) {
-			LOG.error(e.getMessage());
 		} finally {
 			HttpClientUtil.close(response);
 		}
 
+		return new JSONObject();
+	}
+
+	@Override
+	public JSONObject alterUserPassword(String token, String username, String newpassword) throws ApiException {
+		LOG.debug("Begin alter user password");
+
+		StringBuilder httpUrl = buildRequestUrl();
+		httpUrl.append("users").append("/");
+		httpUrl.append(username).append("/").append("password");
+
+		List<Header> headers = buildCommonHeaders(token);
+
+		JSONObject param = new JSONObject();
+		param.put("newpassword", newpassword);
+
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.put(httpUrl.toString(), param.toString(), headers, Constants.Charset.UTF8);
+			if (HttpClientUtil.isStatusOK(response)) {
+				return HttpClientUtil.parseResponseGetJson(response);
+			}
+
+		} finally {
+			HttpClientUtil.close(response);
+		}
 		return new JSONObject();
 	}
 

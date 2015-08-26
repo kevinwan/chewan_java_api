@@ -27,7 +27,6 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
-import com.gongpingjia.carplay.common.util.ToolsUtils;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.AlbumPhotoDao;
 import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
@@ -309,7 +308,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseDo loginUser(User user) {
+	public ResponseDo loginUser(User user) throws ApiException {
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		// 验证参数
@@ -337,11 +336,7 @@ public class UserServiceImpl implements UserService {
 		data.put("isAuthenticated", userData.getIsauthenticated());
 
 		// 获取用户授权信息
-		ResponseDo tokenResponseDo = getUserToken(userData.getId());
-		if (tokenResponseDo.isFailure()) {
-			return tokenResponseDo;
-		}
-		data.put("token", tokenResponseDo.getData());
+		data.put("token", getUserToken(userData.getId()));
 
 		// 查询用户车辆信息
 		Car car = carDao.selectByUserId(userData.getId());
@@ -358,45 +353,41 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseDo forgetPassword(User user, String code) {
+	public ResponseDo forgetPassword(User user, String code) throws ApiException {
 		Map<String, Object> data = new HashMap<String, Object>();
 		// 验证参数
-		if (!ToolsUtils.isPhoneNumber(user.getPhone())) {
+		if (!CommonUtil.isPhoneNumber(user.getPhone())) {
 			LOG.warn("invalid params");
-			return ResponseDo.buildFailureResponse("输入参数有误");
+			throw new ApiException("输入参数有误");
 		}
 
 		// 验证验证码
-		try {
-			checker.checkPhoneVerifyCode(user.getPhone(), code);
-		} catch (ApiException e) {
-			return ResponseDo.buildFailureResponse(e.getMessage());
-		}
+		checker.checkPhoneVerifyCode(user.getPhone(), code);
 
 		// 查询用户注册信息
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("phone", user.getPhone());
 		List<User> users = userDao.selectByParam(param);
-		if (null == users || users.size() < 1) {
+		if (users.isEmpty()) {
 			LOG.warn("Fail to find user");
-			return ResponseDo.buildFailureResponse("用户不存在");
+			throw new ApiException("用户不存在");
 		}
 
 		// 跟新密码
 		User upUser = users.get(0);
 		upUser.setPassword(user.getPassword());
-		if (0 == userDao.updateByPrimaryKey(upUser)) {
-			LOG.warn("Fail to update password");
-			return ResponseDo.buildFailureResponse("更新密码失败");
-		}
+		userDao.updateByPrimaryKey(upUser);
+
+		EmchatAccount emchatAccount = emchatAccountDao.selectByPrimaryKey(upUser.getId());
+		// 更新环信用户的密码
+		chatThirdService.alterUserPassword(chatCommonService.getChatToken(), emchatAccount.getUsername(),
+				user.getPassword());
+		emchatAccount.setPassword(user.getPassword());
+		emchatAccountDao.updateByPrimaryKey(emchatAccount);
 
 		// 获取用户授权信息
-		ResponseDo tokenResponseDo = getUserToken(upUser.getId());
-		if (tokenResponseDo.isFailure()) {
-			return tokenResponseDo;
-		}
 		data.put("userId", upUser.getId());
-		data.put("token", tokenResponseDo.getData());
+		data.put("token", getUserToken(upUser.getId()));
 
 		return ResponseDo.buildSuccessResponse(data);
 	}
@@ -676,27 +667,25 @@ public class UserServiceImpl implements UserService {
 		return ResponseDo.buildSuccessResponse(photos);
 	}
 
-	private ResponseDo getUserToken(String userId) {
+	private String getUserToken(String userId) throws ApiException {
 		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
 		if (null == tokenVerification) {
 			LOG.warn("Fail to get token and expire info from token_verification");
-			return ResponseDo.buildFailureResponse("获取用户授权信息失败");
+			throw new ApiException("获取用户授权信息失败");
 		}
 
 		// 如果过期 跟新Token
 		if (tokenVerification.getExpire() > DateUtil.getTime()) {
-			return ResponseDo.buildSuccessResponse(tokenVerification.getToken());
+			return tokenVerification.getToken();
 		}
 
 		String uuid = CodeGenerator.generatorId();
 		tokenVerification.setToken(uuid);
 		tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
 				PropertiesUtil.getProperty("gongpingjia.token.over.date", 7)));
-		if (0 == tokenVerificationDao.updateByPrimaryKey(tokenVerification)) {
-			LOG.warn("Fail to update new token and expire info");
-			return ResponseDo.buildFailureResponse("更新用户授权信息失败");
-		}
-		return ResponseDo.buildSuccessResponse(uuid);
+		tokenVerificationDao.updateByPrimaryKey(tokenVerification);
+
+		return uuid;
 	}
 
 	private ResponseDo applyAuthenticationParam(AuthenticationApplication authen, String token, String userId) {

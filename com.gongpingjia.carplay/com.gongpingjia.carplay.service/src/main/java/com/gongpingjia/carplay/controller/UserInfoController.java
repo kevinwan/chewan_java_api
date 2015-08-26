@@ -107,7 +107,12 @@ public class UserInfoController {
 		user.setPhone(phone);
 		user.setPassword(password);
 
-		return userService.loginUser(user);
+		try {
+			return userService.loginUser(user);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 
 	/**
@@ -131,7 +136,12 @@ public class UserInfoController {
 		user.setPhone(phone);
 		user.setPassword(password);
 
-		return userService.forgetPassword(user, code);
+		try {
+			return userService.forgetPassword(user, code);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 
 	/**

@@ -29,9 +29,10 @@ public interface UserService {
 	 * 
 	 * @param user
 	 * @return
+	 * @throws ApiException
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo loginUser(User user);
+	ResponseDo loginUser(User user) throws ApiException;
 
 	/**
 	 * 忘记密码
@@ -39,9 +40,10 @@ public interface UserService {
 	 * @param user
 	 * @param code
 	 * @return
+	 * @throws ApiException
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo forgetPassword(User user, String code);
+	ResponseDo forgetPassword(User user, String code) throws ApiException;
 
 	/**
 	 * 车主认证

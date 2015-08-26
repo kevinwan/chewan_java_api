@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import net.sf.json.JSONObject;
 
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
+import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.dao.EmchatTokenDao;
@@ -24,8 +25,9 @@ public class ChatCommonService {
 	 * 获取应用的Token
 	 * 
 	 * @return 应用Token字符串
+	 * @throws ApiException
 	 */
-	public String getChatToken() {
+	public String getChatToken() throws ApiException {
 		EmchatToken token = emchatTokenDao.selectFirstOne();
 		if (token != null) {
 			if (token.getExpire() > DateUtil.getTime()) {
