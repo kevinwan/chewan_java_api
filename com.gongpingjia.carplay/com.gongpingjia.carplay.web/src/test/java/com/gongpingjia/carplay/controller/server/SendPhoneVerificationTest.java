@@ -47,7 +47,7 @@ public class SendPhoneVerificationTest extends BaseTest {
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(1)).andDo(MockMvcResultHandlers.print())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
 				.andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
