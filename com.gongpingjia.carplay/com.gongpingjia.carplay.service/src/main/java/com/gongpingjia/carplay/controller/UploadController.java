@@ -1,7 +1,5 @@
 package com.gongpingjia.carplay.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +34,11 @@ public class UploadController {
 	 * @return 上传结果
 	 */
 	@RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadUserPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+	public ResponseDo uploadUserPhoto(@RequestParam("attach") MultipartFile attach) {
 		LOG.info("uploadAvatarPhoto attach size: {}", attach.getSize());
 
 		try {
-			return service.uploadUserPhoto(attach, request);
+			return service.uploadUserPhoto(attach);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
@@ -58,11 +56,11 @@ public class UploadController {
 	 */
 	@RequestMapping(value = "/user/{userId}/license/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
 	public ResponseDo uploadLicensePhoto(@PathVariable(value = "userId") String userId,
-			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+			@RequestParam("token") String token, @RequestParam("attach") MultipartFile attach) {
 		LOG.info("uploadLicensePhoto attach size: {}", attach.getSize());
 
 		try {
-			return service.uploadLicensePhoto(userId, attach, request);
+			return service.uploadLicensePhoto(userId, attach, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
@@ -79,10 +77,11 @@ public class UploadController {
 	 * @return 返回上传结果
 	 */
 	@RequestMapping(value = "/activity/cover/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadCoverPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+	public ResponseDo uploadCoverPhoto(@RequestParam("attach") MultipartFile attach,
+			@RequestParam("token") String token, @RequestParam("userId") String userId) {
 		LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
 		try {
-			return service.uploadCoverPhoto(attach, request);
+			return service.uploadCoverPhoto(attach, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -102,11 +101,11 @@ public class UploadController {
 	 */
 	@RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
 	public ResponseDo uploadAlbumPhoto(@PathVariable("userId") String userId,
-			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+			@RequestParam("attach") MultipartFile attach, @RequestParam("token") String token) {
 		LOG.info("uploadAlbumPhoto attach size: {}, userId: {}", attach.getSize(), userId);
 
 		try {
-			return service.uploadAlbumPhoto(userId, attach, request);
+			return service.uploadAlbumPhoto(userId, attach, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -123,16 +122,16 @@ public class UploadController {
 	 * @return 返回上传结果信息
 	 */
 	@RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadFeedbackPhoto(@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+	public ResponseDo uploadFeedbackPhoto(@RequestParam("attach") MultipartFile attach) {
 		LOG.info("uploadFeedbackPhoto attach size: {}", attach.getSize());
 		try {
-			return service.uploadFeedbackPhoto(attach, request);
+			return service.uploadFeedbackPhoto(attach);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 2.37 更改头像
 	 * 
@@ -144,11 +143,11 @@ public class UploadController {
 	 */
 	@RequestMapping(value = "/user/{userId}/avatar", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
 	public ResponseDo reUploadUserPhoto(@PathVariable(value = "userId") String userId,
-			@RequestParam("attach") MultipartFile attach, HttpServletRequest request) {
+			@RequestParam("attach") MultipartFile attach, @RequestParam("token") String token) {
 		LOG.info("reUploadUserPhoto attach size: {}", attach.getSize());
 
 		try {
-			return service.reUploadUserPhoto(userId, attach, request);
+			return service.reUploadUserPhoto(userId, attach, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse("上传文件失败");
