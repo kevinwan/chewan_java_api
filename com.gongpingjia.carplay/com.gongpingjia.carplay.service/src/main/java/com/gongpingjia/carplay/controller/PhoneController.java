@@ -40,7 +40,7 @@ public class PhoneController {
 	 */
 	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.GET)
 	public ResponseDo sendPhoneVerification(@PathVariable String phone,
-			@RequestParam(value = "type", defaultValue = "0") int type) {
+			@RequestParam(value = "type", defaultValue = "0") Integer type) {
 
 		LOG.debug("sendPhoneVerification begin");
 		try {

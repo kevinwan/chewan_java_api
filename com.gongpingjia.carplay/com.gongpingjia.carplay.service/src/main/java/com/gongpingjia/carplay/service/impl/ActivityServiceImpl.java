@@ -239,7 +239,7 @@ public class ActivityServiceImpl implements ActivityService {
 				MessageFormat.format(PropertiesUtil.getProperty("activity.share.url", ""), activity.getId()));
 		data.put("shareTitle", MessageFormat.format(PropertiesUtil.getProperty("activity.share.title", ""),
 				user.getNickname(), activity.getTitle()));
-		String date = DateUtil.format(activity.getStart(), Constants.ACTIVITY_SHARE_DATE_FORMAT);
+		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
 		data.put(
 				"shareContent",

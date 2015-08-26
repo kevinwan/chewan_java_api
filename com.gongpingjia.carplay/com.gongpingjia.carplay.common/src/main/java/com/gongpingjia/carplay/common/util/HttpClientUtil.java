@@ -33,6 +33,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -359,6 +360,41 @@ public class HttpClientUtil {
 		return response;
 	}
 
+	/**
+	 * 执行HTTP请求，返回JSONObject对象
+	 * 
+	 * @param method
+	 * @param httpUrl
+	 * @param params
+	 * @param headers
+	 * @param charSetName
+	 * @return
+	 * @throws ApiException
+	 */
+	public JSONObject execute(HttpMethod method, String httpUrl, Map<String, String> params, List<Header> headers,
+			String charSetName) throws ApiException {
+		CloseableHttpResponse response = null;
+
+		try {
+			if (method == HttpMethod.POST) {
+				response = post(httpUrl, params, headers, charSetName);
+			} else if (method == HttpMethod.GET) {
+				response = get(httpUrl, params, headers, charSetName);
+			} else if (method == HttpMethod.DELETE) {
+				response = delete(httpUrl, headers, charSetName);
+			} else if (method == HttpMethod.PUT) {
+				response = put(httpUrl, JSONObject.fromObject(params).toString(), headers, charSetName);
+			}
+
+			if (response != null) {
+				return parseResponseGetJson(response);
+			}
+		} finally {
+			close(response);
+		}
+		return new JSONObject();
+	}
+
 	// public static void main(String[] args) throws ApiException,
 	// ParseException, IOException {
 	// ObjectNode objectNode = jsonFactory.objectNode();
@@ -390,5 +426,23 @@ public class HttpClientUtil {
 	// byte[] bytes = EntityUtils.toByteArray(response.getEntity());
 	//
 	// close(response);
+
+	// =================================
+	// JSONObject params = new JSONObject();
+	// params.put("grant_type", "client_credentials");
+	// params.put("app_id", "498313800000245057");
+	// params.put("app_secret", "5239f57abf3f3ca71acd91fe7a973342");
+	//
+	// Header header = new BasicHeader("Accept",
+	// "application/json; charset=UTF-8");
+	//
+	// CloseableHttpResponse response = post(
+	// "https://oauth.api.189.cn/emp/oauth2/v3/access_token?grant_type=client_credentials&app_id=498313800000245057&app_secret=5239f57abf3f3ca71acd91fe7a973342",
+	// "", Arrays.asList(header), "UTF-8");
+	// System.out.println(response.getStatusLine());
+	// System.out.println(response.getEntity().toString());
+	// System.out.println(EntityUtils.toString(response.getEntity()));
+	// close(response);
+	//
 	// }
 }

@@ -16,10 +16,18 @@ public class Constants {
 	 */
 	public static final int HTTP_STATUS_OK = 200;
 
-	/**
-	 * 活动分享格式
-	 */
-	public static final String ACTIVITY_SHARE_DATE_FORMAT = "MM月dd日";
+	public interface DateFormat {
+
+		/**
+		 * 发送验证码请求参数Timestamp
+		 */
+		public static final String PHONE_VERIFY_TIMESTAMP = "YYYY-MM-dd HH:mm:ss";
+
+		/**
+		 * 活动分享格式
+		 */
+		public static final String ACTIVITY_SHARE = "MM月dd日";
+	}
 
 	public interface Result {
 
