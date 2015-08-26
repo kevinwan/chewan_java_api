@@ -34,7 +34,6 @@ import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.EmchatAccountDao;
-import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
 import com.gongpingjia.carplay.dao.UserDao;
@@ -44,7 +43,6 @@ import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.AuthenticationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.EmchatAccount;
-import com.gongpingjia.carplay.po.PhoneVerification;
 import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserAlbum;
@@ -56,9 +54,6 @@ import com.gongpingjia.carplay.service.UserService;
 public class UserServiceImpl implements UserService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
-
-	@Autowired
-	private PhoneVerificationDao phoneVerificationDao;
 
 	@Autowired
 	private PhotoService photoService;
@@ -159,14 +154,20 @@ public class UserServiceImpl implements UserService {
 			LOG.warn("Invalid params photo:{}", user.getPhoto());
 			throw new ApiException("输入参数有误");
 		}
-		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
+
+		if (userDao.selectByPrimaryKey(user.getId()) != null) {
+			LOG.warn("User id:{} has already registed", user.getId());
+			throw new ApiException("该用户已注册");
+		}
+
+		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
 
 		boolean phoneRegister = isPhoneRegister(request);
 		boolean snsRegister = isSnsRegister(request);
 
 		if (!phoneRegister && !snsRegister) {
 			// 既不是Phone注册，也不是第三方SNS注册，需要报输入参数有误
-			LOG.warn("Invalid params, it is neither phone register, nore sns register");
+			LOG.warn("Invalid params, it is neither phone register, nor sns register");
 			throw new ApiException("输入参数有误");
 		}
 
@@ -219,6 +220,15 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	/**
+	 * 检查用户注册的手机号和验证码是否正确
+	 * 
+	 * @param phoneRegister
+	 *            是否为手机注册
+	 * @param request
+	 *            请求参数
+	 * @throws ApiException
+	 */
 	private void checkPhoneRegister(boolean phoneRegister, HttpServletRequest request) throws ApiException {
 		if (phoneRegister) {
 			String phone = request.getParameter("phone");
@@ -227,10 +237,7 @@ public class UserServiceImpl implements UserService {
 				throw new ApiException("输入参数有误");
 			}
 
-			ResponseDo response = checkPhoneVerification(phone, request.getParameter("code"));
-			if (response.isFailure()) {
-				throw new ApiException(response.getErrmsg());
-			}
+			checker.checkPhoneVerifyCode(phone, request.getParameter("code"));
 
 			// 判断用户是否注册过
 			Map<String, Object> param = new HashMap<String, Object>();
@@ -360,9 +367,10 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 验证验证码
-		ResponseDo failureResponse = checkPhoneVerification(user.getPhone(), code);
-		if (failureResponse.isFailure()) {
-			return failureResponse;
+		try {
+			checker.checkPhoneVerifyCode(user.getPhone(), code);
+		} catch (ApiException e) {
+			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 
 		// 查询用户注册信息
@@ -666,23 +674,6 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return ResponseDo.buildSuccessResponse(photos);
-	}
-
-	private ResponseDo checkPhoneVerification(String phone, String code) {
-
-		// 验证验证码
-		PhoneVerification phoneVerification = phoneVerificationDao.selectByPrimaryKey(phone);
-		if (null == phoneVerification) {
-			LOG.warn("Cannot find code of this phone :" + phone);
-			return ResponseDo.buildFailureResponse("未能获取该手机的验证码");
-		} else if (!code.equals(phoneVerification.getCode())) {
-			LOG.warn("Code not correct,phone : " + phone + ". error code :" + code);
-			return ResponseDo.buildFailureResponse("验证码错误");
-		} else if (phoneVerification.getExpire() < DateUtil.getTime()) {
-			LOG.warn("Code expired");
-			return ResponseDo.buildFailureResponse("该验证码已过期，请重新获取验证码");
-		}
-		return ResponseDo.buildSuccessResponse();
 	}
 
 	private ResponseDo getUserToken(String userId) {

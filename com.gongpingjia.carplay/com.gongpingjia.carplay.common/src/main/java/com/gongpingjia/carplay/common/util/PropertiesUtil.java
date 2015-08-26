@@ -51,7 +51,7 @@ public class PropertiesUtil {
 		LOG.info("Load properties file: {}", propFile.getName());
 		try {
 			inStream = new FileInputStream(propFile);
-			inReader = new InputStreamReader(inStream, "UTF-8");
+			inReader = new InputStreamReader(inStream, Constants.Charset.UTF8);
 			properties.load(inReader);
 		} catch (FileNotFoundException e) {
 			LOG.warn(e.getMessage(), e);

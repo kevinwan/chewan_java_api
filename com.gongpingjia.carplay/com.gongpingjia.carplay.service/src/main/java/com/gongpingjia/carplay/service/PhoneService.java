@@ -14,7 +14,7 @@ public interface PhoneService {
 	 * @return 发送成功返回成功信息，否则返回失败信息
 	 * @throws ApiException
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo sendVerification(String phone, Integer type) throws ApiException;
 
 	/**

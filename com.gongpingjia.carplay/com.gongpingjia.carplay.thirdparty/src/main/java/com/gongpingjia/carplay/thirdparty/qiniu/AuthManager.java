@@ -5,7 +5,7 @@ import com.qiniu.storage.BucketManager;
 import com.qiniu.util.Auth;
 
 /**
- * 建议采用Spring IOC单利管理
+ * 建议采用Spring IOC单例管理
  * 
  * @author 链接七牛服务器鉴权
  *

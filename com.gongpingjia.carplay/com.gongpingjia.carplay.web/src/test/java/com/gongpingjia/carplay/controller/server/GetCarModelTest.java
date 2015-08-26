@@ -28,4 +28,14 @@ public class GetCarModelTest extends BaseTest {
 
 		Assert.assertNull(result.getModelAndView());
 	}
+	
+	@Test
+	public void testModel2() throws Exception {
+		MvcResult result = mockMvc.perform(get("/car/model"))
+				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
+				.andDo(MockMvcResultHandlers.print())
+				.andReturn();
+
+		Assert.assertNull(result.getModelAndView());
+	}
 }

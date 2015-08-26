@@ -9,7 +9,9 @@ import org.springframework.util.StringUtils;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
+import com.gongpingjia.carplay.po.PhoneVerification;
 import com.gongpingjia.carplay.po.TokenVerification;
 
 /**
@@ -25,6 +27,9 @@ public class ParameterChecker {
 
 	@Autowired
 	private TokenVerificationDao tokenDao;
+
+	@Autowired
+	private PhoneVerificationDao phoneDao;
 
 	/**
 	 * 检查传入的参数userID和token的合格性，以及token是否过期
@@ -165,6 +170,34 @@ public class ParameterChecker {
 		if ((!CommonUtil.isUUID(value))) {
 			LOG.error("Parameter {} is not correct format UUID string, paramValue:{}", paramName, value);
 			throw new ApiException("输入参数有误");
+		}
+	}
+
+	/**
+	 * 验证手机号和验证码是否匹配
+	 * 
+	 * @param phone
+	 *            手机号
+	 * @param code
+	 *            验证码
+	 * @throws ApiException
+	 *             不匹配抛出异常
+	 */
+	public void checkPhoneVerifyCode(String phone, String code) throws ApiException {
+		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
+		if (phoneVerify == null) {
+			LOG.warn("Phone number is not exist in the phone verification table");
+			throw new ApiException("未能获取该手机的验证码");
+		}
+
+		if (!code.equals(phoneVerify.getCode())) {
+			LOG.warn("Phone verify code is not corrected");
+			throw new ApiException("验证码有误");
+		}
+
+		if (phoneVerify.getExpire() < DateUtil.getTime()) {
+			LOG.warn("Phone verify code is expired, please re acquisition");
+			throw new ApiException("该验证码已过期，请重新获取验证码");
 		}
 	}
 }

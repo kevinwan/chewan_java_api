@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.CarService;
@@ -33,16 +34,20 @@ public class CarServiceImpl implements CarService {
 
 		JSONObject json = new JSONObject();
 		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
+
 		Header header = new BasicHeader("Accept", "application/json");
 
 		LOG.debug("Begin request gongpingjia server");
-		CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(),
-				Arrays.asList(header), "UTF-8");
+		CloseableHttpResponse response = null;
+		try {
+			response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(0), Arrays.asList(header),
+					Constants.Charset.UTF8);
 
-		String data = HttpClientUtil.parseResponse(response);
-		json = JSONObject.fromObject(data);
-
-		HttpClientUtil.close(response);
+			String data = HttpClientUtil.parseResponse(response);
+			json = JSONObject.fromObject(data);
+		} finally {
+			HttpClientUtil.close(response);
+		}
 
 		return ResponseDo.buildSuccessResponse(json);
 	}
@@ -67,12 +72,16 @@ public class CarServiceImpl implements CarService {
 
 		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.mode.url", "");
 		Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
-		CloseableHttpResponse response = HttpClientUtil.get(gpjUrl, params, Arrays.asList(header), "GBK");
+		CloseableHttpResponse response = null;
 
-		String data = HttpClientUtil.parseResponse(response);
-		json = JSONObject.fromObject(data);
+		try {
+			response = HttpClientUtil.get(gpjUrl, params, Arrays.asList(header), Constants.Charset.UTF8);
 
-		HttpClientUtil.close(response);
+			String data = HttpClientUtil.parseResponse(response);
+			json = JSONObject.fromObject(data);
+		} finally {
+			HttpClientUtil.close(response);
+		}
 
 		return ResponseDo.buildSuccessResponse(json);
 	}

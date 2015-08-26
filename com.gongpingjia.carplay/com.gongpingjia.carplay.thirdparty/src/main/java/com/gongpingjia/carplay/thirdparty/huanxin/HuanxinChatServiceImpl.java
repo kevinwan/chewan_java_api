@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 
@@ -43,7 +44,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), params, headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), params, headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -65,7 +66,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), userMap, headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), userMap, headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				// 只有在返回为200 的情况向才解析结果
 				return HttpClientUtil.parseResponseGetJson(response);
@@ -110,7 +111,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -144,7 +145,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.put(httpUrl.toString(), json.toString(), headers, "UTF-8");
+			response = HttpClientUtil.put(httpUrl.toString(), json.toString(), headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -168,7 +169,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.delete(httpUrl.toString(), headers, "UTF-8");
+			response = HttpClientUtil.delete(httpUrl.toString(), headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -193,7 +194,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), "", headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), "", headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -218,7 +219,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.delete(httpUrl.toString(), headers, "UTF-8");
+			response = HttpClientUtil.delete(httpUrl.toString(), headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}
@@ -253,7 +254,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		CloseableHttpResponse response = null;
 		try {
-			response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, "UTF-8");
+			response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, Constants.Charset.UTF8);
 			if (HttpClientUtil.isStatusOK(response)) {
 				return HttpClientUtil.parseResponseGetJson(response);
 			}

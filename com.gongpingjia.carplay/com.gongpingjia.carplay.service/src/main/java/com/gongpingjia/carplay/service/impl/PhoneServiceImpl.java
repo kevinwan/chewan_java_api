@@ -46,6 +46,9 @@ public class PhoneServiceImpl implements PhoneService {
 	@Autowired
 	private PhoneVerificationDao phoneDao;
 
+	@Autowired
+	private ParameterChecker checker;
+
 	@Override
 	public ResponseDo sendVerification(String phone, Integer type) throws ApiException {
 
@@ -99,21 +102,7 @@ public class PhoneServiceImpl implements PhoneService {
 			}
 		}
 
-		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
-		if (phoneVerify == null) {
-			LOG.warn("Phone number is not exist in the phone verification table");
-			throw new ApiException("未能获取该手机的验证码");
-		}
-
-		if (!code.equals(phoneVerify.getCode())) {
-			LOG.warn("Phone verify code is not corrected");
-			throw new ApiException("验证码有误");
-		}
-
-		if (phoneVerify.getExpire() < DateUtil.getTime()) {
-			LOG.warn("Phone verify code is expired, please re acquisition");
-			throw new ApiException("该验证码已过期，请重新获取验证码");
-		}
+		checker.checkPhoneVerifyCode(phone, code);
 
 		return ResponseDo.buildSuccessResponse();
 	}

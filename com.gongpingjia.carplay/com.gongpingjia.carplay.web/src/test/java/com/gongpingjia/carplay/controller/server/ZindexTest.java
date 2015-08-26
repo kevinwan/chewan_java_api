@@ -26,13 +26,13 @@ public class ZindexTest {
 		PhoneController.sendPhoneVerification(null, 0);
 
 		// 2.2 验证码校验
-		PhoneController.checkPhoneVerification(null, null);
+		PhoneController.checkPhoneVerification(null, null, null);
 
 		// 2.3省市列表
 		// 采用XML替代，在客户端实现
 
 		// 2.4 头像上传
-		UploadController.uploadUserPhoto(null, null);
+		UploadController.uploadUserPhoto(null);
 
 		// 2.5注册
 		UserInfoController.register(null, null, null, null, null, null, null, null, null, null);
@@ -61,7 +61,7 @@ public class ZindexTest {
 		ActivityController.getAvailableSeats(null, null);
 
 		// 2.14 活动图片上传
-		UploadController.uploadCoverPhoto(null, null);
+		UploadController.uploadCoverPhoto(null, null, null);
 
 		// 2.15 创建活动
 		ActivityController.registerActivity(null);
@@ -148,7 +148,7 @@ public class ZindexTest {
 		MessageController.getMessageList(null, null, null, null, null);
 
 		// 2.43 上传意见反馈图片
-		UploadController.uploadFeedbackPhoto(null, null);
+		UploadController.uploadFeedbackPhoto(null);
 
 		// 2.44 提交反馈信息
 		MessageController.submitFeedback(null, null, null, null);

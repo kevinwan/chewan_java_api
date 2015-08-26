@@ -50,7 +50,7 @@ public class CarController {
 	 * @return 此品牌的车型信息
 	 */
 	@RequestMapping(value = "/car/model", method = RequestMethod.GET)
-	public ResponseDo getCarModel(@RequestParam(value = "brand", defaultValue = "") String brand) {
+	public ResponseDo getCarModel(@RequestParam(value = "brand") String brand) {
 
 		LOG.debug("car/model is called, request parameter brand:" + brand);
 
