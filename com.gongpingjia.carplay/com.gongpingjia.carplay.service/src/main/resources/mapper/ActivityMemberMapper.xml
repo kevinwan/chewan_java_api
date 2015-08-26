@@ -49,7 +49,7 @@
 		LEFT JOIN (
 			SELECT
 				activityId,
-				count(*) AS count
+				count(1) AS count
 			FROM
 				seat_reservation
 			GROUP BY
@@ -58,7 +58,7 @@
 		LEFT JOIN (
 			SELECT
 				activityId,
-				count(*) AS count
+				count(1) AS count
 			FROM
 				seat_reservation
 			WHERE
