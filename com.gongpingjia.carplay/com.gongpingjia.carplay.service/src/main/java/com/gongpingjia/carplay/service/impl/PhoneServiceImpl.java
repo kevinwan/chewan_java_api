@@ -47,7 +47,7 @@ public class PhoneServiceImpl implements PhoneService {
 	private PhoneVerificationDao phoneDao;
 
 	@Override
-	public ResponseDo sendVerification(String phone, int type) throws ApiException {
+	public ResponseDo sendVerification(String phone, Integer type) throws ApiException {
 
 		if (!CommonUtil.isPhoneNumber(phone)) {
 			LOG.warn("Phone number is not correct format");
@@ -80,7 +80,7 @@ public class PhoneServiceImpl implements PhoneService {
 	}
 
 	@Override
-	public ResponseDo verify(String phone, String code) throws ApiException {
+	public ResponseDo verify(String phone, String code, Integer type) throws ApiException {
 		if (!CommonUtil.isPhoneNumber(phone)) {
 			LOG.warn("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
@@ -90,10 +90,13 @@ public class PhoneServiceImpl implements PhoneService {
 			throw new ApiException("输入参数有误");
 		}
 
-		List<User> userList = getUserList(phone);
-		if (userList.size() > 0) {
-			LOG.warn("User with phone number is already registed, phone: {}", phone);
-			throw new ApiException("该用户已注册");
+		if (type == 0) {
+			// 只有当注册的时候去校验手机号是否已经被注册过
+			List<User> userList = getUserList(phone);
+			if (userList.size() > 0) {
+				LOG.warn("User with phone number is already registed, phone: {}", phone);
+				throw new ApiException("该用户已注册");
+			}
 		}
 
 		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
@@ -104,7 +107,7 @@ public class PhoneServiceImpl implements PhoneService {
 
 		if (!code.equals(phoneVerify.getCode())) {
 			LOG.warn("Phone verify code is not corrected");
-			throw new ApiException("未能获取该手机的验证码");
+			throw new ApiException("验证码有误");
 		}
 
 		if (phoneVerify.getExpire() < DateUtil.getTime()) {
@@ -112,7 +115,7 @@ public class PhoneServiceImpl implements PhoneService {
 			throw new ApiException("该验证码已过期，请重新获取验证码");
 		}
 
-		return ResponseDo.buildSuccessResponse("");
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	/**
@@ -182,7 +185,7 @@ public class PhoneServiceImpl implements PhoneService {
 			// 用完response需要释放资源
 			HttpClientUtil.close(response);
 		}
-		return ResponseDo.buildSuccessResponse("");
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	/**

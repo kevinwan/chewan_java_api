@@ -1,7 +1,5 @@
 package com.gongpingjia.carplay.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +37,7 @@ public class PhoneController {
 	 * @return 验证码信息
 	 */
 	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.GET)
-	public ResponseDo sendPhoneVerification(@PathVariable String phone,
+	public ResponseDo sendPhoneVerification(@PathVariable("phone") String phone,
 			@RequestParam(value = "type", defaultValue = "0") Integer type) {
 
 		LOG.debug("sendPhoneVerification begin");
@@ -61,14 +59,13 @@ public class PhoneController {
 	 * @return 返回验证结果信息
 	 */
 	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.POST)
-	public ResponseDo checkPhoneVerification(@PathVariable String phone, HttpServletRequest request) {
+	public ResponseDo checkPhoneVerification(@PathVariable("phone") String phone, @RequestParam("code") String code,
+			@RequestParam(value = "type", defaultValue = "0") Integer type) {
 
 		LOG.debug("checkPhoneVerification begin");
 
-		String code = (String) request.getParameter("code");
-
 		try {
-			return service.verify(phone, code);
+			return service.verify(phone, code, type);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage());
 			return ResponseDo.buildFailureResponse(e.getMessage());

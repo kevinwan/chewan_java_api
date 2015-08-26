@@ -15,7 +15,7 @@ public interface PhoneService {
 	 * @throws ApiException
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo sendVerification(String phone, int type) throws ApiException;
+	ResponseDo sendVerification(String phone, Integer type) throws ApiException;
 
 	/**
 	 * 验证用户验证码
@@ -28,5 +28,5 @@ public interface PhoneService {
 	 * @throws ApiException 
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo verify(String phone, String code) throws ApiException;
+	ResponseDo verify(String phone, String code, Integer type) throws ApiException;
 }
