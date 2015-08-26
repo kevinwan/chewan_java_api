@@ -218,7 +218,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		// 完成群组创建之后，创建群聊组
 		activity.setEmchatgroupid(json.getJSONObject("data").getString("groupid"));
-		activity.setMembersize(json.getJSONObject("data").getInt("maxusers"));
+		activity.setMembersize(PropertiesUtil.getProperty("huanxin.group.maxusers", 500));
 		activityDao.updateByPrimaryKey(activity);
 	}
 
