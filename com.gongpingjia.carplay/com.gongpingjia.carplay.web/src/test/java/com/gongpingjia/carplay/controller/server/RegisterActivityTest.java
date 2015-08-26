@@ -18,10 +18,13 @@ public class RegisterActivityTest extends BaseTest {
 
 	@Test
 	public void testRegisterActivity() throws Exception {
+		String userId="412bac09-b9a0-46b5-a283-7442fa1eb76c";
+		String token="3f1d9898-5531-4753-80fa-2e164c5ba754";
+		
 		MvcResult result = mockMvc
 				.perform(
 						MockMvcRequestBuilders
-								.post("/activity/register?userId=412bac09-b9a0-46b5-a283-7442fa1eb76c&token=206c0f41-4f65-4bf4-ba38-5a11ca03ad36")
+								.post("/activity/register?userId="+userId+"&token="+token)
 								.param("type", "旅行")
 								.param("introduction", "DD活动期间晴空万里，道路通畅")
 								.param("cover", "4d51a321-f953-4623-b7ab-abd4fb858e77")
