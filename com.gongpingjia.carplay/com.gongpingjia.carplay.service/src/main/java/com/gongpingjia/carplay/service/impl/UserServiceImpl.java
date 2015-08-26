@@ -354,6 +354,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseDo forgetPassword(User user, String code) throws ApiException {
+		LOG.debug("Begin reset password by forget password");
 		Map<String, Object> data = new HashMap<String, Object>();
 		// 验证参数
 		if (!CommonUtil.isPhoneNumber(user.getPhone())) {
@@ -378,6 +379,7 @@ public class UserServiceImpl implements UserService {
 		upUser.setPassword(user.getPassword());
 		userDao.updateByPrimaryKey(upUser);
 
+		LOG.debug("Begin reset emchat account password by forget password");
 		EmchatAccount emchatAccount = emchatAccountDao.selectByPrimaryKey(upUser.getId());
 		// 更新环信用户的密码
 		chatThirdService.alterUserPassword(chatCommonService.getChatToken(), emchatAccount.getUsername(),
