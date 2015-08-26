@@ -13,18 +13,17 @@ import com.gongpingjia.carplay.po.UserSubscription;
 
 @Service
 public interface UserService {
-	
+
 	/**
 	 * 注册用户
 	 * 
 	 * @param user
-	 * @param request
 	 * @return
-	 * @throws ApiException 
+	 * @throws ApiException
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo register(User user, HttpServletRequest request) throws ApiException;
-	
+	ResponseDo register(User user) throws ApiException;
+
 	/**
 	 * 用户登录
 	 * 
@@ -33,7 +32,7 @@ public interface UserService {
 	 */
 	@Transactional(readOnly = true)
 	ResponseDo loginUser(User user);
-	
+
 	/**
 	 * 忘记密码
 	 * 
@@ -43,7 +42,7 @@ public interface UserService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo forgetPassword(User user, String code);
-	
+
 	/**
 	 * 车主认证
 	 * 
@@ -51,8 +50,8 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo applyAuthentication(AuthenticationApplication authenticationApplication,String token,String userId);
-	
+	ResponseDo applyAuthentication(AuthenticationApplication authenticationApplication, String token, String userId);
+
 	/**
 	 * 个人详情
 	 * 
@@ -63,7 +62,7 @@ public interface UserService {
 	 */
 	@Transactional(readOnly = true)
 	ResponseDo userInfo(String interviewedUser, String visitorUser, String token);
-	
+
 	/**
 	 * 关注我的人
 	 * 
@@ -74,8 +73,8 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo userListen(String userId,Integer ignore,Integer limit,String token);
-	
+	ResponseDo userListen(String userId, Integer ignore, Integer limit, String token);
+
 	/**
 	 * 关注
 	 * 
@@ -85,8 +84,8 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo payAttention(UserSubscription userSubscription,String token);
-	
+	ResponseDo payAttention(UserSubscription userSubscription, String token);
+
 	/**
 	 * 取消关注
 	 * 
@@ -95,8 +94,8 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo unPayAttention(UserSubscription userSubscription,String token);
-	
+	ResponseDo unPayAttention(UserSubscription userSubscription, String token);
+
 	/**
 	 * 变更我的信息
 	 * 
@@ -105,8 +104,8 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo alterUserInfo(User user,String token);
-	
+	ResponseDo alterUserInfo(User user, String token);
+
 	/**
 	 * 编辑相册图片
 	 * 
@@ -116,5 +115,17 @@ public interface UserService {
 	 * @return
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo manageAlbumPhotos(String userId,String[] photos,String token);
+	ResponseDo manageAlbumPhotos(String userId, String[] photos, String token);
+
+	/**
+	 * 检查注册用户的参数是否正确
+	 * 
+	 * @param user
+	 *            用户信息
+	 * @param request
+	 *            请求参数
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException;
 }

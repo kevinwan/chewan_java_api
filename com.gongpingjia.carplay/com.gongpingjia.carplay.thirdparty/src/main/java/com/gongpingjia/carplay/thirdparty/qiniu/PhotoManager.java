@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.UploadManager;
@@ -55,9 +56,9 @@ public class PhotoManager implements PhotoService {
 			LOG.info(response.bodyString());
 			result = response.jsonToObject(HashMap.class);
 			if (response.isOK()) {
-				result.put("result", "success");
+				result.put("result", Constants.Result.SUCCESS);
 			} else {
-				result.put("result", "failure");
+				result.put("result", Constants.Result.FAILURE);
 			}
 		} catch (QiniuException e) {
 			Response res = e.response;

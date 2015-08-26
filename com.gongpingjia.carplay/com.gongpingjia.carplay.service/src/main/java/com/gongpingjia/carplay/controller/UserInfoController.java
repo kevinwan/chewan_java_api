@@ -79,7 +79,9 @@ public class UserInfoController {
 		user.setPhoto(photo);
 
 		try {
-			return userService.register(user, request);
+			userService.checkRegisterParameters(user, request);
+
+			return userService.register(user);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

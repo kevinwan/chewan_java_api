@@ -21,6 +21,21 @@ public class Constants {
 	 */
 	public static final String ACTIVITY_SHARE_DATE_FORMAT = "MM月dd日";
 
+	public interface Result {
+
+		public static final String RESULT = "result";
+
+		/**
+		 * 成功标识字符串
+		 */
+		public static final String SUCCESS = "success";
+
+		/**
+		 * 失败标识字符串
+		 */
+		public static final String FAILURE = "failure";
+	}
+
 	public interface PhotoKey {
 		/**
 		 * 用户图像上传的Key值
@@ -142,5 +157,19 @@ public class Constants {
 		public static final String COMMON = "普通活动";
 
 		public static final String OFFICIAL = "官方活动";
+	}
+
+	public interface Charset {
+
+		/**
+		 * UTF-8编码
+		 */
+		public static final String UTF8 = "UTF-8";
+
+		/**
+		 * GBK编码
+		 */
+		public static final String GBK = "GBK";
+
 	}
 }

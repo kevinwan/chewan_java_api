@@ -237,6 +237,27 @@ public class HttpClientUtil {
 	}
 
 	/**
+	 * 解析HTTP响应，返回响应体的字节流，一般用户读取图片
+	 * 
+	 * @param response
+	 *            响应体
+	 * @return 返回响应字节流
+	 */
+	public static byte[] parseResponseGetBytes(CloseableHttpResponse response) {
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			try {
+				return EntityUtils.toByteArray(entity);
+			} catch (ParseException e) {
+				LOG.warn("Convert response entity to String failure with ParseException", e);
+			} catch (IOException e) {
+				LOG.warn("Convert response entity to String failure with IOException", e);
+			}
+		}
+		return new byte[0];
+	}
+
+	/**
 	 * 解析HTTP响应，返回JSONObject对象
 	 * 
 	 * @param response
@@ -270,7 +291,7 @@ public class HttpClientUtil {
 			return false;
 		}
 
-		return response.getStatusLine().getStatusCode() == 200;
+		return response.getStatusLine().getStatusCode() == Constants.HTTP_STATUS_OK;
 	}
 
 	public static CloseableHttpResponse put(String httpUrl, String paramString, List<Header> headers, String charSetName)
@@ -338,21 +359,36 @@ public class HttpClientUtil {
 		return response;
 	}
 
-//	public static void main(String[] args) throws ApiException, ParseException, IOException {
-//		ObjectNode objectNode = jsonFactory.objectNode();
-//		objectNode.put("username", "bebe84c777c3308d53ad81efda2d3365");
-//		objectNode.put("password", "e10adc3949ba59abbe56e057f20f883e");
-//
-//		List<Header> headers = new ArrayList<Header>(2);
-//		headers.add(new BasicHeader("Content-Type", "application/json"));
-//		headers.add(new BasicHeader("Authorization",
-//				"Bearer YWMterwfoEsOEeWcnQPhxKXuVQAAAVCZQBpQvnlmA3ZdjXXVz6gnv_Czb3Ar1cU"));
-//
-//		CloseableHttpResponse response = post("https://a1.easemob.com/gongpingjia/carplayapp/users",
-//				objectNode.toString(), headers, "UTF-8");
-//		System.out.println(response.getStatusLine());
-//		System.out.println(response.getEntity().toString());
-//		System.out.println(EntityUtils.toString(response.getEntity()));
-//		close(response);
-//	}
+	// public static void main(String[] args) throws ApiException,
+	// ParseException, IOException {
+	// ObjectNode objectNode = jsonFactory.objectNode();
+	// objectNode.put("username", "bebe84c777c3308d53ad81efda2d3365");
+	// objectNode.put("password", "e10adc3949ba59abbe56e057f20f883e");
+	//
+	// List<Header> headers = new ArrayList<Header>(2);
+	// headers.add(new BasicHeader("Content-Type", "application/json"));
+	// headers.add(new BasicHeader("Authorization",
+	// "Bearer YWMterwfoEsOEeWcnQPhxKXuVQAAAVCZQBpQvnlmA3ZdjXXVz6gnv_Czb3Ar1cU"));
+	//
+	// CloseableHttpResponse response =
+	// post("https://a1.easemob.com/gongpingjia/carplayapp/users",
+	// objectNode.toString(), headers, "UTF-8");
+	// System.out.println(response.getStatusLine());
+	// System.out.println(response.getEntity().toString());
+	// System.out.println(EntityUtils.toString(response.getEntity()));
+	// close(response);
+
+	// ===========================
+	// List<Header> headers = new ArrayList<Header>(0);
+	//
+	// Map<String, String> params = new HashMap<String, String>(0);
+	//
+	// CloseableHttpResponse response = get(
+	// "http://7xknzo.com1.z0.glb.clouddn.com/asset/user/12abfe47-e0fd-4af6-a041-0cb67cbbabdd/avatar.jpg",
+	// params, headers, "UTF-8");
+	//
+	// byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+	//
+	// close(response);
+	// }
 }

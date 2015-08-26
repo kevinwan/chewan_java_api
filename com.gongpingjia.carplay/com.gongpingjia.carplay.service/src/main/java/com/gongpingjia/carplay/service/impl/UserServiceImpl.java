@@ -103,9 +103,7 @@ public class UserServiceImpl implements UserService {
 	private ChatCommonService chatCommonService;
 
 	@Override
-	public ResponseDo register(User user, HttpServletRequest request) throws ApiException {
-		checkRegisterParameters(user, request);
-
+	public ResponseDo register(User user) throws ApiException {
 		String userId = user.getId();
 
 		LOG.debug("Save register data begin");
@@ -152,7 +150,8 @@ public class UserServiceImpl implements UserService {
 		return ResponseDo.buildSuccessResponse(data);
 	}
 
-	private void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException {
+	@Override
+	public void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException {
 		LOG.debug("Begin check input parameters of register");
 
 		// 验证参数
@@ -193,23 +192,24 @@ public class UserServiceImpl implements UserService {
 		if (snsRegister) {
 			// SNS注册 刷新用户信息
 			String snsChannel = request.getParameter("snsChannel");
+			String uid = request.getParameter("snsUid");
 			LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
 			if (Constants.Channel.WECHAT.equals(snsChannel)) {
-				user.setWechatid(request.getParameter("snsUid"));
+				user.setWechatid(uid);
 				user.setWechatname(request.getParameter("snsUserName"));
 				user.setWechatphoto(user.getPhoto());
 			} else if (Constants.Channel.QQ.equals(snsChannel)) {
-				user.setQqid(request.getParameter("snsUid"));
+				user.setQqid(uid);
 				user.setQqname(request.getParameter("snsUserName"));
 				user.setQqphoto(user.getPhoto());
 			} else if (Constants.Channel.SINA_WEIBO.equals(snsChannel)) {
-				user.setSinaweiboid(request.getParameter("snsUid"));
+				user.setSinaweiboid(uid);
 				user.setSinaweiboname(request.getParameter("snsUserName"));
 				user.setSinaweibophoto(user.getPhoto());
 			}
 			// 设置第三方登录密码
 			StringBuilder builder = new StringBuilder();
-			builder.append(user.getId());
+			builder.append(uid);
 			builder.append(snsChannel);
 			builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
 			user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));

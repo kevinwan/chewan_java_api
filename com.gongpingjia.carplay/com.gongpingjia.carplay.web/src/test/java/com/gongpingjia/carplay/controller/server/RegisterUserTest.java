@@ -112,4 +112,30 @@ public class RegisterUserTest extends BaseTest {
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 		Assert.assertNull(result.getModelAndView());
 	}
+	
+	@Test
+	public void testUserRegister5() throws Exception {
+		MvcResult result = mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/user/register")
+							.param("snsUid", "11ABD6303F2C5A51DADnp3W4NMC4")		
+							.param("snsUserName", "剑神")
+							.param("snsChannel", "wechat")
+							.param("nickname", "剑神")
+							.param("gender", "女")
+							.param("birthMonth", "11")
+							.param("birthYear", "1985")
+							.param("birthDay", "5")
+							.param("province", "江苏省")
+							.param("city", "南京市")
+							.param("district", "玄武区")
+							.param("photo", "6d0b832d-401a-458a-bbdf-08a213699844"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								"application/json;charset=UTF-8"))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+		Assert.assertNull(result.getModelAndView());
+	}
 }

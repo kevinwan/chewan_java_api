@@ -88,7 +88,7 @@ public class UploadServiceImpl implements UploadService {
 	private ResponseDo uploadPhoto(byte[] data, String photoId, String key, boolean override) throws ApiException {
 		Map<String, String> result = photoService.upload(data, key, override);
 		LOG.debug("Upload result: {}", result);
-		if ("success".equalsIgnoreCase(result.get("result"))) {
+		if (Constants.Result.SUCCESS.equalsIgnoreCase(result.get("result"))) {
 			Map<String, String> dataMap = new HashMap<String, String>();
 			dataMap.put("photoUrl", PropertiesUtil.getProperty("qiniu.server.url", "") + result.get("key"));
 			dataMap.put("photoId", photoId);

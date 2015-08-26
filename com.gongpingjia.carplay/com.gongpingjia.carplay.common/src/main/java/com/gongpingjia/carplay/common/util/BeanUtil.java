@@ -7,8 +7,7 @@ public class BeanUtil implements ApplicationContextAware {
 	private static ApplicationContext context;
 
 	/**
-	 * Spring注入的时候，会调用接口的该方法，注入context对象
-	 * ==暂时理解为Findbugs误报==
+	 * Spring注入的时候，会调用接口的该方法，注入context对象 ==暂时理解为Findbugs误报==
 	 */
 	@Override
 	public void setApplicationContext(ApplicationContext context) {
@@ -27,6 +26,10 @@ public class BeanUtil implements ApplicationContextAware {
 
 	public static Object getBean(String name) {
 		return context.getBean(name);
+	}
+
+	public static <T> T getBean(Class<T> type) {
+		return context.getBean(type);
 	}
 
 }
