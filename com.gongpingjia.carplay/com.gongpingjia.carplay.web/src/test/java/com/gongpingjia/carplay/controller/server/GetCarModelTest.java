@@ -8,6 +8,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.gongpingjia.carplay.controller.BaseTest;
+
 /**
  * 2.7 获取车型
  * 

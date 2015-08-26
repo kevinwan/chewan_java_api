@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.gongpingjia.carplay.controller.BaseTest;
 import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.po.PhoneVerification;
 

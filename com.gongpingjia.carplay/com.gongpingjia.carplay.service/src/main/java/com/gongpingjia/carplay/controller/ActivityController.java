@@ -442,4 +442,6 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
+	
+	
 }

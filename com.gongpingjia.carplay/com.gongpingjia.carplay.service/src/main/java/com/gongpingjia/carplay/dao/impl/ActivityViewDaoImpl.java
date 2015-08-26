@@ -77,4 +77,9 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 		return DASUtil.selectOne(ActivityView.class.getName(), "selectActivityShareInfo", param);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectActivityByCategory(Map<String, Object> param) {
+		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityByCategory", param);
+	}
+
 }

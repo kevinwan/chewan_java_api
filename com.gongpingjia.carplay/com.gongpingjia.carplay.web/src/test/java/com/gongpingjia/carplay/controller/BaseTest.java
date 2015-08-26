@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.controller.server;
+package com.gongpingjia.carplay.controller;
 
 import org.junit.Before;
 import org.junit.Test;

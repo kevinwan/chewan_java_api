@@ -130,4 +130,13 @@ public interface ActivityViewDao {
 	 */
 	Map<String, Object> selectActivityShareInfo(Map<String, Object> param);
 
+	/**
+	 * 根据活动类别，获取活动信息，主要为获取"官方活动"接口使用
+	 * 
+	 * @param param
+	 *            参数
+	 * @return 返回活动信息
+	 */
+	List<Map<String, Object>> selectActivityByCategory(Map<String, Object> param);
+
 }

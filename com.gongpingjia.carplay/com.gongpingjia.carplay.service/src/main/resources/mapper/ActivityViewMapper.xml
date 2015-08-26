@@ -410,4 +410,22 @@
 		LIMIT 1   
 	</select>
 	
+	<select id="selectActivityByCategory" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			activity.id AS activityId,
+			activity.title,
+			activity.description AS content,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo) AS logo,
+			activity.endTime AS end,
+			(SELECT	concat(#{assetUrl,jdbcType=VARCHAR}, url) FROM activity_cover WHERE activityId = activity.id ORDER BY uploadTime DESC LIMIT 1) AS cover
+		FROM
+			activity, user
+		WHERE
+			activity.organizer = user.id
+		and 
+			activity.category = #{category,jdbcType=VARCHAR}
+		ORDER BY
+			activity.createTime DESC
+	</select>
+	
 </mapper>
