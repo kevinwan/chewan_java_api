@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
@@ -284,7 +285,7 @@ public class BusinessTest extends BaseTest {
 			.andReturn();
 		 
 		// 2.24 关注活动
-		 Map<String,String> user2=getNewUser("12345678913", password, "90be2067-8993-49b8-b9cf-b90353ebba66");
+		 Map<String,String> user2=getNewUser("18086503005", password, "90be2067-8993-49b8-b9cf-b90353ebba66");
 		 mockMvc.perform(
 					MockMvcRequestBuilders.post("/activity/"+activityId+"/subscribe")
 						.param("userId", user2.get("userId"))
@@ -301,8 +302,21 @@ public class BusinessTest extends BaseTest {
 					.param("userId", user2.get("userId"))
 					.param("token", user2.get("token"))
 					.param("seat", "0"))
+		 			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
 					.andDo(MockMvcResultHandlers.print())
 					.andReturn();
+		 
+		// 2.45 取消关注活动
+		 mockMvc.perform(
+					MockMvcRequestBuilders
+						.post("/activity/"+activityId+"/unsubscribe")
+						.param("userId", user2.get("userId"))
+						.param("token", user2.get("token")))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
 		 
 		// 2.26 获取申请列表
 		 MvcResult result = mockMvc.perform(get("/user/" + userId + "/application/list").param("token", token))
@@ -315,9 +329,205 @@ public class BusinessTest extends BaseTest {
 		 
 		 String applicationId=JSONObject.fromObject(result.getResponse().getContentAsString()).getJSONArray("data").getJSONObject(0).getString("applicationId");
 		 System.out.println(applicationId);
+		 
+		// 2.27 同意/拒绝 活动申请
+		 mockMvc.perform(
+					MockMvcRequestBuilders.post("/application/"+applicationId+"/process")
+						.param("userId", userId)
+						.param("token", token).param("action", "1"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+		
+		 // 2.28 获取车座/成员信息
+		 mockMvc
+			.perform(get("/activity/"+activityId+"/members")
+			.param("userId", userId)
+			.param("token", token))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
+			.andReturn();
+		 
+		// 2.29 立即抢座
+		 mockMvc
+			.perform(
+					MockMvcRequestBuilders
+						.post("/activity/"+activityId+"/seat/take")
+						.param("userId", user2.get("userId"))
+						.param("token", user2.get("token"))
+						.param("carId", "")
+						.param("seatIndex", "1"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+
+		// 2.30 拉下座位
+		 mockMvc.perform(
+					MockMvcRequestBuilders
+						.post("/activity/"+activityId+"/seat/return")
+						.param("member", user2.get("userId"))
+						.param("userId", userId)
+						.param("token", token))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+		
+		 // 2.31 移除成员
+		 mockMvc.perform(
+					MockMvcRequestBuilders
+						.post("/activity/"+activityId+"/member/remove")
+						.param("userId", userId)
+						.param("token", token)
+						.param("member", user2.get("userId")))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
 		
 		 
+		// 2.25 申请加入活动
+		 mockMvc.perform(
+					MockMvcRequestBuilders.post("/activity/"+activityId+"/join")
+					.param("userId", user2.get("userId"))
+					.param("token", user2.get("token"))
+					.param("seat", "0"))
+		 			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+					.andDo(MockMvcResultHandlers.print())
+					.andReturn();
+				 
+		// 2.27 同意/拒绝 活动申请
+		 mockMvc.perform(
+					MockMvcRequestBuilders.post("/application/"+applicationId+"/process")
+						.param("userId", userId)
+						.param("token", token).param("action", "1"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+		 
+		// 2.32 退出活动
+				 mockMvc.perform(MockMvcRequestBuilders
+								.post("/activity/"+activityId+"/quit")
+								.param("userId", user2.get("userId"))
+								.param("token", user2.get("token")))
+					.andExpect(MockMvcResultMatchers.status().isOk())
+					.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+					.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+					.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+					.andDo(MockMvcResultHandlers.print()).andReturn();
+		// 2.33 编辑活动
+		 mockMvc
+			.perform(
+					MockMvcRequestBuilders
+							.post("/activity/"+activityId+"/info?userId="+userId+"&token="+token)
+							.param("type", "旅行")
+							.param("introduction", "AA活动期间晴空万里，道路通畅")
+							.param("cover", "4d51a321-f953-4623-b7ab-abd4fb858e77")
+							.param("cover", "59336875-0128-4121-862a-22d1db86fe03")
+							.param("location", "南京邮电大学")
+							.param("longitude", "118.869529")
+							.param("latitude", "32.02632")
+							.param("start", "1436494940937")
+							.param("end",   "1436494955800")
+							.param("province", "江苏省")
+							.param("city", "南京")
+							.param("district", "鼓楼区")
+							.param("pay", "我请客")
+							.param("seat", "2"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+		 
+		 // 2.34 我关注的人
+		 mockMvc.perform(get("/user/"+userId+"/info?userId="+user2.get("userId")+"&token="+user2.get("token")))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+
+		// 2.35 关注其他用户
+		 mockMvc
+			.perform(MockMvcRequestBuilders.post("/user/"+user2.get("userId")+"/listen?token="+user2.get("token"))
+							.param("targetUserId", userId))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+
+		// 2.36 取消关注其他用户
+		 mockMvc
+			.perform(
+					MockMvcRequestBuilders.post("/user/"+user2.get("userId")+"/unlisten?token="+user2.get("token"))
+							.param("targetUserId", userId))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+ 
+		// 2.38 变更我的信息
+		 mockMvc.perform(MockMvcRequestBuilders.post("/user/"+userId+"/info?token="+token)
+							.param("nickname", "小苹果")
+							.param("gender", "男")
+							.param("drivingExperience", "3")
+							.param("province", "江苏省")
+							.param("city", "南京市")
+							.param("district", "栖霞区"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+	
+		// 2.41 获取最新消息数
+		 mockMvc.perform(get("/user/" + userId + "/message/count").param("token", token))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print())
+			.andReturn();
+
+		// 2.42 获取消息列表
+		 mockMvc
+			.perform(get("/user/" + userId + "/message/list").param("token", token).param("type", "application"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print())
+			.andReturn();
+		
+		// 2.46 获取最新版本信息
+		 mockMvc.perform(get("/version?product=android"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
+			.andReturn();
+
+		
+		// 2.47批量删除消息
+		//messageController.removeMessages(null, null, null);
+
+		// 2.48 批量删除评论
+		//messageController.removeComments(null, null, null);
 	}
+	
+	
+	
 	
 	
 	
@@ -331,7 +541,7 @@ public class BusinessTest extends BaseTest {
 	 * */
 	public Map<String ,String> getNewUser(String phone,String password,String photo) throws Exception{
 			// 2.1 获取验证码
-				mockMvc.perform(get("/phone/" + phone + "/verification"))
+				mockMvc.perform(get("/phone/" + phone + "/verification").param("type","0"))
 						.andExpect(MockMvcResultMatchers.status().isOk())
 						.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 						.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -341,8 +551,7 @@ public class BusinessTest extends BaseTest {
 				// 2.2 验证码校验
 				PhoneVerification phoneVerify = phoneVerifyDao.selectByPrimaryKey(phone);
 
-				mockMvc
-						.perform(MockMvcRequestBuilders.post("/phone/" + phone + "/verification").param("code",
+				mockMvc.perform(MockMvcRequestBuilders.post("/phone/" + phone + "/verification").param("code",
 								phoneVerify.getCode()))
 						.andExpect(MockMvcResultMatchers.status().isOk())
 						.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
