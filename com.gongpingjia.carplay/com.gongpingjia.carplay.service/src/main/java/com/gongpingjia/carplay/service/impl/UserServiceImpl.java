@@ -28,6 +28,8 @@ import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.ActivityDao;
+import com.gongpingjia.carplay.dao.ActivityMemberDao;
+import com.gongpingjia.carplay.dao.ActivitySubscriptionDao;
 import com.gongpingjia.carplay.dao.AlbumPhotoDao;
 import com.gongpingjia.carplay.dao.AuthenticationApplicationDao;
 import com.gongpingjia.carplay.dao.AuthenticationChangeHistoryDao;
@@ -95,6 +97,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ChatCommonService chatCommonService;
+
+	@Autowired
+	private ActivitySubscriptionDao subscriptionDao;
+
+	@Autowired
+	private ActivityMemberDao memberDao;
 
 	@Override
 	public ResponseDo register(User user) throws ApiException {
@@ -446,51 +454,74 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseDo userInfo(String interviewedUser, String visitorUser, String token) {
+	public ResponseDo userInfo(String interviewedUser, String visitorUser, String token) throws ApiException {
+		LOG.debug("Check input parameters");
+		checker.checkUserInfo(visitorUser, token);
 
-		Map<String, Object> param = new HashMap<String, Object>();
 		// 验证参数
-		if (!CommonUtil.isUUID(interviewedUser) || !CommonUtil.isUUID(visitorUser) || !CommonUtil.isUUID(token)) {
-			LOG.warn("invalid params");
+		if (!CommonUtil.isUUID(interviewedUser)) {
+			LOG.warn("invalid params interviewedUser:{}", interviewedUser);
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
 		// 获取活动组织者信息
-		UserInfo userInfo = userDao.userInfo(interviewedUser);
+		UserInfo userInfo = userDao.selectUserInfo(interviewedUser);
 		if (null == userInfo) {
 			LOG.warn("Fail to get organizer info of activity");
 			return ResponseDo.buildFailureResponse("获取活动组织者信息失败");
 		}
 
+		Map<String, Object> param = new HashMap<String, Object>(17, 1);
 		param.put("userId", userInfo.getUserId());
 		param.put("nickname", userInfo.getNickname());
 		param.put("gender", userInfo.getGender());
 		param.put("age", userInfo.getAge());
-		param.put("photo", PropertiesUtil.getProperty("gongpingjia.person.pic.url", "") + userInfo.getPhoto()
-				+ CommonUtil.getActivityPhotoPostfix() + "&timestamp=" + DateUtil.getTime());
+
+		StringBuilder photo = new StringBuilder();
+		photo.append(CommonUtil.getPhotoServer());
+		photo.append(userInfo.getPhoto());
+		photo.append(CommonUtil.getActivityPhotoPostfix());
+		photo.append("&timestamp=");
+		photo.append(DateUtil.getTime());
+		param.put("photo", photo.toString());
+
 		param.put("carBrandLogo", userInfo.getCarBrandLogo());
 		param.put("carModel", userInfo.getCarModel());
+
+		param.put("drivingLicensePhoto", userInfo.getDrivingLicensePhoto());
+		if (!StringUtils.isEmpty(userInfo.getDrivingLicensePhoto())) {
+			StringBuilder drivingLicensePhoto = new StringBuilder();
+			drivingLicensePhoto.append(CommonUtil.getPhotoServer());
+			drivingLicensePhoto.append(userInfo.getDrivingLicensePhoto());
+			drivingLicensePhoto.append(CommonUtil.getActivityPhotoPostfix());
+			param.put("drivingLicensePhoto", drivingLicensePhoto.toString());
+		}
+
 		param.put("drivingExperience", userInfo.getDrivingExperience());
 		param.put("province", userInfo.getProvince());
 		param.put("city", userInfo.getCity());
 		param.put("district", userInfo.getDistrict());
 		param.put("isAuthenticated", userInfo.getIsauthenticated());
 
-		param.put("label", interviewedUser == visitorUser ? Constants.UserLabel.USER_ME
+		param.put("label", interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME
 				: Constants.UserLabel.USER_OTHERS);
 
-		param.put("postNumber", activityDao.activityPostNumber(interviewedUser));
+		param.put("postNumber", activityDao.selectActivityPostNumber(interviewedUser));
+
+		Map<String, Object> queryParam = new HashMap<String, Object>(1);
+		queryParam.put("userId", interviewedUser);
+		param.put("subscribeNumber", subscriptionDao.selectCountByParam(queryParam));
+		param.put("joinNumber", memberDao.selectByParam(queryParam).size());
 
 		List<AlbumPhoto> albumPhotos = albumPhotoDao.selectAlbumPhotoUrl(interviewedUser);
-		List<AlbumPhotoView> albumPhotoViewList = new ArrayList<UserServiceImpl.AlbumPhotoView>();
-		if (null != albumPhotos && !albumPhotos.isEmpty()) {
-			for (AlbumPhoto albumPhoto : albumPhotos) {
-				AlbumPhotoView albumPhotoView = new AlbumPhotoView();
-				String url = albumPhoto.getUrl();
-				int idxStart = url.indexOf("/album/");
-				albumPhotoView.setPhotoId(url.substring(idxStart + 7, idxStart + 43));
-				albumPhotoView.setThumbnail_pic(url);
-			}
+		List<Map<String, String>> albumPhotoViewList = new ArrayList<Map<String, String>>();
+		for (AlbumPhoto albumPhoto : albumPhotos) {
+			Map<String, String> albumPhotoView = new HashMap<String, String>(2, 1);
+			String url = albumPhoto.getUrl();
+			albumPhotoView.put("photoId", url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")));
+			albumPhotoView.put("thumbnail_pic", CommonUtil.getPhotoServer() + url);
+
+			albumPhotoViewList.add(albumPhotoView);
 		}
 		param.put("albumPhotos", albumPhotoViewList);
 
@@ -704,29 +735,4 @@ public class UserServiceImpl implements UserService {
 		}
 		return null;
 	}
-
-	class AlbumPhotoView {
-
-		private String photoId;
-
-		private String thumbnail_pic;
-
-		public String getPhotoId() {
-			return photoId;
-		}
-
-		public void setPhotoId(String photoId) {
-			this.photoId = photoId;
-		}
-
-		public String getThumbnail_pic() {
-			return thumbnail_pic;
-		}
-
-		public void setThumbnail_pic(String thumbnail_pic) {
-			this.thumbnail_pic = thumbnail_pic;
-		}
-
-	}
-
 }

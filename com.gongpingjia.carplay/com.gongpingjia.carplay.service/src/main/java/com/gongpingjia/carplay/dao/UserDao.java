@@ -17,7 +17,7 @@ public interface UserDao {
 
 	int updateByPrimaryKey(User user);
 	
-	UserInfo userInfo(String userid);
+	UserInfo selectUserInfo(String userid);
 	
 	List<UserInfo> userListenList(Map<String, Object> param);
 }

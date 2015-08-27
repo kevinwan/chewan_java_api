@@ -39,7 +39,7 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public UserInfo userInfo(String userid) {
+	public UserInfo selectUserInfo(String userid) {
 		return DASUtil.selectOne(UserInfo.class.getName(), "selectUserInfo", userid);
 	}
 

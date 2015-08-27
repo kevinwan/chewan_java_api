@@ -200,7 +200,12 @@ public class UserInfoController {
 
 		LOG.debug("userInfo is called, request parameter produce:");
 
-		return userService.userInfo(interviewedUser, visitorUser, token);
+		try {
+			return userService.userInfo(interviewedUser, visitorUser, token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 
 	/**

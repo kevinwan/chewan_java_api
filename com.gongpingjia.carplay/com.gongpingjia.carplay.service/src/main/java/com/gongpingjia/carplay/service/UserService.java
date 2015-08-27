@@ -61,9 +61,10 @@ public interface UserService {
 	 * @param visitorUser
 	 * @param token
 	 * @return
+	 * @throws ApiException 
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo userInfo(String interviewedUser, String visitorUser, String token);
+	ResponseDo userInfo(String interviewedUser, String visitorUser, String token) throws ApiException;
 
 	/**
 	 * 关注我的人

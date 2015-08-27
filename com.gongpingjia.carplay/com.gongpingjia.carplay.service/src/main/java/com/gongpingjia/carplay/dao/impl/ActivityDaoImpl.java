@@ -38,7 +38,7 @@ public class ActivityDaoImpl implements ActivityDao {
 	}
 
 	@Override
-	public int activityPostNumber(String userid) {
-		return DASUtil.selectOne(Activity.class.getName(), "activityPostNumber", userid);
+	public int selectActivityPostNumber(String userid) {
+		return DASUtil.selectOne(Activity.class.getName(), "selectActivityPostNumber", userid);
 	}
 }

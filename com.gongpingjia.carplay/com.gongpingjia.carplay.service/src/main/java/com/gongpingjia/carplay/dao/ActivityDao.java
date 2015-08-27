@@ -16,5 +16,5 @@ public interface ActivityDao {
 
 	List<Map<String, Object>> selectByOrganizer(Map<String, Object> param);
 
-	int activityPostNumber(String userid);
+	int selectActivityPostNumber(String userid);
 }

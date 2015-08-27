@@ -8,6 +8,7 @@
 		<result column="age" property="age" jdbcType="INTEGER" />
 		<result column="brandLogo" property="carBrandLogo" jdbcType="VARCHAR" />
 		<result column="carModel" property="carModel" jdbcType="VARCHAR" />
+		<result column="drivingLicensePhoto" property="drivingLicensePhoto" jdbcType="VARCHAR" />
 		<result column="drivingExperience" property="drivingExperience" jdbcType="INTEGER" />
 		<result column="province" property="province" jdbcType="VARCHAR" />
 		<result column="city" property="city" jdbcType="VARCHAR" />
@@ -18,8 +19,19 @@
 	
 	<select id="selectUserInfo" resultMap="UserInfoMap" parameterType="java.lang.String">
 		select 
-		    user.id as userId, nickname, gender, (year(sysdate()) - birthYear) as age, photo, ifnull(car.brandLogo, "") as brandLogo, ifnull(car.model, "") as carModel,
-		    ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, province, city, district, isAuthenticated 
+		    user.id as userId, 
+		    nickname, 
+		    gender, 
+		    (year(sysdate()) - birthYear) as age, 
+		    photo, 
+		    ifnull(car.brandLogo, "") as brandLogo, 
+		    ifnull(car.model, "") as carModel,
+		    ifnull(drivingLicensePhoto, "") as drivingLicensePhoto, 
+		    ifnull((year(sysdate()) - drivingLicenseYear), 0) as drivingExperience, 
+		    province, 
+		    city, 
+		    district, 
+		    isAuthenticated 
 		from user left join car on user.id = car.userId
 		where 
 		    user.id = #{userid,jdbcType=VARCHAR}
@@ -38,8 +50,8 @@
 		from user_subscription sub 
             left join user on sub.toUser = user.id
             left join car on car.userId= user.id 
-        order by sub.subscribeTime 
-        desc limit #{ignore,jdbcType=INTEGER} , #{limit,jdbcType=INTEGER}
+        order by sub.subscribeTime desc 
+        limit #{ignore,jdbcType=INTEGER} , #{limit,jdbcType=INTEGER}
 	</select>
 	
 </mapper>

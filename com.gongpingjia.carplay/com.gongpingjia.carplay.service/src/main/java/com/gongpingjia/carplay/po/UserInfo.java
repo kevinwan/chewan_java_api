@@ -3,27 +3,29 @@ package com.gongpingjia.carplay.po;
 public class UserInfo {
 
 	private String userId;
-	
+
 	private String nickname;
-	
+
 	private String gender;
-	
+
 	private Integer age;
-	
+
 	private String photo;
-	
+
 	private String carBrandLogo;
-	
+
 	private String carModel;
-	
+
+	private String drivingLicensePhoto;
+
 	private Integer drivingExperience;
-	
+
 	private String province;
-	
+
 	private String city;
-	
+
 	private String district;
-	
+
 	private Byte isauthenticated;
 
 	public String getUserId() {
@@ -121,6 +123,13 @@ public class UserInfo {
 	public void setIsauthenticated(Byte isauthenticated) {
 		this.isauthenticated = isauthenticated;
 	}
-	
-	
+
+	public String getDrivingLicensePhoto() {
+		return drivingLicensePhoto;
+	}
+
+	public void setDrivingLicensePhoto(String drivingLicensePhoto) {
+		this.drivingLicensePhoto = drivingLicensePhoto;
+	}
+
 }

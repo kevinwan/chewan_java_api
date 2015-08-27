@@ -15,7 +15,7 @@ public class UserInfoTest extends BaseTest {
 	@Test
 	public void testUserInfo() throws Exception {
 		
-		MvcResult result = mockMvc.perform(get("/user/a3864fa5-35ad-408e-86a9-65b6c7f6472f/info?userId=ab3a32e3-c05e-4a40-98ec-6476ef89f05a&token=d82fbe5a-3f58-4c84-81a4-3d27224e8c53"))
+		MvcResult result = mockMvc.perform(get("/user/12abfe47-e0fd-4af6-a041-0cb67cbbabdd/info?userId=12abfe47-e0fd-4af6-a041-0cb67cbbabdd&token=9c7c6543-5e56-4ddf-be2e-cfd8da44bca2"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
