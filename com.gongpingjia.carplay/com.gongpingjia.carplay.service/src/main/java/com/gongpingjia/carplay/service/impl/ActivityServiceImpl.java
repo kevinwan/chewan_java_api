@@ -448,9 +448,9 @@ public class ActivityServiceImpl implements ActivityService {
 		Activity activity = new Activity();
 		activity.setId(activityId);
 		activity.setOrganizer(request.getParameter("userId"));
-		
+
 		buildActivityCommon(request, current, activity);
-		
+
 		activity.setCreatetime(current);
 		activity.setCategory(Constants.ActivityCatalog.COMMON);
 		LOG.debug("Save activity");
@@ -803,18 +803,22 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("参数错误");
 		}
 
-		checker.checkUserInfo(userId, token);
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Fail to get activity info, activityId:{}", activityId);
+			throw new ApiException("未能成功获取活动详情");
+		}
 
-		if (getSeatReservations(activityId).isEmpty()) {
-			LOG.warn("Input parameter activityId no seat reservation, activityId:{}", activityId);
-			throw new ApiException("未能成功获取车座信息");
+		// 当输入的userID不为空的时候，需要校验
+		if (!StringUtils.isEmpty(userId)) {
+			checker.checkUserInfo(userId, token);
+
+			LOG.debug("Record activity view history log");
+			saveActivityViewHistory(activityId, userId);
 		}
 
 		// 查询活动数据
-		Map<String, Object> data = buildActivityInfoData(activityId, userId);
-
-		LOG.debug("Record activity view history log");
-		saveActivityViewHistory(activityId, userId);
+		Map<String, Object> data = buildActivityInfoData(activity, userId);
 
 		// 查询活动相关的数据
 		return ResponseDo.buildSuccessResponse(data);
@@ -853,17 +857,15 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * 构造返回的活动详情的信息
 	 * 
-	 * @param activityId
+	 * @param activity
 	 *            活动ID
 	 * @param userId
 	 *            用户ID
 	 * @return 返回构造的数据信息
 	 */
-	private Map<String, Object> buildActivityInfoData(String activityId, String userId) {
+	private Map<String, Object> buildActivityInfoData(Activity activity, String userId) {
 		LOG.debug("build activity datas");
-		Activity activity = activityDao.selectByPrimaryKey(activityId);
-
-		Map<String, Object> param = buildCommonQueryParam(activityId, userId);
+		Map<String, Object> param = buildCommonQueryParam(activity.getId(), userId);
 
 		List<Map<String, Object>> members = activityViewDao.selectActivityMembers(param);
 
@@ -896,14 +898,16 @@ public class ActivityServiceImpl implements ActivityService {
 		data.put("isModified", activity.getId());
 
 		Map<String, Object> subParam = new HashMap<String, Object>(2, 1);
-		subParam.put("activityId", activityId);
+		subParam.put("activityId", activity);
 		subParam.put("userId", userId);
+
 		Integer subCount = subscriptionDao.selectCountByParam(subParam);
 		data.put("isSubscribed", subCount);
+
 		data.put("isModified", isModified(activity.getCreatetime(), activity.getLastmodifiedtime()));
 		data.put("isOver", isActivityOver(activity.getEndtime()));
 
-		data.put("seatInfo", buildSeateInfo(activityId));
+		data.put("seatInfo", buildSeateInfo(activity.getId()));
 
 		return data;
 	}
@@ -1059,7 +1063,15 @@ public class ActivityServiceImpl implements ActivityService {
 
 		checker.checkUserInfo(userId, token);
 
-		if (!(replyUserId == null)) {
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Fail to get activity info, activityID:{}", activityId);
+			throw new ApiException("未能获取活动创建者信息");
+		}
+
+		Long current = DateUtil.getTime();
+
+		if (replyUserId != null) {
 			if (!CommonUtil.isUUID(replyUserId)) {
 				LOG.warn("input replyUserId is not uuid, replyUserId:{}", replyUserId);
 				throw new ApiException("参数错误");
@@ -1073,16 +1085,38 @@ public class ActivityServiceImpl implements ActivityService {
 				LOG.warn("Reply user is not exist");
 				throw new ApiException("回复的用户不存在");
 			}
+
+			Message replyMessage = new Message();
+			replyMessage.setId(CodeGenerator.generatorId());
+			replyMessage.setFromuser(userId);
+			replyMessage.setTouser(replyUserId);
+			replyMessage.setType(MessageType.COMMENT.getName());
+			replyMessage.setContent(comment);
+			replyMessage.setCreatetime(current);
+			replyMessage.setExtra1(activityId);
+			messageDao.insert(replyMessage);
 		}
+
+		LOG.debug("Record message");
 
 		ActivityComment activityComment = new ActivityComment();
 		activityComment.setId(CodeGenerator.generatorId());
 		activityComment.setActivityid(activityId);
 		activityComment.setComment(comment);
-		activityComment.setCreatetime(DateUtil.getTime());
+		activityComment.setCreatetime(current);
 		activityComment.setReplyuserid(replyUserId);
 		activityComment.setUserid(userId);
 		commentDao.insert(activityComment);
+
+		Message message = new Message();
+		message.setId(CodeGenerator.generatorId());
+		message.setFromuser(userId);
+		message.setTouser(activity.getOrganizer());
+		message.setType(MessageType.COMMENT.getName());
+		message.setContent(comment);
+		message.setCreatetime(current);
+		message.setExtra1(activityId);
+		messageDao.insert(message);
 
 		return ResponseDo.buildSuccessResponse();
 	}

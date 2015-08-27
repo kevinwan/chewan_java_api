@@ -145,6 +145,21 @@ public class ActivityController {
 		}
 	}
 
+	/**
+	 * 2.19 评论活动
+	 * 
+	 * @param activityId
+	 *            活动ID
+	 * @param userId
+	 *            用户ID
+	 * @param token
+	 *            用户会话Token
+	 * @param replyUserId
+	 *            回复用户信息
+	 * @param comment
+	 *            评论的内容
+	 * @return 返回评论结果
+	 */
 	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.POST)
 	public ResponseDo publishComment(@PathVariable("activityId") String activityId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token,
