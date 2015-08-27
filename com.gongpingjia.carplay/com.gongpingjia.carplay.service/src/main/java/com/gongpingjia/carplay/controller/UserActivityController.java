@@ -48,8 +48,8 @@ public class UserActivityController {
 	 * @return 活动发布列表信息
 	 */
 	@RequestMapping(value = "/user/{userId1}/post", method = RequestMethod.GET)
-	public ResponseDo getUserPost(@PathVariable String userId1, @RequestParam(value = "userId") String userId2,
-			@RequestParam(value = "token") String token,
+	public ResponseDo getUserPost(@PathVariable("userId1") String userId1,
+			@RequestParam(value = "userId") String userId2, @RequestParam(value = "token") String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 

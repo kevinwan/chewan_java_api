@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -228,7 +229,10 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
 		JSONObject json = new JSONObject();
 		json.put("target_type", "chatgroups");
-		json.put("target", groupId);
+		
+		JSONArray array = new JSONArray();
+		array.add(groupId);
+		json.put("target", array);
 
 		JSONObject msg = new JSONObject();
 		msg.put("type", "txt");
@@ -276,4 +280,36 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 		return new JSONObject();
 	}
 
+	// public static void main(String[] args) throws ApiException {
+	// String httpUrl =
+	// "https://a1.easemob.com:443/gongpingjia/carplayapp/messages";
+	//
+	// List<Header> headers = new ArrayList<Header>(2);
+	// headers.add(new BasicHeader("Content-Type", "application/json"));
+	// headers.add(new BasicHeader("Authorization",
+	// MessageFormat.format(AUTH_HEADER_FORMAT,
+	// "YWMterwfoEsOEeWcnQPhxKXuVQAAAVCZQBpQvnlmA3ZdjXXVz6gnv_Czb3Ar1cU")));
+	//
+	// JSONObject json = new JSONObject();
+	// json.put("target_type", "chatgroups");
+	//
+	// JSONArray array = new JSONArray();
+	// array.add("99123551197462944");
+	// json.put("target", array);
+	//
+	// JSONObject msg = new JSONObject();
+	// msg.put("type", "txt");
+	// msg.put("msg", "Test send message");
+	//
+	// json.put("msg", msg);
+	// json.put("from", "4c5dd2e14f07667b244176e782206910");
+	//
+	// CloseableHttpResponse response = HttpClientUtil.post(httpUrl.toString(),
+	// json.toString(), headers,
+	// Constants.Charset.UTF8);
+	//
+	// JSONObject result = HttpClientUtil.parseResponseGetJson(response);
+	//
+	// System.out.println(result);
+	// }
 }
