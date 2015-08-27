@@ -18,7 +18,7 @@ public interface ActivityService {
 	 * @return 返回查询结果信息
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo getAvailableSeats(String userId, String token) throws ApiException;
+	ResponseDo getAvailableSeats(String userId, String token, String activityId) throws ApiException;
 
 	/**
 	 * 注册用户信息
@@ -31,6 +31,17 @@ public interface ActivityService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo registerActivity(HttpServletRequest request) throws ApiException;
+
+	/**
+	 * 检查注册的请求参数是否满足注册的要求, 修改活动的时候同样适用 <br/>
+	 * 新增加这个接口主要是考虑到事务，如果参数校验也放入到事务中会影响性能
+	 * 
+	 * @param request
+	 *            请求参数集合
+	 * @throws ApiException
+	 *             参数校验不合格抛出业务异常
+	 */
+	void checkRegisterActivityParam(HttpServletRequest request) throws ApiException;
 
 	/**
 	 * 根据参数查询活动信息

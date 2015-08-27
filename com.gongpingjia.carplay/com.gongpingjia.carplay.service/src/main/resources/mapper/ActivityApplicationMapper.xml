@@ -20,7 +20,7 @@
 	
 	<select id="selectByCountOfActivityUserAndStatus" resultType="java.util.Map" parameterType="java.util.Map">
 		SELECT
-			count(*) AS count
+			count(1) AS count
 		FROM
 			activity_application
 		WHERE

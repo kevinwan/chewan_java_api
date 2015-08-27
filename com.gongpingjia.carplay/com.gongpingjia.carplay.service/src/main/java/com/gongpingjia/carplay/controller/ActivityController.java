@@ -39,11 +39,12 @@ public class ActivityController {
 	 * @return 返回响应对象
 	 */
 	@RequestMapping(value = "/user/{userId}/seats", method = RequestMethod.GET)
-	public ResponseDo getAvailableSeats(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+	public ResponseDo getAvailableSeats(@PathVariable("userId") String userId, @RequestParam("token") String token,
+			@RequestParam(value = "activityId", required = false) String activityId) {
 		LOG.info("getAvailableSeats with userId: {}", userId);
 
 		try {
-			return service.getAvailableSeats(userId, token);
+			return service.getAvailableSeats(userId, token, activityId);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -61,6 +62,9 @@ public class ActivityController {
 	public ResponseDo registerActivity(HttpServletRequest request) {
 		LOG.info("registerActivity begin");
 		try {
+
+			service.checkRegisterActivityParam(request);
+
 			return service.registerActivity(request);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -382,6 +386,8 @@ public class ActivityController {
 			@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
 		LOG.info("alterActivityInfo begin");
 		try {
+			service.checkRegisterActivityParam(request);
+
 			return service.alterActivityInfo(activityId, userId, token, request);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -442,6 +448,5 @@ public class ActivityController {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-	
-	
+
 }

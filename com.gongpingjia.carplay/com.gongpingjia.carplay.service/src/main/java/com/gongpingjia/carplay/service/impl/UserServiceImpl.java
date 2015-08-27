@@ -396,7 +396,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseDo applyAuthentication(AuthenticationApplication authen, String token, String userId) {
-
+		LOG.debug("begin check apply authentication parameters");
 		// 参数验证
 		ResponseDo paramRes = applyAuthenticationParam(authen, token, userId);
 		if (null != paramRes) {
@@ -404,8 +404,8 @@ public class UserServiceImpl implements UserService {
 		}
 
 		User user = userDao.selectByPrimaryKey(userId);
-		if (null == user) {
-			LOG.warn("User not exist");
+		if (user == null) {
+			LOG.warn("User not exist, userId:{}", userId);
 			return ResponseDo.buildFailureResponse("用户不存在");
 		}
 		if (user.getIsauthenticated() != null && 0 != user.getIsauthenticated()) {
@@ -423,8 +423,8 @@ public class UserServiceImpl implements UserService {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("userId", userId);
 		List<AuthenticationApplication> authenticationApplications = authenticationApplicationDao.selectByParam(param);
-		if (null != authenticationApplications && authenticationApplications.size() > 0) {
-			LOG.warn("already applied authentication");
+		if (!authenticationApplications.isEmpty()) {
+			LOG.warn("already applied authentication before");
 			return ResponseDo.buildFailureResponse("之前的认证申请仍在处理中");
 		}
 
@@ -433,19 +433,14 @@ public class UserServiceImpl implements UserService {
 		authen.setBrandlogo(authen.getBrandlogo().substring(authen.getBrandlogo().lastIndexOf('/') + 1));
 		authen.setStatus(Constants.ApplyAuthenticationStatus.STATUS_PENDING_PROCESSED);
 		authen.setCreatetime(DateUtil.getTime());
-		if (0 == authenticationApplicationDao.insert(authen)) {
-			LOG.warn("Fail to insert into authentication_application table");
-			return ResponseDo.buildFailureResponse("未能成功申请认证");
-		}
+		authenticationApplicationDao.insert(authen);
+
 		AuthenticationChangeHistory authenHistory = new AuthenticationChangeHistory();
 		authenHistory.setId(CodeGenerator.generatorId());
 		authenHistory.setApplicationid(authen.getId());
 		authenHistory.setStatus(Constants.ApplyAuthenticationStatus.STATUS_PENDING_PROCESSED);
 		authenHistory.setTimestamp(DateUtil.getTime());
-		if (0 == authenticationChangeHistoryDao.insert(authenHistory)) {
-			LOG.warn("Fail to insert into authentication_change_history table");
-			return ResponseDo.buildFailureResponse("添加认证申请历史记录失败");
-		}
+		authenticationChangeHistoryDao.insert(authenHistory);
 
 		return ResponseDo.buildSuccessResponse("");
 	}
@@ -692,9 +687,13 @@ public class UserServiceImpl implements UserService {
 
 	private ResponseDo applyAuthenticationParam(AuthenticationApplication authen, String token, String userId) {
 		// 验证参数
-		if ((authen.getDrivingexperience() > 50) || (authen.getBrandlogo().indexOf("http://") < 0)
-				|| authen.getBrandlogo().lastIndexOf("/") <= 6) {
-			LOG.warn("invalid params");
+		if ((authen.getDrivingexperience() > 50)) {
+			LOG.warn("Invalid params driving experience:{}", authen.getDrivingexperience());
+			return ResponseDo.buildFailureResponse("输入参数有误");
+		}
+
+		if ((authen.getBrandlogo().indexOf("http://") < 0) || authen.getBrandlogo().lastIndexOf("/") <= 6) {
+			LOG.warn("Invalid params brandlogo:{}", authen.getBrandlogo());
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 

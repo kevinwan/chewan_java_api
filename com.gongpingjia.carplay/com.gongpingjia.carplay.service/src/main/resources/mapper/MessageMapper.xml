@@ -29,14 +29,14 @@
 
 	<select id="selectCountByUserAndTypeComment" resultType="java.util.Map"
 		parameterType="java.util.Map">
-		select count(*) as count from message where toUser =
+		select count(1) as count from message where toUser =
 		#{userId,jdbcType=VARCHAR} and isChecked = 0
 		and type = #{type,jdbcType=VARCHAR}
 	</select>
 
 	<select id="selectCountByUserAndTypeNotComment" resultType="java.util.Map"
 		parameterType="java.util.Map">
-		select count(*) as count from message where toUser =
+		select count(1) as count from message where toUser =
 		#{userId,jdbcType=VARCHAR} and isChecked = 0
 		and type is not null and type not like #{type,jdbcType=VARCHAR}
 	</select>

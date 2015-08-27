@@ -122,8 +122,8 @@
 			ifnull(price, 0) AS price
 		FROM
 			activity
-		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
-		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
+		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
+		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
 		LEFT JOIN user ON activity.organizer = user.id
 		LEFT JOIN car ON car.userId = user.id
 		WHERE latitude IS NOT NULL AND longitude IS NOT NULL
@@ -189,8 +189,8 @@
 		FROM
 			activity_view_history history
 		LEFT JOIN activity ON history.activityId = activity.id
-		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
-		LEFT JOIN (SELECT activityId, count(*) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
+		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
+		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB ON activity.id = resB.activityId
 		LEFT JOIN user ON activity.organizer = user.id
 		LEFT JOIN car ON car.userId = user.id
 		<where>

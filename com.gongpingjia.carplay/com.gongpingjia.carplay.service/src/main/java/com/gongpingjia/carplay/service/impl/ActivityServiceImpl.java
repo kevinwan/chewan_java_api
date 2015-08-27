@@ -123,7 +123,7 @@ public class ActivityServiceImpl implements ActivityService {
 	private ChatCommonService chatCommonService;
 
 	@Override
-	public ResponseDo getAvailableSeats(String userId, String token) throws ApiException {
+	public ResponseDo getAvailableSeats(String userId, String token, String activityId) throws ApiException {
 
 		checker.checkUserInfo(userId, token);
 
@@ -132,15 +132,29 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Map<String, Object> result = new HashMap<String, Object>(3, 1);
 
+		int maxValue = 0;
 		if (car == null) {
 			LOG.info("User has not authicate in system");
-			result.put("maxValue", getMaxCarSeat(null));
+			maxValue = getMaxCarSeat(null);
+			result.put("maxValue", maxValue);
 			result.put("isAuthenticated", 0);
 		} else {
 			LOG.info("User has already authicated");
-			result.put("maxValue", getMaxCarSeat(car));
+			maxValue = getMaxCarSeat(car);
+			result.put("maxValue", maxValue);
 			result.put("isAuthenticated", 1);
 		}
+
+		int minValue = getMinCarSeat();
+		// activID不为空
+		if (!StringUtils.isEmpty(activityId)) {
+			LOG.debug("Get seat mimValue of activityId:{}", activityId);
+			Integer noCarSeats = seatReservDao.selectActivityJoinSeatCount(activityId);
+			if (noCarSeats > minValue && noCarSeats < maxValue) {
+				minValue = noCarSeats;
+			}
+		}
+		result.put("minValue", minValue);
 
 		return ResponseDo.buildSuccessResponse(result);
 	}
@@ -173,8 +187,6 @@ public class ActivityServiceImpl implements ActivityService {
 	public ResponseDo registerActivity(HttpServletRequest request) throws ApiException {
 
 		String userId = request.getParameter("userId");
-
-		checkActivityParam(request);
 
 		// 生成公共的部分参数
 		String activityId = CodeGenerator.generatorId();
@@ -383,13 +395,13 @@ public class ActivityServiceImpl implements ActivityService {
 		String[] covers = request.getParameterValues("cover");
 		if (covers == null || covers.length < 1
 				|| covers.length > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
-			LOG.warn("Input covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
+			LOG.warn("Input parameter covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
 			throw new ApiException("输入参数有误");
 		}
 
 		for (String coverId : covers) {
 			if (!photoService.isExist(MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverId))) {
-				LOG.warn("Activity cover is not exist");
+				LOG.warn("Activity cover is not exist, cover:{}", coverId);
 				throw new ApiException("输入参数有误");
 			}
 		}
@@ -403,7 +415,8 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常信息
 	 */
-	private void checkActivityParam(HttpServletRequest request) throws ApiException {
+	@Override
+	public void checkRegisterActivityParam(HttpServletRequest request) throws ApiException {
 		LOG.debug("Check input parameters");
 		String userId = request.getParameter("userId");
 		String token = request.getParameter("token");
@@ -435,7 +448,9 @@ public class ActivityServiceImpl implements ActivityService {
 		Activity activity = new Activity();
 		activity.setId(activityId);
 		activity.setOrganizer(request.getParameter("userId"));
+		
 		buildActivityCommon(request, current, activity);
+		
 		activity.setCreatetime(current);
 		activity.setCategory(Constants.ActivityCatalog.COMMON);
 		LOG.debug("Save activity");
@@ -475,8 +490,11 @@ public class ActivityServiceImpl implements ActivityService {
 		activity.setEndtime(computeEndTime(activity.getStart(), activity.getEnd()));
 
 		int length = PropertiesUtil.getProperty("activity.title.length.limit", 7);
-		activity.setTitle((activity.getDescription().length() <= length) ? activity.getDescription() : activity
-				.getDescription().substring(0, length));
+		if (activity.getDescription().length() <= length) {
+			activity.setTitle(activity.getDescription());
+		} else {
+			activity.setTitle(activity.getDescription().substring(0, length));
+		}
 
 		LOG.debug("Build activity province, city, district if they are empty");
 		User user = userDao.selectByPrimaryKey(request.getParameter("userId"));
@@ -1821,8 +1839,6 @@ public class ActivityServiceImpl implements ActivityService {
 	@Override
 	public ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
 			throws ApiException {
-
-		checkActivityParam(request);
 
 		// 只有活动的创建者才能编辑活动
 		Activity activity = activityDao.selectByPrimaryKey(activityId);
