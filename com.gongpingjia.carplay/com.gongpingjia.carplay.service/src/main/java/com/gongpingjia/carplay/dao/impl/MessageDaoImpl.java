@@ -33,23 +33,23 @@ public class MessageDaoImpl implements MessageDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> selectCountByUserAndTypeComment(Map<String, Object> param) {
-		return DASUtil.selectList(Message.class.getName(), "selectCountByUserAndTypeComment", param);
+	public Integer selectCountByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.selectOne(Message.class.getName(), "selectCountByUserAndTypeComment", param);
 	}
 
 	@Override
-	public List<Map<String, Object>> selectCountByUserAndTypeNotComment(Map<String, Object> param) {
-		return DASUtil.selectList(Message.class.getName(), "selectCountByUserAndTypeNotComment", param);
+	public Integer selectCountByUserAndTypeNotComment(Map<String, Object> param) {
+		return DASUtil.selectOne(Message.class.getName(), "selectCountByUserAndTypeNotComment", param);
 	}
 
 	@Override
-	public List<Map<String, Object>> selectContentByUserAndTypeComment(Map<String, Object> param) {
-		return DASUtil.selectList(Message.class.getName(), "selectContentByUserAndTypeComment", param);
+	public String selectContentByUserAndTypeComment(Map<String, Object> param) {
+		return DASUtil.selectOne(Message.class.getName(), "selectContentByUserAndTypeComment", param);
 	}
 
 	@Override
-	public List<Map<String, Object>> selectContentByUserAndTypeNotComment(Map<String, Object> param) {
-		return DASUtil.selectList(Message.class.getName(), "selectContentByUserAndTypeNotComment", param);
+	public String selectContentByUserAndTypeNotComment(Map<String, Object> param) {
+		return DASUtil.selectOne(Message.class.getName(), "selectContentByUserAndTypeNotComment", param);
 	}
 
 	@Override

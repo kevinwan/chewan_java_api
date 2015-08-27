@@ -17,7 +17,7 @@
 
 	<select id="selectByActivity" resultType="java.util.Map" parameterType="java.util.Map">
 		select user.id as userId,
-		user.nickname, concat(#{AssetUrl,jdbcType=VARCHAR}, user.photo) as photo from
+		user.nickname, concat(#{assetUrl,jdbcType=VARCHAR}, user.photo) as photo from
 		activity_member, user where
 		activity_member.activityId=#{activityId,jdbcType=VARCHAR} and
 		activity_member.userId = user.id
@@ -37,7 +37,7 @@
 			`user`.nickname,
 			`user`.gender,
 			(YEAR (sysdate()) - `user`.birthYear) AS age,
-			concat(#{AssetUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
+			concat(#{assetUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
 			IFNULL(CONCAT(#{gpjIMGUrl,jdbcType=VARCHAR}, car.brandLogo),'') AS carBrandLogo,
 			IFNULL(car.model,'') AS carModel,
 			IFNULL((YEAR(sysdate())-`user`.drivingLicenseYear),0) AS drivingExperience,

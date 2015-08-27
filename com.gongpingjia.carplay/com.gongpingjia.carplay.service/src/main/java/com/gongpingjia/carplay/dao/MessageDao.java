@@ -14,13 +14,13 @@ public interface MessageDao {
 
 	int updateByPrimaryKey(Message record);
 
-	List<Map<String, Object>> selectCountByUserAndTypeComment(Map<String, Object> param);
+	Integer selectCountByUserAndTypeComment(Map<String, Object> param);
 
-	List<Map<String, Object>> selectCountByUserAndTypeNotComment(Map<String, Object> param);
+	Integer selectCountByUserAndTypeNotComment(Map<String, Object> param);
 
-	List<Map<String, Object>> selectContentByUserAndTypeComment(Map<String, Object> param);
+	String selectContentByUserAndTypeComment(Map<String, Object> param);
 
-	List<Map<String, Object>> selectContentByUserAndTypeNotComment(Map<String, Object> param);
+	String selectContentByUserAndTypeNotComment(Map<String, Object> param);
 
 	List<Map<String, Object>> selectMessageListByUserAndTypeComment(Map<String, Object> param);
 

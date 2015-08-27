@@ -27,21 +27,21 @@
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectCountByUserAndTypeComment" resultType="java.util.Map"
+	<select id="selectCountByUserAndTypeComment" resultType="java.lang.Integer"
 		parameterType="java.util.Map">
 		select count(1) as count from message where toUser =
 		#{userId,jdbcType=VARCHAR} and isChecked = 0
 		and type = #{type,jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectCountByUserAndTypeNotComment" resultType="java.util.Map"
+	<select id="selectCountByUserAndTypeNotComment" resultType="java.lang.Integer"
 		parameterType="java.util.Map">
 		select count(1) as count from message where toUser =
 		#{userId,jdbcType=VARCHAR} and isChecked = 0
 		and type is not null and type not like #{type,jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectContentByUserAndTypeComment" resultType="java.util.Map"
+	<select id="selectContentByUserAndTypeComment" resultType="java.lang.String"
 		parameterType="java.util.Map">
 		select ifnull(content, "") as Content from message where
 		toUser = #{userId,jdbcType=VARCHAR}
@@ -49,7 +49,7 @@
 		desc limit 1
 	</select>
 
-	<select id="selectContentByUserAndTypeNotComment" resultType="java.util.Map"
+	<select id="selectContentByUserAndTypeNotComment" resultType="java.lang.String"
 		parameterType="java.util.Map">
 		select ifnull(content, "") as Content
 		from message

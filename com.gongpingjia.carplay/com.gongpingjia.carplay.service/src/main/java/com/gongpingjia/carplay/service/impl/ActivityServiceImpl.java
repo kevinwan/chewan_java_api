@@ -1326,7 +1326,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		checkProcessParameters(applicationId, userId, token, action);
 
-		Map<String, Object> appActInfo = checkApplyInfo(applicationId, userId);
+		Map<String, String> appActInfo = checkApplyInfo(applicationId, userId);
 
 		List<SeatReservation> seats = checkMemberSeatReservation(String.valueOf(appActInfo.get("activityId")));
 
@@ -1393,10 +1393,10 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @param current
 	 *            当前时间
 	 */
-	private void addActivityMember(String applicationId, String userId, Map<String, Object> appActInfo, Long current) {
+	private void addActivityMember(String applicationId, String userId, Map<String, String> appActInfo, Long current) {
 		LOG.debug("Begin add member to the activity");
-		String activityId = String.valueOf(appActInfo.get("activityId"));
-		String appliedUser = String.valueOf(appActInfo.get("appliedUser"));
+		String activityId = appActInfo.get("activityId");
+		String appliedUser = appActInfo.get("appliedUser");
 
 		ActivityMember member = new ActivityMember();
 		member.setActivityid(activityId);
@@ -1438,15 +1438,24 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void updateSeatReservationInfo(String applicationId, String userId, Map<String, Object> appActInfo,
+	private void updateSeatReservationInfo(String applicationId, String userId, Map<String, String> appActInfo,
 			List<SeatReservation> seats, Long current) throws ApiException {
 		LOG.debug("Begin update seatReservation iformation");
-		String activityId = String.valueOf(appActInfo.get("activityId"));
+		String activityId = appActInfo.get("activityId");
 		int totalSeats = seats.size();
 		// 申请者能提供的座位数
-		int seatCount = TypeConverUtil.convertToInteger("seat", String.valueOf(appActInfo.get("seat")), false);
+		int seatCount = TypeConverUtil.convertToInteger("seat", appActInfo.get("seat"), false);
 
 		int noCarSeatCount = getNoCarSeats(seats);
+		if (getAvailableSeats(seats) == 0) {
+			LOG.warn("No available seat for this user");
+			String errorMessage = "请选择“提供空座”的人加入活动";
+			if (noCarSeatCount == totalSeats) {
+				errorMessage = "还没有人提供车，" + errorMessage;
+			}
+			throw new ApiException(errorMessage);
+		}
+
 		// 申请人可以提供座位
 		if (seatCount > 0) {
 			LOG.debug("Application user can offer {} seats , applicationId:{}", seatCount, applicationId);
@@ -1455,8 +1464,7 @@ public class ActivityServiceImpl implements ActivityService {
 				throw new ApiException("该用户必须提供不少于 " + noCarSeatCount + " 个空座");
 			}
 
-			String appliedUser = String.valueOf(appActInfo.get("appliedUser"));
-			Car car = carDao.selectByUserId(appliedUser);
+			Car car = carDao.selectByUserId(appActInfo.get("appliedUser"));
 			if (car == null) {
 				LOG.warn("Fail to find car of applied user");
 				throw new ApiException("未能成功返回该用户的车辆信息");
@@ -1475,7 +1483,7 @@ public class ActivityServiceImpl implements ActivityService {
 				seatReservDao.updateByOfferdCar(updateParam);
 			}
 
-			List<SeatReservation> reservList = new ArrayList<SeatReservation>();
+			List<SeatReservation> reservList = new ArrayList<SeatReservation>(seatCount);
 			// 有车的
 			reservList.add(buildSeatReservation(userId, activityId, current, car.getId(), 0));
 			// 没有车的
@@ -1485,14 +1493,6 @@ public class ActivityServiceImpl implements ActivityService {
 			seatReservDao.insert(reservList);
 		}
 
-		if (getAvailableSeats(seats) == 0) {
-			LOG.warn("No available seat for this user");
-			String errorMessage = "请选择“提供空座”的人加入活动";
-			if (noCarSeatCount == totalSeats) {
-				errorMessage = "还没有人提供车，" + errorMessage;
-			}
-			throw new ApiException(errorMessage);
-		}
 	}
 
 	/**
@@ -1592,21 +1592,20 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private Map<String, Object> checkApplyInfo(String applicationId, String userId) throws ApiException {
+	private Map<String, String> checkApplyInfo(String applicationId, String userId) throws ApiException {
 		LOG.debug("Check input parameter business logic");
-		Map<String, Object> param = new HashMap<String, Object>(3, 1);
+		Map<String, String> param = new HashMap<String, String>(3, 1);
 		param.put("applicationId", applicationId);
 		param.put("userId", userId);
 		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
-		List<Map<String, Object>> applicationActivitys = activityViewDao.selectActivityApplication(param);
+		List<Map<String, String>> applicationActivitys = activityViewDao.selectActivityApplication(param);
 		if (applicationActivitys.isEmpty()) {
 			LOG.warn("The apploication activity not found");
 			throw new ApiException("未找到待处理的请求");
 		}
 
-		Map<String, Object> appActivity = applicationActivitys.get(0);
-		String appliedUser = String.valueOf(appActivity.get("appliedUser"));
-		if (userId.equals(appliedUser)) {
+		Map<String, String> appActivity = applicationActivitys.get(0);
+		if (userId.equals(appActivity.get("appliedUser"))) {
 			LOG.warn("Cannot process application of yourself");
 			throw new ApiException("不能处理自己提出的申请");
 		}

@@ -53,7 +53,7 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> selectActivityApplication(Map<String, Object> param) {
+	public List<Map<String, String>> selectActivityApplication(Map<String, String> param) {
 		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityApplication", param);
 	}
 
@@ -78,7 +78,7 @@ public class ActivityViewDaoImpl implements ActivityViewDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> selectActivityByCategory(Map<String, Object> param) {
+	public List<Map<String, String>> selectActivityByCategory(Map<String, String> param) {
 		return DASUtil.selectList(ActivityView.class.getName(), "selectActivityByCategory", param);
 	}
 

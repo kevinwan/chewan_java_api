@@ -26,11 +26,11 @@ public class OfficialServiceImpl implements OfficialService {
 	@Override
 	public ResponseDo getActivityList() {
 		LOG.debug("Query official activity list begin");
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
+		Map<String, String> param = new HashMap<String, String>(2, 1);
 		param.put("assetUrl", CommonUtil.getPhotoServer());
 		param.put("category", Constants.ActivityCatalog.OFFICIAL);
 
-		List<Map<String, Object>> data = activityViewDao.selectActivityByCategory(param);
+		List<Map<String, String>> data = activityViewDao.selectActivityByCategory(param);
 		return ResponseDo.buildSuccessResponse(data);
 	}
 

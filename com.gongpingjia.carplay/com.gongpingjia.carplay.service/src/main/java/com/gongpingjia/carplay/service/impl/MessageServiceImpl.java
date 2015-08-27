@@ -65,8 +65,9 @@ public class MessageServiceImpl implements MessageService {
 
 	@Override
 	public ResponseDo getApplicationList(String userId, int ignore, int limit) throws ApiException {
+		LOG.debug("select activityApplicationList");
 
-		Map<String, Object> param = new HashMap<>(5, 1);
+		Map<String, Object> param = new HashMap<String, Object>(5, 1);
 		param.put("userId", userId);
 		param.put("ignore", ignore);
 		param.put("limit", limit);
@@ -75,77 +76,61 @@ public class MessageServiceImpl implements MessageService {
 		param.put("gpjImgUrl", brandImgUrl);
 		List<Map<String, Object>> activityApplicationList = activityApplicationDao.selectByOrganizer(param);
 
-		LOG.debug("select activityApplicationList");
-
 		return ResponseDo.buildSuccessResponse(activityApplicationList);
 	}
 
 	@Override
 	public ResponseDo getMessageCount(String userId) throws ApiException {
+		LOG.debug("select message count");
+		Map<String, Object> messageCountMap = new HashMap<String, Object>(2, 1);
 
-		String commentCount = getCommentCount(userId);
-		String applicationCount = getApplicationCount(userId);
-		String commentContent = getCommentContent(userId);
-		String applicationContent = getApplicationContent(userId);
-
-		LOG.debug("select success");
-
-		Map<String, Object> commentMap = new HashMap<>(2, 1);
-		Map<String, Object> application = new HashMap<>(2, 1);
-		commentMap.put("content", commentContent);
-		commentMap.put("count", commentCount);
-		application.put("content", applicationContent);
-		application.put("count", applicationCount);
-
-		Map<String, Object> messageCountMap = new HashMap<>(2, 1);
+		Map<String, Object> commentMap = new HashMap<String, Object>(2, 1);
+		commentMap.put("content", getCommentContent(userId));
+		commentMap.put("count", getCommentCount(userId));
 		messageCountMap.put("comment", commentMap);
+
+		Map<String, Object> application = new HashMap<String, Object>(2, 1);
+		application.put("content", getApplicationContent(userId));
+		application.put("count", getApplicationCount(userId));
 		messageCountMap.put("application", application);
 
 		return ResponseDo.buildSuccessResponse(messageCountMap);
 	}
 
-	private String getCommentCount(String userId) throws ApiException {
-		Map<String, Object> param = new HashMap<>(2, 1);
+	private Integer getCommentCount(String userId) throws ApiException {
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
 		param.put("userId", userId);
 		param.put("type", MessageType.COMMENT.getName());
-		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeComment(param);
-		if (messageCountList.size() == 0) {
-			LOG.warn("Fail to get comment count");
-			throw new ApiException("未能获取发给该用户的留言数");
-		}
-		return String.valueOf(messageCountList.get(0).get("count"));
+		return messageDao.selectCountByUserAndTypeComment(param);
 	}
 
-	private String getApplicationCount(String userId) throws ApiException {
-		Map<String, Object> param = new HashMap<>(2, 1);
+	private Integer getApplicationCount(String userId) throws ApiException {
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
 		param.put("userId", userId);
 		param.put("type", MessageType.COMMENT.getName());
-		List<Map<String, Object>> messageCountList = messageDao.selectCountByUserAndTypeNotComment(param);
-		if (messageCountList.size() == 0) {
-			LOG.warn("Fail to get application count");
-			throw new ApiException("未能获取发给该用户的活动申请数");
-		}
-		return String.valueOf(messageCountList.get(0).get("count"));
+		return messageDao.selectCountByUserAndTypeNotComment(param);
 	}
 
 	private String getCommentContent(String userId) {
-		Map<String, Object> param = new HashMap<>(2, 1);
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
 		param.put("userId", userId);
 		param.put("type", MessageType.COMMENT.getName());
-		List<Map<String, Object>> messageCountList = messageDao.selectContentByUserAndTypeComment(param);
-		if (messageCountList.size() == 0)
-			return "";
-		return (String) messageCountList.get(0).get("Content");
+		String content = messageDao.selectContentByUserAndTypeComment(param);
+		if (content == null) {
+			content = "";
+		}
+		return content;
 	}
 
 	private String getApplicationContent(String userId) {
-		Map<String, Object> param = new HashMap<>(2, 1);
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
 		param.put("userId", userId);
 		param.put("type", MessageType.COMMENT.getName());
-		List<Map<String, Object>> messageCountList = messageDao.selectContentByUserAndTypeNotComment(param);
-		if (messageCountList.size() == 0)
-			return "";
-		return (String) messageCountList.get(0).get("Content");
+		String content = messageDao.selectContentByUserAndTypeNotComment(param);
+		if (content == null) {
+			content = "";
+		}
+		return content;
 	}
 
 	@Override
@@ -153,7 +138,7 @@ public class MessageServiceImpl implements MessageService {
 		String typeflag = type.toString();
 
 		type = MessageType.COMMENT.getName();
-		Map<String, Object> param = new HashMap<>(6, 1);
+		Map<String, Object> param = new HashMap<String, Object>(6, 1);
 		param.put("userId", userId);
 		param.put("type", type);
 		param.put("ignore", ignore);
@@ -166,7 +151,7 @@ public class MessageServiceImpl implements MessageService {
 		if (typeflag.equals("comment")) {
 			messageList = messageDao.selectMessageListByUserAndTypeComment(param);
 
-			Map<String, Object> paramUp = new HashMap<>(2, 1);
+			Map<String, Object> paramUp = new HashMap<String, Object>(2, 1);
 			paramUp.put("userId", userId);
 			paramUp.put("type", type);
 			messageDao.updateIsCheckedByUserAndTypeComment(paramUp);
@@ -174,7 +159,7 @@ public class MessageServiceImpl implements MessageService {
 		} else if (typeflag.equals("application")) {
 			messageList = messageDao.selectMessageListByUserAndTypeNotComment(param);
 
-			Map<String, Object> paramUp = new HashMap<>(2, 1);
+			Map<String, Object> paramUp = new HashMap<String, Object>(2, 1);
 			paramUp.put("userId", userId);
 			paramUp.put("type", type);
 			messageDao.updateIsCheckedByUserAndTypeCommentNotComment(paramUp);
@@ -182,7 +167,7 @@ public class MessageServiceImpl implements MessageService {
 			for (int i = 0; i < messageList.size(); i++) {
 
 				if (messageList.get(i).get("type").equals(MessageType.AUTHENTICATION.getName())) {
-					Map<String, Object> paramModel = new HashMap<>(1, 1);
+					Map<String, Object> paramModel = new HashMap<String, Object>(1, 1);
 					paramModel.put("applicationId", messageList.get(i).get("applicationId"));
 					List<Map<String, Object>> carModel = authenticationApplicationDao.selectCarModelbyId(paramModel);
 
@@ -240,7 +225,7 @@ public class MessageServiceImpl implements MessageService {
 	public ResponseDo removeMessages(String userId, String[] messages) throws ApiException {
 		for (String messageId : messages) {
 
-			Map<String, Object> param = new HashMap<>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("messageId", messageId);
 			param.put("userId", userId);
 			Message message = messageDao.selectByMeesageIdAndUserId(param);
@@ -267,7 +252,7 @@ public class MessageServiceImpl implements MessageService {
 				throw new ApiException("评论id 格式有误");
 			}
 
-			Map<String, Object> param = new HashMap<>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("commentId", commentId);
 			List<Map<String, Object>> commentinfo = activityCommentDao.selectAuthorAndOrganizerByCommentId(param);
 
@@ -276,8 +261,7 @@ public class MessageServiceImpl implements MessageService {
 				throw new ApiException("未能获取该评论消息");
 			}
 
-			if (!commentinfo.get(0).get("author").equals(userId)
-					&& !commentinfo.get(0).get("organizer").equals(userId)) {
+			if (!commentinfo.get(0).get("author").equals(userId) && !commentinfo.get(0).get("organizer").equals(userId)) {
 				LOG.warn("'Only organizer or author can delete this comment");
 				throw new ApiException("只有活动管理员或评论发布者有权删除该条评论");
 			}

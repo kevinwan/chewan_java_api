@@ -31,7 +31,7 @@
 			`user`.nickname,
 			`user`.gender,
 			(YEAR (sysdate()) - `user`.birthYear) AS age,
-			concat(#{AssetUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
+			concat(#{assetUrl,jdbcType=VARCHAR}, `user`.photo) AS photo,
 			IFNULL(CONCAT(#{gpjIMGUrl,jdbcType=VARCHAR}, car.brandLogo),'') AS carBrandLogo,
 			IFNULL(car.model,'') AS carModel,
 			IFNULL((YEAR(sysdate())-`user`.drivingLicenseYear),0) AS drivingExperience,

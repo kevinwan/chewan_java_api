@@ -56,13 +56,14 @@ public class UserActivityController {
 		LOG.info("=> getUserPost");
 
 		if (!CommonUtil.isUUID(userId1)) {
-			LOG.warn("invalid params");
+			LOG.warn("Invalid params, userId1:{}", userId1);
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
+
 		try {
 			checker.checkUserInfo(userId2, token);
-			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 
+			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -86,8 +87,8 @@ public class UserActivityController {
 	 * @return 活动发布列表信息
 	 */
 	@RequestMapping(value = "/user/{userId1}/subscribe", method = RequestMethod.GET)
-	public ResponseDo getUserSubscribe(@PathVariable String userId1, @RequestParam(value = "userId") String userId2,
-			@RequestParam(value = "token") String token,
+	public ResponseDo getUserSubscribe(@PathVariable("userId1") String userId1,
+			@RequestParam(value = "userId") String userId2, @RequestParam(value = "token") String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
@@ -99,8 +100,8 @@ public class UserActivityController {
 
 		try {
 			checker.checkUserInfo(userId2, token);
-			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 
+			return userActivityService.getUserSubscribe(userId1, userId2, token, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -124,8 +125,8 @@ public class UserActivityController {
 	 * @return 活动发布列表信息
 	 */
 	@RequestMapping(value = "/user/{userId1}/join", method = RequestMethod.GET)
-	public ResponseDo getUserJoin(@PathVariable String userId1, @RequestParam(value = "userId") String userId2,
-			@RequestParam(value = "token") String token,
+	public ResponseDo getUserJoin(@PathVariable("userId1") String userId1,
+			@RequestParam(value = "userId") String userId2, @RequestParam(value = "token") String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
@@ -137,8 +138,8 @@ public class UserActivityController {
 		}
 		try {
 			checker.checkUserInfo(userId2, token);
+			
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
-
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
