@@ -142,7 +142,7 @@ public class UploadController {
 	 * @return 返回结果对象
 	 */
 	@RequestMapping(value = "/user/{userId}/avatar", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo reUploadUserPhoto(@PathVariable(value = "userId") String userId,
+	public ResponseDo alterAvatar(@PathVariable(value = "userId") String userId,
 			@RequestParam("attach") MultipartFile attach, @RequestParam("token") String token) {
 		LOG.info("reUploadUserPhoto attach size: {}", attach.getSize());
 

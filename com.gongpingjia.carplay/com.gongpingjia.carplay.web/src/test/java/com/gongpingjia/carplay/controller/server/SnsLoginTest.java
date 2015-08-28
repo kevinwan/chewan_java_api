@@ -29,4 +29,23 @@ public class SnsLoginTest extends BaseTest{
 		Assert.assertNull(result.getModelAndView());
 	}
 	
+	@Test
+	public void testSnsLogin2() throws Exception {
+		MvcResult result = mockMvc
+				.perform(
+						MockMvcRequestBuilders.post("/sns/login")
+								.param("uid", "11ABD6303F2C5A51DADnp3W4NMC4")
+								.param("username", "剑神")
+								.param("url", "http://gb.cri.cn/mmsource/images/2015/08/25/85/311680634753988777.jpg")
+								.param("channel", "qq")
+								.param("sign", "cb4beb36ad2bcedca1257d1f242df265"))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(
+						MockMvcResultMatchers.content().contentType(
+								"application/json;charset=UTF-8"))
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+		Assert.assertNull(result.getModelAndView());
+	}
+	
 }

@@ -130,7 +130,7 @@ public class ZindexTest {
 		userInfoController.unPayAttention(null, null, null);
 
 		// 2.37 更改头像
-		uploadController.reUploadUserPhoto(null, null, null);
+		uploadController.alterAvatar(null, null, null);
 
 		// 2.38 变更我的信息
 		userInfoController.alterUserInfo(null, null, null, null, null, null, null, null);

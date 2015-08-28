@@ -66,4 +66,19 @@ public class DateUtil {
 		calendar.add(type, param);
 		return calendar.getTimeInMillis();
 	}
+
+	/**
+	 * 获取date的对应的type类型的值
+	 * 
+	 * @param date
+	 *            日期对象
+	 * @param type
+	 *            类型，对时间的年、月、日、时、分、秒操作，如Calendar.HOUR
+	 * @return 返回取值
+	 */
+	public static int getValue(Date date, int type) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		return calendar.get(type);
+	}
 }

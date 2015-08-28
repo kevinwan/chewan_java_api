@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserSubscription;
@@ -302,10 +303,13 @@ public class UserInfoController {
 	 */
 	@RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
 	public ResponseDo alterUserInfo(@PathVariable(value = "userId") String userId,
-			@RequestParam(value = "nickname") String nickname, @RequestParam(value = "gender") String gender,
-			@RequestParam(value = "drivingExperience") Integer drivingExperience,
-			@RequestParam(value = "province") String province, @RequestParam(value = "city") String city,
-			@RequestParam(value = "district") String district, @RequestParam(value = "token") String token) {
+			@RequestParam(value = "token") String token,
+			@RequestParam(value = "nickname", required = false) String nickname,
+			@RequestParam(value = "gender", required = false) String gender,
+			@RequestParam(value = "drivingExperience", required = false) Integer drivingExperience,
+			@RequestParam(value = "province", required = false) String province,
+			@RequestParam(value = "city", required = false) String city,
+			@RequestParam(value = "district", required = false) String district) {
 
 		LOG.debug("alterUserInfo is called, request parameter produce:");
 
@@ -316,8 +320,10 @@ public class UserInfoController {
 		user.setProvince(province);
 		user.setCity(city);
 		user.setDistrict(district);
-		user.setDrivinglicenseyear(Calendar.getInstance().get(Calendar.YEAR) - drivingExperience);
-
+		if (drivingExperience != null) {
+			user.setDrivinglicenseyear(DateUtil.getValue(DateUtil.getDate(), Calendar.YEAR) - drivingExperience);
+		}
+		
 		return userService.alterUserInfo(user, token);
 	}
 
@@ -339,6 +345,37 @@ public class UserInfoController {
 		LOG.debug("manageAlbumPhotos is called, request parameter produce:");
 
 		return userService.manageAlbumPhotos(userId, photos, token);
+	}
+	
+	/**
+	 * 2.49 三方登录
+	 * 
+	 * @param uid
+	 *            三方登录返回的用户唯一标识
+	 * @param channel
+	 *            wechat 、qq 或 sinaWeibo
+	 * @param sign
+	 *            API签名，计算方法为 MD5(uid + channel + BundleID) 其中，BundleID 为
+	 *            com.gongpingjia.carplay
+	 * 
+	 * @param username
+	 *            三方登录返回的用户昵称
+	 * @param url
+	 *            三方登录返回的用户头像地址
+	 * @return 返回登录结果
+	 */
+	@RequestMapping(value = "/sns/login", method = RequestMethod.POST)
+	public ResponseDo snsLogin(@RequestParam("uid") String uid, @RequestParam("channel") String channel,
+			@RequestParam("sign") String sign, @RequestParam(value = "username", required = false) String username,
+			@RequestParam(value = "url", required = false) String url) {
+		LOG.info("snsLogin begin");
+
+		try {
+			return userService.snsLogin(uid, channel, sign, username, url);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 	}
 
 }

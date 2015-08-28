@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
 
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +23,10 @@ import com.gongpingjia.carplay.common.enums.ApplicationStatus;
 import com.gongpingjia.carplay.common.enums.MessageType;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
-import com.gongpingjia.carplay.common.util.BeanUtil;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
-import com.gongpingjia.carplay.common.util.EncoderHandler;
-import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
@@ -46,7 +41,6 @@ import com.gongpingjia.carplay.dao.ApplicationChangeHistoryDao;
 import com.gongpingjia.carplay.dao.CarDao;
 import com.gongpingjia.carplay.dao.MessageDao;
 import com.gongpingjia.carplay.dao.SeatReservationDao;
-import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserDao;
 import com.gongpingjia.carplay.po.Activity;
 import com.gongpingjia.carplay.po.ActivityApplication;
@@ -62,7 +56,6 @@ import com.gongpingjia.carplay.po.ApplicationChangeHistory;
 import com.gongpingjia.carplay.po.Car;
 import com.gongpingjia.carplay.po.Message;
 import com.gongpingjia.carplay.po.SeatReservation;
-import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.ActivityService;
 
@@ -225,7 +218,7 @@ public class ActivityServiceImpl implements ActivityService {
 				null);
 		if (json.isEmpty()) {
 			LOG.warn("Failed to create chat group");
-			throw new ApiException("Create chat group failure");
+			throw new ApiException("创建聊天群组失败");
 		}
 
 		// 完成群组创建之后，创建群聊组
@@ -1913,15 +1906,32 @@ public class ActivityServiceImpl implements ActivityService {
 		LOG.debug("refresh data");
 		coverDao.deleteByActivityId(activityId);
 
+		String oldTitle = activity.getTitle();
+
 		Long current = DateUtil.getTime();
 		buildActivityCommon(request, current, activity);
 		activityDao.updateByPrimaryKey(activity);
+
+		modifyEmchatGroup(activity, oldTitle);
 
 		saveActivityCovers(request, activityId, current);
 
 		Map<String, String> data = buildShareData(userId, activity);
 
 		return ResponseDo.buildSuccessResponse(data);
+	}
+
+	private void modifyEmchatGroup(Activity activity, String oldTitle) throws ApiException {
+		String newTitle = activity.getTitle();
+		if (!oldTitle.equals(newTitle)) {
+			LOG.debug("Begin modify chat group");
+			JSONObject json = chatThirdService.modifyChatGroup(chatCommonService.getChatToken(),
+					activity.getEmchatgroupid(), newTitle, activity.getId().replace("-", "_"));
+			if (json.isEmpty()) {
+				LOG.warn("Failed to modify chat group");
+				throw new ApiException("修改聊天群组失败");
+			}
+		}
 	}
 
 	@Override
@@ -1951,130 +1961,4 @@ public class ActivityServiceImpl implements ActivityService {
 		return ResponseDo.buildSuccessResponse();
 	}
 
-	@Override
-	public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url)
-			throws ApiException {
-		checkSnsLoginParameters(uid, channel, sign);
-
-		LOG.debug("Save data begin");
-		Map<String, Object> param = new HashMap<String, Object>(1);
-		param.put(channel + "Id", uid);
-		List<User> users = userDao.selectByParam(param);
-
-		if (users.isEmpty()) {
-			// 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
-			LOG.debug("No exist user in the system, register new user by client call register interface");
-
-			// 用户ID
-			String id = CodeGenerator.generatorId();
-			String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
-
-			uploadPhotoToServer(url, key);
-
-			Map<String, String> data = new HashMap<String, String>(5, 1);
-			data.put("snsUid", uid);
-			data.put("snsUserName", username);
-			data.put("snsChannel", channel);
-			data.put("photoUrl", CommonUtil.getPhotoServer() + key);
-			data.put("photoId", id);
-
-			return ResponseDo.buildSuccessResponse(data);
-		} else {
-			// 用户已经存在于系统中
-			LOG.debug("User is exist in the system, return login infor");
-			User user = users.get(0);
-
-			TokenVerificationDao tokenDao = BeanUtil.getBean(TokenVerificationDao.class);
-			TokenVerification token = tokenDao.selectByPrimaryKey(user.getId());
-
-			Map<String, Object> data = new HashMap<String, Object>(9, 1);
-			data.put("userId", user.getId());
-			data.put("token", token.getToken());
-			data.put("isAuthenticated", 0);
-			data.put("nickname", user.getNickname());
-			data.put("photo",
-					CommonUtil.getPhotoServer() + MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
-
-			Car car = carDao.selectByUserId(user.getId());
-			if (car != null) {
-				data.put("brand", CommonUtil.ifNull(car.getBrand(), ""));
-				data.put("brandLogo", CommonUtil.getGPJImagePrefix() + CommonUtil.ifNull(car.getBrandlogo(), ""));
-				data.put("model", CommonUtil.ifNull(car.getModel(), ""));
-				data.put("seatNumber", car.getSeat());
-			} else {
-				data.put("brand", "");
-				data.put("brandLogo", "");
-				data.put("model", "");
-				data.put("seatNumber", 0);
-			}
-			return ResponseDo.buildSuccessResponse(data);
-		}
-	}
-
-	/**
-	 * 第三方登录，上传图片到七牛服务器
-	 * 
-	 * @param url
-	 *            请求URL
-	 * @param key
-	 *            图片 Key值
-	 * @throws ApiException
-	 *             业务异常
-	 */
-	private void uploadPhotoToServer(String url, String key) throws ApiException {
-		LOG.debug("Download user photo from internet, url:{}", url);
-		if (StringUtils.isEmpty(url)) {
-			LOG.warn("Failed to obtain user photo from server");
-			throw new ApiException("未能从三方登录获取头像信息");
-		}
-
-		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
-				0), Constants.Charset.UTF8);
-		if (!HttpClientUtil.isStatusOK(response)) {
-			LOG.warn("Failed to obtain user photo from server");
-			HttpClientUtil.close(response);
-			throw new ApiException("未能从三方登录获取头像信息");
-		}
-
-		byte[] imageBytes = HttpClientUtil.parseResponseGetBytes(response);
-		HttpClientUtil.close(response);
-
-		LOG.debug("Upload photo to photo server");
-		PhotoService photoService = BeanUtil.getBean(PhotoService.class);
-		Map<String, String> uploadResult = photoService.upload(imageBytes, key, true);
-		if (!Constants.Result.SUCCESS.equals(uploadResult.get("result"))) {
-			// 上传失败了
-			LOG.warn("Failed to upload photo to the server");
-			throw new ApiException("未能成功上传图像");
-		}
-	}
-
-	private void checkSnsLoginParameters(String uid, String channel, String sign) throws ApiException {
-		LOG.debug("Check input parameters");
-
-		if (!Constants.Channel.CHANNEL_LIST.contains(channel)) {
-			// Channel不在范围内
-			LOG.warn("Input channel is not in the list, input channel:{}", channel);
-			throw new ApiException("输入参数有误");
-		}
-
-		if (!isPassSignCheck(uid, channel, sign)) {
-			// 检查sign不通过
-			LOG.warn("Input sign correct");
-			throw new ApiException("输入参数有误");
-		}
-	}
-
-	private boolean isPassSignCheck(String uid, String channel, String sign) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(uid);
-		builder.append(channel);
-		builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
-
-		String pass = EncoderHandler.encodeByMD5(builder.toString());
-		if (pass.equals(sign)) {
-			return true;
-		}
-		return false;
-	}
 }

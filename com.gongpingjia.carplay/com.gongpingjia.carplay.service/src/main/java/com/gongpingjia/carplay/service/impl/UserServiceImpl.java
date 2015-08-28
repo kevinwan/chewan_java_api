@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
 
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,13 @@ import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
+import com.gongpingjia.carplay.common.util.BeanUtil;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
+import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.ActivityDao;
 import com.gongpingjia.carplay.dao.ActivityMemberDao;
@@ -557,10 +561,11 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseDo payAttention(UserSubscription userSubscription, String token) {
+		LOG.debug("Pay attention to other user");
 		// 验证参数
 		if (!CommonUtil.isUUID(userSubscription.getTouser())
 				|| userSubscription.getFromuser().equals(userSubscription.getTouser())) {
-			LOG.warn("invalid params");
+			LOG.warn("Invalid params, id format error or targetUserId equals userId error");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
@@ -573,47 +578,49 @@ public class UserServiceImpl implements UserService {
 
 		// 关注用户是否存在
 		User user = userDao.selectByPrimaryKey(userSubscription.getTouser());
-		if (null == user) {
+		if (user == null) {
 			LOG.warn("User not exist");
 			return ResponseDo.buildFailureResponse("关注用户不存在");
 		}
 
 		// 是否已关注
 		UserSubscription userSub = userSubscriptionDao.selectByPrimaryKey(userSubscription);
-		if (null != userSub) {
+		if (userSub != null) {
 			LOG.warn("already listened to this person before");
 			return ResponseDo.buildFailureResponse("已关注该用户，请勿重复关注");
 		}
 		userSubscription.setSubscribetime(DateUtil.getTime());
 		// 关注
-		if (0 == userSubscriptionDao.insert(userSubscription)) {
-			LOG.warn("fail to listen to this persion");
-			return ResponseDo.buildFailureResponse("未能成功关注该用户");
-		}
-		return ResponseDo.buildSuccessResponse("");
+		userSubscriptionDao.insert(userSubscription);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	@Override
 	public ResponseDo unPayAttention(UserSubscription userSubscription, String token) {
+		LOG.debug("un pay attention to other user");
 		// 验证参数
-		if (!CommonUtil.isUUID(userSubscription.getFromuser()) || !CommonUtil.isUUID(token)
-				|| !CommonUtil.isUUID(userSubscription.getTouser())
+		if (!CommonUtil.isUUID(userSubscription.getFromuser())
 				|| userSubscription.getFromuser().equals(userSubscription.getTouser())) {
 			LOG.warn("invalid params");
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
+		try {
+			checker.checkUserInfo(userSubscription.getFromuser(), token);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+
 		// 是否已关注
 		UserSubscription userSub = userSubscriptionDao.selectByPrimaryKey(userSubscription);
-		if (null == userSub) {
+		if (userSub == null) {
 			LOG.warn("cannot unlisten as not listened before");
 			return ResponseDo.buildFailureResponse("没有关注该用户，不能取消关注");
 		}
 
-		if (0 == userSubscriptionDao.deleteByPrimaryKey(userSubscription)) {
-			LOG.warn("fail to listen to this persion");
-			return ResponseDo.buildFailureResponse("未能成功取消对该用户的关注");
-		}
+		userSubscriptionDao.deleteByPrimaryKey(userSubscription);
 
 		return ResponseDo.buildSuccessResponse("");
 	}
@@ -623,6 +630,12 @@ public class UserServiceImpl implements UserService {
 
 		try {
 			checker.checkUserInfo(user.getId(), token);
+
+			if (StringUtils.isEmpty(user.getNickname())) {
+				LOG.warn("Input parameter nickname cannot be empty");
+				throw new ApiException("输入参数有误");
+			}
+
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -631,10 +644,11 @@ public class UserServiceImpl implements UserService {
 		// 用户是否存在
 		User userDB = userDao.selectByPrimaryKey(user.getId());
 		if (null == userDB) {
-			LOG.warn("invalid params");
+			LOG.warn("Invalid params, user not exist, userId:{}", user.getId());
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
+		LOG.debug("update system data");
 		userDB.setNickname(user.getNickname());
 		userDB.setGender(user.getGender());
 		userDB.setProvince(user.getProvince());
@@ -643,11 +657,9 @@ public class UserServiceImpl implements UserService {
 		userDB.setDrivinglicenseyear(user.getDrivinglicenseyear());
 
 		// 跟新用户信息
-		if (0 == userDao.updateByPrimaryKey(userDB)) {
-			LOG.warn("Fail to update user info");
-			return ResponseDo.buildFailureResponse("未能成功更新用户信息");
-		}
-		return ResponseDo.buildSuccessResponse("");
+		userDao.updateByPrimaryKey(userDB);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	@Override
@@ -734,5 +746,132 @@ public class UserServiceImpl implements UserService {
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 		return null;
+	}
+
+	@Override
+	public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url)
+			throws ApiException {
+		checkSnsLoginParameters(uid, channel, sign);
+
+		LOG.debug("Save data begin");
+		Map<String, Object> param = new HashMap<String, Object>(1);
+		param.put(channel + "Id", uid);
+		List<User> users = userDao.selectByParam(param);
+
+		if (users.isEmpty()) {
+			// 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
+			LOG.debug("No exist user in the system, register new user by client call register interface");
+
+			// 用户ID
+			String id = CodeGenerator.generatorId();
+			String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
+
+			uploadPhotoToServer(url, key);
+
+			Map<String, String> data = new HashMap<String, String>(5, 1);
+			data.put("snsUid", uid);
+			data.put("snsUserName", username);
+			data.put("snsChannel", channel);
+			data.put("photoUrl", CommonUtil.getPhotoServer() + key);
+			data.put("photoId", id);
+
+			return ResponseDo.buildSuccessResponse(data);
+		} else {
+			// 用户已经存在于系统中
+			LOG.debug("User is exist in the system, return login infor");
+			User user = users.get(0);
+
+			TokenVerificationDao tokenDao = BeanUtil.getBean(TokenVerificationDao.class);
+			TokenVerification token = tokenDao.selectByPrimaryKey(user.getId());
+
+			Map<String, Object> data = new HashMap<String, Object>(9, 1);
+			data.put("userId", user.getId());
+			data.put("token", token.getToken());
+			data.put("isAuthenticated", 0);
+			data.put("nickname", user.getNickname());
+			data.put("photo",
+					CommonUtil.getPhotoServer() + MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
+
+			Car car = carDao.selectByUserId(user.getId());
+			if (car != null) {
+				data.put("brand", CommonUtil.ifNull(car.getBrand(), ""));
+				data.put("brandLogo", CommonUtil.getGPJImagePrefix() + CommonUtil.ifNull(car.getBrandlogo(), ""));
+				data.put("model", CommonUtil.ifNull(car.getModel(), ""));
+				data.put("seatNumber", car.getSeat());
+			} else {
+				data.put("brand", "");
+				data.put("brandLogo", "");
+				data.put("model", "");
+				data.put("seatNumber", 0);
+			}
+			return ResponseDo.buildSuccessResponse(data);
+		}
+	}
+
+	/**
+	 * 第三方登录，上传图片到七牛服务器
+	 * 
+	 * @param url
+	 *            请求URL
+	 * @param key
+	 *            图片 Key值
+	 * @throws ApiException
+	 *             业务异常
+	 */
+	private void uploadPhotoToServer(String url, String key) throws ApiException {
+		LOG.debug("Download user photo from internet, url:{}", url);
+		if (StringUtils.isEmpty(url)) {
+			LOG.warn("Failed to obtain user photo from server");
+			throw new ApiException("未能从三方登录获取头像信息");
+		}
+
+		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
+				0), Constants.Charset.UTF8);
+		if (!HttpClientUtil.isStatusOK(response)) {
+			LOG.warn("Failed to obtain user photo from server");
+			HttpClientUtil.close(response);
+			throw new ApiException("未能从三方登录获取头像信息");
+		}
+
+		byte[] imageBytes = HttpClientUtil.parseResponseGetBytes(response);
+		HttpClientUtil.close(response);
+
+		LOG.debug("Upload photo to photo server");
+		PhotoService photoService = BeanUtil.getBean(PhotoService.class);
+		Map<String, String> uploadResult = photoService.upload(imageBytes, key, true);
+		if (!Constants.Result.SUCCESS.equals(uploadResult.get("result"))) {
+			// 上传失败了
+			LOG.warn("Failed to upload photo to the server");
+			throw new ApiException("未能成功上传图像");
+		}
+	}
+
+	private void checkSnsLoginParameters(String uid, String channel, String sign) throws ApiException {
+		LOG.debug("Check input parameters");
+
+		if (!Constants.Channel.CHANNEL_LIST.contains(channel)) {
+			// Channel不在范围内
+			LOG.warn("Input channel is not in the list, input channel:{}", channel);
+			throw new ApiException("输入参数有误");
+		}
+
+		if (!isPassSignCheck(uid, channel, sign)) {
+			// 检查sign不通过
+			LOG.warn("Input sign correct");
+			throw new ApiException("输入参数有误");
+		}
+	}
+
+	private boolean isPassSignCheck(String uid, String channel, String sign) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(uid);
+		builder.append(channel);
+		builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
+
+		String pass = EncoderHandler.encodeByMD5(builder.toString());
+		if (pass.equals(sign)) {
+			return true;
+		}
+		return false;
 	}
 }
