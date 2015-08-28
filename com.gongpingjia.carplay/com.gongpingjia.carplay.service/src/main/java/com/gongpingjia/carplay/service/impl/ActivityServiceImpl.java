@@ -1202,6 +1202,7 @@ public class ActivityServiceImpl implements ActivityService {
 		message.setExtra1(activity.getId());
 		message.setExtra2(seat);
 		message.setExtra3(application.getId());
+		message.setIsdeleted((byte) 0);
 		messageDao.insert(message);
 	}
 
@@ -1701,7 +1702,6 @@ public class ActivityServiceImpl implements ActivityService {
 			// 非活动成员，不能占座
 			LOG.warn("only member has privilege of taking seat");
 			throw new ApiException("只有活动成员才可以占座");
-
 		}
 
 		List<SeatReservation> alreadyTakeSeats = seatReservDao.selectListByParam(param);
