@@ -43,12 +43,12 @@ public class MessageDaoImpl implements MessageDao {
 	}
 
 	@Override
-	public String selectContentByUserAndTypeComment(Map<String, Object> param) {
+	public Map<String, Object> selectContentByUserAndTypeComment(Map<String, Object> param) {
 		return DASUtil.selectOne(Message.class.getName(), "selectContentByUserAndTypeComment", param);
 	}
 
 	@Override
-	public String selectContentByUserAndTypeNotComment(Map<String, Object> param) {
+	public Map<String, Object> selectContentByUserAndTypeNotComment(Map<String, Object> param) {
 		return DASUtil.selectOne(Message.class.getName(), "selectContentByUserAndTypeNotComment", param);
 	}
 

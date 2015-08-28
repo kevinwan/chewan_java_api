@@ -666,8 +666,8 @@ public class UserServiceImpl implements UserService {
 	public ResponseDo manageAlbumPhotos(String userId, String[] photos, String token) {
 
 		// 验证参数
-		if (photos.length > 9) {
-			LOG.warn("invalid params");
+		if (photos.length > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
+			LOG.warn("Invalid params, photos count:{}", photos.length);
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 

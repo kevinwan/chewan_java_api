@@ -184,8 +184,9 @@ public class UploadServiceImpl implements UploadService {
 			LOG.warn("get userAlbum by userId return empty result");
 			throw new ApiException("获取相册失败");
 		}
+		
 		UserAlbum userAlbum = userAlbumList.get(0);
-
+		
 		LOG.debug("check photos in album is over max count or not");
 		int photosCount = albumDao.selectPhotosCoutByAlbumid(userAlbum.getId());
 		int maxCount = PropertiesUtil.getProperty("user.album.photo.max.count", 9);

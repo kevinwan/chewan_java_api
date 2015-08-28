@@ -19,8 +19,8 @@ public class GetMessageCountTest extends BaseTest {
 
 	@Test
 	public void testMessageCount() throws Exception {
-		String userId = "ad5b9c52-2e48-40ed-89b6-26154355262f";
-		String token = "4efcd9c6-7a2c-4ff0-a8e4-feaecd197406";
+		String userId = "83d307d8-c337-4339-96be-bd90c9625f0e";
+		String token = "24973384-f9c4-496d-bd93-2f2b481923c0";
 		MvcResult result = mockMvc.perform(get("/user/" + userId + "/message/count").param("token", token))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))

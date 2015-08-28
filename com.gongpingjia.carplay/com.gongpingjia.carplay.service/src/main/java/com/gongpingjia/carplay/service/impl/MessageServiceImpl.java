@@ -36,9 +36,9 @@ import com.gongpingjia.carplay.service.MessageService;
 
 @Service
 public class MessageServiceImpl implements MessageService {
+
 	private static final Logger LOG = LoggerFactory.getLogger(VersionController.class);
-	private String assetUrl = PropertiesUtil.getProperty("qiniu.server.url", "") + "asset";
-	private String brandImgUrl = PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "");
+
 	@Autowired
 	private ActivityApplicationDao activityApplicationDao;
 
@@ -72,8 +72,8 @@ public class MessageServiceImpl implements MessageService {
 		param.put("ignore", ignore);
 		param.put("limit", limit);
 		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
-		param.put("assertUrl", assetUrl);
-		param.put("gpjImgUrl", brandImgUrl);
+		param.put("assertUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
+		param.put("gpjImgUrl", PropertiesUtil.getProperty("gongpingjia.brand.logo.url", ""));
 		List<Map<String, Object>> activityApplicationList = activityApplicationDao.selectByOrganizer(param);
 
 		return ResponseDo.buildSuccessResponse(activityApplicationList);
@@ -84,51 +84,38 @@ public class MessageServiceImpl implements MessageService {
 		LOG.debug("select message count");
 		Map<String, Object> messageCountMap = new HashMap<String, Object>(2, 1);
 
-		Map<String, Object> commentMap = new HashMap<String, Object>(2, 1);
-		commentMap.put("content", getCommentContent(userId));
-		commentMap.put("count", getCommentCount(userId));
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
+		param.put("userId", userId);
+		param.put("type", MessageType.COMMENT.getName());
+
+		Map<String, Object> commentMap = new HashMap<String, Object>(4, 1);
+		Map<String, Object> commentContent = messageDao.selectContentByUserAndTypeComment(param);
+		commentMap.putAll(buildContentMap(commentContent));
+		commentMap.put("count", messageDao.selectCountByUserAndTypeComment(param));
 		messageCountMap.put("comment", commentMap);
 
-		Map<String, Object> application = new HashMap<String, Object>(2, 1);
-		application.put("content", getApplicationContent(userId));
-		application.put("count", getApplicationCount(userId));
+		Map<String, Object> application = new HashMap<String, Object>(4, 1);
+		Map<String, Object> applicationContent = messageDao.selectContentByUserAndTypeNotComment(param);
+		application.putAll(buildContentMap(applicationContent));
+		application.put("count", messageDao.selectCountByUserAndTypeNotComment(param));
 		messageCountMap.put("application", application);
 
 		return ResponseDo.buildSuccessResponse(messageCountMap);
 	}
 
-	private Integer getCommentCount(String userId) throws ApiException {
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
-		param.put("userId", userId);
-		param.put("type", MessageType.COMMENT.getName());
-		return messageDao.selectCountByUserAndTypeComment(param);
-	}
-
-	private Integer getApplicationCount(String userId) throws ApiException {
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
-		param.put("userId", userId);
-		param.put("type", MessageType.COMMENT.getName());
-		return messageDao.selectCountByUserAndTypeNotComment(param);
-	}
-
-	private String getCommentContent(String userId) {
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
-		param.put("userId", userId);
-		param.put("type", MessageType.COMMENT.getName());
-		String content = messageDao.selectContentByUserAndTypeComment(param);
+	/**
+	 * 根据content构造返回值，如果为null构造初始值
+	 * 
+	 * @param content
+	 *            内容Map
+	 * @return 返回构造之后的Map
+	 */
+	private Map<String, Object> buildContentMap(Map<String, Object> content) {
 		if (content == null) {
-			content = "";
-		}
-		return content;
-	}
-
-	private String getApplicationContent(String userId) {
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
-		param.put("userId", userId);
-		param.put("type", MessageType.COMMENT.getName());
-		String content = messageDao.selectContentByUserAndTypeNotComment(param);
-		if (content == null) {
-			content = "";
+			content = new HashMap<String, Object>(3, 1);
+			content.put("content", "");
+			content.put("createTime", 0);
+			content.put("type", "");
 		}
 		return content;
 	}
@@ -143,8 +130,8 @@ public class MessageServiceImpl implements MessageService {
 		param.put("type", type);
 		param.put("ignore", ignore);
 		param.put("limit", limit);
-		param.put("brandImgUrl", brandImgUrl);
-		param.put("assetImgUrl", assetUrl);
+		param.put("brandImgUrl", PropertiesUtil.getProperty("gongpingjia.brand.logo.url", ""));
+		param.put("assetImgUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
 
 		List<Map<String, Object>> messageList;
 

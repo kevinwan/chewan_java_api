@@ -322,8 +322,10 @@ public class UserInfoController {
 		user.setDistrict(district);
 		if (drivingExperience != null) {
 			user.setDrivinglicenseyear(DateUtil.getValue(DateUtil.getDate(), Calendar.YEAR) - drivingExperience);
+		} else {
+			user.setDrivinglicenseyear(0);
 		}
-		
+
 		return userService.alterUserInfo(user, token);
 	}
 
@@ -342,11 +344,11 @@ public class UserInfoController {
 	public ResponseDo manageAlbumPhotos(@PathVariable(value = "userId") String userId,
 			@RequestParam(value = "photos") String[] photos, @RequestParam(value = "token") String token) {
 
-		LOG.debug("manageAlbumPhotos is called, request parameter produce:");
+		LOG.debug("manageAlbumPhotos is called, request parameter produced");
 
 		return userService.manageAlbumPhotos(userId, photos, token);
 	}
-	
+
 	/**
 	 * 2.49 三方登录
 	 * 

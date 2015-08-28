@@ -41,17 +41,24 @@
 		and type is not null and type not like #{type,jdbcType=VARCHAR}
 	</select>
 
-	<select id="selectContentByUserAndTypeComment" resultType="java.lang.String"
+	<select id="selectContentByUserAndTypeComment" resultType="java.util.Map"
 		parameterType="java.util.Map">
-		select ifnull(content, "") as Content from message where
-		toUser = #{userId,jdbcType=VARCHAR}
+		select 
+			ifnull(content, "") as content,
+			createTime,
+			type		
+		from message 
+		where toUser = #{userId,jdbcType=VARCHAR}
 		and isChecked = 0 and type = #{type,jdbcType=VARCHAR} order by createTime
 		desc limit 1
 	</select>
 
-	<select id="selectContentByUserAndTypeNotComment" resultType="java.lang.String"
+	<select id="selectContentByUserAndTypeNotComment" resultType="java.util.Map"
 		parameterType="java.util.Map">
-		select ifnull(content, "") as Content
+		select 
+			ifnull(content, "") as content,
+			createTime,
+			type		
 		from message
 		where toUser = #{userId,jdbcType=VARCHAR}
 		and isChecked = 0 and type is not null

@@ -18,9 +18,9 @@ public interface MessageDao {
 
 	Integer selectCountByUserAndTypeNotComment(Map<String, Object> param);
 
-	String selectContentByUserAndTypeComment(Map<String, Object> param);
+	Map<String, Object> selectContentByUserAndTypeComment(Map<String, Object> param);
 
-	String selectContentByUserAndTypeNotComment(Map<String, Object> param);
+	Map<String, Object> selectContentByUserAndTypeNotComment(Map<String, Object> param);
 
 	List<Map<String, Object>> selectMessageListByUserAndTypeComment(Map<String, Object> param);
 
