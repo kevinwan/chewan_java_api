@@ -92,7 +92,7 @@ public interface ActivityViewDao {
 	 *            活动参数
 	 * @return 返回活动相关的信息集合
 	 */
-	List<Map<String, String>> selectActivityApplication(Map<String, String> param);
+	List<Map<String, Object>> selectActivityApplication(Map<String, String> param);
 
 	/**
 	 * 获取活动成员信息列表

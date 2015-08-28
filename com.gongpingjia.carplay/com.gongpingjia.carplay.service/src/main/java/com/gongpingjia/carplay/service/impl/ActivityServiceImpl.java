@@ -374,12 +374,36 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private void checkActivityAddress(HttpServletRequest request) throws ApiException {
 		LOG.debug("Check activity location and address");
+		String province = request.getParameter("province");
+		String city = request.getParameter("city");
+		String district = request.getParameter("district");
 		// 要么省市区全部都不为空，要么地址不为空，当二者都为空的时候需要报错
-		if ((StringUtils.isEmpty(request.getParameter("province")) || StringUtils.isEmpty(request.getParameter("city")) || StringUtils
-				.isEmpty(request.getParameter("district"))) && StringUtils.isEmpty(request.getParameter("address"))) {
+		if (isActivityDetailCityEmpty(province, city, district) && StringUtils.isEmpty(request.getParameter("address"))) {
 			LOG.warn("Province, city and district cannot be empty, or the same with address");
 			throw new ApiException("输入参数有误");
 		}
+	}
+
+	/**
+	 * 检查省、市、区信息是否存在空值，存在空字符串就返回false，都不为空返回
+	 * 
+	 * @param province
+	 * @param city
+	 * @param district
+	 * @return
+	 */
+	private boolean isActivityDetailCityEmpty(String province, String city, String district) {
+		if (StringUtils.isEmpty(province)) {
+			return true;
+		}
+		// 当为直辖市的时候，city为空值，不能检查
+		// if (StringUtils.isEmpty(city)) {
+		// return true;
+		// }
+		if (StringUtils.isEmpty(district)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -421,6 +445,7 @@ public class ActivityServiceImpl implements ActivityService {
 		String userId = request.getParameter("userId");
 		String token = request.getParameter("token");
 		checker.checkUserInfo(userId, token);
+
 		checker.checkParameterEmpty("type", request.getParameter("type"));
 		checker.checkParameterEmpty("introduction", request.getParameter("introduction"));
 		checker.checkParameterEmpty("location", request.getParameter("location"));
@@ -496,10 +521,9 @@ public class ActivityServiceImpl implements ActivityService {
 			activity.setTitle(activity.getDescription().substring(0, length));
 		}
 
-		LOG.debug("Build activity province, city, district if they are empty");
-		User user = userDao.selectByPrimaryKey(request.getParameter("userId"));
-		if (StringUtils.isEmpty(activity.getProvince()) || StringUtils.isEmpty(activity.getCity())
-				|| StringUtils.isEmpty(activity.getDistrict())) {
+		if (isActivityDetailCityEmpty(activity.getProvince(), activity.getCity(), activity.getDistrict())) {
+			LOG.debug("Build activity province, city, district if they are empty");
+			User user = userDao.selectByPrimaryKey(request.getParameter("userId"));
 			activity.setProvince(user.getProvince());
 			activity.setCity(user.getCity());
 			activity.setDistrict(user.getDistrict());
@@ -1327,7 +1351,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		checkProcessParameters(applicationId, userId, token, action);
 
-		Map<String, String> appActInfo = checkApplyInfo(applicationId, userId);
+		Map<String, Object> appActInfo = checkApplyInfo(applicationId, userId);
 
 		List<SeatReservation> seats = checkMemberSeatReservation(String.valueOf(appActInfo.get("activityId")));
 
@@ -1394,10 +1418,10 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @param current
 	 *            当前时间
 	 */
-	private void addActivityMember(String applicationId, String userId, Map<String, String> appActInfo, Long current) {
+	private void addActivityMember(String applicationId, String userId, Map<String, Object> appActInfo, Long current) {
 		LOG.debug("Begin add member to the activity");
-		String activityId = appActInfo.get("activityId");
-		String appliedUser = appActInfo.get("appliedUser");
+		String activityId = String.valueOf(appActInfo.get("activityId"));
+		String appliedUser = String.valueOf(appActInfo.get("appliedUser"));
 
 		ActivityMember member = new ActivityMember();
 		member.setActivityid(activityId);
@@ -1439,13 +1463,13 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void updateSeatReservationInfo(String applicationId, String userId, Map<String, String> appActInfo,
+	private void updateSeatReservationInfo(String applicationId, String userId, Map<String, Object> appActInfo,
 			List<SeatReservation> seats, Long current) throws ApiException {
 		LOG.debug("Begin update seatReservation iformation");
-		String activityId = appActInfo.get("activityId");
+		String activityId = String.valueOf(appActInfo.get("activityId"));
 		int totalSeats = seats.size();
 		// 申请者能提供的座位数
-		int seatCount = TypeConverUtil.convertToInteger("seat", appActInfo.get("seat"), false);
+		int seatCount = TypeConverUtil.convertToInteger("seat", String.valueOf(appActInfo.get("seat")), false);
 
 		int noCarSeatCount = getNoCarSeats(seats);
 		if (getAvailableSeats(seats) == 0) {
@@ -1465,7 +1489,7 @@ public class ActivityServiceImpl implements ActivityService {
 				throw new ApiException("该用户必须提供不少于 " + noCarSeatCount + " 个空座");
 			}
 
-			Car car = carDao.selectByUserId(appActInfo.get("appliedUser"));
+			Car car = carDao.selectByUserId(String.valueOf(appActInfo.get("appliedUser")));
 			if (car == null) {
 				LOG.warn("Fail to find car of applied user");
 				throw new ApiException("未能成功返回该用户的车辆信息");
@@ -1593,19 +1617,19 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private Map<String, String> checkApplyInfo(String applicationId, String userId) throws ApiException {
+	private Map<String, Object> checkApplyInfo(String applicationId, String userId) throws ApiException {
 		LOG.debug("Check input parameter business logic");
 		Map<String, String> param = new HashMap<String, String>(3, 1);
 		param.put("applicationId", applicationId);
 		param.put("userId", userId);
 		param.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
-		List<Map<String, String>> applicationActivitys = activityViewDao.selectActivityApplication(param);
+		List<Map<String, Object>> applicationActivitys = activityViewDao.selectActivityApplication(param);
 		if (applicationActivitys.isEmpty()) {
 			LOG.warn("The apploication activity not found");
 			throw new ApiException("未找到待处理的请求");
 		}
 
-		Map<String, String> appActivity = applicationActivitys.get(0);
+		Map<String, Object> appActivity = applicationActivitys.get(0);
 		if (userId.equals(appActivity.get("appliedUser"))) {
 			LOG.warn("Cannot process application of yourself");
 			throw new ApiException("不能处理自己提出的申请");
@@ -1780,6 +1804,17 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("只有活动创建者可以移除成员");
 		}
 
+		LOG.debug("Begin remove member from chat group");
+		// 将用户从聊天群组中移除
+		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
+				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(member));
+		if (json.isEmpty()) {
+			// 移除用户失败
+			LOG.warn("Remove member:{} from chat group failure, groupId:{}", member, activity.getEmchatgroupid());
+			throw new ApiException("未能将该成员退出群聊");
+		}
+
+		LOG.debug("Begin update system data");
 		ActivityMemberKey key = new ActivityMemberKey();
 		key.setActivityid(activityId);
 		key.setUserid(member);
@@ -1801,16 +1836,6 @@ public class ActivityServiceImpl implements ActivityService {
 			seatReservDao.deleteByParam(param);
 		}
 
-		LOG.debug("Begin remove member from chat group");
-		// 将用户从聊天群组中移除
-		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
-				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(member));
-		if (json.isEmpty()) {
-			// 移除用户失败
-			LOG.warn("Remove member:{} from chat group failure, groupId:{}", member, activity.getEmchatgroupid());
-			throw new ApiException("未能将该成员退出群聊");
-		}
-
 		return ResponseDo.buildSuccessResponse();
 	}
 
@@ -1827,10 +1852,21 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		if (activity.getOrganizer().equals(userId)) {
-			LOG.warn("Activity creator cannot exist activity");
+			LOG.warn("Activity creator cannot exist activity, userId:{}", userId);
 			throw new ApiException("活动创建者不能退出活动");
 		}
 
+		LOG.debug("Begin remove member from chat group");
+		// 将用户从聊天群组中移除
+		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
+				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(userId));
+		if (json.isEmpty()) {
+			// 移除用户失败
+			LOG.warn("Remove member:{} from chat group failure, groupId:{}", userId, activity.getEmchatgroupid());
+			throw new ApiException("未能将该成员退出群聊");
+		}
+
+		LOG.debug("Refresh system data");
 		Car car = carDao.selectByUserId(userId);
 		if (car != null) {
 			List<String> activityCars = seatReservDao.selectCarIdsByActivityId(activityId);
@@ -1845,7 +1881,6 @@ public class ActivityServiceImpl implements ActivityService {
 			seatReservDao.deleteByParam(param);
 		}
 
-		LOG.debug("update data");
 		ActivityMemberKey key = new ActivityMemberKey();
 		key.setActivityid(activityId);
 		key.setUserid(userId);
@@ -1855,16 +1890,6 @@ public class ActivityServiceImpl implements ActivityService {
 		quitParam.put("activityId", activityId);
 		quitParam.put("userId", userId);
 		seatReservDao.updateByQuitActivity(quitParam);
-
-		LOG.debug("Begin remove member from chat group");
-		// 将用户从聊天群组中移除
-		JSONObject json = chatThirdService.deleteUserFromChatGroup(chatCommonService.getChatToken(),
-				activity.getEmchatgroupid(), chatCommonService.getUsernameByUserid(userId));
-		if (json.isEmpty()) {
-			// 移除用户失败
-			LOG.warn("Remove member:{} from chat group failure, groupId:{}", userId, activity.getEmchatgroupid());
-			throw new ApiException("未能将该成员退出群聊");
-		}
 
 		return ResponseDo.buildSuccessResponse();
 	}
