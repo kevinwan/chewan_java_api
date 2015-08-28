@@ -37,9 +37,7 @@ public class MessageService {
 				if (success) {
 					break;
 				}
-
 			}
-
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			success = false;
