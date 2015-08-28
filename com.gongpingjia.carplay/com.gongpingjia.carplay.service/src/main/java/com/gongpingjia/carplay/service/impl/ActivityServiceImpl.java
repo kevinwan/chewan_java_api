@@ -915,7 +915,7 @@ public class ActivityServiceImpl implements ActivityService {
 		data.put("isModified", activity.getId());
 
 		Map<String, Object> subParam = new HashMap<String, Object>(2, 1);
-		subParam.put("activityId", activity);
+		subParam.put("activityId", activity.getId());
 		subParam.put("userId", userId);
 
 		Integer subCount = subscriptionDao.selectCountByParam(subParam);

@@ -31,7 +31,7 @@ public class BusinessTest extends BaseTest {
 	
 	@Test
 	public void registerTest() throws Exception {
-		String phone="12345678912";
+		String phone="15365087965";
 		String password="e10adc3949ba59abbe56e057f20f883e";
 		String photo ="90179e74-e5ce-4925-89cb-d9de2d0ccfc7";
 		
@@ -126,7 +126,7 @@ public class BusinessTest extends BaseTest {
 	public void activityTest() throws Exception{
 		
 		String userId="90179e74-e5ce-4925-89cb-d9de2d0ccfc7";
-		String token="fd9d8810-b7c2-4e9d-821c-fde4af667de3";
+		String token="7a8ec9b9-dbd9-4844-b53d-4192432a27df";
 		
 		//2.15创建活动
 		MvcResult result_15 = mockMvc
@@ -234,8 +234,8 @@ public class BusinessTest extends BaseTest {
 	@Test
 	public void userActionTest()throws Exception{
 		String userId="90179e74-e5ce-4925-89cb-d9de2d0ccfc7";
-		String token="fd9d8810-b7c2-4e9d-821c-fde4af667de3";
-		String activityId="abe3d01e-d0ed-4f18-bcc6-d93becddbc60";
+		String token="7a8ec9b9-dbd9-4844-b53d-4192432a27df";
+		String activityId="d0007003-a8c6-45ed-be1b-9f1878a305c0";
 		String password="e10adc3949ba59abbe56e057f20f883e";
 		
 		
