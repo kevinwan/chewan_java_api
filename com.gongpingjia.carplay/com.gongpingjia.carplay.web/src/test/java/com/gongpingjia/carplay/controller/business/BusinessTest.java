@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
@@ -78,11 +77,9 @@ public class BusinessTest extends BaseTest {
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 
 		//2.8登录
-		mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/user/login")
-								.param("phone", phone)
-								.param("password", password))
+		mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+					.param("phone", phone)
+					.param("password", password))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -91,11 +88,10 @@ public class BusinessTest extends BaseTest {
 		
 		//2.9忘记密码
 		MvcResult result_9 = mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/user/password")
-								.param("phone", phone)
-								.param("password", password)
-								.param("code", phoneVerify.getCode()))
+				.perform(MockMvcRequestBuilders.post("/user/password")
+						.param("phone", phone)
+						.param("password", password)
+						.param("code", phoneVerify.getCode()))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -111,14 +107,12 @@ public class BusinessTest extends BaseTest {
 		
 		
 		// 2.11 车主认证申请
-		mockMvc
-				.perform(
-						MockMvcRequestBuilders.post("/user/"+userId+"/authentication?token="+token)
-								.param("drivingExperience", "3")
-								.param("carBrand", "大众")
-								.param("carBrandLogo", "http://gongpingjia.qiniudn.com/img/logo/7206452af3747880ddd07398a95b9bdbebbc963e.jpg")
-								.param("carModel", "大众cc")
-								.param("slug", "dazhong-cc"))
+		mockMvc.perform(MockMvcRequestBuilders.post("/user/"+userId+"/authentication?token="+token)
+					.param("drivingExperience", "3")
+					.param("carBrand", "大众")
+					.param("carBrandLogo", "http://gongpingjia.qiniudn.com/img/logo/7206452af3747880ddd07398a95b9bdbebbc963e.jpg")
+					.param("carModel", "大众cc")
+					.param("slug", "dazhong-cc"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -136,23 +130,22 @@ public class BusinessTest extends BaseTest {
 		
 		//2.15创建活动
 		MvcResult result_15 = mockMvc
-				.perform(
-						MockMvcRequestBuilders
-								.post("/activity/register?userId="+userId+"&token="+token)
-								.param("type", "旅行")
-								.param("introduction", "DD活动期间晴空万里，道路通畅")
-								.param("cover", "4d51a321-f953-4623-b7ab-abd4fb858e77")
-								.param("cover", "59336875-0128-4121-862a-22d1db86fe03")
-								.param("location", "南京邮电大学")
-								.param("longitude", "118.869529")
-								.param("latitude", "32.02632")
-								.param("start", "1436494940937")
-								.param("end",   "1436494955800")
-								.param("province", "江苏省")
-								.param("city", "南京")
-								.param("district", "鼓楼区")
-								.param("pay", "我请客")
-								.param("seat", "2"))
+				.perform(MockMvcRequestBuilders
+						.post("/activity/register?userId="+userId+"&token="+token)
+						.param("type", "旅行")
+						.param("introduction", "DD活动期间晴空万里，道路通畅")
+						.param("cover", "4d51a321-f953-4623-b7ab-abd4fb858e77")
+						.param("cover", "59336875-0128-4121-862a-22d1db86fe03")
+						.param("location", "南京邮电大学")
+						.param("longitude", "118.869529")
+						.param("latitude", "32.02632")
+						.param("start", "1436494940937")
+						.param("end",   "1436494955800")
+						.param("province", "江苏省")
+						.param("city", "南京")
+						.param("district", "鼓楼区")
+						.param("pay", "我请客")
+						.param("seat", "2"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -213,12 +206,11 @@ public class BusinessTest extends BaseTest {
 				.andDo(MockMvcResultHandlers.print()).andReturn();
 		
 		// 2.19评论活动
-		mockMvc.perform(
-				MockMvcRequestBuilders
-					.post("/activity/"+activityId+"/comment")
-					.param("userId", userId)
-					.param("token", token)
-					.param("comment", "testPublishComment3"))
+		mockMvc.perform(MockMvcRequestBuilders
+				.post("/activity/"+activityId+"/comment")
+				.param("userId", userId)
+				.param("token", token)
+				.param("comment", "testPublishComment3"))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 		.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -226,8 +218,7 @@ public class BusinessTest extends BaseTest {
 		.andDo(MockMvcResultHandlers.print()).andReturn();
 		
 		// 2.18 获取活动评论
-		mockMvc.perform(
-				get("/activity/"+activityId+"/comment")
+		mockMvc.perform(get("/activity/"+activityId+"/comment")
 				.param("userId", userId)
 				.param("token", token))
 		.andExpect(MockMvcResultMatchers.status().isOk())
@@ -257,8 +248,7 @@ public class BusinessTest extends BaseTest {
 		.andDo(MockMvcResultHandlers.print()).andReturn();
 		
 		// 2.21 我(TA)的发布
-		mockMvc
-		.perform(get("/user/" + userId + "/post").param("userId", userId).param("token", token))
+		mockMvc.perform(get("/user/" + userId + "/post").param("userId", userId).param("token", token))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
 		.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
@@ -501,7 +491,7 @@ public class BusinessTest extends BaseTest {
 			.andReturn();
 
 		// 2.42 获取消息列表
-		 mockMvc
+		 MvcResult result_45= mockMvc
 			.perform(get("/user/" + userId + "/message/list").param("token", token).param("type", "application"))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
@@ -518,12 +508,56 @@ public class BusinessTest extends BaseTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0)).andDo(MockMvcResultHandlers.print())
 			.andReturn();
 
-		
+		String messagesId1=JSONObject.fromObject(result_45.getResponse().getContentAsString()).getJSONArray("data").getJSONObject(0).getString("messageId");
+		String[] messages={messagesId1};
 		// 2.47批量删除消息
-		//messageController.removeMessages(null, null, null);
-
+		 mockMvc
+			.perform(MockMvcRequestBuilders.post("/message/remove").param("userId", userId).param("token", token)
+					.param("messages", messages))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=utf-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+		 
+		// 2.19评论活动
+		mockMvc.perform(
+					MockMvcRequestBuilders
+						.post("/activity/"+activityId+"/comment")
+						.param("userId", user2.get("userId"))
+						.param("token", user2.get("token"))
+						.param("comment", "testPublishComment3"))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+			.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+			.andDo(MockMvcResultHandlers.print()).andReturn();
+		
+		// 2.18 获取活动评论
+		MvcResult result_18=mockMvc.perform(
+						get("/activity/"+activityId+"/comment")
+						.param("userId", userId)
+						.param("token", token))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data[0].replyUserId").exists())
+				.andDo(MockMvcResultHandlers.print()).andReturn();
+				
+		
+		String commentId1=JSONObject.fromObject(result_18.getResponse().getContentAsString()).getJSONArray("data").getJSONObject(0).getString("commentId");
+		String[] comments={commentId1};	
+		
 		// 2.48 批量删除评论
-		//messageController.removeComments(null, null, null);
+		mockMvc
+		.perform(MockMvcRequestBuilders.post("/comment/remove").param("userId", userId).param("token", token)
+				.param("comments", comments))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andExpect(MockMvcResultMatchers.content().encoding("UTF-8"))
+		.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=utf-8"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.result").value(0))
+		.andDo(MockMvcResultHandlers.print()).andReturn();
 	}
 	
 	
