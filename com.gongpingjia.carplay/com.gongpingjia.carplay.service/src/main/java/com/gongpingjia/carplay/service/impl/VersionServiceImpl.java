@@ -27,6 +27,9 @@ public class VersionServiceImpl implements VersionService {
 			LOG.warn("No version info exist, product: {}", product);
 			throw new ApiException("获取版本信息失败");
 		}
+		if (version.getRemarks() == null) {
+			version.setRemarks("");
+		}
 		return ResponseDo.buildSuccessResponse(version);
 	}
 }

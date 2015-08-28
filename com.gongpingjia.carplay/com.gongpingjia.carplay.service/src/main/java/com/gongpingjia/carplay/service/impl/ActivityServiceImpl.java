@@ -620,7 +620,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(activityViewList.size());
 		for (ActivityView item : activityViewList) {
-			Map<String, Object> record = new HashMap<String, Object>();
+			Map<String, Object> record = new HashMap<String, Object>(14, 1);
 			record.put("activityId", item.getActivityId());
 			record.put("publishTime", item.getPublishTime());
 			record.put("start", item.getStart());
@@ -629,7 +629,7 @@ public class ActivityServiceImpl implements ActivityService {
 			record.put("type", item.getType());
 			record.put("pay", item.getPay());
 
-			Map<String, Object> organizer = new HashMap<String, Object>();
+			Map<String, Object> organizer = new HashMap<String, Object>(8, 1);
 			organizer.put("userId", item.getUserId());
 			organizer.put("nickname", item.getNickname());
 			organizer.put("gender", item.getGender());
@@ -716,7 +716,7 @@ public class ActivityServiceImpl implements ActivityService {
 			}
 		}
 
-		Map<String, Object> appParam = new HashMap<String, Object>();
+		Map<String, Object> appParam = new HashMap<String, Object>(3, 1);
 		appParam.put("activityId", activityId);
 		appParam.put("userId", userId);
 		appParam.put("status", ApplicationStatus.PENDING_PROCESSED.getName());
@@ -890,7 +890,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Map<String, Object> organizer = activityViewDao.selectActivityOrganizer(param);
 
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<String, Object>(24, 1);
 		data.put("activityId", activity.getId());
 		data.put("publishTime", activity.getCreatetime());
 		data.put("introduction", CommonUtil.ifNull(activity.getDescription(), ""));
@@ -1681,7 +1681,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Map<String, Object> activityShareInfo = activityViewDao.selectActivityShareInfo(param);
 		if (activityShareInfo == null) {
-			activityShareInfo = new HashMap<String, Object>();
+			activityShareInfo = new HashMap<String, Object>(8, 1);
 		}
 		activityShareInfo.put("members", members);
 		activityShareInfo.put("cars", cars);
@@ -1762,7 +1762,7 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("只有活动创建者可以将成员拉下座位");
 		}
 
-		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>(2, 1);
 		param.put("activityId", activityId);
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
@@ -1823,7 +1823,7 @@ public class ActivityServiceImpl implements ActivityService {
 			// 调用更新占座接口，设置对应的userID和Booktime字段为Null
 			seatReservDao.updateByTakeSeat(reservation);
 
-			Map<String, Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>(2, 1);
 			param.put("activityId", activityId);
 			param.put("carId", car.getId());
 			seatReservDao.deleteByParam(param);

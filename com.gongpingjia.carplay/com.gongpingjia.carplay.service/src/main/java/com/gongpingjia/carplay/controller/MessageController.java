@@ -1,8 +1,12 @@
 package com.gongpingjia.carplay.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.MessageService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 
@@ -111,8 +116,9 @@ public class MessageController {
 		LOG.debug("==> getMessageList");
 
 		try {
-			if (!type.equals("comment") && !type.equals("application")) {
-				LOG.warn("invalid params");
+			final List<String> types = Arrays.asList("comment", "application");
+			if (!types.contains(type)) {
+				LOG.warn("Invalid parameter type:{}", type);
 				throw new ApiException("消息类型有误");
 			}
 			checker.checkUserInfo(userId, token);
@@ -141,17 +147,22 @@ public class MessageController {
 	 * @return 提交成功
 	 */
 	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST)
-	public ResponseDo submitFeedback(@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam("content") String content, @RequestParam("photos") String[] photos) {
+	public ResponseDo submitFeedback(@RequestParam(value = "userId", required = false) String userId,
+			@RequestParam(value = "token", required = false) String token, @RequestParam("content") String content,
+			@RequestParam(value = "photos", required = false) String[] photos) {
 
 		LOG.debug("==> submitFeedback");
 
 		try {
-			if (content == null || (photos != null && photos.length > 3)) {
-				LOG.warn("invalid params");
+			if (photos != null && photos.length > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
+				LOG.warn("Invalid params, photos length is over the config, length:{}", photos.length);
 				throw new ApiException("反馈信息的参数错误");
 			}
-			checker.checkUserInfo(userId, token);
+
+			if (!StringUtils.isEmpty(userId)) {
+				checker.checkUserInfo(userId, token);
+			}
+
 			return messageService.submitFeedback(userId, content, photos);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -178,10 +189,11 @@ public class MessageController {
 
 		try {
 			checker.checkUserInfo(userId, token);
-			if (messages == null || messages.length == 0) {
-				LOG.warn("invalid params");
+			if (messages.length == 0) {
+				LOG.warn("Invalid params, messages cannot be empty");
 				throw new ApiException("输入参数有误");
 			}
+
 			return messageService.removeMessages(userId, messages);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -209,16 +221,17 @@ public class MessageController {
 
 		try {
 			checker.checkUserInfo(userId, token);
-			if (comments == null || comments.length == 0) {
-				LOG.warn("invalid params");
+
+			if (comments.length == 0) {
+				LOG.warn("Invalid params, comments length is zero");
 				throw new ApiException("输入参数有误");
 			}
+
 			return messageService.removeComments(userId, comments);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
-
 	}
 
 }

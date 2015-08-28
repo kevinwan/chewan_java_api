@@ -37,4 +37,9 @@ public class ActivityCommentDaoImpl implements ActivityCommentDao {
 		return DASUtil.selectList(ActivityComment.class.getName(), "selectAuthorAndOrganizerByCommentId", param);
 	}
 
+	@Override
+	public int deleteByPrimaryKey(List<String> commentIds) {
+		return DASUtil.deleteList(ActivityComment.class.getName(), "deleteByPrimaryKey", commentIds);
+	}
+
 }

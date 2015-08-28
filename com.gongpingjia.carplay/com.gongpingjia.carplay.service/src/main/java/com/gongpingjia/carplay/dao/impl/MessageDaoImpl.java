@@ -84,7 +84,12 @@ public class MessageDaoImpl implements MessageDao {
 
 	@Override
 	public int updateIsDeletedByMessageId(String messageId) {
-		return DASUtil.update(Message.class.getName(), "updateIsDeletedByMessageId",messageId);
+		return DASUtil.update(Message.class.getName(), "updateIsDeletedByMessageId", messageId);
+	}
+
+	@Override
+	public int updateIsDeletedByMessageId(List<String> messageIds) {
+		return DASUtil.updateList(Message.class.getName(), "updateIsDeletedByMessageId", messageIds);
 	}
 
 }

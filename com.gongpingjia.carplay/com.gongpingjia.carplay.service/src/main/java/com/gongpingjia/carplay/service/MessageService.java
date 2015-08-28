@@ -36,7 +36,8 @@ public interface MessageService {
 	ResponseDo getMessageCount(String userId) throws ApiException;
 
 	/**
-	 * 2.42 获取消息列表
+	 * 2.42 获取消息列表<br/>
+	 * 这里涉及到变更消息的状态由未读改为已读，状态变更涉及update操作，需要事务管理
 	 * 
 	 * @param userId
 	 *            用户Id
@@ -48,7 +49,7 @@ public interface MessageService {
 	 *            返回的条数, 默认为 10
 	 * 
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo getMessageList(String userId, String type, int ignore, int limit) throws ApiException;
 
 	/**
@@ -91,7 +92,7 @@ public interface MessageService {
 	 *            评论ID
 	 *
 	 * @return 删除成功
-	 * @throws ApiException 
+	 * @throws ApiException
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo removeComments(String userId, String[] comments) throws ApiException;

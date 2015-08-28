@@ -15,4 +15,6 @@ public interface ActivityCommentDao {
 	int updateByPrimaryKey(ActivityComment record);
 
 	List<Map<String, Object>> selectAuthorAndOrganizerByCommentId(Map<String, Object> param);
+
+	int deleteByPrimaryKey(List<String> commentIds);
 }

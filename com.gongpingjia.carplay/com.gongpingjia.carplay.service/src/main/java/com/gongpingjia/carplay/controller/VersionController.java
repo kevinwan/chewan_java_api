@@ -26,6 +26,13 @@ public class VersionController {
 	@Autowired
 	private VersionService service;
 
+	/**
+	 * 2.46 获取最新版本信息
+	 * 
+	 * @param product
+	 *            产品类型
+	 * @return 返回版本信息
+	 */
 	@RequestMapping(value = "/version", method = RequestMethod.GET)
 	public ResponseDo version(@RequestParam(value = "product", defaultValue = "android") String product) {
 

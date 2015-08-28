@@ -251,7 +251,7 @@ public class UserServiceImpl implements UserService {
 			checker.checkPhoneVerifyCode(phone, request.getParameter("code"));
 
 			// 判断用户是否注册过
-			Map<String, Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>(1);
 			param.put("phone", phone);
 			List<User> users = userDao.selectByParam(param);
 			if (users.size() > 0) {
@@ -322,7 +322,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ResponseDo loginUser(User user) throws ApiException {
 
-		Map<String, Object> data = new HashMap<String, Object>();
+		Map<String, Object> data = new HashMap<String, Object>(8, 1);
 		// 验证参数
 		if (!CommonUtil.isPhoneNumber(user.getPhone())) {
 			LOG.warn("invalid params");
@@ -330,7 +330,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 查找用户
-		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>(1);
 		param.put("phone", user.getPhone());
 		List<User> users = userDao.selectByParam(param);
 		if (users.isEmpty()) {
@@ -367,7 +367,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ResponseDo forgetPassword(User user, String code) throws ApiException {
 		LOG.debug("Begin reset password by forget password");
-		Map<String, Object> data = new HashMap<String, Object>();
+
 		// 验证参数
 		if (!CommonUtil.isPhoneNumber(user.getPhone())) {
 			LOG.warn("invalid params");
@@ -378,7 +378,7 @@ public class UserServiceImpl implements UserService {
 		checker.checkPhoneVerifyCode(user.getPhone(), code);
 
 		// 查询用户注册信息
-		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>(1, 1);
 		param.put("phone", user.getPhone());
 		List<User> users = userDao.selectByParam(param);
 		if (users.isEmpty()) {
@@ -399,6 +399,7 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setPassword(user.getPassword());
 		emchatAccountDao.updateByPrimaryKey(emchatAccount);
 
+		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		// 获取用户授权信息
 		data.put("userId", upUser.getId());
 		data.put("token", getUserToken(upUser.getId()));
@@ -432,7 +433,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 是否已经提起认证处理
-		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>(1, 1);
 		param.put("userId", userId);
 		List<AuthenticationApplication> authenticationApplications = authenticationApplicationDao.selectByParam(param);
 		if (!authenticationApplications.isEmpty()) {
@@ -529,7 +530,7 @@ public class UserServiceImpl implements UserService {
 		}
 		param.put("albumPhotos", albumPhotoViewList);
 
-		Map<String, Object> subparam = new HashMap<String, Object>();
+		Map<String, Object> subparam = new HashMap<String, Object>(2, 1);
 		subparam.put("interviewedUser", interviewedUser);
 		subparam.put("visitorUser", visitorUser);
 		int subCount = userSubscriptionDao.subscriptionCount(subparam);
@@ -550,7 +551,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 查询关注我的人
-		Map<String, Object> listenParam = new HashMap<String, Object>();
+		Map<String, Object> listenParam = new HashMap<String, Object>(3, 1);
 		listenParam.put("userId", userId);
 		listenParam.put("ignore", null == ignore ? 0 : ignore);
 		listenParam.put("limit", null == limit ? 10 : limit);

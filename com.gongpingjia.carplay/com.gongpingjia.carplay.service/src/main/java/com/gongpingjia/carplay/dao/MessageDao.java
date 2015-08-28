@@ -35,4 +35,6 @@ public interface MessageDao {
 	Message selectByMeesageIdAndUserId(Map<String, Object> param);
 
 	int updateIsDeletedByMessageId(String messageId);
+	
+	int updateIsDeletedByMessageId(List<String> messageIds);
 }

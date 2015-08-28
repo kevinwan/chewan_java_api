@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.enums.ApplicationStatus;
@@ -92,6 +94,7 @@ public class MessageServiceImpl implements MessageService {
 		Map<String, Object> commentContent = messageDao.selectContentByUserAndTypeComment(param);
 		commentMap.putAll(buildContentMap(commentContent));
 		commentMap.put("count", messageDao.selectCountByUserAndTypeComment(param));
+		commentMap.put("type", MessageType.COMMENT.getName());
 		messageCountMap.put("comment", commentMap);
 
 		Map<String, Object> application = new HashMap<String, Object>(4, 1);
@@ -122,97 +125,101 @@ public class MessageServiceImpl implements MessageService {
 
 	@Override
 	public ResponseDo getMessageList(String userId, String type, int ignore, int limit) throws ApiException {
-		String typeflag = type.toString();
+		LOG.debug("Get message list begin");
 
-		type = MessageType.COMMENT.getName();
 		Map<String, Object> param = new HashMap<String, Object>(6, 1);
 		param.put("userId", userId);
-		param.put("type", type);
+		param.put("type", MessageType.COMMENT.getName());
 		param.put("ignore", ignore);
 		param.put("limit", limit);
 		param.put("brandImgUrl", PropertiesUtil.getProperty("gongpingjia.brand.logo.url", ""));
 		param.put("assetImgUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
 
-		List<Map<String, Object>> messageList;
+		List<Map<String, Object>> messageList = new ArrayList<Map<String, Object>>(0);
 
-		if (typeflag.equals("comment")) {
+		if (type.equals("comment")) {
 			messageList = messageDao.selectMessageListByUserAndTypeComment(param);
 
 			Map<String, Object> paramUp = new HashMap<String, Object>(2, 1);
 			paramUp.put("userId", userId);
-			paramUp.put("type", type);
+			paramUp.put("type", MessageType.COMMENT.getName());
 			messageDao.updateIsCheckedByUserAndTypeComment(paramUp);
 
-		} else if (typeflag.equals("application")) {
+		} else if (type.equals("application")) {
 			messageList = messageDao.selectMessageListByUserAndTypeNotComment(param);
 
 			Map<String, Object> paramUp = new HashMap<String, Object>(2, 1);
 			paramUp.put("userId", userId);
-			paramUp.put("type", type);
+			paramUp.put("type", MessageType.COMMENT.getName());
 			messageDao.updateIsCheckedByUserAndTypeCommentNotComment(paramUp);
 
 			for (int i = 0; i < messageList.size(); i++) {
-
-				if (messageList.get(i).get("type").equals(MessageType.AUTHENTICATION.getName())) {
+				if (MessageType.AUTHENTICATION.getName().equals(messageList.get(i).get("type"))) {
 					Map<String, Object> paramModel = new HashMap<String, Object>(1, 1);
 					paramModel.put("applicationId", messageList.get(i).get("applicationId"));
 					List<Map<String, Object>> carModel = authenticationApplicationDao.selectCarModelbyId(paramModel);
 
-					if (carModel.size() > 0)
+					if (!carModel.isEmpty()) {
 						messageList.get(i).put("carModel", carModel.get(0).get("carModel"));
+					}
 				}
 			}
-		} else {
-			LOG.warn("error： getMessageList ，the messageType is error");
-			messageList = null;
-			throw new ApiException("消息类型错误");
 		}
+
 		return ResponseDo.buildSuccessResponse(messageList);
 	}
 
 	@Override
 	public ResponseDo submitFeedback(String userId, String content, String[] photos) throws ApiException {
-		User user = userDao.selectByPrimaryKey(userId);
+		LOG.debug("Submit feedback begin");
+
 		String feedbackId = CodeGenerator.generatorId();
 		Feedback feedback = new Feedback();
 		feedback.setId(feedbackId);
 		feedback.setContent(content);
 		feedback.setCreatetime(DateUtil.getTime());
-		feedback.setNickname(user.getNickname());
-		feedback.setPhone(user.getPhone());
-		feedback.setUserid(user.getId());
-		int affectedRows = feedbackDao.insert(feedback);
-		if (affectedRows == 0) {
-			LOG.warn("Fail to submit feedback");
-			throw new ApiException("提交反馈意见失败");
+
+		if (!StringUtils.isEmpty(userId)) {
+			LOG.debug("Input userId is not empty, record user info, userId:{}", userId);
+			User user = userDao.selectByPrimaryKey(userId);
+			feedback.setNickname(user.getNickname());
+			feedback.setPhone(user.getPhone());
+			feedback.setUserid(user.getId());
 		}
+
+		feedbackDao.insert(feedback);
+
 		if (photos != null) {
 			for (String photo : photos) {
-				if (photoService.isExist(MessageFormat.format(Constants.PhotoKey.FEEDBACK_KEY, photo))) {
-
+				String key = MessageFormat.format(Constants.PhotoKey.FEEDBACK_KEY, photo);
+				// 注意：这里如果反馈的Photo不存在的话，是否需要抛出异常？
+				if (photoService.isExist(key)) {
 					FeedbackPhoto feedbackPhoto = new FeedbackPhoto();
 					feedbackPhoto.setFeedbackid(feedbackId);
 					feedbackPhoto.setId(photo);
 					feedbackPhoto.setUploadtime(DateUtil.getTime());
-					String url = "/feedback/" + photo + ".jpg";
-					feedbackPhoto.setUrl(url);
+					feedbackPhoto.setUrl(key);
 					feedbackPhotoDao.deleteByPrimaryKey(photo);
-					affectedRows = feedbackPhotoDao.insert(feedbackPhoto);
-					if (affectedRows == 0) {
-						LOG.warn("Fail to insert into feedback_photo table");
-						throw new ApiException("未能成功插入反馈图片");
-					}
+					feedbackPhotoDao.insert(feedbackPhoto);
 				}
 			}
 		}
-		return ResponseDo.buildSuccessResponse("");
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	@Override
 	public ResponseDo removeMessages(String userId, String[] messages) throws ApiException {
-		for (String messageId : messages) {
+		LOG.debug("remove messages begin");
 
-			Map<String, Object> param = new HashMap<String, Object>();
+		List<String> messageIds = new ArrayList<String>(messages.length);
+
+		for (String messageId : messages) {
+			if (!CommonUtil.isUUID(messageId)) {
+				LOG.warn("Message id is not uuid format, messageId:{}", messageId);
+				throw new ApiException("输入参数错误");
+			}
+
+			Map<String, Object> param = new HashMap<String, Object>(2, 1);
 			param.put("messageId", messageId);
 			param.put("userId", userId);
 			Message message = messageDao.selectByMeesageIdAndUserId(param);
@@ -221,25 +228,25 @@ public class MessageServiceImpl implements MessageService {
 				LOG.error("Message not found : {}", messageId);
 				throw new ApiException("未找到该消息");
 			}
-
-			int affeced = messageDao.updateIsDeletedByMessageId(messageId);
-			if (affeced == 0) {
-				LOG.error("Fail to delete message :{}", messageId);
-				throw new ApiException("未能成功删除消息");
-			}
+			messageIds.add(messageId);
 		}
-		return ResponseDo.buildSuccessResponse("");
+
+		messageDao.updateIsDeletedByMessageId(messageIds);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	@Override
 	public ResponseDo removeComments(String userId, String[] comments) throws ApiException {
+
+		List<String> commentIds = new ArrayList<String>(comments.length);
 		for (String commentId : comments) {
 			if (!CommonUtil.isUUID(commentId)) {
 				LOG.warn("invalid comment id {}", commentId);
-				throw new ApiException("评论id 格式有误");
+				throw new ApiException("输入参数有误");
 			}
 
-			Map<String, Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>(1);
 			param.put("commentId", commentId);
 			List<Map<String, Object>> commentinfo = activityCommentDao.selectAuthorAndOrganizerByCommentId(param);
 
@@ -248,17 +255,17 @@ public class MessageServiceImpl implements MessageService {
 				throw new ApiException("未能获取该评论消息");
 			}
 
-			if (!commentinfo.get(0).get("author").equals(userId) && !commentinfo.get(0).get("organizer").equals(userId)) {
-				LOG.warn("'Only organizer or author can delete this comment");
+			Map<String, Object> comment = commentinfo.get(0);
+			if (!userId.equals(comment.get("author")) && !userId.equals(comment.get("organizer"))) {
+				LOG.warn("Only organizer or author can delete this comment");
 				throw new ApiException("只有活动管理员或评论发布者有权删除该条评论");
 			}
 
-			int affeced = activityCommentDao.deleteByPrimaryKey(commentId);
-			if (affeced == 0) {
-				LOG.error("Fail to delete comment :{}", commentId);
-				throw new ApiException("未能成功删除评论");
-			}
+			commentIds.add(commentId);
 		}
-		return ResponseDo.buildSuccessResponse("");
+
+		activityCommentDao.deleteByPrimaryKey(commentIds);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 }
