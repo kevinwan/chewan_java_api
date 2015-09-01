@@ -108,6 +108,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ActivityMemberDao memberDao;
 
+	@Autowired
+	private CacheManager cacheManager;
+
 	@Override
 	public ResponseDo register(User user) throws ApiException {
 		String userId = user.getId();
@@ -150,9 +153,12 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setActivatetime(DateUtil.getTime());
 		emchatAccountDao.insert(emchatAccount);
 
+		cacheManager.setUserTokenVerification(tokenVerification);
+
 		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		data.put("userId", userId);
 		data.put("token", tokenVerification.getToken());
+		data.put("photo", CommonUtil.getPhotoServer() + user.getPhoto());
 		return ResponseDo.buildSuccessResponse(data);
 	}
 
@@ -325,7 +331,7 @@ public class UserServiceImpl implements UserService {
 		Map<String, Object> data = new HashMap<String, Object>(8, 1);
 		// 验证参数
 		if (!CommonUtil.isPhoneNumber(user.getPhone())) {
-			LOG.warn("invalid params");
+			LOG.warn("Invalid params, phone:{}", user.getPhone());
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
@@ -359,6 +365,11 @@ public class UserServiceImpl implements UserService {
 							+ car.getBrandlogo());
 			data.put("model", car.getModel());
 			data.put("seatNumber", car.getSeat());
+		} else {
+			data.put("brand", "");
+			data.put("brandLogo", "");
+			data.put("model", "");
+			data.put("seatNumber", "");
 		}
 
 		return ResponseDo.buildSuccessResponse(data);
@@ -709,7 +720,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private String getUserToken(String userId) throws ApiException {
-		TokenVerification tokenVerification = tokenVerificationDao.selectByPrimaryKey(userId);
+		TokenVerification tokenVerification = cacheManager.getUserTokenVerification(userId);
 		if (null == tokenVerification) {
 			LOG.warn("Fail to get token and expire info from token_verification");
 			throw new ApiException("获取用户授权信息失败");
@@ -723,15 +734,17 @@ public class UserServiceImpl implements UserService {
 		String uuid = CodeGenerator.generatorId();
 		tokenVerification.setToken(uuid);
 		tokenVerification.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
-				PropertiesUtil.getProperty("gongpingjia.token.over.date", 7)));
+				PropertiesUtil.getProperty("carplay.token.over.date", 7)));
 		tokenVerificationDao.updateByPrimaryKey(tokenVerification);
+
+		cacheManager.setUserTokenVerification(tokenVerification);
 
 		return uuid;
 	}
 
 	private ResponseDo applyAuthenticationParam(AuthenticationApplication authen, String token, String userId) {
 		// 验证参数
-		if ((authen.getDrivingexperience() > 50)) {
+		if ((authen.getDrivingexperience() > PropertiesUtil.getProperty("user.max.driving.experience.years", 50))) {
 			LOG.warn("Invalid params driving experience:{}", authen.getDrivingexperience());
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
@@ -782,8 +795,7 @@ public class UserServiceImpl implements UserService {
 			LOG.debug("User is exist in the system, return login infor");
 			User user = users.get(0);
 
-			TokenVerificationDao tokenDao = BeanUtil.getBean(TokenVerificationDao.class);
-			TokenVerification token = tokenDao.selectByPrimaryKey(user.getId());
+			TokenVerification token = cacheManager.getUserTokenVerification(user.getId());
 
 			Map<String, Object> data = new HashMap<String, Object>(9, 1);
 			data.put("userId", user.getId());

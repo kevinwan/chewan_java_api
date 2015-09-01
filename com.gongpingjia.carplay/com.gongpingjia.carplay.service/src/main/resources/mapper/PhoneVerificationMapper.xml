@@ -5,11 +5,14 @@
 		<id column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="code" property="code" jdbcType="VARCHAR" />
 		<result column="expire" property="expire" jdbcType="BIGINT" />
+		<result column="modifiedtime" property="modifiedtime" jdbcType="BIGINT" />
+		<result column="sendtimes" property="sendtimes" jdbcType="INTEGER" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
 		select
-		phone, code, expire
+		phone, code, expire,
+		modifiedtime, sendtimes
 		from
 		phone_verification
 		where phone = #{phone,jdbcType=VARCHAR}
@@ -22,15 +25,17 @@
 	</delete>
 
 	<insert id="insert" parameterType="com.gongpingjia.carplay.po.PhoneVerification">
-		insert into phone_verification (phone, code, expire)
+		insert into phone_verification (phone, code, expire, modifiedtime, sendtimes)
 		values
-		(#{phone,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{expire,jdbcType=BIGINT})
+		(#{phone,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{expire,jdbcType=BIGINT}, #{modifiedtime,jdbcType=BIGINT}, #{sendtimes,jdbcType=INTEGER})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.PhoneVerification">
 		update phone_verification
 		set code = #{code,jdbcType=VARCHAR},
-		expire = #{expire,jdbcType=BIGINT}
+		expire = #{expire,jdbcType=BIGINT},
+		modifiedtime = #{modifiedtime,jdbcType=BIGINT},
+		sendtimes = #{sendtimes,jdbcType=INTEGER}
 		where phone = #{phone,jdbcType=VARCHAR}
 	</update>
 </mapper>

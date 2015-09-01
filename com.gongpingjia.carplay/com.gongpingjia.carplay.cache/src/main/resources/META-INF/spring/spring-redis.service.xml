@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 配置注解扫描路径 -->
+	<context:component-scan base-package="com.gongpingjia.carplay.cache" />
+	<context:annotation-config />
+
+	<context:property-placeholder location="classpath:conf/redis.properties"
+		ignore-unresolvable="true" />
+<!-- For real -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+	 	<property name="maxTotal" value="${redis.pool.maxTotal}" />
+		<property name="maxIdle" value="${redis.pool.maxIdle}" />
+		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
+		<property name="testOnBorrow" value="${redis.pool.testOnBorrow}" />
+		<property name="testOnReturn" value="${redis.pool.testOnReturn}" /> 
+	</bean>
+
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool"
+		destroy-method="destroy">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1">
+			<list>
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg index="0" value="${redis.server.ip}" />
+					<constructor-arg index="1" value="${redis.server.port}" />
+					<constructor-arg index="2" value="${redis.server.name}" />
+
+					<property name="password" value="${redis.server.password}" />
+					<property name="soTimeout" value="${redis.server.soTimeout}" />
+					<property name="connectionTimeout" value="${redis.server.connectionTimeout}" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- For Junit Test -->
+	<!-- 
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="1024" />
+		<property name="maxIdle" value="200" />
+		<property name="maxWaitMillis" value="1000" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" /> 
+	</bean>
+
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool"
+		destroy-method="destroy">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1">
+			<list>
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg index="0" value="192.168.17.128" />
+					<constructor-arg index="1" value="6379" />
+					<constructor-arg index="2" value="ServerNode" />
+
+					<property name="password" value="CarPlay@gongpingjia.com" />
+					<property name="soTimeout" value="2000" />
+					<property name="connectionTimeout" value="60000" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+ -->
+</beans>

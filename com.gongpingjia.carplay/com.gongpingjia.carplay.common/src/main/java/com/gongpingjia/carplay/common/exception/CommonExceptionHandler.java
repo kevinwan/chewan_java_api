@@ -52,8 +52,17 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 	 *            请求参数
 	 * @return 返回处理结果
 	 */
-	@ExceptionHandler(PersistenceException.class)
+	@ExceptionHandler(NestedServletException.class)
 	public final ResponseEntity<?> handleNestedServletException(NestedServletException ex, WebRequest request) {
+		LOG.warn("Handle NestedServletException, it is database mapping exception");
+		LOG.error(ex.getMessage(), ex);
+		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
+		HttpHeaders headers = new HttpHeaders();
+		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
+	}
+
+	@ExceptionHandler(PersistenceException.class)
+	public final ResponseEntity<?> handlePersistenceException(PersistenceException ex, WebRequest request) {
 		LOG.warn("Handle NestedServletException, it is database mapping exception");
 		LOG.error(ex.getMessage(), ex);
 		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");

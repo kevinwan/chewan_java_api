@@ -31,6 +31,9 @@ public class ParameterChecker {
 	@Autowired
 	private PhoneVerificationDao phoneDao;
 
+	@Autowired
+	private CacheManager cacheManager;
+
 	/**
 	 * 检查传入的参数userID和token的合格性，以及token是否过期
 	 * 
@@ -48,7 +51,7 @@ public class ParameterChecker {
 			throw new ApiException("输入参数有误");
 		}
 
-		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
+		TokenVerification tokenVerify = cacheManager.getUserTokenVerification(userId);
 		if (tokenVerify == null) {
 			LOG.error("No user token exist in the system, userId:{}", userId);
 			throw new ApiException("用户不存在");
@@ -73,7 +76,7 @@ public class ParameterChecker {
 	 * @return 用户存在返回true， 用户不存在返回false
 	 */
 	public boolean isUserExist(String userId) {
-		TokenVerification tokenVerify = tokenDao.selectByPrimaryKey(userId);
+		TokenVerification tokenVerify = cacheManager.getUserTokenVerification(userId);
 		if (tokenVerify == null) {
 			LOG.warn("No user token exist in the system, userId:{}", userId);
 			return false;

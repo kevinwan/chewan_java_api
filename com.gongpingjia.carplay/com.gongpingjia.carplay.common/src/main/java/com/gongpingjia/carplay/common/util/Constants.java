@@ -21,27 +21,27 @@ public class Constants {
 		/**
 		 * 发送验证码请求参数Timestamp
 		 */
-		public static final String PHONE_VERIFY_TIMESTAMP = "YYYY-MM-dd HH:mm:ss";
+		String PHONE_VERIFY_TIMESTAMP = "YYYY-MM-dd HH:mm:ss";
 
 		/**
 		 * 活动分享格式
 		 */
-		public static final String ACTIVITY_SHARE = "MM月dd日";
+		String ACTIVITY_SHARE = "MM月dd日";
 	}
 
 	public interface Result {
 
-		public static final String RESULT = "result";
+		String RESULT = "result";
 
 		/**
 		 * 成功标识字符串
 		 */
-		public static final String SUCCESS = "success";
+		String SUCCESS = "success";
 
 		/**
 		 * 失败标识字符串
 		 */
-		public static final String FAILURE = "failure";
+		String FAILURE = "failure";
 	}
 
 	public interface PhotoKey {

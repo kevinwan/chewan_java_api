@@ -24,6 +24,7 @@
 		<module>com.gongpingjia.carplay.service</module>
 		<module>com.gongpingjia.carplay.common</module>
 		<module>com.gongpingjia.carplay.thirdparty</module>
+		<module>com.gongpingjia.carplay.cache</module>
 	</modules>
 
 	<dependencies>
@@ -126,18 +127,6 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.7.4</version>
-		</dependency>
-
-		<!-- Redis缓存Client -->
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-redis</artifactId>
-			<version>1.5.2.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>2.7.3</version>
 		</dependency>
 
 		<!-- mybatis核心包 -->

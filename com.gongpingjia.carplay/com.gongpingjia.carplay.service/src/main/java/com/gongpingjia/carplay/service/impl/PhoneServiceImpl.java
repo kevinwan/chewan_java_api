@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
@@ -66,15 +65,46 @@ public class PhoneServiceImpl implements PhoneService {
 			throw new ApiException("参数错误");
 		}
 
-		String verifyCode = savePhoneVerification(phone);
+		PhoneVerification phoneVerification = savePhoneVerification(phone);
 
-		boolean sendResult = MessageService.sendMessage(phone, verifyCode);
+		int dayMaxSendTimes = PropertiesUtil.getProperty("message.send.day.max.times", 4);
+		if (phoneVerification.getSendtimes() != null && phoneVerification.getSendtimes() > dayMaxSendTimes) {
+			LOG.warn("Send message times has over the day max send times");
+			throw new ApiException("今天验证码发送次数已经用完");
+		}
+
+		// 重新计算发送次数
+		refreshPhoneVerification(phoneVerification);
+
+		boolean sendResult = MessageService.sendMessage(phone, phoneVerification.getCode(),
+				phoneVerification.getSendtimes());
 		if (sendResult) {
 			return ResponseDo.buildSuccessResponse();
 		} else {
-			LOG.error("Send message failure, phone:{}, verifyCode:{}", phone, verifyCode);
+			LOG.error("Send message failure, phone:{}, verifyCode:{}", phone, phoneVerification.getCode());
 			return ResponseDo.buildFailureResponse("验证码发送失败");
 		}
+	}
+
+	private void refreshPhoneVerification(PhoneVerification phoneVerification) {
+		Calendar calModify = Calendar.getInstance();
+		Long modifyTime = phoneVerification.getModifiedtime();
+		calModify.setTimeInMillis(modifyTime == null ? 0 : modifyTime);
+
+		Long currentTime = DateUtil.getTime();
+		Calendar current = Calendar.getInstance();
+		current.setTimeInMillis(currentTime);
+
+		if (calModify.get(Calendar.DAY_OF_YEAR) == current.get(Calendar.DAY_OF_YEAR)
+				&& calModify.get(Calendar.YEAR) == current.get(Calendar.YEAR)) {
+			// 表示是同一天
+			phoneVerification.setSendtimes(phoneVerification.getSendtimes() + 1);
+		} else {
+			// 不是同一天
+			phoneVerification.setSendtimes(1);
+		}
+		phoneVerification.setModifiedtime(currentTime);
+		phoneDao.updateByPrimaryKey(phoneVerification);
 	}
 
 	@Override
@@ -82,10 +112,6 @@ public class PhoneServiceImpl implements PhoneService {
 		if (!CommonUtil.isPhoneNumber(phone)) {
 			LOG.warn("Phone number is not correct format");
 			throw new ApiException("不是有效的手机号");
-		}
-		if (StringUtils.isEmpty(code)) {
-			LOG.warn("Parameter code is empty");
-			throw new ApiException("输入参数有误");
 		}
 
 		if (type == 0) {
@@ -120,7 +146,7 @@ public class PhoneServiceImpl implements PhoneService {
 	 * 
 	 * @param phone
 	 */
-	private String savePhoneVerification(String phone) {
+	private PhoneVerification savePhoneVerification(String phone) {
 		// 更新数据库记录
 		PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
 		if (phoneVerify == null) {
@@ -130,6 +156,8 @@ public class PhoneServiceImpl implements PhoneService {
 			phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
 			phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
 					PropertiesUtil.getProperty("message.effective.seconds", 7200)));
+			phoneVerify.setSendtimes(1);
+			phoneVerify.setModifiedtime(DateUtil.getTime());
 
 			phoneDao.insert(phoneVerify);
 		} else {
@@ -139,11 +167,12 @@ public class PhoneServiceImpl implements PhoneService {
 				phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
 				phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
 						PropertiesUtil.getProperty("message.effective.seconds", 7200)));
+				//过期了需要设置次数
 				phoneDao.updateByPrimaryKey(phoneVerify);
 			}
 		}
 
-		return phoneVerify.getCode();
+		return phoneVerify;
 	}
 
 }

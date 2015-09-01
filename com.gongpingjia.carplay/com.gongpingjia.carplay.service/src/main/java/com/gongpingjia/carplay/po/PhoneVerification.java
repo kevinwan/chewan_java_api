@@ -1,33 +1,54 @@
 package com.gongpingjia.carplay.po;
 
 public class PhoneVerification {
-    private String phone;
+	private String phone;
 
-    private String code;
+	private String code;
 
-    private Long expire;
+	private Long expire;
 
-    public String getPhone() {
-        return phone;
-    }
+	private Long modifiedtime;
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	private Integer sendtimes;
 
-    public String getCode() {
-        return code;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public Long getExpire() {
-        return expire;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public void setExpire(Long expire) {
-        this.expire = expire;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Long getExpire() {
+		return expire;
+	}
+
+	public void setExpire(Long expire) {
+		this.expire = expire;
+	}
+
+	public Long getModifiedtime() {
+		return modifiedtime;
+	}
+
+	public void setModifiedtime(Long modifiedtime) {
+		this.modifiedtime = modifiedtime;
+	}
+
+	public Integer getSendtimes() {
+		return sendtimes;
+	}
+
+	public void setSendtimes(Integer sendtimes) {
+		this.sendtimes = sendtimes;
+	}
+
 }
