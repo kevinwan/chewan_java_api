@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +50,8 @@ public class UserActivityController {
 	 */
 	@RequestMapping(value = "/user/{userId1}/post", method = RequestMethod.GET)
 	public ResponseDo getUserPost(@PathVariable("userId1") String userId1,
-			@RequestParam(value = "userId") String userId2, @RequestParam(value = "token") String token,
+			@RequestParam(value = "userId", required = false) String userId2,
+			@RequestParam(value = "token", required = false) String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
@@ -61,8 +63,9 @@ public class UserActivityController {
 		}
 
 		try {
-			checker.checkUserInfo(userId2, token);
-
+			if (!StringUtils.isEmpty(userId2)) {
+				checker.checkUserInfo(userId2, token);
+			}
 			return userActivityService.getUserPost(userId1, userId2, token, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -126,7 +129,8 @@ public class UserActivityController {
 	 */
 	@RequestMapping(value = "/user/{userId1}/join", method = RequestMethod.GET)
 	public ResponseDo getUserJoin(@PathVariable("userId1") String userId1,
-			@RequestParam(value = "userId") String userId2, @RequestParam(value = "token") String token,
+			@RequestParam(value = "userId", required = false) String userId2,
+			@RequestParam(value = "token", required = false) String token,
 			@RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit) {
 
@@ -137,7 +141,9 @@ public class UserActivityController {
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 		try {
-			checker.checkUserInfo(userId2, token);
+			if (!StringUtils.isEmpty(userId2)) {
+				checker.checkUserInfo(userId2, token);
+			}
 			
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 		} catch (ApiException e) {

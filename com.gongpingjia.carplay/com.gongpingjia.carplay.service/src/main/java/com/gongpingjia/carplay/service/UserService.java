@@ -64,7 +64,7 @@ public interface UserService {
 	 * @throws ApiException 
 	 */
 	@Transactional(readOnly = true)
-	ResponseDo userInfo(String interviewedUser, String visitorUser, String token) throws ApiException;
+	ResponseDo getUserInfo(String interviewedUser, String visitorUser, String token) throws ApiException;
 
 	/**
 	 * 关注我的人

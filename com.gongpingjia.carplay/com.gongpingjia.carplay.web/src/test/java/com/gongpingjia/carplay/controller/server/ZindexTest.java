@@ -79,7 +79,7 @@ public class ZindexTest {
 		activityController.publishComment(null, null, null, null, null);
 
 		// 2.20 个人详情
-		userInfoController.userInfo(null, null, null);
+		userInfoController.getUserInfo(null, null, null);
 
 		// 2.21 我(TA)的发布
 		userActivityController.getUserPost(null, null, null, null, null);

@@ -466,18 +466,21 @@ public class UserServiceImpl implements UserService {
 		authenHistory.setTimestamp(DateUtil.getTime());
 		authenticationChangeHistoryDao.insert(authenHistory);
 
-		return ResponseDo.buildSuccessResponse("");
+		return ResponseDo.buildSuccessResponse();
 	}
 
 	@Override
-	public ResponseDo userInfo(String interviewedUser, String visitorUser, String token) throws ApiException {
+	public ResponseDo getUserInfo(String interviewedUser, String visitorUser, String token) throws ApiException {
 		LOG.debug("Check input parameters");
-		checker.checkUserInfo(visitorUser, token);
-
 		// 验证参数
 		if (!CommonUtil.isUUID(interviewedUser)) {
 			LOG.warn("invalid params interviewedUser:{}", interviewedUser);
 			return ResponseDo.buildFailureResponse("输入参数有误");
+		}
+
+		if (!StringUtils.isEmpty(visitorUser)) {
+			// 当且仅当非空的时候校验
+			checker.checkUserInfo(visitorUser, token);
 		}
 
 		// 获取活动组织者信息
@@ -487,11 +490,11 @@ public class UserServiceImpl implements UserService {
 			return ResponseDo.buildFailureResponse("获取活动组织者信息失败");
 		}
 
-		Map<String, Object> param = new HashMap<String, Object>(17, 1);
-		param.put("userId", userInfo.getUserId());
-		param.put("nickname", userInfo.getNickname());
-		param.put("gender", userInfo.getGender());
-		param.put("age", userInfo.getAge());
+		Map<String, Object> data = new HashMap<String, Object>(20, 1);
+		data.put("userId", userInfo.getUserId());
+		data.put("nickname", userInfo.getNickname());
+		data.put("gender", userInfo.getGender());
+		data.put("age", userInfo.getAge());
 
 		StringBuilder photo = new StringBuilder();
 		photo.append(CommonUtil.getPhotoServer());
@@ -499,35 +502,36 @@ public class UserServiceImpl implements UserService {
 		photo.append(CommonUtil.getActivityPhotoPostfix());
 		photo.append("&timestamp=");
 		photo.append(DateUtil.getTime());
-		param.put("photo", photo.toString());
+		data.put("photo", photo.toString());
 
-		param.put("carBrandLogo", userInfo.getCarBrandLogo());
-		param.put("carModel", userInfo.getCarModel());
+		// 检查是否需要添加公平价服务器的前缀
+		data.put("carBrandLogo", PropertiesUtil.getProperty("gongpingjia.brand.url", "") + userInfo.getCarBrandLogo());
+		data.put("carModel", userInfo.getCarModel());
 
-		param.put("drivingLicensePhoto", userInfo.getDrivingLicensePhoto());
+		data.put("drivingLicensePhoto", userInfo.getDrivingLicensePhoto());
 		if (!StringUtils.isEmpty(userInfo.getDrivingLicensePhoto())) {
 			StringBuilder drivingLicensePhoto = new StringBuilder();
 			drivingLicensePhoto.append(CommonUtil.getPhotoServer());
 			drivingLicensePhoto.append(userInfo.getDrivingLicensePhoto());
 			drivingLicensePhoto.append(CommonUtil.getActivityPhotoPostfix());
-			param.put("drivingLicensePhoto", drivingLicensePhoto.toString());
+			data.put("drivingLicensePhoto", drivingLicensePhoto.toString());
 		}
 
-		param.put("drivingExperience", userInfo.getDrivingExperience());
-		param.put("province", userInfo.getProvince());
-		param.put("city", userInfo.getCity());
-		param.put("district", userInfo.getDistrict());
-		param.put("isAuthenticated", userInfo.getIsauthenticated());
+		data.put("drivingExperience", userInfo.getDrivingExperience());
+		data.put("province", userInfo.getProvince());
+		data.put("city", userInfo.getCity());
+		data.put("district", userInfo.getDistrict());
+		data.put("isAuthenticated", userInfo.getIsauthenticated());
 
-		param.put("label", interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME
+		data.put("label", interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME
 				: Constants.UserLabel.USER_OTHERS);
 
-		param.put("postNumber", activityDao.selectActivityPostNumber(interviewedUser));
+		data.put("postNumber", activityDao.selectActivityPostNumber(interviewedUser));
 
 		Map<String, Object> queryParam = new HashMap<String, Object>(1);
 		queryParam.put("userId", interviewedUser);
-		param.put("subscribeNumber", subscriptionDao.selectCountByParam(queryParam));
-		param.put("joinNumber", memberDao.selectByParam(queryParam).size());
+		data.put("subscribeNumber", subscriptionDao.selectCountByParam(queryParam));
+		data.put("joinNumber", memberDao.selectByParam(queryParam).size());
 
 		List<AlbumPhoto> albumPhotos = albumPhotoDao.selectAlbumPhotoUrl(interviewedUser);
 		List<Map<String, String>> albumPhotoViewList = new ArrayList<Map<String, String>>();
@@ -539,16 +543,16 @@ public class UserServiceImpl implements UserService {
 
 			albumPhotoViewList.add(albumPhotoView);
 		}
-		param.put("albumPhotos", albumPhotoViewList);
+		data.put("albumPhotos", albumPhotoViewList);
 
 		Map<String, Object> subparam = new HashMap<String, Object>(2, 1);
 		subparam.put("interviewedUser", interviewedUser);
-		subparam.put("visitorUser", visitorUser);
+		subparam.put("visitorUser", CommonUtil.ifNull(visitorUser, "null"));//设置为null主要是查询返回0
 		int subCount = userSubscriptionDao.subscriptionCount(subparam);
 
-		param.put("isSubscribed", (subCount == 0) ? 0 : 1);
+		data.put("isSubscribed", (subCount == 0) ? 0 : 1);
 
-		return ResponseDo.buildSuccessResponse(param);
+		return ResponseDo.buildSuccessResponse(data);
 	}
 
 	@Override

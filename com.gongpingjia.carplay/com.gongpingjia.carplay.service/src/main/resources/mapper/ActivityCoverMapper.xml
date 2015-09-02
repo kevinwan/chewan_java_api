@@ -16,9 +16,11 @@
 	</select>
 	
 	<select id="selectByActivity" resultType="java.util.Map" parameterType="java.util.Map">
-		select concat(#{assetUrl,jdbcType=VARCHAR}, url) as original_pic 
+		select 
+			concat(#{assetUrl,jdbcType=VARCHAR}, url) as original_pic, 
+			concat(#{assetUrl,jdbcType=VARCHAR}, url, #{photoPostfix,jdbcType=VARCHAR}) as thumbnail_pic
 		from activity_cover 
-		where activityId=#{activityId,jdbcType=VARCHAR}
+			where activityId=#{activityId,jdbcType=VARCHAR}
 		order by uploadTime 	
 	</select>
 

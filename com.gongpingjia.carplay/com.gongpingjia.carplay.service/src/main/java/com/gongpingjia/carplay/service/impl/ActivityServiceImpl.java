@@ -160,11 +160,13 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @return 返回可提供的最大座位数
 	 */
 	private int getMaxCarSeat(Car car) {
-		int config = PropertiesUtil.getProperty("user.unauth.car.max.seats", 2);
-		if (car != null && car.getSeat() > 1) {
+
+		// 有车就返回座位数-1，没车就返回配置参数
+		if (car != null) {
 			return car.getSeat() - 1;
 		}
-		return config;
+
+		return PropertiesUtil.getProperty("user.unauth.car.max.seats", 2);
 	}
 
 	/**
@@ -523,6 +525,8 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		activity.setLastmodifiedtime(current);
+		activity.setCurrentcity(request.getParameter("currentCity"));
+		activity.setCurrentdistrict(request.getParameter("currentDistrict"));
 	}
 
 	/**
@@ -555,7 +559,7 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private Long computeEnd(Long start, String endString) throws ApiException {
 		// 计算活动截止时间
-		Long end = TypeConverUtil.convertToLong("start", endString, false);
+		Long end = TypeConverUtil.convertToLong("end", endString, false);
 		if (end != null && end <= start) {
 			end = null;
 		}
@@ -744,24 +748,29 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
 		param.put("assetUrl", CommonUtil.getPhotoServer());
 		param.put("timestamp", DateUtil.getTime());
+		param.put("normal", PropertiesUtil.getProperty("carplay.car.class.normal.price", 10));
+		param.put("good", PropertiesUtil.getProperty("carplay.car.class.good.price", 30));
 
 		// 请求参数
-		param.put("userId", request.getParameter("userId"));
 		param.put("longitude", request.getParameter("longitude"));
 		param.put("latitude", request.getParameter("latitude"));
-		param.put("city", request.getParameter("city"));
 		param.put("province", request.getParameter("province"));
-		param.put("district", request.getParameter("district"));
+		param.put("currentCity", request.getParameter("city")); // 注意，这里city对应的是currentCity，后续可能有变更
+		param.put("currentDistrict", request.getParameter("district"));// 注意，这里district对应的是currentDistrict，后续可能有变更
 		param.put("type", request.getParameter("type"));
 		param.put("gender", request.getParameter("gender"));
 		param.put("authenticate", request.getParameter("authenticate"));
 		param.put("carLevel", request.getParameter("carLevel"));
-		Integer ignore = TypeConverUtil.convertToInteger("ignore", request.getParameter("ignore"), false);
 
+		Integer ignore = TypeConverUtil.convertToInteger("ignore", request.getParameter("ignore"), false);
+		if (ignore == null) {
+			ignore = 0;
+		}
 		param.put("ignore", ignore);
+
 		Integer limit = TypeConverUtil.convertToInteger("limit", request.getParameter("limit"), false);
 		if (limit == null) {
-			limit = 20;
+			limit = 10;
 		}
 		param.put("limit", limit);
 
@@ -784,14 +793,17 @@ public class ActivityServiceImpl implements ActivityService {
 		String longitude = request.getParameter("longitude");
 		String latitude = request.getParameter("latitude");
 
-		if (!CommonUtil.isUUID(userId)) {
-			LOG.warn("Input parameter userId: {} is not UUID", userId);
-			throw new ApiException("输入参数有误");
-		}
+		if (!StringUtils.isEmpty(userId)) {
+			// 只有当userID和token非空的时候，才会校验
+			if (!CommonUtil.isUUID(userId)) {
+				LOG.warn("Input parameter userId: {} is not UUID", userId);
+				throw new ApiException("输入参数有误");
+			}
 
-		if (!CommonUtil.isUUID(token)) {
-			LOG.warn("Input parameter token: {} is not UUID", token);
-			throw new ApiException("输入参数有误");
+			if (!CommonUtil.isUUID(token)) {
+				LOG.warn("Input parameter token: {} is not UUID", token);
+				throw new ApiException("输入参数有误");
+			}
 		}
 
 		if (!Constants.ActivityKey.KEY_LIST.contains(key)) {
@@ -1125,15 +1137,18 @@ public class ActivityServiceImpl implements ActivityService {
 		activityComment.setUserid(userId);
 		commentDao.insert(activityComment);
 
-		Message message = new Message();
-		message.setId(CodeGenerator.generatorId());
-		message.setFromuser(userId);
-		message.setTouser(activity.getOrganizer());
-		message.setType(MessageType.COMMENT.getName());
-		message.setContent(comment);
-		message.setCreatetime(current);
-		message.setExtra1(activityId);
-		messageDao.insert(message);
+		if (!userId.equals(activity.getOrganizer())) {
+			LOG.debug("UserId is not equals organizer, save message");
+			Message message = new Message();
+			message.setId(CodeGenerator.generatorId());
+			message.setFromuser(userId);
+			message.setTouser(activity.getOrganizer());
+			message.setType(MessageType.COMMENT.getName());
+			message.setContent(comment);
+			message.setCreatetime(current);
+			message.setExtra1(activityId);
+			messageDao.insert(message);
+		}
 
 		return ResponseDo.buildSuccessResponse();
 	}
@@ -1352,7 +1367,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		updateApplication(applicationId, action, current);
 
-		if (action == 1) {
+		if (action == Constants.Flag.POSITIVE) {
 			// 批准了活动申请
 			updateSeatReservationInfo(applicationId, userId, appActInfo, seats, current);
 
@@ -1422,22 +1437,22 @@ public class ActivityServiceImpl implements ActivityService {
 		member.setJointime(current);
 		memberDao.insert(member);
 
-		Message updateMessage = new Message();
-		updateMessage.setExtra3(applicationId);
-		updateMessage.setRemarks(ApplicationStatus.APPROVED.getName());
-		messageDao.updateRemarksByExtra3(updateMessage);
+		Message applyMessage = new Message();
+		applyMessage.setExtra3(applicationId);
+		applyMessage.setRemarks(ApplicationStatus.APPROVED.getName());
+		messageDao.updateRemarksByExtra3(applyMessage);
 
-		Message insertMessage = new Message();
-		insertMessage.setId(CodeGenerator.generatorId());
-		insertMessage.setFromuser(userId);
-		insertMessage.setTouser(appliedUser);
-		insertMessage.setType(MessageType.APPLICATION_RESULT.getName());
-		insertMessage.setContent(String.valueOf(appActInfo.get("introduction")));
-		insertMessage.setCreatetime(current);
-		insertMessage.setExtra1(activityId);
-		insertMessage.setExtra2(0);
-		insertMessage.setExtra3(applicationId);
-		messageDao.insert(insertMessage);
+		Message approveMessage = new Message();
+		approveMessage.setId(CodeGenerator.generatorId());
+		approveMessage.setFromuser(userId);
+		approveMessage.setTouser(appliedUser);
+		approveMessage.setType(MessageType.APPLICATION_RESULT.getName());
+		approveMessage.setContent(String.valueOf(appActInfo.get("introduction")));
+		approveMessage.setCreatetime(current);
+		approveMessage.setExtra1(activityId);
+		approveMessage.setExtra2(0);
+		approveMessage.setExtra3(applicationId);
+		messageDao.insert(approveMessage);
 	}
 
 	/**
@@ -1461,17 +1476,25 @@ public class ActivityServiceImpl implements ActivityService {
 		LOG.debug("Begin update seatReservation iformation");
 		String activityId = String.valueOf(appActInfo.get("activityId"));
 		int totalSeats = seats.size();
-		// 申请者能提供的座位数
-		int seatCount = TypeConverUtil.convertToInteger("seat", String.valueOf(appActInfo.get("seat")), false);
 
 		int noCarSeatCount = getNoCarSeats(seats);
-		if (getAvailableSeats(seats) == 0) {
+		int avaliableSeatCount = getAvailableSeats(seats);
+		if (avaliableSeatCount == 0) { // 思考最后一个人如果没有车的场景
 			LOG.warn("No available seat for this user");
 			String errorMessage = "请选择“提供空座”的人加入活动";
 			if (noCarSeatCount == totalSeats) {
 				errorMessage = "还没有人提供车，" + errorMessage;
 			}
 			throw new ApiException(errorMessage);
+		}
+
+		// 申请者能提供的座位数
+		int seatCount = TypeConverUtil.convertToInteger("seat", String.valueOf(appActInfo.get("seat")), false);
+		if (seatCount == 0 && avaliableSeatCount == 1) {
+			// 表示最后一个申请者不能提供座为，可能为无车人员
+			// 最后一个申请者，不能提供座位
+			LOG.warn("The final application user no car should be refused");
+			throw new ApiException("最后一个活动成员需要提供车座");
 		}
 
 		// 申请人可以提供座位
@@ -1510,7 +1533,6 @@ public class ActivityServiceImpl implements ActivityService {
 			}
 			seatReservDao.insert(reservList);
 		}
-
 	}
 
 	/**
@@ -1556,7 +1578,7 @@ public class ActivityServiceImpl implements ActivityService {
 	private void updateApplication(String applicationId, Integer action, Long current) {
 		LOG.debug("Update application iformation");
 		ApplicationStatus targetStatus = ApplicationStatus.DECLINED;
-		if (action == 1) {
+		if (action == Constants.Flag.POSITIVE) {
 			targetStatus = ApplicationStatus.APPROVED;
 		}
 		ActivityApplication application = applicationDao.selectByPrimaryKey(applicationId);
@@ -1664,6 +1686,12 @@ public class ActivityServiceImpl implements ActivityService {
 		checker.checkParameterUUID("activityId", activityId);
 		checker.checkUserInfo(userId, token);
 
+		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		if (activity == null) {
+			LOG.warn("Activity with activitId:{} is not exist", activityId);
+			throw new ApiException("输入参数有误");
+		}
+
 		LOG.debug("Query member car information");
 		Map<String, Object> param = new HashMap<String, Object>(4, 1);
 		param.put("assetUrl", CommonUtil.getPhotoServer());
@@ -1672,7 +1700,7 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("activityId", activityId);
 		param.put("status", ApplicationStatus.APPROVED.getName());
 		List<Map<String, Object>> members = activityViewDao.selectActivityMemberCarInfo(param);
-		List<Map<String, Object>> cars = activityViewDao.selectActivityMemberCarInfo(param);
+		List<Map<String, Object>> cars = activityViewDao.selectSeatReservationCarInfo(param);
 		for (Map<String, Object> car : cars) {
 			param.put("carId", car.get("carId"));
 			List<Map<String, Object>> users = activityViewDao.selectSeatReservationInfo(param);
@@ -1681,12 +1709,13 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Map<String, Object> activityShareInfo = activityViewDao.selectActivityShareInfo(param);
 		if (activityShareInfo == null) {
-			activityShareInfo = new HashMap<String, Object>(8, 1);
+			activityShareInfo = new HashMap<String, Object>(10, 1);
 		}
 		activityShareInfo.put("members", members);
 		activityShareInfo.put("cars", cars);
 		activityShareInfo.put("activityId", activityId);
-		Activity activity = activityDao.selectByPrimaryKey(activityId);
+		activityShareInfo.put("chatGroupId", activity.getEmchatgroupid());
+
 		activityShareInfo.putAll(buildShareData(activity.getOrganizer(), activity));
 
 		LOG.debug("Finished build response data");

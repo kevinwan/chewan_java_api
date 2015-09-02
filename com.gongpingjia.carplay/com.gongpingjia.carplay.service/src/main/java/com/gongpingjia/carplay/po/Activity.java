@@ -29,6 +29,8 @@ public class Activity {
 
     private Long endtime;
 
+    private Long applicationendtime;
+
     private String location;
 
     private Double longitude;
@@ -52,6 +54,10 @@ public class Activity {
     private Integer membersize;
 
     private String invalid;
+
+    private String currentcity;
+
+    private String currentdistrict;
 
     public String getId() {
         return id;
@@ -165,6 +171,14 @@ public class Activity {
         this.endtime = endtime;
     }
 
+    public Long getApplicationendtime() {
+        return applicationendtime;
+    }
+
+    public void setApplicationendtime(Long applicationendtime) {
+        this.applicationendtime = applicationendtime;
+    }
+
     public String getLocation() {
         return location;
     }
@@ -259,5 +273,21 @@ public class Activity {
 
     public void setInvalid(String invalid) {
         this.invalid = invalid;
+    }
+
+    public String getCurrentcity() {
+        return currentcity;
+    }
+
+    public void setCurrentcity(String currentcity) {
+        this.currentcity = currentcity;
+    }
+
+    public String getCurrentdistrict() {
+        return currentdistrict;
+    }
+
+    public void setCurrentdistrict(String currentdistrict) {
+        this.currentdistrict = currentdistrict;
     }
 }

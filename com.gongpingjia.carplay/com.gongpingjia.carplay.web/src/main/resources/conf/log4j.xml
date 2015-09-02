@@ -34,6 +34,7 @@
 	<!-- 输出到日志文件 -->
 	<appender name="logFile" class="org.apache.log4j.RollingFileAppender">
 		<param name="File" value="log/log4j_debug.log" />
+		<param name="encoding" value="UTF-8" />
 		<param name="Append" value="true" />
 		<param name="MaxFileSize" value="5KB" />
 		<param name="MaxBackupIndex" value="2" />

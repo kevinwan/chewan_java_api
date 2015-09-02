@@ -26,6 +26,8 @@
         <result column="distance" property="distance" jdbcType="DOUBLE" />
         <result column="historyCount" property="historyCount" jdbcType="INTEGER" />
         <result column="endtime" property="endtime" jdbcType="BIGINT" />
+        <result column="currentCity" property="currentcity" jdbcType="VARCHAR" />
+	    <result column="currentDistrict" property="currentdistrict" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<select id="selectLatestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
@@ -69,11 +71,17 @@
 			<if test="district != null">
 				and activity.district = #{district,jdbcType=VARCHAR}
 			</if>
+			<if test="currentCity != null">
+				and activity.currentCity = #{currentCity,jdbcType=VARCHAR}
+			</if>
+			<if test="currentDistrict != null">
+				and activity.currentDistrict = #{currentDistrict,jdbcType=VARCHAR}
+			</if>
 			<if test="type != null">
 				and activity.type = #{type,jdbcType=VARCHAR}
 			</if>
 			<if test="gender != null">
-				and usr.gender = #{gender,jdbcType=VARCHAR}
+				and user.gender = #{gender,jdbcType=VARCHAR}
 			</if>
 			<if test="authenticate == '1'">
 				and carModel is not null
@@ -82,10 +90,10 @@
 				and carModel is null
 			</if>
 			<if test="carLevel == 'good' ">
-				and price > 30
+				and price > #{good,jdbcType=INTEGER}
 			</if>
 			<if test="carLevel == 'normal' ">
-				and BETWEEN 10 and 30
+				and BETWEEN #{normal,jdbcType=INTEGER} and #{good,jdbcType=INTEGER}
 			</if>
 		</where>
 		ORDER BY
@@ -119,7 +127,9 @@
 			ifnull(activity.province, "") AS province,
 			ifnull(activity.city, "") AS city,
 			ifnull(activity.district, "") AS district,
-			ifnull(price, 0) AS price
+			ifnull(price, 0) AS price,
+			activity.currentCity,
+			activity.currentDistrict
 		FROM
 			activity
 		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation GROUP BY activityId) resA ON activity.id = resA.activityId
@@ -136,11 +146,17 @@
 		<if test="district != null">
 			and activity.district = #{district,jdbcType=VARCHAR}
 		</if>
+		<if test="currentCity != null">
+			and activity.currentCity = #{currentCity,jdbcType=VARCHAR}
+		</if>
+		<if test="currentDistrict != null">
+			and activity.currentDistrict = #{currentDistrict,jdbcType=VARCHAR}
+		</if>
 		<if test="type != null">
 			and activity.type = #{type,jdbcType=VARCHAR}
 		</if>
 		<if test="gender != null">
-			and usr.gender = #{gender,jdbcType=VARCHAR}
+			and user.gender = #{gender,jdbcType=VARCHAR}
 		</if>
 		<if test="authenticate == '1'">
 			and carModel is not null
@@ -149,10 +165,10 @@
 			and carModel is null
 		</if>
 		<if test="carLevel == 'good' ">
-			and price > 30
+			and price > #{good,jdbcType=INTEGER}
 		</if>
 		<if test="carLevel == 'normal' ">
-			and BETWEEN 10 and 30
+			and BETWEEN #{normal,jdbcType=INTEGER} and #{good,jdbcType=INTEGER}
 		</if>
 		HAVING
 			distance > 0
@@ -203,11 +219,17 @@
 			<if test="district != null">
 				and activity.district = #{district,jdbcType=VARCHAR}
 			</if>
+			<if test="currentCity != null">
+				and activity.currentCity = #{currentCity,jdbcType=VARCHAR}
+			</if>
+			<if test="currentDistrict != null">
+				and activity.currentDistrict = #{currentDistrict,jdbcType=VARCHAR}
+			</if>
 			<if test="type != null">
 				and activity.type = #{type,jdbcType=VARCHAR}
 			</if>
 			<if test="gender != null">
-				and usr.gender = #{gender,jdbcType=VARCHAR}
+				and user.gender = #{gender,jdbcType=VARCHAR}
 			</if>
 			<if test="authenticate == '1'">
 				and carModel is not null
@@ -216,10 +238,10 @@
 				and carModel is null
 			</if>
 			<if test="carLevel == 'good' ">
-				and price > 30
+				and price > #{good,jdbcType=INTEGER}
 			</if>
 			<if test="carLevel == 'normal' ">
-				and BETWEEN 10 and 30
+				and BETWEEN #{normal,jdbcType=INTEGER} and #{good,jdbcType=INTEGER}
 			</if>
 		</where>
 		GROUP BY
@@ -347,7 +369,8 @@
 			activity_member member
 			LEFT JOIN user ON member.userId = user.id
 			LEFT JOIN car ON car.userId = user.id
-			LEFT JOIN activity_application app ON app.activityId = member.activityId AND app.userId = member.userId AND app.status = #{status,jdbcType=VARCHAR}
+			LEFT JOIN activity_application app ON app.activityId = member.activityId 
+				AND app.userId = member.userId AND app.status = #{status,jdbcType=VARCHAR}
 		WHERE
 			member.activityId = #{activityId,jdbcType=VARCHAR}
 	</select>
@@ -359,9 +382,8 @@
 			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR},	car.brandLogo),"") AS carBrandLogo,
 			ifnull(car.model, "") AS carModel
 		FROM
-			(SELECT	carId, count(1) AS totalSeat FROM	seat_reservation
-				WHERE activityId = #{activityId,jdbcType=VARCHAR} GROUP BY carId
-			) srv
+			(SELECT	carId, count(1) AS totalSeat FROM seat_reservation
+				WHERE activityId = #{activityId,jdbcType=VARCHAR} GROUP BY carId) srv
 		JOIN car ON srv.carId = car.id
 	</select>
 	

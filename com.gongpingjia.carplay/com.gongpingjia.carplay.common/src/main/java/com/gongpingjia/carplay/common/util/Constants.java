@@ -16,6 +16,22 @@ public class Constants {
 	 */
 	public static final int HTTP_STATUS_OK = 200;
 
+	/**
+	 * 标志位
+	 */
+	public interface Flag {
+
+		/**
+		 * 积极的，正面的， 肯定的，同意的
+		 */
+		int POSITIVE = 1;
+
+		/**
+		 * 消极的，负面的，否定的，拒绝的
+		 */
+		int NEGATIVE = 0;
+	}
+
 	public interface DateFormat {
 
 		/**

@@ -74,7 +74,8 @@ public class UserActivityServiceImpl implements UserActivityService {
 			map.put("startDate", activity.get("start"));
 			map.put("isOver", (Long) activity.get("endTime") < DateUtil.getTime() ? 1 : 0);
 
-			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
+			map.putAll(membersAndCovers((String) activity.get("activityId"),
+					String.valueOf(CommonUtil.ifNull(userId2, "null")))); // 检查userID2是否为null
 
 			activityMapList.add(map);
 		}
@@ -127,7 +128,8 @@ public class UserActivityServiceImpl implements UserActivityService {
 			map.put("holdingSeat", activity.get("holdingSeat"));
 			map.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
 
-			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
+			map.putAll(membersAndCovers((String) activity.get("activityId"),
+					String.valueOf(CommonUtil.ifNull(userId2, "null"))));
 
 			activityMapList.add(map);
 		}
@@ -176,7 +178,8 @@ public class UserActivityServiceImpl implements UserActivityService {
 			map.put("holdingSeat", activity.get("holdingSeat"));
 			map.put("isOrganizer", activity.get("organizer").equals(userId2) ? 1 : 0);
 
-			map.putAll(membersAndCovers((String) activity.get("activityId"), userId2));
+			map.putAll(membersAndCovers((String) activity.get("activityId"),
+					String.valueOf(CommonUtil.ifNull(userId2, "null"))));
 			activityMapList.add(map);
 		}
 
@@ -240,25 +243,17 @@ public class UserActivityServiceImpl implements UserActivityService {
 		Map<String, Object> map = new HashMap<String, Object>(3, 1);
 
 		// 根据活动，查找活动成员
-		Map<String, Object> param = new HashMap<String, Object>(2, 1);
+		Map<String, Object> param = new HashMap<String, Object>(3, 1);
 		param.put("activityId", activityId);
 		param.put("assetUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
+		param.put("photoPostfix", CommonUtil.getActivityPhotoPostfix());
 		List<Map<String, String>> membersList = memberDao.selectByActivity(param);
 
 		map.put("members", membersList);
 
 		map.put("isMember", isMember(activityId, membersList, userId2));
 		// 根据活动，查找活动封面
-		List<Map<String, String>> coverList = coverDao.selectByActivity(param);
-
-		// 处理活动封面
-		List<Map<String, String>> coverAllList = new ArrayList<>(coverList.size());
-		for (Map<String, String> cover : coverList) {
-			// cover.put("original_pic", cover.get("original_pic"));
-			cover.put("thumbnail_pic", cover.get("original_pic") + CommonUtil.getActivityPhotoPostfix());
-			coverAllList.add(cover);
-		}
-		map.put("cover", coverAllList);
+		map.put("cover", coverDao.selectByActivity(param));
 
 		return map;
 	}

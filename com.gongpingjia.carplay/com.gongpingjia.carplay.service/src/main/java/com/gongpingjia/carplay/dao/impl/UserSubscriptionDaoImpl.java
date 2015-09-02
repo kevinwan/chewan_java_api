@@ -29,8 +29,7 @@ public class UserSubscriptionDaoImpl implements UserSubscriptionDao {
 
 	@Override
 	public int updateByPrimaryKey(UserSubscription record) {
-		// TODO Auto-generated method stub
-		return 0;
+		return DASUtil.update(UserSubscription.class.getName(), "updateByPrimaryKey", record);
 	}
 
 	@Override

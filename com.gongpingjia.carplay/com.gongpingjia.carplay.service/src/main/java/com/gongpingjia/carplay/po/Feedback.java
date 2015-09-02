@@ -13,6 +13,8 @@ public class Feedback {
 
     private Long createtime;
 
+    private String remarks;
+
     public String getId() {
         return id;
     }
@@ -59,5 +61,13 @@ public class Feedback {
 
     public void setCreatetime(Long createtime) {
         this.createtime = createtime;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

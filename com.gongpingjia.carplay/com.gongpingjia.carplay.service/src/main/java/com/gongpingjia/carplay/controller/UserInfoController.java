@@ -196,13 +196,14 @@ public class UserInfoController {
 	 * @return 个人详情返回结果
 	 */
 	@RequestMapping(value = "/user/{interviewedUser}/info", method = RequestMethod.GET)
-	public ResponseDo userInfo(@PathVariable(value = "interviewedUser") String interviewedUser,
-			@RequestParam(value = "userId") String visitorUser, @RequestParam(value = "token") String token) {
+	public ResponseDo getUserInfo(@PathVariable(value = "interviewedUser") String interviewedUser,
+			@RequestParam(value = "userId", required = false) String visitorUser,
+			@RequestParam(value = "token", required = false) String token) {
 
-		LOG.debug("userInfo is called, request parameter produce:");
+		LOG.debug("getUserInfo is called, interviewedUser:{}, vistorUser:{}", interviewedUser, visitorUser);
 
 		try {
-			return userService.userInfo(interviewedUser, visitorUser, token);
+			return userService.getUserInfo(interviewedUser, visitorUser, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
