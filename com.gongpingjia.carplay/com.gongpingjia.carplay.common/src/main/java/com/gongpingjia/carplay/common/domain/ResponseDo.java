@@ -41,7 +41,7 @@ public class ResponseDo {
 
 		return response;
 	}
-	
+
 	public static ResponseDo buildSuccessResponse() {
 		return buildSuccessResponse("");
 	}
@@ -76,13 +76,5 @@ public class ResponseDo {
 
 	public String getErrmsg() {
 		return errmsg;
-	}
-
-	public boolean isSuccess() {
-		return result == 0;
-	}
-
-	public boolean isFailure() {
-		return result != 0;
 	}
 }
