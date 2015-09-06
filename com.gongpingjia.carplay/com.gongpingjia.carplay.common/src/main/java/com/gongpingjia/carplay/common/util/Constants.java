@@ -17,6 +17,11 @@ public class Constants {
 	public static final int HTTP_STATUS_OK = 200;
 
 	/**
+	 * 版本信息
+	 */
+	public static final String VERSION = CommonUtil.getVersion();
+
+	/**
 	 * 标志位
 	 */
 	public interface Flag {

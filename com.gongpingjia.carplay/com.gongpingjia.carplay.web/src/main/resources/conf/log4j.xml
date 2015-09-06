@@ -41,10 +41,6 @@
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{ISO8601} %p %c -- %m%n" />
 		</layout>
-		<filter class="org.apache.log4j.varia.LevelRangeFilter">
-			<param name="LevelMin" value="DEBUG" />
-			<param name="LevelMax" value="FATAL" />
-		</filter>
 	</appender>
 
 	<!--通过<category></category>的定义可以将各个包中的类日志输出到不同的日志文件中 -->

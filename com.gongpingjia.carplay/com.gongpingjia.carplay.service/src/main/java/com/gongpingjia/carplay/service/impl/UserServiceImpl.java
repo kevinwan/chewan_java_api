@@ -113,8 +113,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseDo register(User user) throws ApiException {
-		String userId = user.getId();
+		String userId = CodeGenerator.generatorId();
 
+		user.setId(userId);
 		LOG.debug("Save register data begin");
 		// 注册用户
 		userDao.insert(user);
@@ -170,11 +171,6 @@ public class UserServiceImpl implements UserService {
 		if (!CommonUtil.isUUID(user.getPhoto())) {
 			LOG.warn("Invalid params photo:{}", user.getPhoto());
 			throw new ApiException("输入参数有误");
-		}
-
-		if (userDao.selectByPrimaryKey(user.getId()) != null) {
-			LOG.warn("User id:{} has already registed", user.getId());
-			throw new ApiException("该用户已注册");
 		}
 
 		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
@@ -547,7 +543,7 @@ public class UserServiceImpl implements UserService {
 
 		Map<String, Object> subparam = new HashMap<String, Object>(2, 1);
 		subparam.put("interviewedUser", interviewedUser);
-		subparam.put("visitorUser", CommonUtil.ifNull(visitorUser, "null"));//设置为null主要是查询返回0
+		subparam.put("visitorUser", CommonUtil.ifNull(visitorUser, "null"));// 设置为null主要是查询返回0
 		int subCount = userSubscriptionDao.subscriptionCount(subparam);
 
 		data.put("isSubscribed", (subCount == 0) ? 0 : 1);
