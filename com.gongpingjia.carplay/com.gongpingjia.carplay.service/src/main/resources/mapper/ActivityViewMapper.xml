@@ -42,12 +42,12 @@
 			paymentType AS pay,
 			resA.count AS totalSeat,
 			resB.count AS holdingSeat,
-			usr.userId AS userId,
-			usr.nickname,
-			usr.gender,
-			usr.age,
-			usr.photo,
-			usr.drivingExperience,
+			user.id,
+			user.nickname,
+			user.gender,
+			(YEAR(sysdate()) - user.birthYear) AS age,
+			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=",#{timestamp,jdbcType=BIGINT}) AS photo,
+			ifnull((YEAR(sysdate()) - user.drivingLicenseYear),	0) AS drivingExperience,
 			ifnull(concat(#{gpjImagePrefix,jdbcType=VARCHAR}, ifnull(car.brandLogo, "")),"") AS carBrandLogo,
 			ifnull(car.model, "") AS carModel,
 			ifnull(car.price, 0) AS price
@@ -57,10 +57,8 @@
 			ON activity.id = resA.activityId
 		LEFT JOIN (SELECT activityId, count(1) AS count FROM seat_reservation WHERE userId IS NOT NULL GROUP BY activityId) resB 
 			ON activity.id = resB.activityId
-		LEFT JOIN (SELECT id AS userId,	nickname, gender, (YEAR(sysdate()) - birthYear) AS age,
-			concat(#{assetUrl,jdbcType=VARCHAR}, photo, "?timestamp=",#{timestamp,jdbcType=BIGINT}) AS photo,
-			ifnull((YEAR(sysdate()) - drivingLicenseYear),	0) AS drivingExperience	FROM USER) usr ON activity.organizer = usr.userId
-		LEFT JOIN car ON car.userId = usr.userId
+		LEFT JOIN user ON activity.organizer = user.id
+		LEFT JOIN car ON car.userId = user.id
 		<where>
 			<if test="province != null">
 				and activity.province = #{province,jdbcType=VARCHAR}
