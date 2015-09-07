@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
 			throw new ApiException("输入参数有误");
 		}
 
-		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
+		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
 
 		boolean phoneRegister = isPhoneRegister(request);
 		boolean snsRegister = isSnsRegister(request);

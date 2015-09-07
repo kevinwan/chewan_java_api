@@ -61,19 +61,18 @@ public class UserInfoController {
 	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
 	public ResponseDo register(HttpServletRequest request, @RequestParam(value = "nickname") String nickname,
 			@RequestParam(value = "gender") String gender, @RequestParam(value = "birthYear") Integer birthYear,
-			@RequestParam(value = "birthMonth") Integer birthMonth, @RequestParam(value = "birthDay") Integer birthDay,
+			@RequestParam(value = "birthMonth") Integer birthMonth, @RequestParam(value = "birthday") Integer birthday,
 			@RequestParam(value = "province") String province, @RequestParam(value = "city") String city,
 			@RequestParam(value = "district") String district, @RequestParam(value = "photo") String photo) {
 
 		LOG.debug("register is called, request parameter produce:");
 
 		User user = new User();
-		user.setId(photo);
 		user.setNickname(nickname);
 		user.setGender(gender);
 		user.setBirthyear(birthYear);
 		user.setBirthmonth(birthMonth);
-		user.setBirthday(birthDay);
+		user.setBirthday(birthday);
 		user.setProvince(province);
 		user.setCity(city);
 		user.setDistrict(district);
