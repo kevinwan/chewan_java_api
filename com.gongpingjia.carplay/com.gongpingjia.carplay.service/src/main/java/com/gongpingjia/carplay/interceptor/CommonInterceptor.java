@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class CommonInterceptor implements HandlerInterceptor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CommonInterceptor.class);
-
+	
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object paramObject,
 			Exception paramException) throws Exception {
 		LOG.info("=======afterCompletion=========" + request.getParameterMap().toString());

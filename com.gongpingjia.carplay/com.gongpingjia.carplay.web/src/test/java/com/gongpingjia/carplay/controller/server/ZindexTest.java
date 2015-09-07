@@ -44,7 +44,7 @@ public class ZindexTest {
 		carController.getCarModel(null);
 
 		// 2.8登录
-		userInfoController.loginUser(null, null);
+		//userInfoController.loginUser(null, null);
 
 		// 2.9 忘记密码
 		userInfoController.forgetPassword(null, null, null);

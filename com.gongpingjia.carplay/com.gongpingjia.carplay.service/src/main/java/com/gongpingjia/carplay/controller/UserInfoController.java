@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,15 +98,17 @@ public class UserInfoController {
 	 *            密码
 	 * @return 登陆结果
 	 */
-	@RequestMapping(value = "/user/login", method = RequestMethod.POST)
-	public ResponseDo loginUser(@RequestParam(value = "phone") String phone,
-			@RequestParam(value = "password") String password) {
+	@RequestMapping(value = "/user/login", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo loginUser(@RequestBody User user) {
 
+//		@RequestParam(value = "phone") String phone,
+//		@RequestParam(value = "password") String password
 		LOG.debug("login is called, request parameter produce:");
 
-		User user = new User();
-		user.setPhone(phone);
-		user.setPassword(password);
+//		User user = new User();
+//		user.setPhone(phone);
+//		user.setPassword(password);
 
 		try {
 			return userService.loginUser(user);
