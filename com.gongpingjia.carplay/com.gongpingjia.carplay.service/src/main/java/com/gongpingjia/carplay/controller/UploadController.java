@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +35,7 @@ public class UploadController {
 	 * @return 上传结果
 	 */
 	@RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadUserPhoto(@RequestParam("attach") MultipartFile attach) {
+	public ResponseDo uploadUserPhoto(@RequestBody MultipartFile attach) {
 		LOG.info("uploadAvatarPhoto attach size: {}", attach.getSize());
 
 		try {

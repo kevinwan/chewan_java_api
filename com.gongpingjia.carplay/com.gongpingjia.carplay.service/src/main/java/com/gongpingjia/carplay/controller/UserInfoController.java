@@ -139,10 +139,10 @@ public class UserInfoController {
 		LOG.debug("forgetPassword is called, request parameter produce:");
 
 		try {
-			if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code", "password"))) {
+			if(CommonUtil.isEmpty(json,Arrays.asList("phone","code","password"))){
 				throw new ApiException("输入参数有误");
 			}
-
+		
 			User user = new User();
 			user.setPhone(json.getString("phone"));
 			user.setPassword(json.getString("password"));
