@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.common.util;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.json.JSONObject;
@@ -126,7 +127,6 @@ public class CommonUtil {
 	 * @return
 	 */
 	public static boolean isEmpty(JSONObject json, String key) {
-
 		if (json == null) {
 			return true;
 		}
@@ -138,6 +138,46 @@ public class CommonUtil {
 		if (StringUtils.isEmpty(json.getString(key))) {
 			return true;
 		}
+		return false;
+	}
+
+	/**
+	 * 检查Key对应的参数为数组类型是否为空
+	 * 
+	 * @param json
+	 * @param key
+	 * @return
+	 */
+	public static boolean isArrayEmpty(JSONObject json, String key) {
+		if (json == null) {
+			return true;
+		}
+
+		if (!json.containsKey(key)) {
+			return true;
+		}
+
+		if (json.getJSONArray(key).isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 批量检查Key值为空的参数,如果存在一个为空的就返回true
+	 * 
+	 * @param json
+	 * @param keys
+	 * @return
+	 */
+	public static boolean isEmpty(JSONObject json, List<String> keys) {
+		for (String key : keys) {
+			if (isEmpty(json, key)) {
+				LOG.warn("Parameter {} is empty", key);
+				return true;
+			}
+		}
+
 		return false;
 	}
 }

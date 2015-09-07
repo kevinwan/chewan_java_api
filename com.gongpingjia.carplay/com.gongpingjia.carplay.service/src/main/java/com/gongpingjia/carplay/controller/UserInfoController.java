@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.controller;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 import net.sf.json.JSONObject;
@@ -67,37 +68,13 @@ public class UserInfoController {
 
 		LOG.debug("register is called, request parameter produce:");
 		try {
-			if (CommonUtil.isEmpty(json, "nickname")) {
-				LOG.warn("Input parameter nickname is empty");
-				throw new ApiException("输入参数错误");
-			}
-
-			if (CommonUtil.isEmpty(json, "gender")) {
-				LOG.warn("Input parameter gender is empty");
-				throw new ApiException("输入参数错误");
-			}
-
-			if (CommonUtil.isEmpty(json, "province")) {
-				LOG.warn("Input parameter province is empty");
-				throw new ApiException("输入参数错误");
-			}
-
-			if (CommonUtil.isEmpty(json, "city")) {
-				LOG.warn("Input parameter city is empty");
-				throw new ApiException("输入参数错误");
-			}
-
-			if (CommonUtil.isEmpty(json, "district")) {
-				LOG.warn("Input parameter district is empty");
-				throw new ApiException("输入参数错误");
-			}
-
-			if (CommonUtil.isEmpty(json, "photo")) {
-				LOG.warn("Input parameter photo is empty");
+			// 检查必须参数是否为空
+			if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "province", "city", "district", "photo"))) {
 				throw new ApiException("输入参数错误");
 			}
 
 			User user = new User();
+			user.setId(json.getString("photo"));
 			user.setNickname(json.getString("nickname"));
 			user.setGender(json.getString("gender"));
 			user.setBirthyear(json.getInt("birthYear"));
@@ -157,17 +134,20 @@ public class UserInfoController {
 	 */
 	@RequestMapping(value = "/user/password", method = RequestMethod.POST, headers = {
 			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
-	public ResponseDo forgetPassword(@RequestBody JSONObject json, @RequestParam(value = "phone") String phone,
-			@RequestParam(value = "code") String code, @RequestParam(value = "password") String password) {
+	public ResponseDo forgetPassword(@RequestBody JSONObject json) {
 
 		LOG.debug("forgetPassword is called, request parameter produce:");
 
-		User user = new User();
-		user.setPhone(phone);
-		user.setPassword(password);
-
 		try {
-			return userService.forgetPassword(user, code);
+			if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code", "password"))) {
+				throw new ApiException("输入参数有误");
+			}
+
+			User user = new User();
+			user.setPhone(json.getString("phone"));
+			user.setPassword(json.getString("password"));
+
+			return userService.forgetPassword(user, json.getString("code"));
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

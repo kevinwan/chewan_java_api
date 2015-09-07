@@ -111,10 +111,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseDo register(User user) throws ApiException {
-		String userId = CodeGenerator.generatorId();
-
-		user.setId(userId);
 		LOG.debug("Save register data begin");
+		String userId = user.getId();
 		// 注册用户
 		userDao.insert(user);
 
