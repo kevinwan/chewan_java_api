@@ -123,7 +123,7 @@ public class UploadController {
 	 * @return 返回上传结果信息
 	 */
 	@RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadFeedbackPhoto(@RequestBody MultipartFile attach) {
+	public ResponseDo uploadFeedbackPhoto(MultipartFile attach) {
 		LOG.info("uploadFeedbackPhoto attach size: {}", attach.getSize());
 		try {
 			return service.uploadFeedbackPhoto(attach);
