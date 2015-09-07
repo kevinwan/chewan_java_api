@@ -1,6 +1,6 @@
 package com.gongpingjia.carplay.service;
 
-import javax.servlet.http.HttpServletRequest;
+import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +61,7 @@ public interface UserService {
 	 * @param visitorUser
 	 * @param token
 	 * @return
-	 * @throws ApiException 
+	 * @throws ApiException
 	 */
 	@Transactional(readOnly = true)
 	ResponseDo getUserInfo(String interviewedUser, String visitorUser, String token) throws ApiException;
@@ -130,8 +130,8 @@ public interface UserService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException;
-	
+	void checkRegisterParameters(User user, JSONObject request) throws ApiException;
+
 	/**
 	 * 第三方登录
 	 * 

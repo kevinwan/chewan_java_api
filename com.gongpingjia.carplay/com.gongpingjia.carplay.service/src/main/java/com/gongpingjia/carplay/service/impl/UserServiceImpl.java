@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -164,7 +162,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void checkRegisterParameters(User user, HttpServletRequest request) throws ApiException {
+	public void checkRegisterParameters(User user, JSONObject json) throws ApiException {
 		LOG.debug("Begin check input parameters of register");
 
 		// 验证参数
@@ -175,8 +173,8 @@ public class UserServiceImpl implements UserService {
 
 		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
 
-		boolean phoneRegister = isPhoneRegister(request);
-		boolean snsRegister = isSnsRegister(request);
+		boolean phoneRegister = isPhoneRegister(json);
+		boolean snsRegister = isSnsRegister(json);
 
 		if (!phoneRegister && !snsRegister) {
 			// 既不是Phone注册，也不是第三方SNS注册，需要报输入参数有误
@@ -184,7 +182,7 @@ public class UserServiceImpl implements UserService {
 			throw new ApiException("输入参数有误");
 		}
 
-		checkPhoneRegister(phoneRegister, request);
+		checkPhoneRegister(phoneRegister, json);
 
 		// 判断七牛上图片是否存在
 		if (!photoService.isExist(user.getPhoto())) {
@@ -192,7 +190,7 @@ public class UserServiceImpl implements UserService {
 			throw new ApiException("注册图片未上传");
 		}
 
-		refreshUserBySnsRegister(user, snsRegister, request);
+		refreshUserBySnsRegister(user, snsRegister, json);
 	}
 
 	/**
@@ -200,25 +198,25 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param user
 	 * @param snsRegister
-	 * @param request
+	 * @param json
 	 */
-	private void refreshUserBySnsRegister(User user, boolean snsRegister, HttpServletRequest request) {
+	private void refreshUserBySnsRegister(User user, boolean snsRegister, JSONObject json) {
 		if (snsRegister) {
 			// SNS注册 刷新用户信息
-			String snsChannel = request.getParameter("snsChannel");
-			String uid = request.getParameter("snsUid");
+			String snsChannel = json.getString("snsChannel");
+			String uid = json.getString("snsUid");
 			LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
 			if (Constants.Channel.WECHAT.equals(snsChannel)) {
 				user.setWechatid(uid);
-				user.setWechatname(request.getParameter("snsUserName"));
+				user.setWechatname(json.getString("snsUserName"));
 				user.setWechatphoto(user.getPhoto());
 			} else if (Constants.Channel.QQ.equals(snsChannel)) {
 				user.setQqid(uid);
-				user.setQqname(request.getParameter("snsUserName"));
+				user.setQqname(json.getString("snsUserName"));
 				user.setQqphoto(user.getPhoto());
 			} else if (Constants.Channel.SINA_WEIBO.equals(snsChannel)) {
 				user.setSinaweiboid(uid);
-				user.setSinaweiboname(request.getParameter("snsUserName"));
+				user.setSinaweiboname(json.getString("snsUserName"));
 				user.setSinaweibophoto(user.getPhoto());
 			}
 			// 设置第三方登录密码
@@ -228,8 +226,8 @@ public class UserServiceImpl implements UserService {
 			builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
 			user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
 		} else {
-			user.setPhone(request.getParameter("phone"));
-			user.setPassword(request.getParameter("password"));
+			user.setPhone(json.getString("phone"));
+			user.setPassword(json.getString("password"));
 		}
 	}
 
@@ -238,19 +236,19 @@ public class UserServiceImpl implements UserService {
 	 * 
 	 * @param phoneRegister
 	 *            是否为手机注册
-	 * @param request
+	 * @param json
 	 *            请求参数
 	 * @throws ApiException
 	 */
-	private void checkPhoneRegister(boolean phoneRegister, HttpServletRequest request) throws ApiException {
+	private void checkPhoneRegister(boolean phoneRegister, JSONObject json) throws ApiException {
 		if (phoneRegister) {
-			String phone = request.getParameter("phone");
+			String phone = json.getString("phone");
 			if (!CommonUtil.isPhoneNumber(phone)) {
 				LOG.warn("Phone number:{} is not correct format", phone);
 				throw new ApiException("输入参数有误");
 			}
 
-			checker.checkPhoneVerifyCode(phone, request.getParameter("code"));
+			checker.checkPhoneVerifyCode(phone, json.getString("code"));
 
 			// 判断用户是否注册过
 			Map<String, Object> param = new HashMap<String, Object>(1);
@@ -266,23 +264,20 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * 判断是否为手机注册
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求
 	 * @return 手机注册返回true
 	 */
-	private boolean isPhoneRegister(HttpServletRequest request) {
-		String phone = request.getParameter("phone");
-		if (StringUtils.isEmpty(phone)) {
+	private boolean isPhoneRegister(JSONObject json) {
+		if (CommonUtil.isEmpty(json, "phone")) {
 			return false;
 		}
 
-		String code = request.getParameter("code");
-		if (StringUtils.isEmpty(code)) {
+		if (CommonUtil.isEmpty(json, "code")) {
 			return false;
 		}
 
-		String password = request.getParameter("password");
-		if (StringUtils.isEmpty(password)) {
+		if (CommonUtil.isEmpty(json, "password")) {
 			return false;
 		}
 
@@ -292,26 +287,24 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * 判读是否为第三方注册
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求参数
 	 * @return 第三方注册，返回true
 	 */
-	private boolean isSnsRegister(HttpServletRequest request) {
-		String snsUid = request.getParameter("snsUid");
-		if (StringUtils.isEmpty(snsUid)) {
+	private boolean isSnsRegister(JSONObject json) {
+		if (CommonUtil.isEmpty(json, "snsUid")) {
 			return false;
 		}
 
-		String snsUserName = request.getParameter("snsUserName");
-		if (StringUtils.isEmpty(snsUserName)) {
+		if (CommonUtil.isEmpty(json, "snsUserName")) {
 			return false;
 		}
 
-		String snsChannel = request.getParameter("snsChannel");
-		if (StringUtils.isEmpty(snsChannel)) {
+		if (CommonUtil.isEmpty(json, "snsChannel")) {
 			return false;
 		}
 
+		String snsChannel = json.getString("snsChannel");
 		if (!Constants.Channel.CHANNEL_LIST.contains(snsChannel)) {
 			// 检查Channel是否包含在Channel——List中
 			LOG.warn("Input channel:{} is not in the channel list", snsChannel);

@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.controller;
 
 import java.util.Calendar;
 
-import javax.servlet.http.HttpServletRequest;
+import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
@@ -60,28 +61,54 @@ public class UserInfoController {
 	 *            该 photo的uuid
 	 * @return 注册结果
 	 */
-	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
-	public ResponseDo register(HttpServletRequest request, @RequestParam(value = "nickname") String nickname,
-			@RequestParam(value = "gender") String gender, @RequestParam(value = "birthYear") Integer birthYear,
-			@RequestParam(value = "birthMonth") Integer birthMonth, @RequestParam(value = "birthday") Integer birthday,
-			@RequestParam(value = "province") String province, @RequestParam(value = "city") String city,
-			@RequestParam(value = "district") String district, @RequestParam(value = "photo") String photo) {
+	@RequestMapping(value = "/user/register", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo register(@RequestBody JSONObject json) {
 
 		LOG.debug("register is called, request parameter produce:");
-
-		User user = new User();
-		user.setNickname(nickname);
-		user.setGender(gender);
-		user.setBirthyear(birthYear);
-		user.setBirthmonth(birthMonth);
-		user.setBirthday(birthday);
-		user.setProvince(province);
-		user.setCity(city);
-		user.setDistrict(district);
-		user.setPhoto(photo);
-
 		try {
-			userService.checkRegisterParameters(user, request);
+			if (CommonUtil.isEmpty(json, "nickname")) {
+				LOG.warn("Input parameter nickname is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			if (CommonUtil.isEmpty(json, "gender")) {
+				LOG.warn("Input parameter gender is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			if (CommonUtil.isEmpty(json, "province")) {
+				LOG.warn("Input parameter province is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			if (CommonUtil.isEmpty(json, "city")) {
+				LOG.warn("Input parameter city is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			if (CommonUtil.isEmpty(json, "district")) {
+				LOG.warn("Input parameter district is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			if (CommonUtil.isEmpty(json, "photo")) {
+				LOG.warn("Input parameter photo is empty");
+				throw new ApiException("输入参数错误");
+			}
+
+			User user = new User();
+			user.setNickname(json.getString("nickname"));
+			user.setGender(json.getString("gender"));
+			user.setBirthyear(json.getInt("birthYear"));
+			user.setBirthmonth(json.getInt("birthMonth"));
+			user.setBirthday(json.getInt("birthDay"));
+			user.setProvince(json.getString("province"));
+			user.setCity(json.getString("city"));
+			user.setDistrict(json.getString("district"));
+			user.setPhoto(json.getString("photo"));
+
+			userService.checkRegisterParameters(user, json);
 
 			return userService.register(user);
 		} catch (ApiException e) {
@@ -128,8 +155,9 @@ public class UserInfoController {
 	 *            密码 (MD5加密后的值)
 	 * @return 忘记密码结果
 	 */
-	@RequestMapping(value = "/user/password", method = RequestMethod.POST)
-	public ResponseDo forgetPassword(@RequestParam(value = "phone") String phone,
+	@RequestMapping(value = "/user/password", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo forgetPassword(@RequestBody JSONObject json, @RequestParam(value = "phone") String phone,
 			@RequestParam(value = "code") String code, @RequestParam(value = "password") String password) {
 
 		LOG.debug("forgetPassword is called, request parameter produce:");

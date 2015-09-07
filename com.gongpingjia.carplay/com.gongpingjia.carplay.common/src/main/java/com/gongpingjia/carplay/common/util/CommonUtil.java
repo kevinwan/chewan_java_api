@@ -2,6 +2,8 @@ package com.gongpingjia.carplay.common.util;
 
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -114,5 +116,28 @@ public class CommonUtil {
 			return defaultValue;
 		}
 		return objectValue;
+	}
+
+	/**
+	 * 检查JSON对象中对应的Key值是否为空，如果为空返回true， 否则返回false
+	 * 
+	 * @param json
+	 * @param key
+	 * @return
+	 */
+	public static boolean isEmpty(JSONObject json, String key) {
+
+		if (json == null) {
+			return true;
+		}
+
+		if (!json.containsKey(key)) {
+			return true;
+		}
+
+		if (StringUtils.isEmpty(json.getString(key))) {
+			return true;
+		}
+		return false;
 	}
 }
