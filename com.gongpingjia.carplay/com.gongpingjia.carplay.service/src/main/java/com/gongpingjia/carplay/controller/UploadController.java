@@ -122,7 +122,9 @@ public class UploadController {
 	 *            请求信息
 	 * @return 返回上传结果信息
 	 */
-	@RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data;boundary=---------------------------7da2137580612")
+	@RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = {
+			"multipart/form-data;boundary=---------------------------7da2137580612",
+			"Content-Type=application/octet-stream", "charset=utf-8" })
 	public ResponseDo uploadFeedbackPhoto(@RequestBody MultipartFile attach) {
 		LOG.info("uploadFeedbackPhoto attach size: {}", attach.getSize());
 		try {
