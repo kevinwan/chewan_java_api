@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
 
 		User userData = users.get(0);
 		if (!user.getPassword().equals(userData.getPassword())) {
-			LOG.warn("Fail to find user");
+			LOG.warn("User password is incorrect");
 			return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
 		}
 

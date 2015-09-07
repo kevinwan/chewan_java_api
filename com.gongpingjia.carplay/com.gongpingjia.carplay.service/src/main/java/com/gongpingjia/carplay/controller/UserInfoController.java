@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,16 +102,14 @@ public class UserInfoController {
 	@RequestMapping(value = "/user/login", method = RequestMethod.POST, headers = {
 			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo loginUser(@RequestBody User user) {
-
-//		@RequestParam(value = "phone") String phone,
-//		@RequestParam(value = "password") String password
 		LOG.debug("login is called, request parameter produce:");
 
-//		User user = new User();
-//		user.setPhone(phone);
-//		user.setPassword(password);
-
 		try {
+			if (StringUtils.isEmpty(user.getPassword()) || StringUtils.isEmpty(user.getPhone())) {
+				LOG.warn("Input parameters password or phone is empty");
+				throw new ApiException("输入参数有误");
+			}
+
 			return userService.loginUser(user);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
