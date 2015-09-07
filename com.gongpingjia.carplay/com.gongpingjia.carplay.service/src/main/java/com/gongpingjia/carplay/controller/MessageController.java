@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.MessageService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
+
+import net.sf.json.JSONObject;
 
 /**
  * 消息message
@@ -146,14 +150,33 @@ public class MessageController {
 	 * 
 	 * @return 提交成功
 	 */
-	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST)
-	public ResponseDo submitFeedback(@RequestParam(value = "userId", required = false) String userId,
-			@RequestParam(value = "token", required = false) String token, @RequestParam("content") String content,
-			@RequestParam(value = "photos", required = false) String[] photos) {
+	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo submitFeedback(@RequestBody JSONObject json) {
 
 		LOG.debug("==> submitFeedback");
 
+		/*
+		 * @RequestParam(value = "userId", required = false) String userId,
+		 * 
+		 * @RequestParam(value = "token", required = false) String
+		 * token, @RequestParam("content") String content,
+		 * 
+		 * @RequestParam(value = "photos", required = false) String[] photos
+		 */
 		try {
+			if (CommonUtil.isEmpty(json, "userId") || CommonUtil.isEmpty(json, "token")
+					|| CommonUtil.isEmpty(json, "photos") || CommonUtil.isEmpty(json, "content")) {
+				LOG.warn("Input parameter nickname is empty");
+				throw new ApiException("输入参数错误");
+			}
+			String userId = json.getString("userId");
+			String token = json.getString("token");
+			String content = json.getString("content");
+			String[] photos = new String[json.getJSONArray("photos").size()];
+			for(int i=0;i<json.getJSONArray("photos").size();i++){
+				photos[i]=(String)json.getJSONArray("photos").get(i);
+			}
 			if (photos != null && photos.length > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
 				LOG.warn("Invalid params, photos length is over the config, length:{}", photos.length);
 				throw new ApiException("反馈信息的参数错误");

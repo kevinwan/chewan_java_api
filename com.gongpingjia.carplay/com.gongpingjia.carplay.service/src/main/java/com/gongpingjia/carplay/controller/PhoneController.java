@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,7 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.service.PhoneService;
+
+import net.sf.json.JSONObject;
 
 /**
  * 手机验证码相关的操作
@@ -58,13 +62,24 @@ public class PhoneController {
 	 *            请求体信息
 	 * @return 返回验证结果信息
 	 */
-	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.POST)
-	public ResponseDo checkPhoneVerification(@PathVariable("phone") String phone, @RequestParam("code") String code,
-			@RequestParam(value = "type", defaultValue = "0") Integer type) {
+	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo checkPhoneVerification(@PathVariable("phone") String phone, @RequestBody JSONObject json) {
 
 		LOG.debug("checkPhoneVerification begin");
 
 		try {
+			if (CommonUtil.isEmpty(json, "code")) {
+				LOG.warn("Input parameter nickname is empty");
+				throw new ApiException("输入参数错误");
+			}
+			String code = json.getString("code");
+			Integer type;
+			if (CommonUtil.isEmpty(json, "type")) {
+				type = 0;
+			} else {
+				type = json.getInt("type");
+			}
 			return service.verify(phone, code, type);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage());
