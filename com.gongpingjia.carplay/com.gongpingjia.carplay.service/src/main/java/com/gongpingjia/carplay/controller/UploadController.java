@@ -34,7 +34,7 @@ public class UploadController {
 	 * 
 	 * @return 上传结果
 	 */
-	@RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	@RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = { "Content-Type=multipart/form-data" })
 	public ResponseDo uploadUserPhoto(@RequestBody MultipartFile attach) {
 		LOG.info("uploadAvatarPhoto attach size: {}", attach.getSize());
 
@@ -55,9 +55,9 @@ public class UploadController {
 	 *            用户会话Token
 	 * @return 返回结果对象
 	 */
-	@RequestMapping(value = "/user/{userId}/license/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
+	@RequestMapping(value = "/user/{userId}/license/upload", method = RequestMethod.POST, headers = { "Content-Type=multipart/form-data" })
 	public ResponseDo uploadLicensePhoto(@PathVariable(value = "userId") String userId,
-			@RequestParam("token") String token, @RequestParam("attach") MultipartFile attach) {
+			@RequestParam("token") String token, @RequestBody MultipartFile attach) {
 		LOG.info("uploadLicensePhoto attach size: {}", attach.getSize());
 
 		try {
@@ -77,9 +77,9 @@ public class UploadController {
 	 *            请求参数
 	 * @return 返回上传结果
 	 */
-	@RequestMapping(value = "/activity/cover/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadCoverPhoto(@RequestParam("attach") MultipartFile attach,
-			@RequestParam("token") String token, @RequestParam("userId") String userId) {
+	@RequestMapping(value = "/activity/cover/upload", method = RequestMethod.POST, headers = { "Content-Type=multipart/form-data" })
+	public ResponseDo uploadCoverPhoto(@RequestBody MultipartFile attach, @RequestParam("token") String token,
+			@RequestParam("userId") String userId) {
 		LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
 		try {
 			return service.uploadCoverPhoto(attach, userId, token);
@@ -100,9 +100,9 @@ public class UploadController {
 	 *            请求参数
 	 * @return 返回响应结果信息
 	 */
-	@RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo uploadAlbumPhoto(@PathVariable("userId") String userId,
-			@RequestParam("attach") MultipartFile attach, @RequestParam("token") String token) {
+	@RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = { "Content-Type=multipart/form-data" })
+	public ResponseDo uploadAlbumPhoto(@PathVariable("userId") String userId, @RequestParam("token") String token,
+			@RequestBody MultipartFile attach) {
 		LOG.info("uploadAlbumPhoto attach size: {}, userId: {}", attach.getSize(), userId);
 
 		try {
@@ -142,9 +142,9 @@ public class UploadController {
 	 *            用户会话Token
 	 * @return 返回结果对象
 	 */
-	@RequestMapping(value = "/user/{userId}/avatar", method = RequestMethod.POST, headers = "Content-Type=multipart/form-data")
-	public ResponseDo alterAvatar(@PathVariable(value = "userId") String userId,
-			@RequestParam("attach") MultipartFile attach, @RequestParam("token") String token) {
+	@RequestMapping(value = "/user/{userId}/avatar", method = RequestMethod.POST, headers = { "Content-Type=multipart/form-data" })
+	public ResponseDo alterAvatar(@PathVariable(value = "userId") String userId, @RequestParam("token") String token,
+			@RequestBody MultipartFile attach) {
 		LOG.info("reUploadUserPhoto attach size: {}", attach.getSize());
 
 		try {

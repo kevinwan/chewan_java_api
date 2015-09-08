@@ -247,8 +247,10 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
-				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
+		data.put(
+				"shareContent",
+				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
+						activity.getLocation(), activity.getPaymenttype() }));
 		return data;
 	}
 
@@ -366,11 +368,8 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private void checkActivityAddress(JSONObject json) throws ApiException {
 		LOG.debug("Check activity location and address");
-		String province = json.getString("province");
-		String city = json.getString("city");
-		String district = json.getString("district");
-		// 要么省市区全部都不为空，要么地址不为空，当二者都为空的时候需要报错
-		if (isActivityDetailCityEmpty(province, city, district) && StringUtils.isEmpty(json.getString("address"))) {
+		// 要么省市区全部都不为空，要么地址不为空，当二者都为空的时候需要报错 //"city",
+		if (CommonUtil.isEmpty(json, Arrays.asList("province", "district")) && CommonUtil.isEmpty(json, "address")) {
 			LOG.warn("Province, city and district cannot be empty, or the same with address");
 			throw new ApiException("输入参数有误");
 		}
@@ -1797,8 +1796,7 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
-					userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 
