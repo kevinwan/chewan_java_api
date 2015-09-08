@@ -247,8 +247,10 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
-				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
+		data.put(
+				"shareContent",
+				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
+						activity.getLocation(), activity.getPaymenttype() }));
 		return data;
 	}
 
@@ -354,7 +356,7 @@ public class ActivityServiceImpl implements ActivityService {
 		}
 
 		Car car = carDao.selectByUserId(userId);
-		Integer seat = Integer.valueOf(json.getString("seat"));
+		Integer seat = TypeConverUtil.convertToInteger("seat", json.getString("seat"), true);
 		if (seat > getMaxCarSeat(car) || seat < getMinCarSeat()) {
 			LOG.warn("The offered car seat is override range");
 			throw new ApiException("提供的空座数超出范围");
@@ -501,13 +503,13 @@ public class ActivityServiceImpl implements ActivityService {
 			LOG.warn("Input parameter have Empty");
 			throw new ApiException("输入参数有误");
 		}
-		String address = CommonUtil.isEmpty(json, "address") ? null : json.getString("address");
-		String longitude = CommonUtil.isEmpty(json, "longitude") ? null : json.getString("longitude");
-		String latitude = CommonUtil.isEmpty(json, "latitude") ? null : json.getString("latitude");
-		String end = CommonUtil.isEmpty(json, "end") ? null : json.getString("end");
-		String province = CommonUtil.isEmpty(json, "province") ? null : json.getString("province");
-		String city = CommonUtil.isEmpty(json, "city") ? null : json.getString("city");
-		String district = CommonUtil.isEmpty(json, "district") ? null : json.getString("district");
+		String address = CommonUtil.getString(json, "address", null);
+		String longitude = CommonUtil.getString(json, "longitude", null);
+		String latitude = CommonUtil.getString(json, "latitude", null);
+		String end = CommonUtil.getString(json, "end", null);
+		String province = CommonUtil.getString(json, "province", null);
+		String city = CommonUtil.getString(json, "city", null);
+		String district = CommonUtil.getString(json, "district", null);
 
 		activity.setType(json.getString("type"));
 		activity.setDescription(json.getString("introduction"));
@@ -1630,7 +1632,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		checker.checkParameterUUID("applicationId", applicationId);
 
-		if (action != 0 && action != 1) {
+		if (action != Constants.Flag.NEGATIVE && action != Constants.Flag.POSITIVE) {
 			LOG.warn("Input parameter action is 0 or 1, action:{}", action);
 			throw new ApiException("参数错误");
 		}
@@ -1813,8 +1815,7 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
-					userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 

@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.gongpingjia.carplay.common.exception.ApiException;
-
 /**
  * 公共类公共方法
  * 
@@ -203,5 +201,20 @@ public class CommonUtil {
 		}
 
 		return false;
+	}
+
+	/**
+	 * 获取json对象中key的value值，如果key不存在就返回defaultValue
+	 * 
+	 * @param json
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	public static String getString(JSONObject json, String key, String defaultValue) {
+		if (isEmpty(json, key)) {
+			return defaultValue;
+		}
+		return json.getString(key);
 	}
 }

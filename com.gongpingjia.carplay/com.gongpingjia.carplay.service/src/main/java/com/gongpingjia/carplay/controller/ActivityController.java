@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.service.ActivityService;
 
 import net.sf.json.JSONObject;
@@ -165,23 +166,19 @@ public class ActivityController {
 	 *            评论的内容
 	 * @return 返回评论结果
 	 */
-	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.POST)
+	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo publishComment(@PathVariable("activityId") String activityId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("publishComment begin");
 		try {
 			if (CommonUtil.isEmpty(json, "comment")) {
-				LOG.warn("Input parameter  comment is empty");
+				LOG.warn("Input parameter comment is empty");
 				throw new ApiException("输入参数错误");
 			}
 			String comment = json.getString("comment");
 
-			String replyUserId;
-			if (CommonUtil.isEmpty(json, "replyUserId")) {
-				replyUserId = null;
-			} else {
-				replyUserId = json.getString("replyUserId");
-			}
+			String replyUserId = CommonUtil.getString(json, "replyUserId", null);
 
 			return service.publishComment(activityId, userId, token, replyUserId, comment);
 		} catch (ApiException e) {
@@ -229,8 +226,8 @@ public class ActivityController {
 	 * @return 返回加入结果信息
 	 */
 	@RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST)
-	public ResponseDo joinActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
-			@RequestParam("token") String token, @RequestBody JSONObject json) {
+	public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("joinActivity begin");
 
 		try {
@@ -238,7 +235,9 @@ public class ActivityController {
 				LOG.warn("Input parm seat is empty");
 				throw new ApiException("输入参数错误");
 			}
-			Integer seat = json.getInt("seat");
+
+			Integer seat = TypeConverUtil.convertToInteger("seat", json.getString("seat"), true);
+
 			return service.joinActivity(activityId, userId, token, seat);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -259,7 +258,8 @@ public class ActivityController {
 	 *            对申请的处理，0代表拒绝， 1代表同意
 	 * @return 返回处理结果
 	 */
-	@RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST)
+	@RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo processApplication(@PathVariable("applicationId") String applicationId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("processApplication begin");
@@ -269,7 +269,9 @@ public class ActivityController {
 				LOG.warn("Input parameter action is Empty");
 				throw new ApiException("输入参数错误");
 			}
-			Integer action = json.getInt("action");
+
+			Integer action = TypeConverUtil.convertToInteger("action", json.getString("action"), true);
+
 			return service.processApplication(applicationId, userId, token, action);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -315,23 +317,21 @@ public class ActivityController {
 	 *            座位索引
 	 * @return 返回抢座结果
 	 */
-	@RequestMapping(value = "/activity/{activityId}/seat/take", method = RequestMethod.POST)
+	@RequestMapping(value = "/activity/{activityId}/seat/take", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo takeSeat(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
 			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("takeSeat begin");
 
 		try {
-			String carId;
-			if (CommonUtil.isEmpty(json, "carId")) {
-				carId = null;
-			} else {
-				carId = json.getString("carId");
-			}
+			String carId = CommonUtil.getString(json, "carId", null);
+
 			if (CommonUtil.isEmpty(json, "seatIndex")) {
 				LOG.warn("Input parameter seatIndex is Empty");
 				throw new ApiException("输入参数错误");
 			}
-			Integer seatIndex = json.getInt("seatIndex");
+
+			Integer seatIndex = TypeConverUtil.convertToInteger("seatIndex", json.getString("seatIndex"), true);
 
 			return service.takeSeat(activityId, userId, token, carId, seatIndex);
 		} catch (ApiException e) {
@@ -353,7 +353,8 @@ public class ActivityController {
 	 *            会话Token
 	 * @return 返回被拉下来的结果
 	 */
-	@RequestMapping(value = "/activity/{activityId}/seat/return", method = RequestMethod.POST)
+	@RequestMapping(value = "/activity/{activityId}/seat/return", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo returnSeat(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
 			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("returnSeat beging");
@@ -363,6 +364,7 @@ public class ActivityController {
 				LOG.warn("Input parameter member is Empty");
 				throw new ApiException("输入参数错误");
 			}
+
 			String member = json.getString("member");
 
 			return service.returnSeat(activityId, member, userId, token);
@@ -385,15 +387,17 @@ public class ActivityController {
 	 *            会话Token
 	 * @return 返回被移除的结果
 	 */
-	@RequestMapping(value = "/activity/{activityId}/member/remove", method = RequestMethod.POST)
-	public ResponseDo removeMember(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
-			@RequestParam("token") String token, @RequestBody JSONObject json) {
+	@RequestMapping(value = "/activity/{activityId}/member/remove", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo removeMember(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("removeMember begin");
 		try {
 			if (CommonUtil.isEmpty(json, "member")) {
 				LOG.warn("Input parameter member is Empty");
 				throw new ApiException("输入参数错误");
 			}
+
 			String member = json.getString("member");
 
 			return service.removeMember(activityId, member, userId, token);
@@ -416,8 +420,8 @@ public class ActivityController {
 	 * 
 	 */
 	@RequestMapping(value = "/activity/{activityId}/quit", method = RequestMethod.POST)
-	public ResponseDo quitActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
-			@RequestParam("token") String token) {
+	public ResponseDo quitActivity(@PathVariable("activityId") String activityId,
+			@RequestParam("userId") String userId, @RequestParam("token") String token) {
 		LOG.info("quitActivity begin");
 
 		try {
@@ -441,7 +445,8 @@ public class ActivityController {
 	 *            编辑活动的请求参数
 	 * @return 返回编辑结果
 	 */
-	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.POST)
+	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo alterActivityInfo(@PathVariable("activityId") String activityId,
 			@RequestParam("userId") String userId, @RequestParam("token") String token, JSONObject json) {
 		LOG.info("alterActivityInfo begin");
