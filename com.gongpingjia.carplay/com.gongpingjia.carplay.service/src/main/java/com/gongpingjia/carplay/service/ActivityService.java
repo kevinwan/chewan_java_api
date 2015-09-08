@@ -32,7 +32,7 @@ public interface ActivityService {
 	 *             业务异常处理
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo registerActivity(String userId , JSONObject json) throws ApiException;
+	ResponseDo registerActivity(String userId, JSONObject json) throws ApiException;
 
 	/**
 	 * 检查注册的请求参数是否满足注册的要求, 修改活动的时候同样适用 <br/>
@@ -54,7 +54,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常处理
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo getActivityList(HttpServletRequest request) throws ApiException;
 
 	/**
@@ -270,8 +270,7 @@ public interface ActivityService {
 	 *             业务异常
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo alterActivityInfo(String activityId, String userId, String token, JSONObject json)
-			throws ApiException;
+	ResponseDo alterActivityInfo(String activityId, String userId, String token, JSONObject json) throws ApiException;
 
 	/**
 	 * 取消关注活动
