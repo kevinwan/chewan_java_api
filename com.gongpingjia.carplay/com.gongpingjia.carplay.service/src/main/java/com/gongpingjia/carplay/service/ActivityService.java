@@ -54,7 +54,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常处理
 	 */
-	@Transactional(rollbackFor = Exception.class)
+	@Transactional(readOnly = true)
 	ResponseDo getActivityList(HttpServletRequest request) throws ApiException;
 
 	/**
@@ -70,7 +70,7 @@ public interface ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo getActivityInfo(String activityId, String userId, String token) throws ApiException;
 
 	/**
