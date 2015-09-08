@@ -2,14 +2,13 @@ package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-
-import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +57,8 @@ import com.gongpingjia.carplay.po.Message;
 import com.gongpingjia.carplay.po.SeatReservation;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.service.ActivityService;
+
+import net.sf.json.JSONObject;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -179,23 +180,21 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	@Override
-	public ResponseDo registerActivity(HttpServletRequest request) throws ApiException {
-
-		String userId = request.getParameter("userId");
+	public ResponseDo registerActivity(String userId, JSONObject json) throws ApiException {
 
 		// 生成公共的部分参数
 		String activityId = CodeGenerator.generatorId();
 		Long current = DateUtil.getTime();
 
-		Activity activity = saveActivity(request, activityId, current);
+		Activity activity = saveActivity(json, userId, activityId, current);
 
-		saveActivityCovers(request, activityId, current);
+		saveActivityCovers(json, activityId, current);
 
 		saveActivityMember(userId, activityId, current);
 
 		saveSeatReservation(userId, activityId, activity.getInitialseat(), current);
 
-		saveActivityApplication(request.getParameter("seat"), activityId, userId, current);
+		saveActivityApplication(json.getString("seat"), activityId, userId, current);
 
 		// 创建环信聊天群,更新活动字段
 		createEmchatGroup(activity);
@@ -248,10 +247,8 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put(
-				"shareContent",
-				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
-						activity.getLocation(), activity.getPaymenttype() }));
+		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
+				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
 		return data;
 	}
 
@@ -324,8 +321,8 @@ public class ActivityServiceImpl implements ActivityService {
 		return member;
 	}
 
-	private List<ActivityCover> saveActivityCovers(HttpServletRequest request, String activityId, Long current) {
-		String[] covers = request.getParameterValues("cover");
+	private List<ActivityCover> saveActivityCovers(JSONObject json, String activityId, Long current) {
+		String[] covers = CommonUtil.jsonArrayToStrings(json.getJSONArray("cover"));
 		List<ActivityCover> activityCovers = new ArrayList<ActivityCover>();
 		for (String coverId : covers) {
 			ActivityCover activityCover = new ActivityCover();
@@ -349,10 +346,10 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void checkActivitySeat(HttpServletRequest request, String userId) throws ApiException {
+	private void checkActivitySeat(JSONObject json, String userId) throws ApiException {
 		LOG.debug("Check request seats is in range or not");
 		Car car = carDao.selectByUserId(userId);
-		Integer seat = Integer.valueOf(request.getParameter("seat"));
+		Integer seat = Integer.valueOf(json.getString("seat"));
 		if (seat > getMaxCarSeat(car) || seat < getMinCarSeat()) {
 			LOG.warn("The offered car seat is override range");
 			throw new ApiException("提供的空座数超出范围");
@@ -367,13 +364,13 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void checkActivityAddress(HttpServletRequest request) throws ApiException {
+	private void checkActivityAddress(JSONObject json) throws ApiException {
 		LOG.debug("Check activity location and address");
-		String province = request.getParameter("province");
-		String city = request.getParameter("city");
-		String district = request.getParameter("district");
+		String province = json.getString("province");
+		String city = json.getString("city");
+		String district = json.getString("district");
 		// 要么省市区全部都不为空，要么地址不为空，当二者都为空的时候需要报错
-		if (isActivityDetailCityEmpty(province, city, district) && StringUtils.isEmpty(request.getParameter("address"))) {
+		if (isActivityDetailCityEmpty(province, city, district) && StringUtils.isEmpty(json.getString("address"))) {
 			LOG.warn("Province, city and district cannot be empty, or the same with address");
 			throw new ApiException("输入参数有误");
 		}
@@ -409,14 +406,20 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void checkActivityCover(HttpServletRequest request) throws ApiException {
+	private void checkActivityCover(JSONObject json) throws ApiException {
 		LOG.debug("Check activity cover is exist or not");
-		String[] covers = request.getParameterValues("cover");
-		if (covers == null || covers.length < 1
-				|| covers.length > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
-			LOG.warn("Input parameter covers length is {}, out of the range", (covers == null) ? 0 : covers.length);
+		if (CommonUtil.isArrayEmpty(json, "cover")) {
+			LOG.warn("Input parameter  cover is empty");
+			throw new ApiException("输入参数错误");
+		}
+
+		int coverLengh = json.getJSONArray("cover").size();
+		if (coverLengh > PropertiesUtil.getProperty("user.album.photo.max.count", 9)) {
+			LOG.warn("Input parameter covers length is {}, out of the range", coverLengh);
 			throw new ApiException("输入参数有误");
 		}
+
+		String[] covers = CommonUtil.jsonArrayToStrings(json.getJSONArray("cover"));
 
 		for (String coverId : covers) {
 			if (!photoService.isExist(MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverId))) {
@@ -429,33 +432,30 @@ public class ActivityServiceImpl implements ActivityService {
 	/**
 	 * 检查创建活动的活动参数信息
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求参数
 	 * @throws ApiException
 	 *             业务异常信息
 	 */
 	@Override
-	public void checkRegisterActivityParam(HttpServletRequest request) throws ApiException {
+	public void checkRegisterActivityParam(String userId, String token, JSONObject json) throws ApiException {
 		LOG.debug("Check input parameters");
-		String userId = request.getParameter("userId");
-		String token = request.getParameter("token");
+
 		checker.checkUserInfo(userId, token);
 
-		checker.checkParameterEmpty("type", request.getParameter("type"));
-		checker.checkParameterEmpty("introduction", request.getParameter("introduction"));
-		checker.checkParameterEmpty("location", request.getParameter("location"));
-		checker.checkParameterEmpty("pay", request.getParameter("pay"));
-		checker.checkParameterLongType("start", request.getParameter("start"));
+		if (CommonUtil.isEmpty(json, Arrays.asList("type", "introduction", "location", "pay", "start"))) {
+			throw new ApiException("输入参数错误");
+		}
 
-		checkActivityCover(request);
-		checkActivityAddress(request);
-		checkActivitySeat(request, userId);
+		checkActivityCover(json);
+		checkActivityAddress(json);
+		checkActivitySeat(json, userId);
 	}
 
 	/**
 	 * 根据Request对象构建Activity对象
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求对象
 	 * @param activityId
 	 * @param current
@@ -463,13 +463,13 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @return 返回活动对象
 	 * @throws ApiException
 	 */
-	private Activity saveActivity(HttpServletRequest request, String activityId, Long current) throws ApiException {
+	private Activity saveActivity(JSONObject json, String userId, String activityId, Long current) throws ApiException {
 		LOG.debug("Build activity by request parameters");
 		Activity activity = new Activity();
 		activity.setId(activityId);
-		activity.setOrganizer(request.getParameter("userId"));
+		activity.setOrganizer(userId);
 
-		buildActivityCommon(request, current, activity);
+		buildActivityCommon(json, userId, current, activity);
 
 		activity.setCreatetime(current);
 		activity.setCategory(Constants.ActivityCatalog.COMMON);
@@ -491,22 +491,23 @@ public class ActivityServiceImpl implements ActivityService {
 	 * @throws ApiException
 	 *             业务异常
 	 */
-	private void buildActivityCommon(HttpServletRequest request, Long current, Activity activity) throws ApiException {
-		activity.setType(request.getParameter("type"));
-		activity.setDescription(request.getParameter("introduction"));
-		activity.setLocation(request.getParameter("location"));
-		activity.setProvince(request.getParameter("province"));
-		activity.setCity(request.getParameter("city"));
-		activity.setDistrict(request.getParameter("district"));
-		activity.setAddress(request.getParameter("address"));
-		activity.setPaymenttype(request.getParameter("pay"));
-		activity.setInitialseat(TypeConverUtil.convertToInteger("seat", request.getParameter("seat"), false));
-		activity.setLatitude(TypeConverUtil.convertToDouble("latitude", request.getParameter("latitude"), false));
-		activity.setLongitude(TypeConverUtil.convertToDouble("longitude", request.getParameter("longitude"), false));
+	private void buildActivityCommon(JSONObject json, String userId, Long current, Activity activity)
+			throws ApiException {
+		activity.setType(json.getString("type"));
+		activity.setDescription(json.getString("introduction"));
+		activity.setLocation(json.getString("location"));
+		activity.setProvince(json.getString("province"));
+		activity.setCity(json.getString("city"));
+		activity.setDistrict(json.getString("district"));
+		activity.setAddress(json.getString("address"));
+		activity.setPaymenttype(json.getString("pay"));
+		activity.setInitialseat(TypeConverUtil.convertToInteger("seat", json.getString("seat"), false));
+		activity.setLatitude(TypeConverUtil.convertToDouble("latitude", json.getString("latitude"), false));
+		activity.setLongitude(TypeConverUtil.convertToDouble("longitude", json.getString("longitude"), false));
 
 		// 计算start end endTime
-		activity.setStart(computeStart(request.getParameter("start"), current));
-		activity.setEnd(computeEnd(activity.getStart(), request.getParameter("end")));
+		activity.setStart(computeStart(json.getString("start"), current));
+		activity.setEnd(computeEnd(activity.getStart(), json.getString("end")));
 		activity.setEndtime(computeEndTime(activity.getStart(), activity.getEnd()));
 
 		int length = PropertiesUtil.getProperty("activity.title.length.limit", 7);
@@ -518,15 +519,15 @@ public class ActivityServiceImpl implements ActivityService {
 
 		if (isActivityDetailCityEmpty(activity.getProvince(), activity.getCity(), activity.getDistrict())) {
 			LOG.debug("Build activity province, city, district if they are empty");
-			User user = userDao.selectByPrimaryKey(request.getParameter("userId"));
+			User user = userDao.selectByPrimaryKey(userId);
 			activity.setProvince(user.getProvince());
 			activity.setCity(user.getCity());
 			activity.setDistrict(user.getDistrict());
 		}
 
 		activity.setLastmodifiedtime(current);
-		activity.setCurrentcity(request.getParameter("currentCity"));
-		activity.setCurrentdistrict(request.getParameter("currentDistrict"));
+		activity.setCurrentcity(json.getString("currentCity"));
+		activity.setCurrentdistrict(json.getString("currentDistrict"));
 	}
 
 	/**
@@ -1796,7 +1797,8 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
+					userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 
@@ -1917,7 +1919,7 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	@Override
-	public ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
+	public ResponseDo alterActivityInfo(String activityId, String userId, String token, JSONObject json)
 			throws ApiException {
 
 		// 只有活动的创建者才能编辑活动
@@ -1938,12 +1940,12 @@ public class ActivityServiceImpl implements ActivityService {
 		String oldTitle = activity.getTitle();
 
 		Long current = DateUtil.getTime();
-		buildActivityCommon(request, current, activity);
+		buildActivityCommon(json, userId, current, activity);
 		activityDao.updateByPrimaryKey(activity);
 
 		modifyEmchatGroup(activity, oldTitle);
 
-		saveActivityCovers(request, activityId, current);
+		saveActivityCovers(json, activityId, current);
 
 		Map<String, String> data = buildShareData(userId, activity);
 

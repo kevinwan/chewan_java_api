@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.service.ActivityService;
+
+import net.sf.json.JSONObject;
 
 /**
  * 活动相关的操作
@@ -58,14 +62,15 @@ public class ActivityController {
 	 *            请求
 	 * @return 返回响应结果对象
 	 */
-	@RequestMapping(value = "/activity/register", method = RequestMethod.POST)
-	public ResponseDo registerActivity(HttpServletRequest request) {
+	@RequestMapping(value = "/activity/register", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo registerActivity(@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestBody JSONObject json) {
 		LOG.info("registerActivity begin");
 		try {
+			service.checkRegisterActivityParam(userId, token, json);
 
-			service.checkRegisterActivityParam(request);
-
-			return service.registerActivity(request);
+			return service.registerActivity(userId, json);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
@@ -162,12 +167,22 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/comment", method = RequestMethod.POST)
 	public ResponseDo publishComment(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam(value = "replyUserId", required = false) String replyUserId,
-			@RequestParam("comment") String comment) {
+			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("publishComment begin");
-
 		try {
+			if (CommonUtil.isEmpty(json, "comment")) {
+				LOG.warn("Input parameter  comment is empty");
+				throw new ApiException("输入参数错误");
+			}
+			String comment = json.getString("comment");
+
+			String replyUserId;
+			if (CommonUtil.isEmpty(json, "replyUserId")) {
+				replyUserId = null;
+			} else {
+				replyUserId = json.getString("replyUserId");
+			}
+
 			return service.publishComment(activityId, userId, token, replyUserId, comment);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -214,12 +229,16 @@ public class ActivityController {
 	 * @return 返回加入结果信息
 	 */
 	@RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST)
-	public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam("seat") Integer seat) {
+	public ResponseDo joinActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("joinActivity begin");
 
 		try {
+			if (CommonUtil.isEmpty(json, "seat")) {
+				LOG.warn("Input parm seat is empty");
+				throw new ApiException("输入参数错误");
+			}
+			Integer seat = json.getInt("seat");
 			return service.joinActivity(activityId, userId, token, seat);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -242,11 +261,15 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST)
 	public ResponseDo processApplication(@PathVariable("applicationId") String applicationId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam("action") Integer action) {
+			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("processApplication begin");
 
 		try {
+			if (CommonUtil.isEmpty(json, "action")) {
+				LOG.warn("Input parameter action is Empty");
+				throw new ApiException("输入参数错误");
+			}
+			Integer action = json.getInt("action");
 			return service.processApplication(applicationId, userId, token, action);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -294,11 +317,22 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/seat/take", method = RequestMethod.POST)
 	public ResponseDo takeSeat(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
-			@RequestParam("token") String token, @RequestParam("carId") String carId,
-			@RequestParam("seatIndex") Integer seatIndex) {
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("takeSeat begin");
 
 		try {
+			String carId;
+			if (CommonUtil.isEmpty(json, "carId")) {
+				carId = null;
+			} else {
+				carId = json.getString("carId");
+			}
+			if (CommonUtil.isEmpty(json, "seatIndex")) {
+				LOG.warn("Input parameter seatIndex is Empty");
+				throw new ApiException("输入参数错误");
+			}
+			Integer seatIndex = json.getInt("seatIndex");
+
 			return service.takeSeat(activityId, userId, token, carId, seatIndex);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -320,11 +354,17 @@ public class ActivityController {
 	 * @return 返回被拉下来的结果
 	 */
 	@RequestMapping(value = "/activity/{activityId}/seat/return", method = RequestMethod.POST)
-	public ResponseDo returnSeat(@PathVariable("activityId") String activityId, @RequestParam("member") String member,
-			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+	public ResponseDo returnSeat(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("returnSeat beging");
 
 		try {
+			if (CommonUtil.isEmpty(json, "member")) {
+				LOG.warn("Input parameter member is Empty");
+				throw new ApiException("输入参数错误");
+			}
+			String member = json.getString("member");
+
 			return service.returnSeat(activityId, member, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -346,11 +386,16 @@ public class ActivityController {
 	 * @return 返回被移除的结果
 	 */
 	@RequestMapping(value = "/activity/{activityId}/member/remove", method = RequestMethod.POST)
-	public ResponseDo removeMember(@PathVariable("activityId") String activityId,
-			@RequestParam("member") String member, @RequestParam("userId") String userId,
-			@RequestParam("token") String token) {
+	public ResponseDo removeMember(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("removeMember begin");
 		try {
+			if (CommonUtil.isEmpty(json, "member")) {
+				LOG.warn("Input parameter member is Empty");
+				throw new ApiException("输入参数错误");
+			}
+			String member = json.getString("member");
+
 			return service.removeMember(activityId, member, userId, token);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
@@ -371,8 +416,8 @@ public class ActivityController {
 	 * 
 	 */
 	@RequestMapping(value = "/activity/{activityId}/quit", method = RequestMethod.POST)
-	public ResponseDo quitActivity(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+	public ResponseDo quitActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token) {
 		LOG.info("quitActivity begin");
 
 		try {
@@ -398,12 +443,12 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.POST)
 	public ResponseDo alterActivityInfo(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
+			@RequestParam("userId") String userId, @RequestParam("token") String token, JSONObject json) {
 		LOG.info("alterActivityInfo begin");
 		try {
-			service.checkRegisterActivityParam(request);
+			service.checkRegisterActivityParam(userId, token, json);
 
-			return service.alterActivityInfo(activityId, userId, token, request);
+			return service.alterActivityInfo(activityId, userId, token, json);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

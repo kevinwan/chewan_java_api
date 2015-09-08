@@ -3,11 +3,14 @@ package com.gongpingjia.carplay.common.util;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import com.gongpingjia.carplay.common.exception.ApiException;
 
 /**
  * 公共类公共方法
@@ -27,8 +30,8 @@ public class CommonUtil {
 	/**
 	 * UUID的正则表达式匹配
 	 */
-	private static final Pattern UUID_PATTERN = Pattern.compile(
-			"^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern UUID_PATTERN = Pattern
+			.compile("^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * 检查电话号码是否正确
@@ -148,7 +151,7 @@ public class CommonUtil {
 	 * @param key
 	 * @return
 	 */
-	public static boolean isArrayEmpty(JSONObject json, String key) {
+	public static boolean isArrayEmpty(JSONObject json, String key) throws ApiException {
 		if (json == null) {
 			return true;
 		}
@@ -156,11 +159,32 @@ public class CommonUtil {
 		if (!json.containsKey(key)) {
 			return true;
 		}
-
-		if (json.getJSONArray(key).isEmpty()) {
-			return true;
+		try {
+			if (json.getJSONArray(key).isEmpty()) {
+				return true;
+			}
+		} catch (Exception e) {
+			LOG.warn("{} is not a JSONArray", key);
+			throw new ApiException("输入参数有误");
 		}
 		return false;
+	}
+
+	/**
+	 * 根据JSONArray返回String数组
+	 */
+	public static String[] jsonArrayToStrings(JSONArray jsonArray) {
+		String[] strings;
+		int length = jsonArray.size();
+		if (length == 0) {
+			return null;
+		} else {
+			strings = new String[length];
+			for (int i = 0; i < length; i++) {
+				strings[i] = jsonArray.getString(i);
+			}
+			return strings;
+		}
 	}
 
 	/**

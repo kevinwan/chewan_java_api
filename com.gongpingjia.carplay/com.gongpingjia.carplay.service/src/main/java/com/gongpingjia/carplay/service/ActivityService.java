@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 
+import net.sf.json.JSONObject;
+
 public interface ActivityService {
 	/**
 	 * 获取可提供的空座位数
@@ -23,25 +25,25 @@ public interface ActivityService {
 	/**
 	 * 注册用户信息
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求参数
 	 * @return 返回响应结果对象
 	 * @throws ApiException
 	 *             业务异常处理
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo registerActivity(HttpServletRequest request) throws ApiException;
+	ResponseDo registerActivity(String userId , JSONObject json) throws ApiException;
 
 	/**
 	 * 检查注册的请求参数是否满足注册的要求, 修改活动的时候同样适用 <br/>
 	 * 新增加这个接口主要是考虑到事务，如果参数校验也放入到事务中会影响性能
 	 * 
-	 * @param request
+	 * @param json
 	 *            请求参数集合
 	 * @throws ApiException
 	 *             参数校验不合格抛出业务异常
 	 */
-	void checkRegisterActivityParam(HttpServletRequest request) throws ApiException;
+	void checkRegisterActivityParam(String userId, String token, JSONObject json) throws ApiException;
 
 	/**
 	 * 根据参数查询活动信息
@@ -261,14 +263,14 @@ public interface ActivityService {
 	 *            用户ID
 	 * @param token
 	 *            用户会话token
-	 * @param request
+	 * @param json
 	 *            请求参数
 	 * @return 返回响应结果信息
 	 * @throws ApiException
 	 *             业务异常
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	ResponseDo alterActivityInfo(String activityId, String userId, String token, HttpServletRequest request)
+	ResponseDo alterActivityInfo(String activityId, String userId, String token, JSONObject json)
 			throws ApiException;
 
 	/**

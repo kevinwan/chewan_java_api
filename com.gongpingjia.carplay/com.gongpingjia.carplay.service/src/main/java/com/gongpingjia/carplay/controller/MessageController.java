@@ -152,39 +152,30 @@ public class MessageController {
 	 */
 	@RequestMapping(value = "/feedback/submit", method = RequestMethod.POST, headers = {
 			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
-	public ResponseDo submitFeedback(@RequestBody JSONObject json) {
+	public ResponseDo submitFeedback(@RequestParam("userId") String userId, @RequestParam("token") String token,
+			@RequestBody JSONObject json) {
 
 		LOG.debug("==> submitFeedback");
-
-		/*
-		 * @RequestParam(value = "userId", required = false) String userId,
-		 * 
-		 * @RequestParam(value = "token", required = false) String
-		 * token, @RequestParam("content") String content,
-		 * 
-		 * @RequestParam(value = "photos", required = false) String[] photos
-		 */
 		try {
-			if (CommonUtil.isEmpty(json, "userId") || CommonUtil.isEmpty(json, "token")
-					|| CommonUtil.isEmpty(json, "photos") || CommonUtil.isEmpty(json, "content")) {
-				LOG.warn("Input parameter nickname is empty");
+			if (CommonUtil.isArrayEmpty(json, "photos") || CommonUtil.isEmpty(json, "content")) {
+				LOG.warn("Input parameter  photos or content is empty");
 				throw new ApiException("输入参数错误");
 			}
-			String userId = json.getString("userId");
-			String token = json.getString("token");
+
 			String content = json.getString("content");
-			String[] photos = new String[json.getJSONArray("photos").size()];
-			for(int i=0;i<json.getJSONArray("photos").size();i++){
-				photos[i]=(String)json.getJSONArray("photos").get(i);
-			}
-			if (photos != null && photos.length > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
-				LOG.warn("Invalid params, photos length is over the config, length:{}", photos.length);
+			
+			int photosLength = json.getJSONArray("photos").size();
+			if ( photosLength > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
+				LOG.warn("Invalid params, photos length is over the config, length:{}", photosLength);
 				throw new ApiException("反馈信息的参数错误");
 			}
-
-			if (!StringUtils.isEmpty(userId)) {
-				checker.checkUserInfo(userId, token);
+			
+			String[] photos = new String[photosLength];
+			for (int i = 0; i < photosLength; i++) {
+				photos[i] = json.getJSONArray("photos").getString(i);
 			}
+
+			checker.checkUserInfo(userId, token);
 
 			return messageService.submitFeedback(userId, content, photos);
 		} catch (ApiException e) {
@@ -205,17 +196,25 @@ public class MessageController {
 	 *
 	 * @return 删除成功
 	 */
-	@RequestMapping(value = "/message/remove", method = RequestMethod.POST)
+	@RequestMapping(value = "/message/remove", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo removeMessages(@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam("messages") String[] messages) {
+			@RequestBody JSONObject json) {
 		LOG.debug("==> removeMessages");
 
 		try {
-			checker.checkUserInfo(userId, token);
-			if (messages.length == 0) {
-				LOG.warn("Invalid params, messages cannot be empty");
-				throw new ApiException("输入参数有误");
+			if (CommonUtil.isArrayEmpty(json, "messages")) {
+				LOG.warn("Input parameter messages is empty");
+				throw new ApiException("输入参数错误");
 			}
+
+			int messagesLengh = json.getJSONArray("messages").size();
+			String[] messages = new String[messagesLengh];
+			for (int i = 0; i < messagesLengh; i++) {
+				messages[i] = json.getJSONArray("messages").getString(i);
+			}
+
+			checker.checkUserInfo(userId, token);
 
 			return messageService.removeMessages(userId, messages);
 		} catch (ApiException e) {
@@ -237,18 +236,25 @@ public class MessageController {
 	 * @return 删除成功
 	 * 
 	 */
-	@RequestMapping(value = "/comment/remove", method = RequestMethod.POST)
+	@RequestMapping(value = "/comment/remove", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo removeComments(@RequestParam("userId") String userId, @RequestParam("token") String token,
-			@RequestParam("comments") String[] comments) {
+			@RequestBody JSONObject json) {
 		LOG.debug("==>removeComments");
 
 		try {
-			checker.checkUserInfo(userId, token);
-
-			if (comments.length == 0) {
-				LOG.warn("Invalid params, comments length is zero");
-				throw new ApiException("输入参数有误");
+			if (CommonUtil.isArrayEmpty(json, "comments")) {
+				LOG.warn("Input parameter  comments is empty");
+				throw new ApiException("输入参数错误");
 			}
+
+			int commentsLengh = json.getJSONArray("comments").size();
+			String[] comments = new String[commentsLengh];
+			for (int i = 0; i < commentsLengh; i++) {
+				comments[i] = json.getJSONArray("comments").getString(i);
+			}
+
+			checker.checkUserInfo(userId, token);
 
 			return messageService.removeComments(userId, comments);
 		} catch (ApiException e) {
