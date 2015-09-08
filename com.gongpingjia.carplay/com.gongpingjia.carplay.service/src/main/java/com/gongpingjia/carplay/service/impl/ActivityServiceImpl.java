@@ -324,7 +324,7 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	private List<ActivityCover> saveActivityCovers(JSONObject json, String activityId, Long current) {
-		String[] covers = CommonUtil.jsonArrayToStrings(json.getJSONArray("cover"));
+		String[] covers = CommonUtil.getStringArray(json.getJSONArray("cover"));
 		List<ActivityCover> activityCovers = new ArrayList<ActivityCover>();
 		for (String coverId : covers) {
 			ActivityCover activityCover = new ActivityCover();
@@ -423,7 +423,7 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("输入参数有误");
 		}
 
-		String[] covers = CommonUtil.jsonArrayToStrings(json.getJSONArray("cover"));
+		String[] covers = CommonUtil.getStringArray(json.getJSONArray("cover"));
 
 		for (String coverId : covers) {
 			if (!photoService.isExist(MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverId))) {

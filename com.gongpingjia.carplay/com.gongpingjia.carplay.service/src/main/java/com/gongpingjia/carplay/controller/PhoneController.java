@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.service.PhoneService;
 
 import net.sf.json.JSONObject;
@@ -74,18 +75,15 @@ public class PhoneController {
 				throw new ApiException("输入参数错误");
 			}
 			String code = json.getString("code");
-			Integer type;
-			if (CommonUtil.isEmpty(json, "type")) {
-				type = 0;
-			} else {
-				String typeString = json.getString("type");
-				try {
-					type = Integer.valueOf(typeString);
-				} catch (Exception e) {
-					LOG.warn("Input parameter type is not Integer");
-					throw new ApiException("输入参数错误");
-				}
+
+			String typeString = CommonUtil.getString(json, "type", null);
+
+			Integer type = TypeConverUtil.convertToInteger("type", typeString, true);
+			if (type != 0 && type != 1) {
+				LOG.warn("Input parameter type is not 1 or 0");
+				throw new ApiException("输入参数有误");
 			}
+
 			return service.verify(phone, code, type);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage());

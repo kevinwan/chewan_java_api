@@ -405,7 +405,7 @@ public class UserInfoController {
 			return ResponseDo.buildFailureResponse("输入参数有误");
 		}
 
-		String[] photos = CommonUtil.jsonArrayToStrings(json.getJSONArray("photos"));
+		String[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
 
 		return userService.manageAlbumPhotos(userId, photos, token);
 	}

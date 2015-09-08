@@ -171,7 +171,7 @@ public class CommonUtil {
 	/**
 	 * 根据JSONArray返回String数组
 	 */
-	public static String[] jsonArrayToStrings(JSONArray jsonArray) {
+	public static String[] getStringArray(JSONArray jsonArray) {
 		String[] strings;
 		int length = jsonArray.size();
 		if (length == 0) {

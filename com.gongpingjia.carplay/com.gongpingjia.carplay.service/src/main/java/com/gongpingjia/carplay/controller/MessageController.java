@@ -20,6 +20,7 @@ import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.service.MessageService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -156,23 +157,25 @@ public class MessageController {
 
 		LOG.debug("==> submitFeedback");
 		try {
-			if (CommonUtil.isArrayEmpty(json, "photos") || CommonUtil.isEmpty(json, "content")) {
-				LOG.warn("Input parameter  photos or content is empty");
+			if (CommonUtil.isEmpty(json, "content")) {
+				LOG.warn("Input parameter content is empty");
 				throw new ApiException("输入参数错误");
 			}
 
 			String content = json.getString("content");
 
-			int photosLength = json.getJSONArray("photos").size();
+			JSONArray photoArray = new JSONArray();
+			if (!CommonUtil.isArrayEmpty(json, "photos")) {
+				photoArray = json.getJSONArray("photos");
+			}
+
+			int photosLength = photoArray.size();
 			if (photosLength > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
 				LOG.warn("Invalid params, photos length is over the config, length:{}", photosLength);
 				throw new ApiException("反馈信息的参数错误");
 			}
 
-			String[] photos = new String[photosLength];
-			for (int i = 0; i < photosLength; i++) {
-				photos[i] = json.getJSONArray("photos").getString(i);
-			}
+			String[] photos = CommonUtil.getStringArray(photoArray);
 
 			checker.checkUserInfo(userId, token);
 
@@ -207,11 +210,7 @@ public class MessageController {
 				throw new ApiException("输入参数错误");
 			}
 
-			int messagesLengh = json.getJSONArray("messages").size();
-			String[] messages = new String[messagesLengh];
-			for (int i = 0; i < messagesLengh; i++) {
-				messages[i] = json.getJSONArray("messages").getString(i);
-			}
+			String[] messages = CommonUtil.getStringArray(json.getJSONArray("messages"));
 
 			checker.checkUserInfo(userId, token);
 
@@ -247,11 +246,7 @@ public class MessageController {
 				throw new ApiException("输入参数错误");
 			}
 
-			int commentsLengh = json.getJSONArray("comments").size();
-			String[] comments = new String[commentsLengh];
-			for (int i = 0; i < commentsLengh; i++) {
-				comments[i] = json.getJSONArray("comments").getString(i);
-			}
+			String[] comments = CommonUtil.getStringArray(json.getJSONArray("comments"));
 
 			checker.checkUserInfo(userId, token);
 
