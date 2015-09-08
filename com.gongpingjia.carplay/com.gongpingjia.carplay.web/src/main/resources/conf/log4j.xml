@@ -32,14 +32,14 @@
 	</appender>
 
 	<!-- 输出到日志文件 -->
-	<appender name="logFile" class="org.apache.log4j.RollingFileAppender">
+	<appender name="logFile" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="log/log4j_debug.log" />
 		<param name="encoding" value="UTF-8" />
 		<param name="Append" value="true" />
-		<param name="MaxFileSize" value="5KB" />
-		<param name="MaxBackupIndex" value="2" />
+		<param name="MaxFileSize" value="5MB" />
+		<param name="MaxBackupIndex" value="10" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{ISO8601} %p %c -- %m%n" />
+			<param name="ConversionPattern" value="%d{yyy-MM-dd HH:mm:ss,SSS} %p %c(%l) -- %m%n" />
 		</layout>
 	</appender>
 
@@ -47,39 +47,27 @@
 	<category name="com.gongpingjia.carplay">
 		<priority value="debug" />
 		<appender-ref ref="logFile" />
-	</category>
-	<category name="com.gongpingjia.carplay">
-		<priority value="debug" />
 		<appender-ref ref="console" />
 	</category>
 
 	<category name="org.springframework">
 		<priority value="DEBUG" />
 		<appender-ref ref="logFile" />
-	</category>
-	<category name="org.springframework">
-		<priority value="DEBUG" />
 		<appender-ref ref="console" />
 	</category>
 
 	<category name="org.mybatis.spring">
 		<priority value="error" />
 		<appender-ref ref="logFile" />
-	</category>
-	<category name="org.mybatis.spring">
-		<priority value="error" />
 		<appender-ref ref="console" />
 	</category>
-	
+
 	<category name="org.apache.ibatis">
 		<priority value="error" />
 		<appender-ref ref="logFile" />
-	</category>
-	<category name="org.apache.ibatis">
-		<priority value="error" />
 		<appender-ref ref="console" />
 	</category>
-	
+
 	<root>
 		<priority value="debug" />
 	</root>
