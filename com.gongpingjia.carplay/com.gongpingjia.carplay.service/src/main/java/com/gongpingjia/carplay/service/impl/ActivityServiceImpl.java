@@ -247,10 +247,8 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put(
-				"shareContent",
-				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
-						activity.getLocation(), activity.getPaymenttype() }));
+		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
+				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
 		return data;
 	}
 
@@ -350,6 +348,11 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private void checkActivitySeat(JSONObject json, String userId) throws ApiException {
 		LOG.debug("Check request seats is in range or not");
+		if (CommonUtil.isEmpty(json, "seat")) {
+			LOG.warn("Input parameter seat is Empty");
+			throw new ApiException("输入参数有误");
+		}
+
 		Car car = carDao.selectByUserId(userId);
 		Integer seat = Integer.valueOf(json.getString("seat"));
 		if (seat > getMaxCarSeat(car) || seat < getMinCarSeat()) {
@@ -492,21 +495,35 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private void buildActivityCommon(JSONObject json, String userId, Long current, Activity activity)
 			throws ApiException {
+
+		if (CommonUtil.isEmpty(json, Arrays.asList("type", "introduction", "location", "pay", "seat", "start",
+				"currentCity", "currentDistrict"))) {
+			LOG.warn("Input parameter have Empty");
+			throw new ApiException("输入参数有误");
+		}
+		String address = CommonUtil.isEmpty(json, "address") ? null : json.getString("address");
+		String longitude = CommonUtil.isEmpty(json, "longitude") ? null : json.getString("longitude");
+		String latitude = CommonUtil.isEmpty(json, "latitude") ? null : json.getString("latitude");
+		String end = CommonUtil.isEmpty(json, "end") ? null : json.getString("end");
+		String province = CommonUtil.isEmpty(json, "province") ? null : json.getString("province");
+		String city = CommonUtil.isEmpty(json, "city") ? null : json.getString("city");
+		String district = CommonUtil.isEmpty(json, "district") ? null : json.getString("district");
+
 		activity.setType(json.getString("type"));
 		activity.setDescription(json.getString("introduction"));
 		activity.setLocation(json.getString("location"));
-		activity.setProvince(json.getString("province"));
-		activity.setCity(json.getString("city"));
-		activity.setDistrict(json.getString("district"));
-		activity.setAddress(json.getString("address"));
+		activity.setProvince(province);
+		activity.setCity(city);
+		activity.setDistrict(district);
+		activity.setAddress(address);
 		activity.setPaymenttype(json.getString("pay"));
 		activity.setInitialseat(TypeConverUtil.convertToInteger("seat", json.getString("seat"), false));
-		activity.setLatitude(TypeConverUtil.convertToDouble("latitude", json.getString("latitude"), false));
-		activity.setLongitude(TypeConverUtil.convertToDouble("longitude", json.getString("longitude"), false));
+		activity.setLatitude(TypeConverUtil.convertToDouble("latitude", latitude, false));
+		activity.setLongitude(TypeConverUtil.convertToDouble("longitude", longitude, false));
 
 		// 计算start end endTime
 		activity.setStart(computeStart(json.getString("start"), current));
-		activity.setEnd(computeEnd(activity.getStart(), json.getString("end")));
+		activity.setEnd(computeEnd(activity.getStart(), end));
 		activity.setEndtime(computeEndTime(activity.getStart(), activity.getEnd()));
 
 		int length = PropertiesUtil.getProperty("activity.title.length.limit", 7);
@@ -1796,7 +1813,8 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
+					userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 
