@@ -144,7 +144,7 @@ public class UserActivityController {
 			if (!StringUtils.isEmpty(userId2)) {
 				checker.checkUserInfo(userId2, token);
 			}
-			
+
 			return userActivityService.getUserJoin(userId1, userId2, token, ignore, limit);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);

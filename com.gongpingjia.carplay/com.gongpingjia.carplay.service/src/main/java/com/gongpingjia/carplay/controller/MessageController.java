@@ -162,13 +162,13 @@ public class MessageController {
 			}
 
 			String content = json.getString("content");
-			
+
 			int photosLength = json.getJSONArray("photos").size();
-			if ( photosLength > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
+			if (photosLength > PropertiesUtil.getProperty("user.feedback.photo.max.count", 3)) {
 				LOG.warn("Invalid params, photos length is over the config, length:{}", photosLength);
 				throw new ApiException("反馈信息的参数错误");
 			}
-			
+
 			String[] photos = new String[photosLength];
 			for (int i = 0; i < photosLength; i++) {
 				photos[i] = json.getJSONArray("photos").getString(i);
