@@ -13,7 +13,8 @@
     http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<!-- 默认扫描的包路径 -->
-	<context:component-scan base-package="com.gongpingjia.carplay.controller,com.gongpingjia.carplay.common.exception" />
+	<context:component-scan
+		base-package="com.gongpingjia.carplay.controller,com.gongpingjia.carplay.common.exception" />
 
 	<!-- 添加注解驱动 -->
 	<mvc:annotation-driven />
@@ -22,4 +23,11 @@
 		<!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
 		<bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor" />
 	</mvc:interceptors>
+
+	<!-- 设置上传文件的最大尺寸为2MB -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>
+		<property name="maxUploadSize" value="2097152" />
+	</bean>
 </beans>

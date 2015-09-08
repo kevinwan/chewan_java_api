@@ -54,11 +54,11 @@
 	</category>
 
 	<category name="org.springframework">
-		<priority value="error" />
+		<priority value="DEBUG" />
 		<appender-ref ref="logFile" />
 	</category>
 	<category name="org.springframework">
-		<priority value="error" />
+		<priority value="DEBUG" />
 		<appender-ref ref="console" />
 	</category>
 
