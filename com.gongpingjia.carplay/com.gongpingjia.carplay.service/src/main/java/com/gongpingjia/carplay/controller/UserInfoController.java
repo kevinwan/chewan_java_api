@@ -20,6 +20,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserSubscription;
@@ -139,10 +140,10 @@ public class UserInfoController {
 		LOG.debug("forgetPassword is called, request parameter produce:");
 
 		try {
-			if(CommonUtil.isEmpty(json,Arrays.asList("phone","code","password"))){
+			if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code", "password"))) {
 				throw new ApiException("输入参数有误");
 			}
-		
+
 			User user = new User();
 			user.setPhone(json.getString("phone"));
 			user.setPassword(json.getString("password"));
@@ -173,22 +174,32 @@ public class UserInfoController {
 	 *            用户uuid
 	 * @return 认证结果
 	 */
-	@RequestMapping(value = "/user/{userId}/authentication", method = RequestMethod.POST)
-	public ResponseDo applyAuthentication(@RequestParam(value = "token") String token,
-			@RequestParam(value = "drivingExperience") Integer drivingExperience,
-			@RequestParam(value = "carBrand") String carBrand,
-			@RequestParam(value = "carBrandLogo") String carBrandLogo,
-			@RequestParam(value = "carModel") String carModel, @RequestParam(value = "slug") String slug,
-			@PathVariable(value = "userId") String userId) {
-
+	@RequestMapping(value = "/user/{userId}/authentication", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo applyAuthentication(@PathVariable(value = "userId") String userId,
+			@RequestParam(value = "token") String token, @RequestBody JSONObject json) {
 		LOG.debug("applyAuthentication is called, request parameter produce:");
+
+		if (CommonUtil
+				.isEmpty(json, Arrays.asList("drivingExperience", "carBrand", "carBrandLogo", "carModel", "slug"))) {
+			return ResponseDo.buildFailureResponse("输入参数有误");
+		}
+
+		Integer drivingExperience = 0;
+		try {
+			drivingExperience = TypeConverUtil.convertToInteger("drivingExperience",
+					json.getString("drivingExperience"), true);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
 
 		AuthenticationApplication authenticationApplication = new AuthenticationApplication();
 		authenticationApplication.setDrivingexperience(drivingExperience);
-		authenticationApplication.setBrand(carBrand);
-		authenticationApplication.setBrandlogo(carBrandLogo);
-		authenticationApplication.setModel(carModel);
-		authenticationApplication.setSlug(slug);
+		authenticationApplication.setBrand(json.getString("carBrand"));
+		authenticationApplication.setBrandlogo(json.getString("carBrandLogo"));
+		authenticationApplication.setModel(json.getString("carModel"));
+		authenticationApplication.setSlug(json.getString("slug"));
 
 		return userService.applyAuthentication(authenticationApplication, token, userId);
 	}
@@ -253,15 +264,21 @@ public class UserInfoController {
 	 *            token
 	 * @return 关注其他用户返回结果
 	 */
-	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/{userId}/listen", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo payAttention(@PathVariable(value = "userId") String userId,
-			@RequestParam(value = "targetUserId") String targetUserId, @RequestParam(value = "token") String token) {
+			@RequestParam(value = "token") String token, @RequestBody JSONObject json) {
 
 		LOG.debug("userListen is called, request parameter produce:");
 
+		if (CommonUtil.isEmpty(json, "targetUserId")) {
+			LOG.warn("Input parameter targetUserId is empty");
+			return ResponseDo.buildFailureResponse("输入参数错误");
+		}
+
 		UserSubscription userSubscription = new UserSubscription();
 		userSubscription.setFromuser(userId);
-		userSubscription.setTouser(targetUserId);
+		userSubscription.setTouser(json.getString("targetUserId"));
 
 		return userService.payAttention(userSubscription, token);
 	}
@@ -277,15 +294,21 @@ public class UserInfoController {
 	 *            token
 	 * @return 取消关注其他用户返回结果
 	 */
-	@RequestMapping(value = "/user/{userId}/unlisten", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/{userId}/unlisten", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo unPayAttention(@PathVariable(value = "userId") String userId,
-			@RequestParam(value = "targetUserId") String targetUserId, @RequestParam(value = "token") String token) {
+			@RequestParam(value = "token") String token, @RequestBody JSONObject json) {
 
 		LOG.debug("userListen is called, request parameter produce:");
 
+		if (CommonUtil.isEmpty(json, "targetUserId")) {
+			LOG.warn("Input parameter targetUserId is empty");
+			return ResponseDo.buildFailureResponse("输入参数错误");
+		}
+
 		UserSubscription userSubscription = new UserSubscription();
 		userSubscription.setFromuser(userId);
-		userSubscription.setTouser(targetUserId);
+		userSubscription.setTouser(json.getString("targetUserId"));
 
 		return userService.unPayAttention(userSubscription, token);
 	}
@@ -311,26 +334,46 @@ public class UserInfoController {
 	 *            token
 	 * @return 变更我的信息返回结果
 	 */
-	@RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo alterUserInfo(@PathVariable(value = "userId") String userId,
-			@RequestParam(value = "token") String token,
-			@RequestParam(value = "nickname", required = false) String nickname,
-			@RequestParam(value = "gender", required = false) String gender,
-			@RequestParam(value = "drivingExperience", required = false) Integer drivingExperience,
-			@RequestParam(value = "province", required = false) String province,
-			@RequestParam(value = "city", required = false) String city,
-			@RequestParam(value = "district", required = false) String district) {
+			@RequestParam(value = "token") String token, @RequestBody JSONObject json) {
 
 		LOG.debug("alterUserInfo is called, request parameter produce:");
 
 		User user = new User();
 		user.setId(userId);
-		user.setNickname(nickname);
-		user.setGender(gender);
-		user.setProvince(province);
-		user.setCity(city);
-		user.setDistrict(district);
-		if (drivingExperience != null) {
+		if (!CommonUtil.isEmpty(json, "nickname")) {
+			user.setNickname(json.getString("nickname"));
+		}
+
+		if (!CommonUtil.isEmpty(json, "gender")) {
+			user.setGender(json.getString("gender"));
+		}
+
+		if (!CommonUtil.isEmpty(json, "province")) {
+			user.setProvince(json.getString("province"));
+		}
+
+		if (!CommonUtil.isEmpty(json, "city")) {
+			user.setCity(json.getString("city"));
+		}
+
+		if (!CommonUtil.isEmpty(json, "district")) {
+			user.setDistrict(json.getString("district"));
+		}
+
+		if (!CommonUtil.isEmpty(json, "drivingExperience")) {
+
+			Integer drivingExperience = 0;
+			try {
+				drivingExperience = TypeConverUtil.convertToInteger("drivingExperience",
+						json.getString("drivingExperience"), false);
+			} catch (ApiException e) {
+				LOG.warn("Input parameter drivingExperience is not number format");
+				return ResponseDo.buildFailureResponse("输入参数有误");
+			}
+
 			user.setDrivinglicenseyear(DateUtil.getValue(DateUtil.getDate(), Calendar.YEAR) - drivingExperience);
 		} else {
 			user.setDrivinglicenseyear(0);
@@ -350,11 +393,19 @@ public class UserInfoController {
 	 *            token
 	 * @return 编辑相册图片返回结果
 	 */
-	@RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
 	public ResponseDo manageAlbumPhotos(@PathVariable(value = "userId") String userId,
-			@RequestParam(value = "photos") String[] photos, @RequestParam(value = "token") String token) {
+			@RequestParam(value = "token") String token, @RequestBody JSONObject json) {
 
 		LOG.debug("manageAlbumPhotos is called, request parameter produced");
+
+		if (!CommonUtil.isArrayEmpty(json, "photos")) {
+			LOG.warn("Input parameters photos is empty");
+			return ResponseDo.buildFailureResponse("输入参数有误");
+		}
+
+		String[] photos = CommonUtil.jsonArrayToStrings(json.getJSONArray("photos"));
 
 		return userService.manageAlbumPhotos(userId, photos, token);
 	}
@@ -376,18 +427,31 @@ public class UserInfoController {
 	 *            三方登录返回的用户头像地址
 	 * @return 返回登录结果
 	 */
-	@RequestMapping(value = "/sns/login", method = RequestMethod.POST)
-	public ResponseDo snsLogin(@RequestParam("uid") String uid, @RequestParam("channel") String channel,
-			@RequestParam("sign") String sign, @RequestParam(value = "username", required = false) String username,
-			@RequestParam(value = "url", required = false) String url) {
+	@RequestMapping(value = "/sns/login", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo snsLogin(@RequestBody JSONObject json) {
 		LOG.info("snsLogin begin");
 
 		try {
-			return userService.snsLogin(uid, channel, sign, username, url);
+			if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "sign"))) {
+				throw new ApiException("输入参数有误");
+			}
+
+			String username = null;
+			if (!CommonUtil.isEmpty(json, "username")) {
+				username = json.getString("username");
+			}
+
+			String url = null;
+			if (!CommonUtil.isEmpty(json, "url")) {
+				url = json.getString("url");
+			}
+
+			return userService.snsLogin(json.getString("uid"), json.getString("channel"), json.getString("sign"),
+					username, url);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
 	}
-
 }

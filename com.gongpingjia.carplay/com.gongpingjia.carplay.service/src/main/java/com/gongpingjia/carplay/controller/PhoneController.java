@@ -70,16 +70,20 @@ public class PhoneController {
 
 		try {
 			if (CommonUtil.isEmpty(json, "code")) {
-				LOG.warn("Input parameter nickname is empty");
+				LOG.warn("Input parameter code is empty");
 				throw new ApiException("输入参数错误");
 			}
 			String code = json.getString("code");
-			Integer type;
-			if (CommonUtil.isEmpty(json, "type")) {
-				type = 0;
-			} else {
+
+			Integer type = 0;
+			if (!CommonUtil.isEmpty(json, "type")) {
 				type = json.getInt("type");
+				if (type != 1 && type != 0) { // 1表示忘记密码, 0表示注册
+					LOG.warn("Input parameter type is not 1 or 0");
+					throw new ApiException("输入参数错误");
+				}
 			}
+
 			return service.verify(phone, code, type);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage());

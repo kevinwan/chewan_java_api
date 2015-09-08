@@ -659,7 +659,7 @@ public class UserServiceImpl implements UserService {
 		userDB.setDistrict(user.getDistrict());
 		userDB.setDrivinglicenseyear(user.getDrivinglicenseyear());
 
-		// 跟新用户信息
+		// 更新用户信息
 		userDao.updateByPrimaryKey(userDB);
 
 		return ResponseDo.buildSuccessResponse();
