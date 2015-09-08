@@ -78,15 +78,6 @@ public class CommonUtil {
 	}
 
 	/**
-	 * 获取版本信息
-	 * 
-	 * @return 返回版本信息
-	 */
-	public static String getVersion() {
-		return PropertiesUtil.getProperty("carplay.version", "v1");
-	}
-
-	/**
 	 * 获取公平价图标前缀
 	 * 
 	 * @return 返回gpjImagePrefix
