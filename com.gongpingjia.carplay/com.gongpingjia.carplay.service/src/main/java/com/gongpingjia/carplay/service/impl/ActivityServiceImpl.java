@@ -647,10 +647,16 @@ public class ActivityServiceImpl implements ActivityService {
 			record.put("activityId", item.getActivityId());
 			record.put("publishTime", item.getPublishTime());
 			record.put("start", item.getStart());
+			record.put("endTime", item.getEndtime());
 			record.put("introduction", item.getIntroduction());
 			record.put("location", item.getLocation());
+			record.put("province", item.getProvince());
+			record.put("city", item.getCity());
+			record.put("district", item.getDistrict());
 			record.put("type", item.getType());
 			record.put("pay", item.getPay());
+			record.put("holdingSeat", item.getHoldingSeat());
+			record.put("role", item.getCategory());
 
 			Map<String, Object> organizer = new HashMap<String, Object>(8, 1);
 			organizer.put("userId", item.getUserId());
