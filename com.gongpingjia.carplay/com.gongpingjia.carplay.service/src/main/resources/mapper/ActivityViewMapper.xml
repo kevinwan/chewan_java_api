@@ -28,6 +28,7 @@
         <result column="endtime" property="endtime" jdbcType="BIGINT" />
         <result column="currentCity" property="currentcity" jdbcType="VARCHAR" />
 	    <result column="currentDistrict" property="currentdistrict" jdbcType="VARCHAR" />
+	    <result column="category" property="category" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<select id="selectLatestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
@@ -39,6 +40,7 @@
 			ifnull(description, "") AS introduction,
 			location,
 			type,
+			category,
 			paymentType AS pay,
 			resA.count AS totalSeat,
 			resB.count AS holdingSeat,
@@ -108,6 +110,7 @@
 			ifnull(description, "") AS introduction,
 			location,
 			type,
+			category,
 			paymentType AS pay,
 			resA.count AS totalSeat,
 			resB.count AS holdingSeat,
@@ -181,6 +184,7 @@
 			activity.createTime AS publishTime,
 			activity.start,
 			activity.endtime,
+			activity.category,
 			ifnull(activity.description, "") AS introduction,
 			activity.location,
 			ifnull(activity.province, "") AS province,
@@ -280,7 +284,8 @@
 		    concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR}) AS photo,
 		    ifnull((year(sysdate()) - drivingLicenseYear), "") as drivingExperience, 
 		    concat(#{gpjImagePrefix,jdbcType=VARCHAR}, brandLogo) as carBrandLogo, 
-		    ifnull(car.model, "") as carModel 
+		    ifnull(car.model, "") as carModel,
+		    user.role
 		 FROM user LEFT JOIN car ON user.id = car.userId 
 		 WHERE user.id = #{userId,jdbcType=VARCHAR} 
 	</select>

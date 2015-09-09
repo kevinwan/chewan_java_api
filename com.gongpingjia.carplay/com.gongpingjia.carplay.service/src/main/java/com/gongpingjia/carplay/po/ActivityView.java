@@ -54,6 +54,8 @@ public class ActivityView {
 	private Integer historyCount;
 
 	private Long endtime;
+	
+	private String category;
 
 	public String getActivityId() {
 		return activityId;
@@ -245,6 +247,14 @@ public class ActivityView {
 
 	public void setEndtime(Long endtime) {
 		this.endtime = endtime;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 }

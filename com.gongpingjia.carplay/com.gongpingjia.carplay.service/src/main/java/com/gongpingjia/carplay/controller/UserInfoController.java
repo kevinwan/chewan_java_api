@@ -85,7 +85,8 @@ public class UserInfoController {
 			user.setCity(json.getString("city"));
 			user.setDistrict(json.getString("district"));
 			user.setPhoto(json.getString("photo"));
-
+			user.setRole("普通用户");
+			
 			userService.checkRegisterParameters(user, json);
 
 			return userService.register(user);
