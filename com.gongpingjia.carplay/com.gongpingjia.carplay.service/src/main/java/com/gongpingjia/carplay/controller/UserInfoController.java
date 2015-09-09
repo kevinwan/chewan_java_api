@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
@@ -85,7 +86,7 @@ public class UserInfoController {
 			user.setCity(json.getString("city"));
 			user.setDistrict(json.getString("district"));
 			user.setPhoto(json.getString("photo"));
-			user.setRole("普通用户");
+			user.setRole(Constants.ActivityCatalog.COMMON);
 			
 			userService.checkRegisterParameters(user, json);
 
