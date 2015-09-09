@@ -78,7 +78,7 @@ public class PhoneController {
 
 			String typeString = CommonUtil.getString(json, "type", null);
 			Integer type;
-			if (CommonUtil.isEmpty(json, json.getString("type"))) {
+			if (CommonUtil.isEmpty(json, "type")) {
 				type = 0;
 			}
 			type = TypeConverUtil.convertToInteger("type", typeString, true);
