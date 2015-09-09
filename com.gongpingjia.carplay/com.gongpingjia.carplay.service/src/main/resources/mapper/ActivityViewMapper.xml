@@ -44,7 +44,7 @@
 			paymentType AS pay,
 			resA.count AS totalSeat,
 			resB.count AS holdingSeat,
-			user.id,
+			user.id as userId,
 			user.nickname,
 			user.gender,
 			(YEAR(sysdate()) - user.birthYear) AS age,
