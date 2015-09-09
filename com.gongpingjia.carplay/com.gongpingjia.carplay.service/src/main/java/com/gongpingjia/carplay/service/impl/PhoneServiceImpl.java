@@ -168,6 +168,7 @@ public class PhoneServiceImpl implements PhoneService {
 				phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
 						PropertiesUtil.getProperty("message.effective.seconds", 7200)));
 				//过期了需要设置次数
+				phoneVerify.setSendtimes(0);
 				phoneDao.updateByPrimaryKey(phoneVerify);
 			}
 		}
