@@ -182,6 +182,13 @@ public class Constants {
 
 		public static final String OFFICIAL = "官方活动";
 	}
+	
+	public interface UserCatalog {
+
+		public static final String COMMON = "普通用户";
+
+		public static final String OFFICIAL = "官方用户";
+	}
 
 	public interface Charset {
 

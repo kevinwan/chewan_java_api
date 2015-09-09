@@ -29,6 +29,7 @@
         <result column="currentCity" property="currentcity" jdbcType="VARCHAR" />
 	    <result column="currentDistrict" property="currentdistrict" jdbcType="VARCHAR" />
 	    <result column="category" property="category" jdbcType="VARCHAR" />
+	    <result column="role" property="role" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<select id="selectLatestActivities" resultType="com.gongpingjia.carplay.po.ActivityView" parameterType="java.util.Map">
@@ -47,6 +48,7 @@
 			user.id as userId,
 			user.nickname,
 			user.gender,
+			user.role,
 			(YEAR(sysdate()) - user.birthYear) AS age,
 			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=",#{timestamp,jdbcType=BIGINT}) AS photo,
 			ifnull((YEAR(sysdate()) - user.drivingLicenseYear),	0) AS drivingExperience,
@@ -117,6 +119,7 @@
 			user.id AS userId,
 			user.nickname,
 			user.gender,
+			user.role,
 			(YEAR(sysdate()) - user.birthYear) age,
 			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=", #{timestamp,jdbcType=BIGINT}) AS photo,
 			ifnull((YEAR(sysdate()) - user.drivingLicenseYear), 0) AS drivingExperience,
@@ -197,6 +200,7 @@
 			user.id AS userId,
 			user.nickname,
 			user.gender,
+			user.role,
 			(YEAR(sysdate()) - user.birthYear) AS age,
 			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, "?timestamp=", #{timestamp,jdbcType=BIGINT}) AS photo,
 			ifnull((YEAR(sysdate()) - user.drivingLicenseYear),0) AS drivingExperience,

@@ -86,7 +86,7 @@ public class UserInfoController {
 			user.setCity(json.getString("city"));
 			user.setDistrict(json.getString("district"));
 			user.setPhoto(json.getString("photo"));
-			user.setRole(Constants.ActivityCatalog.COMMON);
+			user.setRole(Constants.UserCatalog.COMMON);
 			
 			userService.checkRegisterParameters(user, json);
 

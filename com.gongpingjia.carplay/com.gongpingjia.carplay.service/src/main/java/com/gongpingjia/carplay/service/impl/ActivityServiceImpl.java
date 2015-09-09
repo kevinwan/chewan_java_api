@@ -656,7 +656,7 @@ public class ActivityServiceImpl implements ActivityService {
 			record.put("type", item.getType());
 			record.put("pay", item.getPay());
 			record.put("holdingSeat", item.getHoldingSeat());
-			record.put("role", item.getCategory());
+			record.put("role",item.getRole());
 
 			Map<String, Object> organizer = new HashMap<String, Object>(8, 1);
 			organizer.put("userId", item.getUserId());
