@@ -773,13 +773,13 @@ public class ActivityServiceImpl implements ActivityService {
 		// 请求参数
 		param.put("longitude", request.getParameter("longitude"));
 		param.put("latitude", request.getParameter("latitude"));
-		param.put("province", request.getParameter("province"));
-		param.put("currentCity", request.getParameter("city")); // 注意，这里city对应的是currentCity，后续可能有变更
-		param.put("currentDistrict", request.getParameter("district"));// 注意，这里district对应的是currentDistrict，后续可能有变更
-		param.put("type", request.getParameter("type"));
-		param.put("gender", request.getParameter("gender"));
-		param.put("authenticate", request.getParameter("authenticate"));
-		param.put("carLevel", request.getParameter("carLevel"));
+		param.put("province", CommonUtil.ifEmtyReturnNull(request.getParameter("province")));
+		param.put("currentCity", CommonUtil.ifEmtyReturnNull(request.getParameter("city"))); // 注意，这里city对应的是currentCity，后续可能有变更
+		param.put("currentDistrict", CommonUtil.ifEmtyReturnNull(request.getParameter("district")));// 注意，这里district对应的是currentDistrict，后续可能有变更
+		param.put("type", CommonUtil.ifEmtyReturnNull(request.getParameter("type")));
+		param.put("gender", CommonUtil.ifEmtyReturnNull(request.getParameter("gender")));
+		param.put("authenticate", CommonUtil.ifEmtyReturnNull(request.getParameter("authenticate")));
+		param.put("carLevel", CommonUtil.ifEmtyReturnNull(request.getParameter("carLevel")));
 
 		Integer ignore = TypeConverUtil.convertToInteger("ignore", request.getParameter("ignore"), false);
 		if (ignore == null) {

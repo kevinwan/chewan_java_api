@@ -28,8 +28,8 @@ public class CommonUtil {
 	/**
 	 * UUID的正则表达式匹配
 	 */
-	private static final Pattern UUID_PATTERN = Pattern.compile(
-			"^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
+	private static final Pattern UUID_PATTERN = Pattern
+			.compile("^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * 检查电话号码是否正确
@@ -108,6 +108,29 @@ public class CommonUtil {
 		if (objectValue == null) {
 			return defaultValue;
 		}
+		return objectValue;
+	}
+
+	/**
+	 * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+	 * 
+	 * @param objectValue
+	 *            目标值
+	 * @param defaultValue
+	 *            默认值
+	 * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+	 */
+	public static Object ifEmtyReturnNull(Object objectValue) {
+		if (objectValue == null) {
+			return null;
+		}
+
+		if (objectValue instanceof String) {
+			if (StringUtils.isEmpty(objectValue.toString().trim())) {
+				return null;
+			}
+		}
+
 		return objectValue;
 	}
 
