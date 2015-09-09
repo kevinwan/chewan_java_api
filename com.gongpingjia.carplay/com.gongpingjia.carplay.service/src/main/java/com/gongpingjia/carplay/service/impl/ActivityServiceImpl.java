@@ -655,7 +655,7 @@ public class ActivityServiceImpl implements ActivityService {
 			record.put("district", item.getDistrict());
 			record.put("type", item.getType());
 			record.put("pay", item.getPay());
-			record.put("holdingSeat", item.getHoldingSeat().toString());
+			record.put("holdingSeat", item.getHoldingSeat());
 			record.put("role",item.getRole());
 
 			Map<String, Object> organizer = new HashMap<String, Object>(8, 1);
@@ -670,7 +670,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 			record.put("organizer", organizer);
 
-			record.put("totalSeat", item.getTotalSeat().toString());
+			record.put("totalSeat", item.getTotalSeat());
 
 			Map<String, Object> param = buildCommonQueryParam(item.getActivityId(), userId);
 
