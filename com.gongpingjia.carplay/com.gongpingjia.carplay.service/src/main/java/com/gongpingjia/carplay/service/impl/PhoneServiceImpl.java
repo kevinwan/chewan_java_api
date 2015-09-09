@@ -68,7 +68,7 @@ public class PhoneServiceImpl implements PhoneService {
 		PhoneVerification phoneVerification = savePhoneVerification(phone);
 
 		int dayMaxSendTimes = PropertiesUtil.getProperty("message.send.day.max.times", 4);
-		if (phoneVerification.getSendtimes() != null && phoneVerification.getSendtimes() > dayMaxSendTimes) {
+		if (phoneVerification.getSendtimes() != null && phoneVerification.getSendtimes() >= dayMaxSendTimes) {
 			LOG.warn("Send message times has over the day max send times");
 			throw new ApiException("今天验证码发送次数已经用完");
 		}
@@ -156,7 +156,7 @@ public class PhoneServiceImpl implements PhoneService {
 			phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
 			phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
 					PropertiesUtil.getProperty("message.effective.seconds", 7200)));
-			phoneVerify.setSendtimes(1);
+			phoneVerify.setSendtimes(0);
 			phoneVerify.setModifiedtime(DateUtil.getTime());
 
 			phoneDao.insert(phoneVerify);
