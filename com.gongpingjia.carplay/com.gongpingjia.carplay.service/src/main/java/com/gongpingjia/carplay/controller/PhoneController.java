@@ -77,8 +77,11 @@ public class PhoneController {
 			String code = json.getString("code");
 
 			String typeString = CommonUtil.getString(json, "type", null);
-
-			Integer type = TypeConverUtil.convertToInteger("type", typeString, true);
+			Integer type;
+			if (CommonUtil.isEmpty(json, json.getString("type"))) {
+				type = 0;
+			}
+			type = TypeConverUtil.convertToInteger("type", typeString, true);
 			if (type != 0 && type != 1) {
 				LOG.warn("Input parameter type is not 1 or 0");
 				throw new ApiException("输入参数有误");
