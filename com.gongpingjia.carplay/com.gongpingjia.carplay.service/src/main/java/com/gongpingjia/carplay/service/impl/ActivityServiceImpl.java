@@ -1148,6 +1148,8 @@ public class ActivityServiceImpl implements ActivityService {
 			replyMessage.setContent(comment);
 			replyMessage.setCreatetime(current);
 			replyMessage.setExtra1(activityId);
+			replyMessage.setIschecked((byte)Constants.Flag.NEGATIVE);
+			replyMessage.setIsdeleted((byte)Constants.Flag.NEGATIVE);
 			messageDao.insert(replyMessage);
 		}
 
