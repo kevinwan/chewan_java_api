@@ -347,9 +347,8 @@ public class UserServiceImpl implements UserService {
 		Car car = carDao.selectByUserId(userData.getId());
 		if (null != car) {
 			data.put("brand", car.getBrand());
-			data.put("brandLogo",
-					car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")
-							+ car.getBrandlogo());
+			data.put("brandLogo", car.getBrandlogo() == null ? ""
+					: PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + car.getBrandlogo());
 			data.put("model", car.getModel());
 			data.put("seatNumber", car.getSeat());
 		} else {
@@ -510,8 +509,8 @@ public class UserServiceImpl implements UserService {
 		data.put("district", userInfo.getDistrict());
 		data.put("isAuthenticated", userInfo.getIsauthenticated());
 
-		data.put("label", interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME
-				: Constants.UserLabel.USER_OTHERS);
+		data.put("label",
+				interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME : Constants.UserLabel.USER_OTHERS);
 
 		data.put("postNumber", activityDao.selectActivityPostNumber(interviewedUser));
 
@@ -652,12 +651,24 @@ public class UserServiceImpl implements UserService {
 		}
 
 		LOG.debug("update system data");
-		userDB.setNickname(user.getNickname());
-		userDB.setGender(user.getGender());
-		userDB.setProvince(user.getProvince());
-		userDB.setCity(user.getCity());
-		userDB.setDistrict(user.getDistrict());
-		userDB.setDrivinglicenseyear(user.getDrivinglicenseyear());
+		if (user.getNickname() != null) {
+			userDB.setNickname(user.getNickname());
+		}
+		if (user.getGender() != null) {
+			userDB.setGender(user.getGender());
+		}
+		if (user.getProvince() != null) {
+			userDB.setProvince(user.getProvince());
+		}
+		if (user.getCity() != null) {
+			userDB.setCity(user.getCity());
+		}
+		if (user.getDistrict() != null) {
+			userDB.setDistrict(user.getDistrict());
+		}
+		if (user.getDrivinglicenseyear() != null) {
+			userDB.setDrivinglicenseyear(user.getDrivinglicenseyear());
+		}
 
 		// 更新用户信息
 		userDao.updateByPrimaryKey(userDB);
@@ -829,8 +840,8 @@ public class UserServiceImpl implements UserService {
 			throw new ApiException("未能从三方登录获取头像信息");
 		}
 
-		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
-				0), Constants.Charset.UTF8);
+		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0),
+				new ArrayList<Header>(0), Constants.Charset.UTF8);
 		if (!HttpClientUtil.isStatusOK(response)) {
 			LOG.warn("Failed to obtain user photo from server");
 			HttpClientUtil.close(response);
