@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.service.impl;
 
+import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,6 @@ import com.gongpingjia.carplay.dao.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.po.EmchatToken;
 import com.gongpingjia.carplay.po.TokenVerification;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 /**
  * 对业务缓存的统一处理
@@ -99,8 +98,8 @@ public class CacheManager {
 	 * 
 	 * @return 平拍信息
 	 */
-	public String getCarBrand() {
-		return cacheService.get(CacheUtil.CacheName.CAR_BRAND);
+	public JSONObject getCarBrand() {
+		return cacheService.get(CacheUtil.CacheName.CAR_BRAND,JSONObject.class);
 	}
 
 	/**
@@ -110,7 +109,7 @@ public class CacheManager {
 	 *            品牌信息字符串
 	 * @return 返回保存到缓存的结果
 	 */
-	public String setCarBrand(JSONArray brand) {
+	public String setCarBrand(String brand) {
 
 		String result = cacheService.set(CacheUtil.CacheName.CAR_BRAND, brand);
 
