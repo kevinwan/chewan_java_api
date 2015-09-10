@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -44,7 +45,7 @@ public class CarServiceImpl implements CarService {
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
 		
-		String data ;
+		JSONArray data ;
 		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
 
 		Header header = new BasicHeader("Accept", "application/json");
@@ -57,7 +58,7 @@ public class CarServiceImpl implements CarService {
 
 			String dataGpj = HttpClientUtil.parseResponse(response);
 			JSONObject json = JSONObject.fromObject(dataGpj);
-			data = json.getJSONArray("brand").toString();
+			data = json.getJSONArray("brand");
 			LOG.debug("Refresh brand info in cache server");
 			cacheManager.setCarBrand(data);
 		} finally {
