@@ -37,7 +37,7 @@
 		select
 		id, password, nickname, phone, gender, birthYear, birthMonth, birthDay, province,
 		city, district, photo, drivingLicenseYear, drivingLicensePhoto, isAuthenticated,
-		credit, registerTime, invalid
+		credit, registerTime, invalid, role
 		from user
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
