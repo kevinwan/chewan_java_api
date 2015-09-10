@@ -99,7 +99,7 @@ public class CacheManager {
 	 * @return 平拍信息
 	 */
 	public String getCarBrand() {
-		return cacheService.get(CacheUtil.CacheName.CAR_BRAND, String.class);
+		return cacheService.get(CacheUtil.CacheName.CAR_BRAND);
 	}
 
 	/**
