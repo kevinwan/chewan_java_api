@@ -37,10 +37,10 @@ public class CarServiceImpl implements CarService {
 	public ResponseDo getCarBrand() throws ApiException {
 
 		LOG.debug("Query data from cache first");
-		JSONObject jsonCache = cacheManager.getCarBrand();
-		if (jsonCache != null) {
-			return ResponseDo.buildSuccessResponse(jsonCache);
-		}
+//		JSONObject jsonCache = cacheManager.getCarBrand();
+//		if (jsonCache != null) {
+//			return ResponseDo.buildSuccessResponse(jsonCache);
+//		}
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
 		String data = new String();
