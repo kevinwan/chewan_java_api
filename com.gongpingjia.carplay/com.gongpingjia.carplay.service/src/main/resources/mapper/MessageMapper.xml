@@ -105,7 +105,7 @@
 			message.type,
 			message.fromUser AS userId,
 			concat(
-			#{assetImgUrl,jdbcType=VARCHAR}, user.photo, "?imageView2/1/w/200") AS photo,
+			#{assetImgUrl,jdbcType=VARCHAR}, 'user'.photo, "?imageView2/1/w/200") AS photo,
 			'user'.nickname,
 			(YEAR (sysdate()) - 'user'.birthYear) AS age,
 			'user'.gender,
