@@ -37,13 +37,14 @@ public class CarServiceImpl implements CarService {
 	public ResponseDo getCarBrand() throws ApiException {
 
 		LOG.debug("Query data from cache first");
-		JSONObject jsonCache = cacheManager.getCarBrand();
-		if (jsonCache != null) {
-			return ResponseDo.buildSuccessResponse(jsonCache);
+		String brandCache = cacheManager.getCarBrand();
+		if (brandCache != null) {
+			return ResponseDo.buildSuccessResponse(brandCache);
 		}
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
-		JSONObject json = new JSONObject();
+		
+		String data ;
 		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
 
 		Header header = new BasicHeader("Accept", "application/json");
@@ -54,16 +55,16 @@ public class CarServiceImpl implements CarService {
 			response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(0), Arrays.asList(header),
 					Constants.Charset.UTF8);
 
-			String data = HttpClientUtil.parseResponse(response);
-			json = JSONObject.fromObject(data);
-			json.put("data", json.getJSONArray("brand"));
+			String dataGpj = HttpClientUtil.parseResponse(response);
+			JSONObject json = JSONObject.fromObject(dataGpj);
+			data = json.getJSONArray("brand").toString();
 			LOG.debug("Refresh brand info in cache server");
 			cacheManager.setCarBrand(data);
 		} finally {
 			HttpClientUtil.close(response);
 		}
 
-		return ResponseDo.buildSuccessResponse(json);
+		return ResponseDo.buildSuccessResponse(data);
 	}
 
 	/**

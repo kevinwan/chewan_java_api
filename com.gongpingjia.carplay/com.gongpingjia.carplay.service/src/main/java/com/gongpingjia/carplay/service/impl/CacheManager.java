@@ -98,8 +98,8 @@ public class CacheManager {
 	 * 
 	 * @return 平拍信息
 	 */
-	public JSONObject getCarBrand() {
-		return cacheService.get(CacheUtil.CacheName.CAR_BRAND, JSONObject.class);
+	public String getCarBrand() {
+		return cacheService.get(CacheUtil.CacheName.CAR_BRAND, String.class);
 	}
 
 	/**
