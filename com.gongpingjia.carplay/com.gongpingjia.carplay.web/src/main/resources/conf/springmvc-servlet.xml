@@ -24,7 +24,8 @@
 		<bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor" />
 	</mvc:interceptors>
 
-	<mvc:resources location="/WEB-INF/jsp/" mapping="/WEB-INF/jsp/**"></mvc:resources>
+	<mvc:default-servlet-handler />
+	<mvc:resources location="/html/" mapping="/html/**"></mvc:resources>
 
 	<!-- 设置上传文件的最大尺寸为2MB -->
 	<bean id="multipartResolver"
