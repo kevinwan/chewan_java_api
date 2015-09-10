@@ -481,7 +481,7 @@ public class UserServiceImpl implements UserService {
 		data.put("nickname", userInfo.getNickname());
 		data.put("gender", userInfo.getGender());
 		data.put("age", userInfo.getAge());
-
+		data.put("role", userInfo.getRole());
 		StringBuilder photo = new StringBuilder();
 		photo.append(CommonUtil.getPhotoServer());
 		photo.append(userInfo.getPhoto());

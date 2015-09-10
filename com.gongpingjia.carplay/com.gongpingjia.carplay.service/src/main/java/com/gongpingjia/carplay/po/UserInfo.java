@@ -26,6 +26,8 @@ public class UserInfo {
 
 	private String district;
 
+	private String role;
+
 	private Byte isauthenticated;
 
 	public String getUserId() {
@@ -114,6 +116,14 @@ public class UserInfo {
 
 	public void setDistrict(String district) {
 		this.district = district;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public Byte getIsauthenticated() {

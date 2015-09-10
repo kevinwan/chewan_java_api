@@ -14,6 +14,7 @@
 		<result column="city" property="city" jdbcType="VARCHAR" />
 		<result column="district" property="district" jdbcType="VARCHAR" />
 		<result column="photo" property="photo" jdbcType="VARCHAR" />
+		<result column="role" property="role" jdbcType="VARCHAR" />
 		<result column="isAuthenticated" property="isauthenticated" jdbcType="TINYINT" />
 	</resultMap>
 	
@@ -31,6 +32,7 @@
 		    province, 
 		    city, 
 		    district, 
+		    role,
 		    isAuthenticated 
 		from user left join car on user.id = car.userId
 		where 
@@ -44,6 +46,7 @@
             user.gender, 
             (year(sysdate()) - user.birthYear) as age, 
             user.photo, 
+            user.role,
             ifnull((year(sysdate()) - user.drivingLicenseYear), 0) as drivingExperience, 
             ifnull(car.brandLogo, "") as carBrandLogo, 
             ifnull(car.model, "") as carModel 
