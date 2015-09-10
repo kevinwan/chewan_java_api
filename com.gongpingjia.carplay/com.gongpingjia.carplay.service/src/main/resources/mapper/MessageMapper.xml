@@ -73,13 +73,13 @@
 			message.type,
 			message.fromUser AS userId,
 			concat(
-			#{assetImgUrl,jdbcType=VARCHAR}, 'user'.photo, "?imageView2/1/w/200") AS photo,
-			'user'.nickname,
-			(YEAR (sysdate()) - 'user'.birthYear) AS age,
-			'user'.gender,
+			#{assetImgUrl,jdbcType=VARCHAR}, `user`.photo, "?imageView2/1/w/200") AS photo,
+			`user`.nickname,
+			(YEAR (sysdate()) - `user`.birthYear) AS age,
+			`user`.gender,
 			ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.brandLogo), "") as carBrandLogo,
 			ifnull(car.model, "") AS carModel,
-			ifnull((YEAR (sysdate()) - 'user'.drivingLicenseYear),0) AS drivingExperience,
+			ifnull((YEAR (sysdate()) - `user`.drivingLicenseYear),0) AS drivingExperience,
 			message.content,
 			ifnull(message.extra2, 0) AS seat,
 			ifnull(message.extra3, "") AS applicationId,
@@ -87,8 +87,8 @@
 			ifnull(message.remarks, "") AS remarks
 		FROM
 				message
-		LEFT JOIN user ON 'user'.id = message.fromUser
-		LEFT JOIN car ON car.userId = 'user'.id
+		LEFT JOIN user ON `user`.id = message.fromUser
+		LEFT JOIN car ON car.userId = `user`.id
 		WHERE
 			message.toUser = #{userId,jdbcType=VARCHAR} 
 		AND message.type = #{type,jdbcType=VARCHAR} 
@@ -105,13 +105,13 @@
 			message.type,
 			message.fromUser AS userId,
 			concat(
-			#{assetImgUrl,jdbcType=VARCHAR}, 'user'.photo, "?imageView2/1/w/200") AS photo,
-			'user'.nickname,
-			(YEAR (sysdate()) - 'user'.birthYear) AS age,
-			'user'.gender,
+			#{assetImgUrl,jdbcType=VARCHAR}, `user`.photo, "?imageView2/1/w/200") AS photo,
+			`user`.nickname,
+			(YEAR (sysdate()) - `user`.birthYear) AS age,
+			`user`.gender,
 			ifnull(concat(#{brandImgUrl,jdbcType=VARCHAR} , car.brandLogo), "") as carBrandLogo,
 			ifnull(car.model, "") AS carModel,
-			ifnull((YEAR (sysdate()) - 'user'.drivingLicenseYear),0) AS drivingExperience,
+			ifnull((YEAR (sysdate()) - `user`.drivingLicenseYear),0) AS drivingExperience,
 			message.content,
 			ifnull(message.extra2, 0) AS seat,
 			ifnull(message.extra3, "") AS applicationId,
@@ -119,8 +119,8 @@
 			ifnull(message.remarks, "") AS remarks
 		FROM
 				message
-		LEFT JOIN 'user' ON 'user'.id = message.fromUser
-		LEFT JOIN car ON car.userId = 'user'.id
+		LEFT JOIN `user` ON `user`.id = message.fromUser
+		LEFT JOIN car ON car.userId = `user`.id
 		WHERE
 			message.toUser = #{userId,jdbcType=VARCHAR}
 		AND	message.type IS NOT NULL 
