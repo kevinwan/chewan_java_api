@@ -58,6 +58,15 @@ public class CarServiceImpl implements CarService {
 
 			JSONObject json = JSONObject.fromObject(data);
 			dataJson = json.getJSONArray("brand");
+			
+			JSONObject[] jsonObjects=(JSONObject[])dataJson.toArray();
+			for(JSONObject jsonObject:jsonObjects){
+				String logo_img_name=jsonObject.getString("jsonObject");
+				String logo_img=PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")+logo_img_name;
+				jsonObject.remove("logo_img");
+				json.put("logo_img", logo_img);
+			}
+			
 			LOG.debug("Refresh brand info in cache server");
 
 			cacheManager.setCarBrand(json.toString());
