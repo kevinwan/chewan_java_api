@@ -58,13 +58,17 @@ public class CarServiceImpl implements CarService {
 
 			JSONObject json = JSONObject.fromObject(data);
 			dataJson = json.getJSONArray("brand");
-			
-			for(int i=0;i<dataJson.size();i++){
-				dataJson.getJSONObject(i).put("logo_img", PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")+dataJson.getJSONObject(i).remove("logo_img"));
+
+			for (int i = 0; i < dataJson.size(); i++) {
+				dataJson.getJSONObject(i).put(
+						"logo_img",
+						PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")
+								+ dataJson.getJSONObject(i).remove("logo_img"));
 			}
-			
+
 			LOG.debug("Refresh brand info in cache server");
 
+			json.put("brand", dataJson);
 			cacheManager.setCarBrand(json.toString());
 		} finally {
 			HttpClientUtil.close(response);
@@ -109,6 +113,7 @@ public class CarServiceImpl implements CarService {
 			dataJson = json.getJSONArray("model_list");
 
 			LOG.debug("Refresh data in the cache server");
+			
 			cacheManager.setCarMode(brand, data);
 		} finally {
 			HttpClientUtil.close(response);
