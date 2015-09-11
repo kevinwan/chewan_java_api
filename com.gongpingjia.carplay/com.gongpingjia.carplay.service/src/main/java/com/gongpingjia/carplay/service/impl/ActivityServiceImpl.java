@@ -1751,7 +1751,7 @@ public class ActivityServiceImpl implements ActivityService {
 		activityShareInfo.put("cars", cars);
 		activityShareInfo.put("activityId", activityId);
 		activityShareInfo.put("chatGroupId", activity.getEmchatgroupid());
-
+		activityShareInfo.put("isMember", isMember(userId, activityId, members));
 		activityShareInfo.putAll(buildShareData(activity.getOrganizer(), activity));
 
 		LOG.debug("Finished build response data");
