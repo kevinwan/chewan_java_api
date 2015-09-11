@@ -27,7 +27,7 @@
 		<constructor-arg index="0" ref="jedisPoolConfig" />
 		<constructor-arg index="1">
 			<list>
-				<bean class="redis.clients.jedis.JedisShardInfo">
+				<bean id="serverNode" class="redis.clients.jedis.JedisShardInfo">
 					<constructor-arg index="0" value="${redis.server.ip}" />
 					<constructor-arg index="1" value="${redis.server.port}" />
 					<constructor-arg index="2" value="${redis.server.name}" />
@@ -35,6 +35,16 @@
 					<property name="password" value="${redis.server.password}" />
 					<property name="soTimeout" value="${redis.server.soTimeout}" />
 					<property name="connectionTimeout" value="${redis.server.connectionTimeout}" />
+				</bean>
+				
+				<bean id="slaveNode" class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg index="0" value="${redis.slave.ip}" />
+					<constructor-arg index="1" value="${redis.slave.port}" />
+					<constructor-arg index="2" value="${redis.slave.name}" />
+
+					<property name="password" value="${redis.slave.password}" />
+					<property name="soTimeout" value="${redis.slave.soTimeout}" />
+					<property name="connectionTimeout" value="${redis.slave.connectionTimeout}" />
 				</bean>
 			</list>
 		</constructor-arg>
