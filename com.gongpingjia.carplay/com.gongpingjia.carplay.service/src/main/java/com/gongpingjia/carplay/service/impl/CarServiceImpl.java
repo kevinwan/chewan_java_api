@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -35,15 +36,14 @@ public class CarServiceImpl implements CarService {
 	 * @return 品牌信息
 	 */
 	public ResponseDo getCarBrand() throws ApiException {
-
 		LOG.debug("Query data from cache first");
-		JSONObject jsonCache = cacheManager.getCarBrand();
-		if (jsonCache != null) {
-			return ResponseDo.buildSuccessResponse(jsonCache);
+		JSONObject dataCache = cacheManager.getCarBrand();
+		if (dataCache != null) {
+			return ResponseDo.buildSuccessResponse(dataCache.get("brand"));
 		}
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
-		JSONObject json = new JSONObject();
+		JSONArray dataJson = new JSONArray();
 		String gpjUrl = PropertiesUtil.getProperty("gongpingjia.brand.url", "");
 
 		Header header = new BasicHeader("Accept", "application/json");
@@ -55,15 +55,17 @@ public class CarServiceImpl implements CarService {
 					Constants.Charset.UTF8);
 
 			String data = HttpClientUtil.parseResponse(response);
-			json = JSONObject.fromObject(data);
-			json.put("data", json.getJSONArray("brand"));
+
+			JSONObject json = JSONObject.fromObject(data);
+			dataJson = json.getJSONArray("brand");
 			LOG.debug("Refresh brand info in cache server");
-			//cacheManager.setCarBrand(data);
+
+			cacheManager.setCarBrand(json.toString());
 		} finally {
 			HttpClientUtil.close(response);
 		}
 
-		return ResponseDo.buildSuccessResponse(json.getJSONArray("brand"));
+		return ResponseDo.buildSuccessResponse(dataJson);
 	}
 
 	/**

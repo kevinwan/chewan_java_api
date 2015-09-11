@@ -35,7 +35,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.get(key);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}

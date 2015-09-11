@@ -99,7 +99,7 @@ public class CacheManager {
 	 * @return 平拍信息
 	 */
 	public JSONObject getCarBrand() {
-		return cacheService.get(CacheUtil.CacheName.CAR_BRAND,JSONObject.class);
+		return cacheService.get(CacheUtil.CacheName.CAR_BRAND, JSONObject.class);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class CacheManager {
 	 */
 	public EmchatToken getEmchatToken() {
 		EmchatToken token = cacheService.get(CacheUtil.CacheName.EMCHAT_TOKEN, EmchatToken.class);
-		
+
 		if (token == null) {
 			token = emchatTokenDao.selectFirstOne();
 		}
