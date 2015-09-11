@@ -251,6 +251,13 @@ public class ActivityServiceImpl implements ActivityService {
 				"shareContent",
 				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
 						activity.getLocation(), activity.getPaymenttype() }));
+		
+		Map<String, Object> coverParam=new HashMap<String,Object>(2,1);
+		coverParam.put("assetUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
+		coverParam.put("activityId", activity.getId());
+		List<Map<String, String>> covers=coverDao.selectByActivity(coverParam);
+		data.put("imgUrl", covers.get(0).get("original_pic"));
+		
 		return data;
 	}
 
