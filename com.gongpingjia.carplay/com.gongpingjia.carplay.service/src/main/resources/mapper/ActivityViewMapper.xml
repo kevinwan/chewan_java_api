@@ -365,7 +365,7 @@
 			user.id AS userId,
 			user.nickname,
 			user.gender,
-			user.role
+			user.role,
 			(YEAR(sysdate()) - user.birthYear) age,
 			concat(#{assetUrl,jdbcType=VARCHAR}, user.photo, #{photoPostfix,jdbcType=VARCHAR}) AS photo,
 			ifnull((YEAR (sysdate()) - drivingLicenseYear), 0) AS drivingExperience,
