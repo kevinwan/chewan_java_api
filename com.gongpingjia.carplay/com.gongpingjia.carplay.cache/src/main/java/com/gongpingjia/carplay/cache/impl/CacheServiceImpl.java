@@ -65,7 +65,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.set(key, value);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -85,7 +85,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.del(key);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -98,7 +98,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.hget(key, field);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -121,7 +121,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.hset(key, field, value);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -142,7 +142,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.exists(key);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -155,7 +155,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.hexists(key, field);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -168,7 +168,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.hmget(key, fields);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -195,7 +195,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.hdel(key, field);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}
@@ -208,7 +208,7 @@ public class CacheServiceImpl implements CacheService {
 		try {
 			return jedis.expire(key, seconds);
 		} catch (Exception e) {
-			LOG.error("Execute redis command failure", e.getMessage());
+			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
 		} finally {
 			jedis.close();
 		}

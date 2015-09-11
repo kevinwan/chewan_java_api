@@ -37,9 +37,9 @@ public class CarServiceImpl implements CarService {
 	 */
 	public ResponseDo getCarBrand() throws ApiException {
 		LOG.debug("Query data from cache first");
-		JSONObject dataCache = cacheManager.getCarBrand();
-		if (dataCache != null) {
-			return ResponseDo.buildSuccessResponse(dataCache.get("brand"));
+		JSONObject jsonCache = cacheManager.getCarBrand();
+		if (jsonCache != null) {
+			return ResponseDo.buildSuccessResponse(jsonCache.get("brand"));
 		}
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
@@ -80,7 +80,7 @@ public class CarServiceImpl implements CarService {
 		LOG.debug("Query data from cache first");
 		JSONObject jsonCache = cacheManager.getCarModel(brand);
 		if (jsonCache != null) {
-			return ResponseDo.buildSuccessResponse(jsonCache);
+			return ResponseDo.buildSuccessResponse(jsonCache.get("model_list"));
 		}
 
 		LOG.debug("Query data from gongpingjia if no data exist in the cache");
@@ -93,11 +93,15 @@ public class CarServiceImpl implements CarService {
 		Header header = new BasicHeader("Accept", "application/json; charset=UTF-8");
 		CloseableHttpResponse response = null;
 
+		JSONArray dataJson = new JSONArray();
+
 		try {
 			response = HttpClientUtil.get(gpjUrl, params, Arrays.asList(header), Constants.Charset.UTF8);
 
 			String data = HttpClientUtil.parseResponse(response);
 			json = JSONObject.fromObject(data);
+
+			dataJson = json.getJSONArray("model_list");
 
 			LOG.debug("Refresh data in the cache server");
 			cacheManager.setCarMode(brand, data);
@@ -105,7 +109,7 @@ public class CarServiceImpl implements CarService {
 			HttpClientUtil.close(response);
 		}
 
-		return ResponseDo.buildSuccessResponse(json);
+		return ResponseDo.buildSuccessResponse(dataJson);
 	}
 
 }

@@ -29,7 +29,7 @@
 			<list>
 				<bean id="serverNode" class="redis.clients.jedis.JedisShardInfo">
 					<constructor-arg index="0" value="${redis.server.ip}" />
-					<constructor-arg index="1" value="${redis.server.port}" />
+					<constructor-arg index="1" value="${redis.server.port}"  type="int"/>
 					<constructor-arg index="2" value="${redis.server.name}" />
 
 					<property name="password" value="${redis.server.password}" />
@@ -39,7 +39,7 @@
 				
 				<bean id="slaveNode" class="redis.clients.jedis.JedisShardInfo">
 					<constructor-arg index="0" value="${redis.slave.ip}" />
-					<constructor-arg index="1" value="${redis.slave.port}" />
+					<constructor-arg index="1" value="${redis.slave.port}" type="int"/>
 					<constructor-arg index="2" value="${redis.slave.name}" />
 
 					<property name="password" value="${redis.slave.password}" />
