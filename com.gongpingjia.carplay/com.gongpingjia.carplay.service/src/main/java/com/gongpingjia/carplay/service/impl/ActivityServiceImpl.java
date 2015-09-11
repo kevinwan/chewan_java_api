@@ -1438,7 +1438,7 @@ public class ActivityServiceImpl implements ActivityService {
 		// 发送消息
 		LOG.debug("Send message after add user");
 		User user = userDao.selectByPrimaryKey(applicationUserId);
-		final String format = "欢迎 '{0}' 加入活动";
+		final String format = "欢迎 {0} 加入活动";
 		String textMessage = MessageFormat.format(format, user.getNickname());
 
 		JSONObject sendResult = chatThirdService.sendChatGroupTextMessage(chatCommonService.getChatToken(),
