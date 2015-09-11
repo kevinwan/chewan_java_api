@@ -35,7 +35,7 @@
 	
 	<select id="subscriptionCount" resultType="java.lang.Integer" parameterType="java.lang.String">
 		select count(1) as count from user_subscription 
-		where fromUser = #{interviewedUser,jdbcType=VARCHAR}
-              and toUser = #{visitorUser,jdbcType=VARCHAR}
+		where fromUser = #{visitorUser,jdbcType=VARCHAR}
+              and toUser = #{interviewedUser,jdbcType=VARCHAR}
 	</select>
 </mapper>
