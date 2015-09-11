@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.service.impl;
 
+import java.text.MessageFormat;
+
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,7 @@ public class CacheManager {
 	 * @return Token对象
 	 */
 	public TokenVerification getUserTokenVerification(String userId) {
-		TokenVerification tokenVerify = cacheService.hget(CacheUtil.CacheName.USER_TOKEN, userId,
+		TokenVerification tokenVerify = cacheService.get(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, userId),
 				TokenVerification.class);
 
 		if (tokenVerify == null) {
@@ -60,11 +62,12 @@ public class CacheManager {
 	 *            用户Token对象
 	 * @return 如果更新成功返回true， 否则返回false
 	 */
-	public boolean setUserTokenVerification(TokenVerification token) {
+	public String setUserTokenVerification(TokenVerification token) {
 
-		Long result = cacheService.hset(CacheUtil.CacheName.USER_TOKEN, token.getUserid(), token);
+		String result = cacheService
+				.set(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, token.getUserid()), token);
 
-		return result != 0;
+		return result;
 	}
 
 	/**

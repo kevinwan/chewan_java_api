@@ -5,7 +5,7 @@ import java.text.MessageFormat;
 public class CacheUtil {
 
 	public interface CacheName {
-		String USER_TOKEN = "UserToken";
+		String USER_TOKEN = "UserToken:{0}";
 
 		String CAR_MODEL = "CarModel:{0}";
 
