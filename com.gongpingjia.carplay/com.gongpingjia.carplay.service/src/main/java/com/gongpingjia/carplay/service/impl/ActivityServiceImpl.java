@@ -747,7 +747,7 @@ public class ActivityServiceImpl implements ActivityService {
 	private Integer isMember(String userId, String activityId, List<Map<String, Object>> members) {
 		Integer isMember = 0;
 		for (Map<String, Object> member : members) {
-			if (member.containsKey(userId)) {
+			if (userId.equals(member.get("userId"))) {
 				isMember = 1;
 				return isMember;
 			}
