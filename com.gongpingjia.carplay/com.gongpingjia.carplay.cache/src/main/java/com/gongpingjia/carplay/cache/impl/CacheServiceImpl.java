@@ -29,6 +29,12 @@ public class CacheServiceImpl implements CacheService {
 	@Autowired
 	private ShardedJedisPool shardedJedisPool;
 
+	/**
+	 * Master库，主要用于写缓存
+	 */
+	@Autowired
+	private ShardedJedis writeShardedJedis;
+
 	@Override
 	public String get(String key) {
 		ShardedJedis jedis = shardedJedisPool.getResource();
@@ -60,14 +66,10 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public String set(String key, String value) {
-
-		ShardedJedis jedis = shardedJedisPool.getResource();
 		try {
-			return jedis.set(key, value);
+			return writeShardedJedis.set(key, value);
 		} catch (Exception e) {
 			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
-		} finally {
-			jedis.close();
 		}
 		return null;
 	}
@@ -117,13 +119,10 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public Long hset(String key, String field, String value) {
-		ShardedJedis jedis = shardedJedisPool.getResource();
 		try {
-			return jedis.hset(key, field, value);
+			return writeShardedJedis.hset(key, field, value);
 		} catch (Exception e) {
 			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
-		} finally {
-			jedis.close();
 		}
 		return null;
 	}
@@ -191,26 +190,20 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public Long hdel(String key, String field) {
-		ShardedJedis jedis = shardedJedisPool.getResource();
 		try {
-			return jedis.hdel(key, field);
+			return writeShardedJedis.hdel(key, field);
 		} catch (Exception e) {
 			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
-		} finally {
-			jedis.close();
 		}
 		return null;
 	}
 
 	@Override
 	public Long expire(String key, int seconds) {
-		ShardedJedis jedis = shardedJedisPool.getResource();
 		try {
-			return jedis.expire(key, seconds);
+			return writeShardedJedis.expire(key, seconds);
 		} catch (Exception e) {
 			LOG.error("Execute redis command failure:{}, message:{}", e.getClass(), e.getMessage());
-		} finally {
-			jedis.close();
 		}
 		return null;
 	}
