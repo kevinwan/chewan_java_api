@@ -1269,6 +1269,7 @@ public class ActivityServiceImpl implements ActivityService {
 		message.setExtra2(seat);
 		message.setExtra3(application.getId());
 		message.setIsdeleted((byte) 0);
+		message.setIschecked((byte) 0);
 		messageDao.insert(message);
 	}
 
