@@ -1563,7 +1563,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 			List<SeatReservation> reservList = new ArrayList<SeatReservation>(seatCount);
 			// 有车的
-			reservList.add(buildSeatReservation(userId, activityId, current, car.getId(), 0));
+			reservList.add(buildSeatReservation(car.getUserid(), activityId, current, car.getId(), 0));
 			// 没有车的
 			for (int i = noCarSeatCount + 1; i <= seatCount; ++i) {
 				reservList.add(buildSeatReservation(null, activityId, current, car.getId(), i));
