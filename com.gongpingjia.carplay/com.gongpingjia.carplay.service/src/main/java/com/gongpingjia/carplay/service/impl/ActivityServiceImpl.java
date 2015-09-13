@@ -1880,7 +1880,7 @@ public class ActivityServiceImpl implements ActivityService {
 		key.setUserid(member);
 		memberDao.deleteByPrimaryKey(key);
 		
-		Car car = carDao.selectByUserId(userId);
+		Car car = carDao.selectByUserId(member);
 		if (car != null) {
 			SeatReservation reservation = new SeatReservation();
 			reservation.setActivityid(activityId);
