@@ -226,8 +226,8 @@ public class ActivityController {
 	 * @return 返回加入结果信息
 	 */
 	@RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST)
-	public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+	public ResponseDo joinActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("joinActivity begin");
 
 		try {
@@ -389,8 +389,8 @@ public class ActivityController {
 	 */
 	@RequestMapping(value = "/activity/{activityId}/member/remove", method = RequestMethod.POST, headers = {
 			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
-	public ResponseDo removeMember(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+	public ResponseDo removeMember(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token, @RequestBody JSONObject json) {
 		LOG.info("removeMember begin");
 		try {
 			if (CommonUtil.isEmpty(json, "member")) {
@@ -420,8 +420,8 @@ public class ActivityController {
 	 * 
 	 */
 	@RequestMapping(value = "/activity/{activityId}/quit", method = RequestMethod.POST)
-	public ResponseDo quitActivity(@PathVariable("activityId") String activityId,
-			@RequestParam("userId") String userId, @RequestParam("token") String token) {
+	public ResponseDo quitActivity(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
+			@RequestParam("token") String token) {
 		LOG.info("quitActivity begin");
 
 		try {

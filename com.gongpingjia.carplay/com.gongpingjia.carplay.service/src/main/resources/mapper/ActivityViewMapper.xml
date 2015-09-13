@@ -377,8 +377,8 @@
 			activity_member member
 			LEFT JOIN user ON member.userId = user.id
 			LEFT JOIN car ON car.userId = user.id
-			LEFT JOIN activity_application app ON app.activityId = member.activityId 
-				AND app.userId = member.userId AND app.status = #{status,jdbcType=VARCHAR}
+			LEFT JOIN activity_application app ON member.activityId = app.activityId 
+				AND member.userId = app.userId AND app.status = #{status,jdbcType=VARCHAR}
 		WHERE
 			member.activityId = #{activityId,jdbcType=VARCHAR}
 	</select>
