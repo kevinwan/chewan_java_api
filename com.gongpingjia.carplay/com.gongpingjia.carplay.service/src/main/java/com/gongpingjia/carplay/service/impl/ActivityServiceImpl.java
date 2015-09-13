@@ -247,17 +247,15 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put(
-				"shareContent",
-				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
-						activity.getLocation(), activity.getPaymenttype() }));
-		
-		Map<String, Object> coverParam=new HashMap<String,Object>(2,1);
+		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
+				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
+
+		Map<String, Object> coverParam = new HashMap<String, Object>(2, 1);
 		coverParam.put("assetUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
 		coverParam.put("activityId", activity.getId());
-		List<Map<String, String>> covers=coverDao.selectByActivity(coverParam);
+		List<Map<String, String>> covers = coverDao.selectByActivity(coverParam);
 		data.put("imgUrl", covers.get(0).get("original_pic"));
-		
+
 		return data;
 	}
 
@@ -663,7 +661,7 @@ public class ActivityServiceImpl implements ActivityService {
 			record.put("type", item.getType());
 			record.put("pay", item.getPay());
 			record.put("holdingSeat", item.getHoldingSeat());
-			record.put("role",item.getRole());
+			record.put("role", item.getRole());
 
 			Map<String, Object> organizer = new HashMap<String, Object>(8, 1);
 			organizer.put("userId", item.getUserId());
@@ -1156,8 +1154,8 @@ public class ActivityServiceImpl implements ActivityService {
 			replyMessage.setContent(comment);
 			replyMessage.setCreatetime(current);
 			replyMessage.setExtra1(activityId);
-			replyMessage.setIschecked((byte)Constants.Flag.NEGATIVE);
-			replyMessage.setIsdeleted((byte)Constants.Flag.NEGATIVE);
+			replyMessage.setIschecked((byte) Constants.Flag.NEGATIVE);
+			replyMessage.setIsdeleted((byte) Constants.Flag.NEGATIVE);
 			messageDao.insert(replyMessage);
 		}
 
@@ -1488,6 +1486,9 @@ public class ActivityServiceImpl implements ActivityService {
 		approveMessage.setExtra1(activityId);
 		approveMessage.setExtra2(0);
 		approveMessage.setExtra3(applicationId);
+		approveMessage.setRemarks(ApplicationStatus.APPROVED.getName());
+		approveMessage.setIschecked((byte) Constants.Flag.NEGATIVE);
+		approveMessage.setIsdeleted((byte) Constants.Flag.NEGATIVE);
 		messageDao.insert(approveMessage);
 	}
 
@@ -1832,7 +1833,8 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
+					userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 
