@@ -377,8 +377,15 @@
 			activity_member member
 			LEFT JOIN user ON member.userId = user.id
 			LEFT JOIN car ON car.userId = user.id
-			LEFT JOIN activity_application app ON member.activityId = app.activityId 
-				AND member.userId = app.userId AND app.status = #{status,jdbcType=VARCHAR}
+			LEFT JOIN 
+				(SELECT 
+					activityId,userId,seat,`status` 
+				FROM activity_application 
+				GROUP BY activityId,userId  
+				HAVING MAX(createTime) 
+				AND `status`=#{status,jdbcType=VARCHAR}) app 
+			ON member.activityId = app.activityId 
+			AND member.userId = app.userId 
 		WHERE
 			member.activityId = #{activityId,jdbcType=VARCHAR}
 	</select>

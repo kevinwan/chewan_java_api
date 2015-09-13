@@ -1879,8 +1879,6 @@ public class ActivityServiceImpl implements ActivityService {
 		key.setActivityid(activityId);
 		key.setUserid(member);
 		memberDao.deleteByPrimaryKey(key);
-
-		applicationDao.deleteByActivityIdAndMemberId(key);
 		
 		Car car = carDao.selectByUserId(userId);
 		if (car != null) {
