@@ -95,4 +95,10 @@
 		createTime = #{createtime,jdbcType=BIGINT}
 		where id = #{id,jdbcType=VARCHAR}
 	</update>
+	
+	<delete id="deleteByActivityIdAndMemberId" parameterType="com.gongpingjia.carplay.po.ActivityMemberKey">
+		delete from activity_application
+		where userId = #{userid,jdbcType=VARCHAR}
+		and activityId = #{activityid,jdbcType=VARCHAR}
+	</delete>
 </mapper>

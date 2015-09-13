@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.gongpingjia.carplay.common.util.DASUtil;
 import com.gongpingjia.carplay.dao.ActivityApplicationDao;
 import com.gongpingjia.carplay.po.ActivityApplication;
+import com.gongpingjia.carplay.po.ActivityMemberKey;
 
 @Service
 public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
@@ -44,6 +45,11 @@ public class ActivityApplicationDaoImpl implements ActivityApplicationDao {
 	@Override
 	public List<Map<String, Object>> selectByOrganizer(Map<String, Object> param) {
 		return DASUtil.selectList(ActivityApplication.class.getName(), "selectByOrganizer", param);
+	}
+
+	@Override
+	public int deleteByActivityIdAndMemberId(ActivityMemberKey key) {
+		return DASUtil.delete(ActivityApplication.class.getName(), "deleteByActivityIdAndMemberId", key);
 	}
 
 }
