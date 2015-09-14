@@ -30,5 +30,7 @@ public interface SeatReservationDao {
 	
 	List<String> selectCarIdsByActivityId(String activityId);
 	
-	int updateByQuitActivity(Map<String, Object> param); 
+	int updateByQuitActivity(Map<String, Object> param);
+
+	int selectIsCarOwner(Map<String, Object> param); 
 }

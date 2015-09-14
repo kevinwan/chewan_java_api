@@ -118,6 +118,19 @@
 			AND carId IS NOT NULL
 	</select>
 	
+	<select id="selectIsCarOwner" resultType="java.lang.Integer" parameterType="java.util.Map">
+	    select 
+	    	count(car.id) 
+	    from car 
+	    where car.userId = #{member,jdbcType=VARCHAR} 
+	    and car.id in 
+	    (select 
+	    	distinct carId 
+	    from seat_reservation 
+	    where activityId = #{activityId,jdbcType=VARCHAR} 
+	    and carId is not null)
+	</select>
+	
 	<update id="updateByQuitActivity" parameterType="com.gongpingjia.carplay.po.SeatReservation">
 		UPDATE seat_reservation
 		SET 

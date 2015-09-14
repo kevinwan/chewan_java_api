@@ -1838,6 +1838,12 @@ public class ActivityServiceImpl implements ActivityService {
 			throw new ApiException("未能成功拉下座位");
 		}
 
+		int isCarOwner=seatReservDao.selectIsCarOwner(param);
+		if(isCarOwner!=0){
+			LOG.warn("Fail to return car owner");
+			throw new ApiException("不能将车主拉下座位");
+		}
+		
 		LOG.debug("Begin update seat reservation");
 		SeatReservation seatReservation = seatList.get(0);
 		seatReservation.setBooktime(null);
