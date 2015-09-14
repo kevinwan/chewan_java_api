@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setActivatetime(DateUtil.getTime());
 		emchatAccountDao.insert(emchatAccount);
 
-		cacheManager.setUserTokenVerification(tokenVerification);
+		// cacheManager.setUserTokenVerification(tokenVerification);//为了测试，先注释掉这里
 
 		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		data.put("userId", userId);
@@ -485,12 +485,12 @@ public class UserServiceImpl implements UserService {
 		StringBuilder photo = new StringBuilder();
 		photo.append(CommonUtil.getPhotoServer());
 		photo.append(userInfo.getPhoto());
-		data.put("originalPhoto", photo.toString());//原图
-		
+		data.put("originalPhoto", photo.toString());// 原图
+
 		photo.append(CommonUtil.getActivityPhotoPostfix());
 		photo.append("&timestamp=");
 		photo.append(DateUtil.getTime());
-		data.put("photo", photo.toString());//缩略图
+		data.put("photo", photo.toString());// 缩略图
 
 		// 检查是否需要添加公平价服务器的前缀
 		data.put("carBrandLogo", PropertiesUtil.getProperty("gongpingjia.brand.url", "") + userInfo.getCarBrandLogo());
