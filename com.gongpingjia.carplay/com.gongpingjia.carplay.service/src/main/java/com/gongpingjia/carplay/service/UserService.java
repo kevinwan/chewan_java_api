@@ -31,7 +31,7 @@ public interface UserService {
 	 * @return
 	 * @throws ApiException
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(rollbackFor = Exception.class)
 	ResponseDo loginUser(User user) throws ApiException;
 
 	/**
