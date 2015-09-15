@@ -64,8 +64,10 @@ public class CacheManager {
      */
     public String setUserTokenVerification(TokenVerification token) {
 
-        return cacheService.set(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, token.getUserid()),
+        String result = cacheService.set(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, token.getUserid()),
                 token);
+
+        return result;
     }
 
     /**
