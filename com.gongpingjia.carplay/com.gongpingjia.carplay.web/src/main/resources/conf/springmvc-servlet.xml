@@ -26,6 +26,7 @@
 
 	<mvc:default-servlet-handler />
 	<mvc:resources location="/html/" mapping="/html/**"></mvc:resources>
+	<mvc:resources location="/photos/" mapping="/photos/**"></mvc:resources>
 
 	<!-- 设置上传文件的最大尺寸为2MB -->
 	<bean id="multipartResolver"

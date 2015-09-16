@@ -59,6 +59,10 @@ public class Activity {
 
     private String currentdistrict;
 
+    private Double currentlongitude;
+
+    private Double currentlatitude;
+
     public String getId() {
         return id;
     }
@@ -289,5 +293,21 @@ public class Activity {
 
     public void setCurrentdistrict(String currentdistrict) {
         this.currentdistrict = currentdistrict;
+    }
+
+    public Double getCurrentlongitude() {
+        return currentlongitude;
+    }
+
+    public void setCurrentlongitude(Double currentlongitude) {
+        this.currentlongitude = currentlongitude;
+    }
+
+    public Double getCurrentlatitude() {
+        return currentlatitude;
+    }
+
+    public void setCurrentlatitude(Double currentlatitude) {
+        this.currentlatitude = currentlatitude;
     }
 }

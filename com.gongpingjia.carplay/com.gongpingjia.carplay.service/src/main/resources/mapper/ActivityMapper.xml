@@ -31,6 +31,8 @@
 		<result column="invalid" property="invalid" jdbcType="VARCHAR" />
 	    <result column="currentCity" property="currentcity" jdbcType="VARCHAR" />
 	    <result column="currentDistrict" property="currentdistrict" jdbcType="VARCHAR" />
+		<result column="currentLongitude" property="currentlongitude" jdbcType="DOUBLE" />
+		<result column="currentLatitude" property="currentlatitude" jdbcType="DOUBLE" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -39,7 +41,7 @@
 		province, city, district, address, title, description,
 		extraInfo, start, end, endTime, applicationEndTime, location, longitude, latitude,
 		paymentType, initialSeat, createTime,
-		lastModifiedTime, extraServiceId, emchatGroupId, category, memberSize, invalid, currentCity, currentDistrict
+		lastModifiedTime, extraServiceId, emchatGroupId, category, memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude
 		from activity
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -66,7 +68,7 @@
       longitude, latitude, paymentType, 
       initialSeat, createTime, lastModifiedTime, 
       extraServiceId, emchatGroupId, category, 
-      memberSize, invalid, currentCity, currentDistrict)
+      memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude)
     values (#{id,jdbcType=VARCHAR}, #{organizer,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR}, 
       #{type,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
@@ -75,7 +77,8 @@
       #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE}, #{paymenttype,jdbcType=VARCHAR}, 
       #{initialseat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT}, #{lastmodifiedtime,jdbcType=BIGINT}, 
       #{extraserviceid,jdbcType=VARCHAR}, #{emchatgroupid,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, 
-      #{membersize,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR}, #{currentcity,jdbcType=VARCHAR}, #{currentdistrict,jdbcType=VARCHAR})
+      #{membersize,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR}, #{currentcity,jdbcType=VARCHAR}, #{currentdistrict,jdbcType=VARCHAR},
+      #{currentlongitude,jdbcType=DOUBLE}, #{currentlatitude,jdbcType=DOUBLE})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Activity">
@@ -92,8 +95,8 @@
 		extraInfo = #{extrainfo,jdbcType=VARCHAR},
 		start = #{start,jdbcType=BIGINT},
 		end = #{end,jdbcType=BIGINT},
-      		endTime = #{endtime,jdbcType=BIGINT},
-      applicationEndTime = #{applicationendtime,jdbcType=BIGINT},
+      	endTime = #{endtime,jdbcType=BIGINT},
+        applicationEndTime = #{applicationendtime,jdbcType=BIGINT},
 		location = #{location,jdbcType=VARCHAR},
 		longitude =	#{longitude,jdbcType=DOUBLE},
 		latitude = #{latitude,jdbcType=DOUBLE},
@@ -102,13 +105,15 @@
 		createTime = #{createtime,jdbcType=BIGINT},
 		lastModifiedTime = #{lastmodifiedtime,jdbcType=BIGINT},
 		extraServiceId = #{extraserviceid,jdbcType=VARCHAR},
-      		emchatGroupId = #{emchatgroupid,jdbcType=VARCHAR},
-      		category = #{category,jdbcType=VARCHAR},
-      		memberSize = #{membersize,jdbcType=INTEGER},
-      invalid = #{invalid,jdbcType=VARCHAR},
-      currentCity = #{currentcity,jdbcType=VARCHAR},
-      currentDistrict = #{currentdistrict,jdbcType=VARCHAR}
-		where id = #{id,jdbcType=VARCHAR}
+		emchatGroupId = #{emchatgroupid,jdbcType=VARCHAR},
+		category = #{category,jdbcType=VARCHAR},
+		memberSize = #{membersize,jdbcType=INTEGER},
+	   invalid = #{invalid,jdbcType=VARCHAR},
+	   currentCity = #{currentcity,jdbcType=VARCHAR},
+	   currentDistrict = #{currentdistrict,jdbcType=VARCHAR},
+	   currentLongitude = #{currentlongitude,jdbcType=DOUBLE},
+	   currentLatitude = #{currentlatitude,jdbcType=DOUBLE}
+	   where id = #{id,jdbcType=VARCHAR}
 	</update>
 	
 	<select id="selectActivityPostNumber" resultType="java.lang.Integer" parameterType="java.lang.String">

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gongpingjia.carplay.common.photo.LocalFileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,12 @@ public class UploadServiceImpl implements UploadService {
 	@Autowired
 	private UserAlbumDao userAlbumDao;
 
+	/**
+	 * 对存放在本地文件的操作
+	 */
+	@Autowired
+	private LocalFileManager localFileManager;
+
 	@Override
 	public ResponseDo uploadUserPhoto(MultipartFile multiFile) throws ApiException {
 		LOG.debug("Begin upload file to server");
@@ -67,12 +74,17 @@ public class UploadServiceImpl implements UploadService {
 		String id = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
 
-		return uploadPhoto(data, id, key, true);
+		localFileManager.saveFile(data, key);
+
+		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("photoUrl", PropertiesUtil.getProperty("carplay.server.url", "") + key);
+		dataMap.put("photoId", id);
+		return ResponseDo.buildSuccessResponse(dataMap);
 	}
 
 	/**
 	 * 上传图片
-	 * 
+	 *
 	 * @param data
 	 *            photo二进制数据文件
 	 * @param photoId
@@ -99,7 +111,7 @@ public class UploadServiceImpl implements UploadService {
 
 	/**
 	 * 获取上传文件的byte数组，准备向图片资源服务器上传
-	 * 
+	 *
 	 * @param multiFile
 	 *            HTTP上传的数据文件
 	 * @return 返回文件byte数组
@@ -155,7 +167,12 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		String key = MessageFormat.format(Constants.PhotoKey.LICENSE_KEY, userId);
 
-		return uploadPhoto(data, userId, key, true);
+		localFileManager.saveFile(data, key);
+
+		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("photoUrl", PropertiesUtil.getProperty("carplay.server.url", "") + key);
+		dataMap.put("photoId", userId);
+		return ResponseDo.buildSuccessResponse(dataMap);
 	}
 
 	@Override
@@ -184,9 +201,9 @@ public class UploadServiceImpl implements UploadService {
 			LOG.warn("get userAlbum by userId return empty result");
 			throw new ApiException("获取相册失败");
 		}
-		
+
 		UserAlbum userAlbum = userAlbumList.get(0);
-		
+
 		LOG.debug("check photos in album is over max count or not");
 		int photosCount = albumDao.selectPhotosCoutByAlbumid(userAlbum.getId());
 		int maxCount = PropertiesUtil.getProperty("user.album.photo.max.count", 9);

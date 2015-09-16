@@ -30,7 +30,7 @@ public class UploadController {
 	private UploadService service;
 
 	/**
-	 * 2.4 头像上传
+	 * 2.4 头像上传(上传到本地服务器)
 	 * 
 	 * @return 上传结果
 	 */
