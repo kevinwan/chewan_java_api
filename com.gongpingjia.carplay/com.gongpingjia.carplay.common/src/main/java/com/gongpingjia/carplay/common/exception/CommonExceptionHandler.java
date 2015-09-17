@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.common.exception;
 
+import net.sf.json.JSONException;
+
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
@@ -122,4 +124,22 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 		Exception ex = new Exception(throwable);
 		return handleExceptionInternal(ex, response, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 	}
+
+	/**
+	 * 处理JSON请求参数的异常
+	 * 
+	 * @param ex
+	 *            异常详情
+	 * @param request
+	 *            请求参数
+	 * @return 返回处理结果
+	 */
+	@ExceptionHandler(JSONException.class)
+	public final ResponseEntity<?> handleJSONException(JSONException ex, WebRequest request) {
+		LOG.warn("Handle JSONException, it is input parameters exception");
+		LOG.error(ex.getMessage(), ex);
+		ResponseDo response = ResponseDo.buildFailureResponse("输入参数错误");
+		return handleExceptionInternal(new Exception(ex), response, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+
 }

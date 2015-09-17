@@ -153,4 +153,13 @@ public interface UserService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
+	
+	/**
+	 * 变更用户位置信息
+	 * @param json 
+	 * @return
+	 * @throws ApiException
+	 */
+	@Transactional(rollbackFor = Exception.class)
+	ResponseDo changeLocation(JSONObject json) throws ApiException;
 }

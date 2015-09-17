@@ -40,6 +40,7 @@ import com.gongpingjia.carplay.dao.EmchatAccountDao;
 import com.gongpingjia.carplay.dao.TokenVerificationDao;
 import com.gongpingjia.carplay.dao.UserAlbumDao;
 import com.gongpingjia.carplay.dao.UserDao;
+import com.gongpingjia.carplay.dao.UserLocationDao;
 import com.gongpingjia.carplay.dao.UserSubscriptionDao;
 import com.gongpingjia.carplay.po.AlbumPhoto;
 import com.gongpingjia.carplay.po.AuthenticationApplication;
@@ -50,6 +51,7 @@ import com.gongpingjia.carplay.po.TokenVerification;
 import com.gongpingjia.carplay.po.User;
 import com.gongpingjia.carplay.po.UserAlbum;
 import com.gongpingjia.carplay.po.UserInfo;
+import com.gongpingjia.carplay.po.UserLocation;
 import com.gongpingjia.carplay.po.UserSubscription;
 import com.gongpingjia.carplay.service.UserService;
 
@@ -108,6 +110,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private CacheManager cacheManager;
+
+	@Autowired
+	private UserLocationDao locationDao;
 
 	@Override
 	public ResponseDo register(User user) throws ApiException {
@@ -347,8 +352,9 @@ public class UserServiceImpl implements UserService {
 		Car car = carDao.selectByUserId(userData.getId());
 		if (null != car) {
 			data.put("brand", car.getBrand());
-			data.put("brandLogo", car.getBrandlogo() == null ? ""
-					: PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + car.getBrandlogo());
+			data.put("brandLogo",
+					car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")
+							+ car.getBrandlogo());
 			data.put("model", car.getModel());
 			data.put("seatNumber", car.getSeat());
 		} else {
@@ -511,8 +517,8 @@ public class UserServiceImpl implements UserService {
 		data.put("district", userInfo.getDistrict());
 		data.put("isAuthenticated", userInfo.getIsauthenticated());
 
-		data.put("label",
-				interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME : Constants.UserLabel.USER_OTHERS);
+		data.put("label", interviewedUser.equals(visitorUser) ? Constants.UserLabel.USER_ME
+				: Constants.UserLabel.USER_OTHERS);
 
 		data.put("postNumber", activityDao.selectActivityPostNumber(interviewedUser));
 
@@ -842,8 +848,8 @@ public class UserServiceImpl implements UserService {
 			throw new ApiException("未能从三方登录获取头像信息");
 		}
 
-		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0),
-				new ArrayList<Header>(0), Constants.Charset.UTF8);
+		CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
+				0), Constants.Charset.UTF8);
 		if (!HttpClientUtil.isStatusOK(response)) {
 			LOG.warn("Failed to obtain user photo from server");
 			HttpClientUtil.close(response);
@@ -890,5 +896,30 @@ public class UserServiceImpl implements UserService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public ResponseDo changeLocation(JSONObject json) throws ApiException {
+		LOG.debug("Begin check input parameters");
+
+		UserLocation location = new UserLocation();
+		if (!CommonUtil.isEmpty(json, "userId")) {
+			// userID不为空，需要检查用户的有效性
+			String userId = json.getString("userId");
+			if (!checker.isUserExist(userId)) {
+				LOG.warn("User is not exist, userId:{}", userId);
+				throw new ApiException("输入参数有误");
+			}
+			location.setUserid(userId);
+		}
+
+		location.setDeviceToken(json.getString("deviceToken"));
+		location.setLongitude(json.getDouble("longitude"));
+		location.setLatitude(json.getDouble("latitude"));
+		location.setRefreshtime(DateUtil.getTime());
+
+		locationDao.replaceIntoLocation(location);
+
+		return ResponseDo.buildSuccessResponse();
 	}
 }

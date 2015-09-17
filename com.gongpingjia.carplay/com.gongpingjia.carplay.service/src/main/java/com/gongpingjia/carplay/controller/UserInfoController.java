@@ -87,7 +87,7 @@ public class UserInfoController {
 			user.setDistrict(json.getString("district"));
 			user.setPhoto(json.getString("photo"));
 			user.setRole(Constants.UserCatalog.COMMON);
-			
+
 			userService.checkRegisterParameters(user, json);
 
 			return userService.register(user);
@@ -451,6 +451,29 @@ public class UserInfoController {
 
 			return userService.snsLogin(json.getString("uid"), json.getString("channel"), json.getString("sign"),
 					username, url);
+		} catch (ApiException e) {
+			LOG.warn(e.getMessage(), e);
+			return ResponseDo.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	/**
+	 * 2.53 变更用户位置信息
+	 * 
+	 * @param json
+	 *            请求Body参数信息
+	 * @return 变更结果信息
+	 */
+	@RequestMapping(value = "/user/location", method = RequestMethod.POST, headers = {
+			"Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+	public ResponseDo changeLocation(@RequestBody JSONObject json) {
+		try {
+			LOG.debug("Begin change user loaction, request:{}", json);
+			if (CommonUtil.isEmpty(json, Arrays.asList("deviceToken", "longitude", "latitude"))) {
+				throw new ApiException("输入参数有误");
+			}
+			
+			return userService.changeLocation(json);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());

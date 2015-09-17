@@ -33,6 +33,7 @@
 	    <result column="currentDistrict" property="currentdistrict" jdbcType="VARCHAR" />
 		<result column="currentLongitude" property="currentlongitude" jdbcType="DOUBLE" />
 		<result column="currentLatitude" property="currentlatitude" jdbcType="DOUBLE" />
+		<result column="inviteCount" property="invitecount" jdbcType="INTEGER" />
 	</resultMap>
 
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -41,7 +42,8 @@
 		province, city, district, address, title, description,
 		extraInfo, start, end, endTime, applicationEndTime, location, longitude, latitude,
 		paymentType, initialSeat, createTime,
-		lastModifiedTime, extraServiceId, emchatGroupId, category, memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude
+		lastModifiedTime, extraServiceId, emchatGroupId, category, memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude,
+		inviteCount
 		from activity
 		where id = #{id,jdbcType=VARCHAR}
 	</select>
@@ -68,7 +70,8 @@
       longitude, latitude, paymentType, 
       initialSeat, createTime, lastModifiedTime, 
       extraServiceId, emchatGroupId, category, 
-      memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude)
+      memberSize, invalid, currentCity, currentDistrict, currentLongitude, currentLatitude,
+      inviteCount)
     values (#{id,jdbcType=VARCHAR}, #{organizer,jdbcType=VARCHAR}, #{photo,jdbcType=VARCHAR}, 
       #{type,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{district,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
@@ -78,7 +81,8 @@
       #{initialseat,jdbcType=INTEGER}, #{createtime,jdbcType=BIGINT}, #{lastmodifiedtime,jdbcType=BIGINT}, 
       #{extraserviceid,jdbcType=VARCHAR}, #{emchatgroupid,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, 
       #{membersize,jdbcType=INTEGER}, #{invalid,jdbcType=VARCHAR}, #{currentcity,jdbcType=VARCHAR}, #{currentdistrict,jdbcType=VARCHAR},
-      #{currentlongitude,jdbcType=DOUBLE}, #{currentlatitude,jdbcType=DOUBLE})
+      #{currentlongitude,jdbcType=DOUBLE}, #{currentlatitude,jdbcType=DOUBLE},
+      #{invitecount,jdbcType=INTEGER})
 	</insert>
 
 	<update id="updateByPrimaryKey" parameterType="com.gongpingjia.carplay.po.Activity">
@@ -112,7 +116,8 @@
 	   currentCity = #{currentcity,jdbcType=VARCHAR},
 	   currentDistrict = #{currentdistrict,jdbcType=VARCHAR},
 	   currentLongitude = #{currentlongitude,jdbcType=DOUBLE},
-	   currentLatitude = #{currentlatitude,jdbcType=DOUBLE}
+	   currentLatitude = #{currentlatitude,jdbcType=DOUBLE},
+	   inviteCount = #{invitecount,jdbcType=INTEGER}
 	   where id = #{id,jdbcType=VARCHAR}
 	</update>
 	

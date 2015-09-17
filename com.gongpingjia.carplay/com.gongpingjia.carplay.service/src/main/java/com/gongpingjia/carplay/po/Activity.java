@@ -1,313 +1,324 @@
 package com.gongpingjia.carplay.po;
 
 public class Activity {
-    private String id;
+	private String id;
 
-    private String organizer;
+	private String organizer;
 
-    private String photo;
+	private String photo;
 
-    private String type;
+	private String type;
 
-    private String province;
+	private String province;
 
-    private String city;
+	private String city;
 
-    private String district;
+	private String district;
 
-    private String address;
+	private String address;
 
-    private String title;
+	private String title;
 
-    private String description;
+	private String description;
 
-    private String extrainfo;
+	private String extrainfo;
 
-    private Long start;
+	private Long start;
 
-    private Long end;
+	private Long end;
 
-    private Long endtime;
+	private Long endtime;
 
-    private Long applicationendtime;
+	private Long applicationendtime;
 
-    private String location;
+	private String location;
 
-    private Double longitude;
+	private Double longitude;
 
-    private Double latitude;
+	private Double latitude;
 
-    private String paymenttype;
+	private String paymenttype;
 
-    private Integer initialseat;
+	private Integer initialseat;
 
-    private Long createtime;
+	private Long createtime;
 
-    private Long lastmodifiedtime;
+	private Long lastmodifiedtime;
 
-    private String extraserviceid;
+	private String extraserviceid;
 
-    private String emchatgroupid;
+	private String emchatgroupid;
 
-    private String category;
+	private String category;
 
-    private Integer membersize;
+	private Integer membersize;
 
-    private String invalid;
+	private String invalid;
 
-    private String currentcity;
+	private String currentcity;
 
-    private String currentdistrict;
+	private String currentdistrict;
 
-    private Double currentlongitude;
+	private Double currentlongitude;
 
-    private Double currentlatitude;
+	private Double currentlatitude;
 
-    public String getId() {
-        return id;
-    }
+	private Integer invitecount;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getOrganizer() {
-        return organizer;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setOrganizer(String organizer) {
-        this.organizer = organizer;
-    }
+	public String getOrganizer() {
+		return organizer;
+	}
 
-    public String getPhoto() {
-        return photo;
-    }
+	public void setOrganizer(String organizer) {
+		this.organizer = organizer;
+	}
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
+	public String getPhoto() {
+		return photo;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public void setPhoto(String photo) {
+		this.photo = photo;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public String getProvince() {
-        return province;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getExtrainfo() {
-        return extrainfo;
-    }
-
-    public void setExtrainfo(String extrainfo) {
-        this.extrainfo = extrainfo;
-    }
-
-    public Long getStart() {
-        return start;
-    }
-
-    public void setStart(Long start) {
-        this.start = start;
-    }
-
-    public Long getEnd() {
-        return end;
-    }
-
-    public void setEnd(Long end) {
-        this.end = end;
-    }
-
-    public Long getEndtime() {
-        return endtime;
-    }
-
-    public void setEndtime(Long endtime) {
-        this.endtime = endtime;
-    }
-
-    public Long getApplicationendtime() {
-        return applicationendtime;
-    }
-
-    public void setApplicationendtime(Long applicationendtime) {
-        this.applicationendtime = applicationendtime;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getPaymenttype() {
-        return paymenttype;
-    }
-
-    public void setPaymenttype(String paymenttype) {
-        this.paymenttype = paymenttype;
-    }
-
-    public Integer getInitialseat() {
-        return initialseat;
-    }
-
-    public void setInitialseat(Integer initialseat) {
-        this.initialseat = initialseat;
-    }
-
-    public Long getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(Long createtime) {
-        this.createtime = createtime;
-    }
-
-    public Long getLastmodifiedtime() {
-        return lastmodifiedtime;
-    }
-
-    public void setLastmodifiedtime(Long lastmodifiedtime) {
-        this.lastmodifiedtime = lastmodifiedtime;
-    }
-
-    public String getExtraserviceid() {
-        return extraserviceid;
-    }
-
-    public void setExtraserviceid(String extraserviceid) {
-        this.extraserviceid = extraserviceid;
-    }
-
-    public String getEmchatgroupid() {
-        return emchatgroupid;
-    }
-
-    public void setEmchatgroupid(String emchatgroupid) {
-        this.emchatgroupid = emchatgroupid;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public Integer getMembersize() {
-        return membersize;
-    }
-
-    public void setMembersize(Integer membersize) {
-        this.membersize = membersize;
-    }
-
-    public String getInvalid() {
-        return invalid;
-    }
-
-    public void setInvalid(String invalid) {
-        this.invalid = invalid;
-    }
-
-    public String getCurrentcity() {
-        return currentcity;
-    }
-
-    public void setCurrentcity(String currentcity) {
-        this.currentcity = currentcity;
-    }
-
-    public String getCurrentdistrict() {
-        return currentdistrict;
-    }
-
-    public void setCurrentdistrict(String currentdistrict) {
-        this.currentdistrict = currentdistrict;
-    }
-
-    public Double getCurrentlongitude() {
-        return currentlongitude;
-    }
-
-    public void setCurrentlongitude(Double currentlongitude) {
-        this.currentlongitude = currentlongitude;
-    }
-
-    public Double getCurrentlatitude() {
-        return currentlatitude;
-    }
-
-    public void setCurrentlatitude(Double currentlatitude) {
-        this.currentlatitude = currentlatitude;
-    }
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getExtrainfo() {
+		return extrainfo;
+	}
+
+	public void setExtrainfo(String extrainfo) {
+		this.extrainfo = extrainfo;
+	}
+
+	public Long getStart() {
+		return start;
+	}
+
+	public void setStart(Long start) {
+		this.start = start;
+	}
+
+	public Long getEnd() {
+		return end;
+	}
+
+	public void setEnd(Long end) {
+		this.end = end;
+	}
+
+	public Long getEndtime() {
+		return endtime;
+	}
+
+	public void setEndtime(Long endtime) {
+		this.endtime = endtime;
+	}
+
+	public Long getApplicationendtime() {
+		return applicationendtime;
+	}
+
+	public void setApplicationendtime(Long applicationendtime) {
+		this.applicationendtime = applicationendtime;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getPaymenttype() {
+		return paymenttype;
+	}
+
+	public void setPaymenttype(String paymenttype) {
+		this.paymenttype = paymenttype;
+	}
+
+	public Integer getInitialseat() {
+		return initialseat;
+	}
+
+	public void setInitialseat(Integer initialseat) {
+		this.initialseat = initialseat;
+	}
+
+	public Long getCreatetime() {
+		return createtime;
+	}
+
+	public void setCreatetime(Long createtime) {
+		this.createtime = createtime;
+	}
+
+	public Long getLastmodifiedtime() {
+		return lastmodifiedtime;
+	}
+
+	public void setLastmodifiedtime(Long lastmodifiedtime) {
+		this.lastmodifiedtime = lastmodifiedtime;
+	}
+
+	public String getExtraserviceid() {
+		return extraserviceid;
+	}
+
+	public void setExtraserviceid(String extraserviceid) {
+		this.extraserviceid = extraserviceid;
+	}
+
+	public String getEmchatgroupid() {
+		return emchatgroupid;
+	}
+
+	public void setEmchatgroupid(String emchatgroupid) {
+		this.emchatgroupid = emchatgroupid;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public Integer getMembersize() {
+		return membersize;
+	}
+
+	public void setMembersize(Integer membersize) {
+		this.membersize = membersize;
+	}
+
+	public String getInvalid() {
+		return invalid;
+	}
+
+	public void setInvalid(String invalid) {
+		this.invalid = invalid;
+	}
+
+	public String getCurrentcity() {
+		return currentcity;
+	}
+
+	public void setCurrentcity(String currentcity) {
+		this.currentcity = currentcity;
+	}
+
+	public String getCurrentdistrict() {
+		return currentdistrict;
+	}
+
+	public void setCurrentdistrict(String currentdistrict) {
+		this.currentdistrict = currentdistrict;
+	}
+
+	public Double getCurrentlongitude() {
+		return currentlongitude;
+	}
+
+	public void setCurrentlongitude(Double currentlongitude) {
+		this.currentlongitude = currentlongitude;
+	}
+
+	public Double getCurrentlatitude() {
+		return currentlatitude;
+	}
+
+	public void setCurrentlatitude(Double currentlatitude) {
+		this.currentlatitude = currentlatitude;
+	}
+
+	public Integer getInvitecount() {
+		return invitecount;
+	}
+
+	public void setInvitecount(Integer invitecount) {
+		this.invitecount = invitecount;
+	}
+
 }
