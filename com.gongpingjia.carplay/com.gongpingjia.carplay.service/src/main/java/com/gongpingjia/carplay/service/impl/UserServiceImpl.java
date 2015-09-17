@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.LocalFileManager;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.BeanUtil;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
@@ -114,6 +115,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserLocationDao locationDao;
 
+	@Autowired
+	private LocalFileManager LocalFileManager;
+
 	@Override
 	public ResponseDo register(User user) throws ApiException {
 		LOG.debug("Save register data begin");
@@ -188,7 +192,7 @@ public class UserServiceImpl implements UserService {
 		checkPhoneRegister(phoneRegister, json);
 
 		// 判断七牛上图片是否存在
-		if (!photoService.isExist(user.getPhoto())) {
+		if (!LocalFileManager.isExist(user.getPhoto())) {
 			LOG.warn("photo not Exist");
 			throw new ApiException("注册图片未上传");
 		}
