@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.gongpingjia.carplay.common.photo.LocalFileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +19,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.AlbumPhotoDao;
@@ -39,7 +40,8 @@ public class UploadServiceImpl implements UploadService {
 	 * 图片上传
 	 */
 	@Autowired
-	private PhotoService photoService;
+	@Qualifier("thirdPhotoManager")
+	private PhotoService thirdPhotoManager;
 
 	/**
 	 * Token校验
@@ -63,7 +65,8 @@ public class UploadServiceImpl implements UploadService {
 	 * 对存放在本地文件的操作
 	 */
 	@Autowired
-	private LocalFileManager localFileManager;
+	@Qualifier("localFileManager")
+	private PhotoService localFileManager;
 
 	@Override
 	public ResponseDo uploadUserPhoto(MultipartFile multiFile) throws ApiException {
@@ -74,12 +77,7 @@ public class UploadServiceImpl implements UploadService {
 		String id = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
 
-		localFileManager.saveFile(data, key);
-
-		Map<String, String> dataMap = new HashMap<String, String>();
-		dataMap.put("photoUrl", PropertiesUtil.getProperty("carplay.server.url", "") + key);
-		dataMap.put("photoId", id);
-		return ResponseDo.buildSuccessResponse(dataMap);
+		return uploadLocalServer(id, data, key);
 	}
 
 	/**
@@ -95,12 +93,12 @@ public class UploadServiceImpl implements UploadService {
 	 * @throws ApiException
 	 *             义务异常
 	 */
-	private ResponseDo uploadPhoto(byte[] data, String photoId, String key, boolean override) throws ApiException {
-		Map<String, String> result = photoService.upload(data, key, override);
+	private ResponseDo uploadThirdServer(byte[] data, String photoId, String key, boolean override) throws ApiException {
+		Map<String, String> result = thirdPhotoManager.upload(data, key, override);
 		LOG.debug("Upload result: {}", result);
 		if (Constants.Result.SUCCESS.equalsIgnoreCase(result.get("result"))) {
 			Map<String, String> dataMap = new HashMap<String, String>();
-			dataMap.put("photoUrl", PropertiesUtil.getProperty("qiniu.server.url", "") + result.get("key"));
+			dataMap.put("photoUrl", CommonUtil.getThirdPhotoServer() + result.get("key"));
 			dataMap.put("photoId", photoId);
 			return ResponseDo.buildSuccessResponse(dataMap);
 		} else {
@@ -167,10 +165,14 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		String key = MessageFormat.format(Constants.PhotoKey.LICENSE_KEY, userId);
 
-		localFileManager.saveFile(data, key);
+		return uploadLocalServer(userId, data, key);
+	}
+
+	private ResponseDo uploadLocalServer(String userId, byte[] data, String key) throws ApiException {
+		localFileManager.upload(data, key, true);
 
 		Map<String, String> dataMap = new HashMap<String, String>();
-		dataMap.put("photoUrl", PropertiesUtil.getProperty("carplay.server.url", "") + key);
+		dataMap.put("photoUrl", CommonUtil.getLocalPhotoServer() + key);
 		dataMap.put("photoId", userId);
 		return ResponseDo.buildSuccessResponse(dataMap);
 	}
@@ -185,7 +187,7 @@ public class UploadServiceImpl implements UploadService {
 		String coverUuid = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.PhotoKey.COVER_KEY, coverUuid);
 
-		return uploadPhoto(data, coverUuid, key, true);
+		return uploadThirdServer(data, coverUuid, key, true);
 	}
 
 	@Override
@@ -217,7 +219,7 @@ public class UploadServiceImpl implements UploadService {
 		byte[] data = buildFileBytes(multiFile);
 		String photoId = CodeGenerator.generatorId();
 		String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photoId);
-		return uploadPhoto(data, photoId, key, true);
+		return uploadThirdServer(data, photoId, key, true);
 	}
 
 	@Override
@@ -227,7 +229,7 @@ public class UploadServiceImpl implements UploadService {
 		LOG.debug("begin upload feedback photo , photoId:{}", photoId);
 
 		String key = MessageFormat.format(Constants.PhotoKey.FEEDBACK_KEY, photoId);
-		return uploadPhoto(data, photoId, key, true);
+		return uploadThirdServer(data, photoId, key, true);
 	}
 
 	@Override
@@ -243,7 +245,7 @@ public class UploadServiceImpl implements UploadService {
 		LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
 		String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, userId);
-		return uploadPhoto(data, userId, key, true);
+		return uploadThirdServer(data, userId, key, true);
 
 	}
 }

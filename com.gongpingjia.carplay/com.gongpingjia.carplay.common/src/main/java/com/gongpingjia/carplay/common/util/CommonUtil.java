@@ -69,20 +69,29 @@ public class CommonUtil {
 	}
 
 	/**
-	 * 获取图片资源服务器
+	 * 获取第三方图片资源服务器
 	 * 
 	 * @return 图片资源服务器URL
 	 */
-	public static String getPhotoServer() {
+	public static String getThirdPhotoServer() {
 		return PropertiesUtil.getProperty("qiniu.server.url", "http://7xknzo.com1.z0.glb.clouddn.com/");
 	}
 
+	/**
+	 * 获取本地图片资源服务器
+	 * 
+	 * @return 图片资源服务器URL
+	 */
+	public static String getLocalPhotoServer() {
+		return PropertiesUtil.getProperty("carplay.server.photo.url", "http://localhost:8080/com.gongpingjia.carplay.web/photos/");
+	}
+	
 	/**
 	 * 获取公平价图标前缀
 	 * 
 	 * @return 返回gpjImagePrefix
 	 */
-	public static String getGPJImagePrefix() {
+	public static String getGPJBrandLogoPrefix() {
 		return PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "http://img.gongpingjia.com/img/logo/");
 	}
 

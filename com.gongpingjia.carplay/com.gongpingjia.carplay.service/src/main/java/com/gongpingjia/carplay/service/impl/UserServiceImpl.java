@@ -14,15 +14,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.photo.LocalFileManager;
 import com.gongpingjia.carplay.common.photo.PhotoService;
-import com.gongpingjia.carplay.common.util.BeanUtil;
 import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
@@ -62,7 +61,12 @@ public class UserServiceImpl implements UserService {
 	private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
+	@Qualifier("thirdPhotoManager")
 	private PhotoService photoService;
+
+	@Autowired
+	@Qualifier("localFileManager")
+	private PhotoService localFileManager;
 
 	@Autowired
 	private UserDao userDao;
@@ -115,9 +119,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserLocationDao locationDao;
 
-	@Autowired
-	private LocalFileManager LocalFileManager;
-
 	@Override
 	public ResponseDo register(User user) throws ApiException {
 		LOG.debug("Save register data begin");
@@ -159,12 +160,17 @@ public class UserServiceImpl implements UserService {
 		emchatAccount.setActivatetime(DateUtil.getTime());
 		emchatAccountDao.insert(emchatAccount);
 
-		// cacheManager.setUserTokenVerification(tokenVerification);//为了测试，先注释掉这里
+		cacheManager.setUserTokenVerification(tokenVerification);
 
 		Map<String, Object> data = new HashMap<String, Object>(2, 1);
 		data.put("userId", userId);
 		data.put("token", tokenVerification.getToken());
-		data.put("photo", CommonUtil.getPhotoServer() + user.getPhoto());
+		if (StringUtils.isEmpty(user.getPhoto())) {
+			data.put("photo", "");
+		} else {
+			data.put("photo", CommonUtil.getLocalPhotoServer() + user.getPhoto());
+		}
+
 		return ResponseDo.buildSuccessResponse(data);
 	}
 
@@ -173,12 +179,19 @@ public class UserServiceImpl implements UserService {
 		LOG.debug("Begin check input parameters of register");
 
 		// 验证参数
-		if (!CommonUtil.isUUID(user.getPhoto())) {
-			LOG.warn("Invalid params photo:{}", user.getPhoto());
-			throw new ApiException("输入参数有误");
+		if (StringUtils.isEmpty(user.getId())) {
+			LOG.debug("User register has not upload photo");
+			user.setId(CodeGenerator.generatorId());
 		}
 
-		user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
+		if (!StringUtils.isEmpty(user.getPhoto())) {
+			user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
+			// 判断图片是否存在
+			if (!localFileManager.isExist(user.getPhoto())) {
+				LOG.warn("photo not exist");
+				throw new ApiException("图像未上传");
+			}
+		}
 
 		boolean phoneRegister = isPhoneRegister(json);
 		boolean snsRegister = isSnsRegister(json);
@@ -190,12 +203,6 @@ public class UserServiceImpl implements UserService {
 		}
 
 		checkPhoneRegister(phoneRegister, json);
-
-		// 判断七牛上图片是否存在
-		if (!LocalFileManager.isExist(user.getPhoto())) {
-			LOG.warn("photo not Exist");
-			throw new ApiException("注册图片未上传");
-		}
 
 		refreshUserBySnsRegister(user, snsRegister, json);
 	}
@@ -352,13 +359,17 @@ public class UserServiceImpl implements UserService {
 		// 获取用户授权信息
 		data.put("token", getUserToken(userData.getId()));
 
+		if (StringUtils.isEmpty(userData.getPhoto())) {
+			data.put("photo", "");
+		} else {
+			data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+		}
+
 		// 查询用户车辆信息
 		Car car = carDao.selectByUserId(userData.getId());
 		if (null != car) {
 			data.put("brand", car.getBrand());
-			data.put("brandLogo",
-					car.getBrandlogo() == null ? "" : PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")
-							+ car.getBrandlogo());
+			data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getBrandlogo());
 			data.put("model", car.getModel());
 			data.put("seatNumber", car.getSeat());
 		} else {
@@ -433,8 +444,8 @@ public class UserServiceImpl implements UserService {
 			return ResponseDo.buildFailureResponse("用户已认证，请勿重复认证");
 		}
 
-		// 判断七牛上图片是否存在
-		if (!LocalFileManager.isExist(user.getPhoto())) {
+		// 判断图片是否存在
+		if (!localFileManager.isExist(user.getPhoto())) {
 			LOG.warn("photo not Exist");
 			return ResponseDo.buildFailureResponse("注册图片未上传");
 		}
@@ -493,7 +504,7 @@ public class UserServiceImpl implements UserService {
 		data.put("age", userInfo.getAge());
 		data.put("role", userInfo.getRole());
 		StringBuilder photo = new StringBuilder();
-		photo.append(CommonUtil.getPhotoServer());
+		photo.append(CommonUtil.getThirdPhotoServer());
 		photo.append(userInfo.getPhoto());
 		data.put("originalPhoto", photo.toString());// 原图
 
@@ -509,7 +520,7 @@ public class UserServiceImpl implements UserService {
 		data.put("drivingLicensePhoto", userInfo.getDrivingLicensePhoto());
 		if (!StringUtils.isEmpty(userInfo.getDrivingLicensePhoto())) {
 			StringBuilder drivingLicensePhoto = new StringBuilder();
-			drivingLicensePhoto.append(CommonUtil.getPhotoServer());
+			drivingLicensePhoto.append(CommonUtil.getThirdPhotoServer());
 			drivingLicensePhoto.append(userInfo.getDrivingLicensePhoto());
 			drivingLicensePhoto.append(CommonUtil.getActivityPhotoPostfix());
 			data.put("drivingLicensePhoto", drivingLicensePhoto.toString());
@@ -537,7 +548,7 @@ public class UserServiceImpl implements UserService {
 			Map<String, String> albumPhotoView = new HashMap<String, String>(2, 1);
 			String url = albumPhoto.getUrl();
 			albumPhotoView.put("photoId", url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf(".")));
-			albumPhotoView.put("thumbnail_pic", CommonUtil.getPhotoServer() + url);
+			albumPhotoView.put("thumbnail_pic", CommonUtil.getThirdPhotoServer() + url);
 
 			albumPhotoViewList.add(albumPhotoView);
 		}
@@ -800,7 +811,7 @@ public class UserServiceImpl implements UserService {
 			data.put("snsUid", uid);
 			data.put("snsUserName", username);
 			data.put("snsChannel", channel);
-			data.put("photoUrl", CommonUtil.getPhotoServer() + key);
+			data.put("photoUrl", CommonUtil.getThirdPhotoServer() + key);
 			data.put("photoId", id);
 
 			return ResponseDo.buildSuccessResponse(data);
@@ -817,12 +828,12 @@ public class UserServiceImpl implements UserService {
 			data.put("isAuthenticated", 0);
 			data.put("nickname", user.getNickname());
 			data.put("photo",
-					CommonUtil.getPhotoServer() + MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
+					CommonUtil.getThirdPhotoServer() + MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getId()));
 
 			Car car = carDao.selectByUserId(user.getId());
 			if (car != null) {
 				data.put("brand", CommonUtil.ifNull(car.getBrand(), ""));
-				data.put("brandLogo", CommonUtil.getGPJImagePrefix() + CommonUtil.ifNull(car.getBrandlogo(), ""));
+				data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + CommonUtil.ifNull(car.getBrandlogo(), ""));
 				data.put("model", CommonUtil.ifNull(car.getModel(), ""));
 				data.put("seatNumber", car.getSeat());
 			} else {
@@ -836,7 +847,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * 第三方登录，上传图片到七牛服务器
+	 * 第三方登录，上传图片到本地服务器
 	 * 
 	 * @param url
 	 *            请求URL
@@ -864,8 +875,7 @@ public class UserServiceImpl implements UserService {
 		HttpClientUtil.close(response);
 
 		LOG.debug("Upload photo to photo server");
-		PhotoService photoService = BeanUtil.getBean(PhotoService.class);
-		Map<String, String> uploadResult = photoService.upload(imageBytes, key, true);
+		Map<String, String> uploadResult = localFileManager.upload(imageBytes, key, true);
 		if (!Constants.Result.SUCCESS.equals(uploadResult.get("result"))) {
 			// 上传失败了
 			LOG.warn("Failed to upload photo to the server");

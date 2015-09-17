@@ -27,7 +27,7 @@ public class OfficialServiceImpl implements OfficialService {
 	public ResponseDo getActivityList() {
 		LOG.debug("Query official activity list begin");
 		Map<String, String> param = new HashMap<String, String>(2, 1);
-		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("assetUrl", CommonUtil.getThirdPhotoServer());
 		param.put("category", Constants.ActivityCatalog.OFFICIAL);
 
 		List<Map<String, String>> data = activityViewDao.selectActivityByCategory(param);

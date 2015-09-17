@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -72,6 +73,7 @@ public class ActivityServiceImpl implements ActivityService {
 	private CarDao carDao;
 
 	@Autowired
+	@Qualifier("thirdPhotoManager")
 	private PhotoService photoService;
 
 	@Autowired
@@ -247,11 +249,13 @@ public class ActivityServiceImpl implements ActivityService {
 				user.getNickname(), activity.getTitle()));
 		String date = DateUtil.format(activity.getStart(), Constants.DateFormat.ACTIVITY_SHARE);
 
-		data.put("shareContent", MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""),
-				new Object[] { date, activity.getLocation(), activity.getPaymenttype() }));
+		data.put(
+				"shareContent",
+				MessageFormat.format(PropertiesUtil.getProperty("activity.share.content", ""), new Object[] { date,
+						activity.getLocation(), activity.getPaymenttype() }));
 
 		Map<String, Object> coverParam = new HashMap<String, Object>(2, 1);
-		coverParam.put("assetUrl", PropertiesUtil.getProperty("qiniu.server.url", ""));
+		coverParam.put("assetUrl", CommonUtil.getThirdPhotoServer());
 		coverParam.put("activityId", activity.getId());
 		List<Map<String, String>> covers = coverDao.selectByActivity(coverParam);
 		data.put("imgUrl", covers.get(0).get("original_pic"));
@@ -705,9 +709,9 @@ public class ActivityServiceImpl implements ActivityService {
 	 */
 	private Map<String, Object> buildCommonQueryParam(String activityId, String userId) {
 		Map<String, Object> param = new HashMap<String, Object>(6, 1);
-		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("assetUrl", CommonUtil.getThirdPhotoServer());
 		param.put("photoPostfix", CommonUtil.getActivityPhotoPostfix());
-		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
+		param.put("gpjImagePrefix", CommonUtil.getGPJBrandLogoPrefix());
 		param.put("activityId", activityId);
 		param.put("userId", userId);
 
@@ -776,8 +780,8 @@ public class ActivityServiceImpl implements ActivityService {
 		LOG.debug("build query param map by query parameters");
 		Map<String, Object> param = new HashMap<String, Object>(16, 1);
 		// 公共参数
-		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
-		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("gpjImagePrefix", CommonUtil.getGPJBrandLogoPrefix());
+		param.put("assetUrl", CommonUtil.getThirdPhotoServer());
 		param.put("timestamp", DateUtil.getTime());
 		param.put("normal", PropertiesUtil.getProperty("carplay.car.class.normal.price", 10));
 		param.put("good", PropertiesUtil.getProperty("carplay.car.class.good.price", 30));
@@ -1106,7 +1110,7 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("activityId", activityId);
 		param.put("ignore", ignore);
 		param.put("limit", limit);
-		param.put("assetUrl", CommonUtil.getPhotoServer());
+		param.put("assetUrl", CommonUtil.getThirdPhotoServer());
 
 		return ResponseDo.buildSuccessResponse(activityViewDao.selectActivityComments(param));
 	}
@@ -1731,8 +1735,8 @@ public class ActivityServiceImpl implements ActivityService {
 
 		LOG.debug("Query member car information");
 		Map<String, Object> param = new HashMap<String, Object>(4, 1);
-		param.put("assetUrl", CommonUtil.getPhotoServer());
-		param.put("gpjImagePrefix", CommonUtil.getGPJImagePrefix());
+		param.put("assetUrl", CommonUtil.getThirdPhotoServer());
+		param.put("gpjImagePrefix", CommonUtil.getGPJBrandLogoPrefix());
 		param.put("photoPostfix", CommonUtil.getActivityPhotoPostfix());
 		param.put("activityId", activityId);
 		param.put("status", ApplicationStatus.APPROVED.getName());
@@ -1833,17 +1837,16 @@ public class ActivityServiceImpl implements ActivityService {
 		param.put("userId", member); // 这里是user需要拉下其他成员
 		List<SeatReservation> seatList = seatReservDao.selectListByParam(param);
 		if (seatList.isEmpty()) {
-			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId,
-					userId);
+			LOG.warn("No related activity user exist in seat_reservation, activityId:{}, userId:{}", activityId, userId);
 			throw new ApiException("未能成功拉下座位");
 		}
 
-		int isCarOwner=seatReservDao.selectIsCarOwner(param);
-		if(isCarOwner!=0){
+		int isCarOwner = seatReservDao.selectIsCarOwner(param);
+		if (isCarOwner != 0) {
 			LOG.warn("Fail to return car owner");
 			throw new ApiException("不能将车主拉下座位");
 		}
-		
+
 		LOG.debug("Begin update seat reservation");
 		SeatReservation seatReservation = seatList.get(0);
 		seatReservation.setBooktime(null);
@@ -1885,7 +1888,7 @@ public class ActivityServiceImpl implements ActivityService {
 		key.setActivityid(activityId);
 		key.setUserid(member);
 		memberDao.deleteByPrimaryKey(key);
-		
+
 		Car car = carDao.selectByUserId(member);
 		if (car != null) {
 			SeatReservation reservation = new SeatReservation();
