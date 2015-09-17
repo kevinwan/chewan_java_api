@@ -434,7 +434,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// 判断七牛上图片是否存在
-		if (!photoService.isExist(user.getPhoto())) {
+		if (!LocalFileManager.isExist(user.getPhoto())) {
 			LOG.warn("photo not Exist");
 			return ResponseDo.buildFailureResponse("注册图片未上传");
 		}
