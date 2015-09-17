@@ -2,6 +2,8 @@ package com.gongpingjia.carplay.controller;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.json.JSONObject;
 
@@ -472,11 +474,43 @@ public class UserInfoController {
 			if (CommonUtil.isEmpty(json, Arrays.asList("deviceToken", "longitude", "latitude"))) {
 				throw new ApiException("输入参数有误");
 			}
-			
+
 			return userService.changeLocation(json);
 		} catch (ApiException e) {
 			LOG.warn(e.getMessage(), e);
 			return ResponseDo.buildFailureResponse(e.getMessage());
 		}
+	}
+
+	/**
+	 * 获取周边用户信息
+	 * 
+	 * @param minLongitude
+	 *            经度下限
+	 * @param maxLongitude
+	 *            经度上限
+	 * @param minLatitude
+	 *            纬度下限
+	 * @param maxLatitude
+	 *            纬度上限
+	 * @param gender
+	 *            性别
+	 * @return 返回
+	 */
+	@RequestMapping(value = "/user/list", method = RequestMethod.GET)
+	public ResponseDo userList(@RequestParam("minLongitude") Double minLongitude,
+			@RequestParam("maxLongitude") Double maxLongitude, @RequestParam("minLatitude") Double minLatitude,
+			@RequestParam("maxLatitude") Double maxLatitude,
+			@RequestParam(value = "gender", required = false) String gender) {
+
+		LOG.debug("Begin get user list by Longitude and Latitude range");
+		Map<String, Object> param = new HashMap<String, Object>(6, 1);
+		param.put("minLongitude", minLongitude);
+		param.put("maxLongitude", maxLongitude);
+		param.put("minLatitude", minLatitude);
+		param.put("maxLatitude", maxLatitude);
+		param.put("gender", gender);
+
+		return userService.userList(param);
 	}
 }

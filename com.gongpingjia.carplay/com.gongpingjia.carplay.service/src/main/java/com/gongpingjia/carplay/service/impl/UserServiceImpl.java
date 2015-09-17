@@ -922,4 +922,14 @@ public class UserServiceImpl implements UserService {
 
 		return ResponseDo.buildSuccessResponse();
 	}
+
+	@Override
+	public ResponseDo userList(Map<String, Object> param) {
+		LOG.debug("Query user list by param:{}", param);
+
+		param.put("refreshTime", PropertiesUtil.getProperty("user.location.max.validate.days", 30) * 86400 * 1000);
+		List<Map<String, Object>> data = locationDao.listUserByParam(param);
+
+		return ResponseDo.buildSuccessResponse(data);
+	}
 }

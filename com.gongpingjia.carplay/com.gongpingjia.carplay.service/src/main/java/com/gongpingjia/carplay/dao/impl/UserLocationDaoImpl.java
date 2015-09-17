@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.dao.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.common.util.DASUtil;
@@ -32,6 +35,11 @@ public class UserLocationDaoImpl implements UserLocationDao {
 	@Override
 	public int replaceIntoLocation(UserLocation record) {
 		return DASUtil.save(UserLocation.class.getName(), "replaceIntoLocation", record);
+	}
+
+	@Override
+	public List<Map<String, Object>> listUserByParam(Map<String, Object> param) {
+		return DASUtil.selectList(UserLocation.class.getName(), "listUserByParam", param);
 	}
 
 }

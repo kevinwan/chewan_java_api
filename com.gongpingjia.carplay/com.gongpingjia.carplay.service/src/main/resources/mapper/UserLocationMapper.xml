@@ -43,4 +43,18 @@
     VALUES (#{deviceToken,jdbcType=VARCHAR}, #{userid,jdbcType=VARCHAR}, #{longitude,jdbcType=DOUBLE}, 
       #{latitude,jdbcType=DOUBLE}, #{refreshtime,jdbcType=BIGINT})
   </insert>
+  
+  <select id="listUserByParam" parameterType="java.util.Map" resultType="java.util.Map">
+	  SELECT
+			device_token,userId,longitude,latitude,gender, isAuthenticated
+		FROM
+			user_location LEFT JOIN USER ON userId = id
+		WHERE
+			    longitude BETWEEN #{minLongitude,jdbcType=DOUBLE} AND #{maxLongitude,jdbcType=DOUBLE}
+			AND latitude BETWEEN #{minLatitude,jdbcType=DOUBLE}	AND #{maxLatitude,jdbcType=DOUBLE}
+			AND refreshTime > #{refreshTime,jdbcType=BIGINT}
+		<if test="gender != null">
+			AND gender = #{gender,jdbcType=VARCHAR}
+		</if>
+  </select>
 </mapper>

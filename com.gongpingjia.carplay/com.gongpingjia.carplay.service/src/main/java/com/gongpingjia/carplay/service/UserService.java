@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.service;
 
+import java.util.Map;
+
 import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Service;
@@ -153,13 +155,23 @@ public interface UserService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
-	
+
 	/**
 	 * 变更用户位置信息
-	 * @param json 
+	 * 
+	 * @param json
 	 * @return
 	 * @throws ApiException
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	ResponseDo changeLocation(JSONObject json) throws ApiException;
+
+	/**
+	 * 根据参数获取用户的列表信息
+	 * 
+	 * @param param
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	ResponseDo userList(Map<String, Object> param);
 }
