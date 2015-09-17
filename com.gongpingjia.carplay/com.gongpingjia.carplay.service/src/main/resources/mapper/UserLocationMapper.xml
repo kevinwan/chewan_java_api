@@ -48,7 +48,7 @@
 	  SELECT
 			device_token,userId,longitude,latitude,gender, isAuthenticated
 		FROM
-			user_location LEFT JOIN USER ON userId = id
+			user_location LEFT JOIN user ON userId = id
 		WHERE
 			    longitude BETWEEN #{minLongitude,jdbcType=DOUBLE} AND #{maxLongitude,jdbcType=DOUBLE}
 			AND latitude BETWEEN #{minLatitude,jdbcType=DOUBLE}	AND #{maxLatitude,jdbcType=DOUBLE}
