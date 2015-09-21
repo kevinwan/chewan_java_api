@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.data.user;
 
 import com.gongpingjia.carplay.data.common.Address;
+import com.gongpingjia.carplay.data.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +24,7 @@ public class User {
     private String photo;
 
     private Address address;
+    private Landmark landmark;
 
     private int licenseYear;
     private String licensePhoto;
@@ -35,6 +37,8 @@ public class User {
 
     private String idCardPhoto;
     private boolean idCardAuthorized;
+
+    private Car car;
 
     /**
      * 用户第三方登录信息
@@ -196,6 +200,22 @@ public class User {
 
     public void setLicense(DrivingLicense license) {
         this.license = license;
+    }
+
+    public Landmark getLandmark() {
+        return landmark;
+    }
+
+    public void setLandmark(Landmark landmark) {
+        this.landmark = landmark;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
     }
 
     @Override

@@ -6,10 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Created by licheng on 2015/9/21.
  */
-@Document
 public class Car {
 
-    @Id
     private String id;
 
     private String userId;
