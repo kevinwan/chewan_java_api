@@ -56,6 +56,16 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
+    public T findOne(Query query) {
+        return mongoTemplate.findOne(query, getCls());
+    }
+
+    @Override
+    public List<T> find(Query query) {
+        return mongoTemplate.find(query, getCls());
+    }
+
+    @Override
     public void save(T entity) {
         mongoTemplate.save(entity);
     }
@@ -76,6 +86,10 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
         mongoTemplate.remove(Query.query(criteria), getCls());
     }
 
+    @Override
+    public void delete(Query query) {
+        mongoTemplate.remove(query, getCls());
+    }
 
     @Override
     public long count() {
@@ -86,6 +100,11 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     public long count(Map<String, Object> params) {
         Criteria criteria = getCriteriaFromMap(params);
         return mongoTemplate.count(Query.query(criteria), getCls());
+    }
+
+    @Override
+    public long count(Query query) {
+        return mongoTemplate.count(query, getCls());
     }
 
     @Override
@@ -142,10 +161,25 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
+    public void update(Query query, Update update) {
+        mongoTemplate.updateMulti(query, update, getCls());
+    }
+
+    @Override
     public void updateAll(Map<String, Object> queryParams, Map<String, Object> updateParams) {
         Criteria criteria = getCriteriaFromMap(queryParams);
         Update update = getUpdateFromMap(updateParams);
-        mongoTemplate.updateMulti(Query.query(criteria), update,getCls());
+        mongoTemplate.updateMulti(Query.query(criteria), update, getCls());
+    }
+
+    @Override
+    public void updateFirst(Query query, Update update) {
+        mongoTemplate.updateFirst(query, update, getCls());
+    }
+
+    @Override
+    public void updateAll(Query query, Update update) {
+        mongoTemplate.updateMulti(query, update, getCls());
     }
 
     private Criteria getCriteriaFromMap(Map<String, Object> params) {

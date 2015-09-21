@@ -1,5 +1,8 @@
 package com.gongpingjia.carplay.dao;
 
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +29,9 @@ public interface BaseDao<T,K> {
 
     public List<T> find(Map<String, Object> params);
 
-    /**
-     *通过mongoDB支持的query查询；与mongodb有一定的耦合性；
-     */
-//    public T findOne(Query query);
+    public T findOne(Query query);
 
-//    public List<T> find(Query query);
+    public List<T> find(Query query);
 
     public void save(T entity);
 
@@ -41,20 +41,26 @@ public interface BaseDao<T,K> {
 
     public void deleteByParams(Map<String, Object> params);
 
+    public void delete(Query query);
 
-//    public void delete(Query query);
-
-    //获取collection所有的document number;
     public long count();
 
     //获取查询条件下collection中 document number;
     public long count(Map<String, Object> params);
 
+    public long count(Query query);
+
     public void update(T entity);
 
     public void updateNotNull(T entity);
 
+    public void update(Query query, Update update);
+
     public void updateAll(Map<String, Object> queryParams, Map<String, Object> updateParams);
+
+    public void updateFirst(Query query, Update update);
+
+    public void updateAll(Query query, Update update);
 
 //    public void update(Query query, Update update);
 }
