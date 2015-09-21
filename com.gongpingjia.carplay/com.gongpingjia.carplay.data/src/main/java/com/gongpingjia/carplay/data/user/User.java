@@ -27,6 +27,7 @@ public class User {
     private Date registerTime;
     private String role;
     private boolean invalid;
+    private String emchatName; //注意环信约束
 
     //用户位置信息
     private Address address;

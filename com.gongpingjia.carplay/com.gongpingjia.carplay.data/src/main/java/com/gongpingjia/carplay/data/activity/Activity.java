@@ -32,7 +32,6 @@ public class Activity {
 
     private String emchatGroupId;
 
-    private String category;
     //活动创建地
     private Address establish;
     //活动创建地经纬度
@@ -113,13 +112,6 @@ public class Activity {
         this.emchatGroupId = emchatGroupId;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
 
     public Address getEstablish() {
         return establish;
@@ -128,7 +120,6 @@ public class Activity {
     public void setEstablish(Address establish) {
         this.establish = establish;
     }
-
 
     public List<String> getMembers() {
         return members;
@@ -167,7 +158,6 @@ public class Activity {
                 ", start=" + start +
                 ", end=" + end +
                 ", emchatGroupId='" + emchatGroupId + '\'' +
-                ", category='" + category + '\'' +
                 ", establish=" + establish +
                 ", estabPoint=" + estabPoint +
                 ", members=" + members +
