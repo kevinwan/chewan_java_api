@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.entity.user;
+package com.gongpingjia.carplay.data.user;
 
 /**
  * Created by licheng on 2015/9/21.
@@ -11,7 +11,7 @@ public class Car {
 
     private String brand;
 
-    private String brandLogo;
+    private String logo;
 
     private String model;
 
@@ -24,6 +24,8 @@ public class Car {
     private String extraInfo;
 
     private boolean invalid;
+
+    private String slug;
 
     public String getId() {
         return id;
@@ -49,12 +51,12 @@ public class Car {
         this.brand = brand;
     }
 
-    public String getBrandLogo() {
-        return brandLogo;
+    public String getLogo() {
+        return logo;
     }
 
-    public void setBrandLogo(String brandLogo) {
-        this.brandLogo = brandLogo;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public String getModel() {
@@ -105,19 +107,28 @@ public class Car {
         this.invalid = invalid;
     }
 
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
     @Override
     public String toString() {
         return "Car{" +
                 "id='" + id + '\'' +
                 ", userId='" + userId + '\'' +
                 ", brand='" + brand + '\'' +
-                ", brandLogo='" + brandLogo + '\'' +
+                ", logo='" + logo + '\'' +
                 ", model='" + model + '\'' +
                 ", color='" + color + '\'' +
                 ", price=" + price +
                 ", seat=" + seat +
                 ", extraInfo='" + extraInfo + '\'' +
                 ", invalid=" + invalid +
+                ", slug='" + slug + '\'' +
                 '}';
     }
 }

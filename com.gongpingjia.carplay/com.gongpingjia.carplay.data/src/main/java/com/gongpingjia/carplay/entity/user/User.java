@@ -27,16 +27,22 @@ public class User {
     private Date registerTime;
     private String role;
     private boolean invalid;
-    private String emchatName; //注意环信约束
+
+    //用户会话信息
+    private String token;
+    private Date expire;
+
+    //注意环信约束
+    private String emchatName;
 
     //用户位置信息
     private Address address;
     private Landmark landmark;
 
-    //用户车辆信息
-    private int licenseYear;
+    //用户车辆信息,驾龄
+    private Integer drivingYears;
     private String licensePhoto;
-    private String authrosizedStatus;
+    private String authorizedStatus;
     private DrivingLicense license;
 
     private Car car;
@@ -69,6 +75,14 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEmchatName() {
+        return emchatName;
+    }
+
+    public void setEmchatName(String emchatName) {
+        this.emchatName = emchatName;
     }
 
     public String getNickname() {
@@ -119,12 +133,12 @@ public class User {
         this.photo = photo;
     }
 
-    public int getLicenseYear() {
-        return licenseYear;
+    public Integer getDrivingYears() {
+        return drivingYears;
     }
 
-    public void setLicenseYear(int licenseYear) {
-        this.licenseYear = licenseYear;
+    public void setDrivingYears(Integer drivingYears) {
+        this.drivingYears = drivingYears;
     }
 
     public String getLicensePhoto() {
@@ -135,12 +149,12 @@ public class User {
         this.licensePhoto = licensePhoto;
     }
 
-    public String getAuthrosizedStatus() {
-        return authrosizedStatus;
+    public String getAuthorizedStatus() {
+        return authorizedStatus;
     }
 
-    public void setAuthrosizedStatus(String authrosizedStatus) {
-        this.authrosizedStatus = authrosizedStatus;
+    public void setAuthorizedStatus(String authorizedStatus) {
+        this.authorizedStatus = authorizedStatus;
     }
 
     public Date getRegisterTime() {
@@ -223,30 +237,19 @@ public class User {
         this.car = car;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", password='" + password + '\'' +
-                ", phone='" + phone + '\'' +
-                ", gender='" + gender + '\'' +
-                ", birthday=" + birthday +
-                ", photo='" + photo + '\'' +
-                ", registerTime=" + registerTime +
-                ", role='" + role + '\'' +
-                ", invalid=" + invalid +
-                ", address=" + address +
-                ", landmark=" + landmark +
-                ", licenseYear=" + licenseYear +
-                ", licensePhoto='" + licensePhoto + '\'' +
-                ", authrosizedStatus='" + authrosizedStatus + '\'' +
-                ", license=" + license +
-                ", car=" + car +
-                ", idCardPhoto='" + idCardPhoto + '\'' +
-                ", idCardAuthorized=" + idCardAuthorized +
-                ", snsInfos=" + snsInfos +
-                ", userAlbum=" + userAlbum +
-                '}';
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Date getExpire() {
+        return expire;
+    }
+
+    public void setExpire(Date expire) {
+        this.expire = expire;
     }
 }

@@ -8,9 +8,7 @@ package com.gongpingjia.carplay.entity.user;
 public class SnsInfo {
     private String uid;
 
-    private String name;
-
-    private String photo;
+    private String channel;
 
     public String getUid() {
         return uid;
@@ -20,28 +18,19 @@ public class SnsInfo {
         this.uid = uid;
     }
 
-    public String getName() {
-        return name;
+    public String getChannel() {
+        return channel;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     @Override
     public String toString() {
         return "SnsInfo{" +
-                "id='" + uid + '\'' +
-                ", name='" + name + '\'' +
-                ", photo='" + photo + '\'' +
+                "uid='" + uid + '\'' +
+                ", channel='" + channel + '\'' +
                 '}';
     }
 }
