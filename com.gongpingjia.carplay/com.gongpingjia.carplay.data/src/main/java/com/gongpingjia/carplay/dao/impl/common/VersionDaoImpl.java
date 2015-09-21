@@ -1,0 +1,13 @@
+package com.gongpingjia.carplay.dao.impl.common;
+
+import com.gongpingjia.carplay.dao.common.VersionDao;
+import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
+import com.gongpingjia.carplay.data.common.Version;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Created by Administrator on 2015/9/21.
+ */
+@Repository("versionDao")
+public class VersionDaoImpl extends BaseDaoImpl<Version,String> implements VersionDao {
+}
