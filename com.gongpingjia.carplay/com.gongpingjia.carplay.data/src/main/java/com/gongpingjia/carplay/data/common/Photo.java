@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.user;
+package com.gongpingjia.carplay.data.common;
 
 import java.util.Date;
 

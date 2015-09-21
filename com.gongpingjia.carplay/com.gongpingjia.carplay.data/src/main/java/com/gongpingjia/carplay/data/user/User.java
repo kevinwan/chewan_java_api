@@ -1,6 +1,8 @@
 package com.gongpingjia.carplay.data.user;
 
 import com.gongpingjia.carplay.data.common.Address;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.List;
@@ -9,7 +11,9 @@ import java.util.List;
  * Created by licheng on 2015/9/19.
  * 用户相关信息,以及环信用户信息
  */
+@Document
 public class User {
+    @Id
     private String id;
     private String nickname;
     private String password;
@@ -25,7 +29,7 @@ public class User {
     private boolean licenseAuthorized;
     private DrivingLicense license;
 
-    private Date createTime;
+    private Date registerTime;
     private String role;
     private boolean invalid;
 
@@ -106,7 +110,6 @@ public class User {
         this.photo = photo;
     }
 
-
     public int getLicenseYear() {
         return licenseYear;
     }
@@ -131,12 +134,12 @@ public class User {
         this.licenseAuthorized = licenseAuthorized;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getRegisterTime() {
+        return registerTime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setRegisterTime(Date registerTime) {
+        this.registerTime = registerTime;
     }
 
     public String getRole() {
@@ -193,5 +196,30 @@ public class User {
 
     public void setLicense(DrivingLicense license) {
         this.license = license;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
+                ", photo='" + photo + '\'' +
+                ", address=" + address +
+                ", licenseYear=" + licenseYear +
+                ", licensePhoto='" + licensePhoto + '\'' +
+                ", licenseAuthorized=" + licenseAuthorized +
+                ", license=" + license +
+                ", registerTime=" + registerTime +
+                ", role='" + role + '\'' +
+                ", invalid=" + invalid +
+                ", idCardPhoto='" + idCardPhoto + '\'' +
+                ", idCardAuthorized=" + idCardAuthorized +
+                ", snsInfos=" + snsInfos +
+                ", userAlbum=" + userAlbum +
+                '}';
     }
 }

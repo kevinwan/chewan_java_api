@@ -1,5 +1,9 @@
 package com.gongpingjia.carplay.data.user;
 
+import com.gongpingjia.carplay.data.common.Photo;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 import java.util.List;
 
@@ -8,8 +12,11 @@ import java.util.List;
  * <p/>
  * 用户相册
  */
+@Document
 public class Album {
+    @Id
     private String id;
+
     private String userId;
     private String coverUrl;
     private Date createTime;
@@ -54,5 +61,16 @@ public class Album {
 
     public void setPhotos(List<Photo> photos) {
         this.photos = photos;
+    }
+
+    @Override
+    public String toString() {
+        return "Album{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", coverUrl='" + coverUrl + '\'' +
+                ", createTime=" + createTime +
+                ", photos=" + photos +
+                '}';
     }
 }

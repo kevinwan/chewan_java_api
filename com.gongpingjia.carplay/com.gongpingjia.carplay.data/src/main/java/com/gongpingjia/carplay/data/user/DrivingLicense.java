@@ -88,4 +88,20 @@ public class DrivingLicense {
     public void setIssueTime(Date issueTime) {
         this.issueTime = issueTime;
     }
+
+
+    @Override
+    public String toString() {
+        return "DrivingLicense{" +
+                "name='" + name + '\'' +
+                ", plate='" + plate + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", address='" + address + '\'' +
+                ", model='" + model + '\'' +
+                ", vehicleNumber='" + vehicleNumber + '\'' +
+                ", engineNumber='" + engineNumber + '\'' +
+                ", registerTime=" + registerTime +
+                ", issueTime=" + issueTime +
+                '}';
+    }
 }
