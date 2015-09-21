@@ -16,6 +16,7 @@ public class AlbumViewHistory {
 
     private String albumId;
 
+    //userId
     private String viewUser;
 
     private Date viewTime;
