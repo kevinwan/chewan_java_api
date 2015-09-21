@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.data.common;
 
 /**
  * Created by licheng on 2015/9/21.
+ * 经纬度信息
  */
 public class Landmark {
 

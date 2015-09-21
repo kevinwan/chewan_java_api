@@ -38,6 +38,7 @@ public class Activity {
     //活动创建地经纬度
     private Landmark estabPoint;
 
+    //存放userID的列表信息
     private List<String> members;
 
     public String getId() {

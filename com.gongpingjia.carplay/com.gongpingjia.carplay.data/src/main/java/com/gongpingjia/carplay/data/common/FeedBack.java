@@ -17,10 +17,6 @@ public class FeedBack {
 
     private String userId;
 
-    private String nickname;
-
-    private String phone;
-
     private List<Photo> photos;
 
     private String content;
@@ -41,22 +37,6 @@ public class FeedBack {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public List<Photo> getPhotos() {
@@ -88,8 +68,6 @@ public class FeedBack {
         return "FeedBack{" +
                 "id='" + id + '\'' +
                 ", userId='" + userId + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phone='" + phone + '\'' +
                 ", photos=" + photos +
                 ", content='" + content + '\'' +
                 ", createTime=" + createTime +

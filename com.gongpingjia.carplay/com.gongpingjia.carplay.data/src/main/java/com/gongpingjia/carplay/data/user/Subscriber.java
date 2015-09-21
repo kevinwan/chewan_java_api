@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  * Created by licheng on 2015/9/21.
- * 关注
+ * 用户关注
  */
 @Document
 public class Subscriber {

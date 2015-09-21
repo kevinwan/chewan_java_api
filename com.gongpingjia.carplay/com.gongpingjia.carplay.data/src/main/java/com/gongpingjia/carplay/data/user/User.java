@@ -16,29 +16,33 @@ import java.util.List;
 public class User {
     @Id
     private String id;
+
+    //用户基本信息
     private String nickname;
     private String password;
     private String phone;
     private String gender;
     private Date birthday;
     private String photo;
-
-    private Address address;
-    private Landmark landmark;
-
-    private int licenseYear;
-    private String licensePhoto;
-    private boolean licenseAuthorized;
-    private DrivingLicense license;
-
     private Date registerTime;
     private String role;
     private boolean invalid;
 
-    private String idCardPhoto;
-    private boolean idCardAuthorized;
+    //用户位置信息
+    private Address address;
+    private Landmark landmark;
+
+    //用户车辆信息
+    private int licenseYear;
+    private String licensePhoto;
+    private String authrosizedStatus;
+    private DrivingLicense license;
 
     private Car car;
+
+    //用户身份证相关信息
+    private String idCardPhoto;
+    private boolean idCardAuthorized;
 
     /**
      * 用户第三方登录信息
@@ -130,12 +134,12 @@ public class User {
         this.licensePhoto = licensePhoto;
     }
 
-    public boolean isLicenseAuthorized() {
-        return licenseAuthorized;
+    public String getAuthrosizedStatus() {
+        return authrosizedStatus;
     }
 
-    public void setLicenseAuthorized(boolean licenseAuthorized) {
-        this.licenseAuthorized = licenseAuthorized;
+    public void setAuthrosizedStatus(String authrosizedStatus) {
+        this.authrosizedStatus = authrosizedStatus;
     }
 
     public Date getRegisterTime() {
@@ -228,14 +232,16 @@ public class User {
                 ", gender='" + gender + '\'' +
                 ", birthday=" + birthday +
                 ", photo='" + photo + '\'' +
-                ", address=" + address +
-                ", licenseYear=" + licenseYear +
-                ", licensePhoto='" + licensePhoto + '\'' +
-                ", licenseAuthorized=" + licenseAuthorized +
-                ", license=" + license +
                 ", registerTime=" + registerTime +
                 ", role='" + role + '\'' +
                 ", invalid=" + invalid +
+                ", address=" + address +
+                ", landmark=" + landmark +
+                ", licenseYear=" + licenseYear +
+                ", licensePhoto='" + licensePhoto + '\'' +
+                ", authrosizedStatus='" + authrosizedStatus + '\'' +
+                ", license=" + license +
+                ", car=" + car +
                 ", idCardPhoto='" + idCardPhoto + '\'' +
                 ", idCardAuthorized=" + idCardAuthorized +
                 ", snsInfos=" + snsInfos +

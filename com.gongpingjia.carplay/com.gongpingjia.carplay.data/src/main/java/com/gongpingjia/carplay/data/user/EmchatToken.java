@@ -1,22 +1,20 @@
 package com.gongpingjia.carplay.data.user;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
 /**
  * Created by licheng on 2015/9/21.
- * 用户会话Token
  */
 @Document
-public class Token {
+public class EmchatToken {
+
     @Id
     private String id;
 
-    @Indexed(unique = true)
-    private String userId;
+    private String application;
 
     private String token;
 
@@ -30,12 +28,12 @@ public class Token {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getApplication() {
+        return application;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setApplication(String application) {
+        this.application = application;
     }
 
     public String getToken() {
@@ -56,9 +54,9 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
+        return "EmchatToken{" +
                 "id='" + id + '\'' +
-                ", userId='" + userId + '\'' +
+                ", application='" + application + '\'' +
                 ", token='" + token + '\'' +
                 ", expire=" + expire +
                 '}';

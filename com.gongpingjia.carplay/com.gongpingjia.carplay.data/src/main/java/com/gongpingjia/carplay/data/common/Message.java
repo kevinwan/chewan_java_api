@@ -7,6 +7,7 @@ import java.util.Date;
 
 /**
  * Created by licheng on 2015/9/21.
+ * 动态，推送的消息
  */
 @Document
 public class Message {
