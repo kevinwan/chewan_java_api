@@ -40,6 +40,9 @@ public class Activity {
     //存放userID的列表信息
     private List<String> members;
 
+    //对接大众点评活动businessID
+    private String businessId;
+
     public String getId() {
         return id;
     }
@@ -143,6 +146,14 @@ public class Activity {
 
     public void setEstabPoint(Landmark estabPoint) {
         this.estabPoint = estabPoint;
+    }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 
     @Override
