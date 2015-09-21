@@ -16,11 +16,16 @@ public class Activity {
     private String type;
     private String pay;
 
-    private Address address;
-    private Point point;
+    private Address destination;
+    private Point destPoint;
 
     private boolean transfer;
     private Date start;
     private Date end;
 
+    private String emchatGroupId;
+
+    private String category;
+    private Address establish;
+    private Point estabPoint;
 }

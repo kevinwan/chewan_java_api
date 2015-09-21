@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Created by licheng on 2015/9/19.
- * 用户相关信息
+ * 用户相关信息,以及环信用户信息
  */
 public class User {
     private String id;
