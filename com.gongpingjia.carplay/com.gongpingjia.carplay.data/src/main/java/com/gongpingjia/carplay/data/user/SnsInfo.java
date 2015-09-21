@@ -6,18 +6,18 @@ package com.gongpingjia.carplay.data.user;
  * 第三方登录相关内容
  */
 public class SnsInfo {
-    private String id;
+    private String uid;
 
     private String name;
 
     private String photo;
 
-    public String getId() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getName() {
@@ -39,7 +39,7 @@ public class SnsInfo {
     @Override
     public String toString() {
         return "SnsInfo{" +
-                "id='" + id + '\'' +
+                "id='" + uid + '\'' +
                 ", name='" + name + '\'' +
                 ", photo='" + photo + '\'' +
                 '}';
