@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.dao.impl.user;
 
 import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
 import com.gongpingjia.carplay.dao.user.EmchatTokenDao;
-import com.gongpingjia.carplay.data.user.EmchatToken;
+import com.gongpingjia.carplay.entity.user.EmchatToken;
 import org.springframework.stereotype.Repository;
 
 /**

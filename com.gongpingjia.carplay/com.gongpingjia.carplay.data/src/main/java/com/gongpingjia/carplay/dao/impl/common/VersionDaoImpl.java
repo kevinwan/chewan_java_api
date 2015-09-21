@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.dao.impl.common;
 
 import com.gongpingjia.carplay.dao.common.VersionDao;
 import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
-import com.gongpingjia.carplay.data.common.Version;
+import com.gongpingjia.carplay.entity.common.Version;
 import org.springframework.stereotype.Repository;
 
 /**

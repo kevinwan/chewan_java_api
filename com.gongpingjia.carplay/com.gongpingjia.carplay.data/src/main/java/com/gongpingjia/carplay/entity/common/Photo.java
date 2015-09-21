@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.common;
+package com.gongpingjia.carplay.entity.common;
 
 import java.util.Date;
 

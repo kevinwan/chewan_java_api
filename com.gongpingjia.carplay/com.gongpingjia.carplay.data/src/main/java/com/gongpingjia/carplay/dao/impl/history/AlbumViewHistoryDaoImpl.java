@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.dao.impl.history;
 
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
-import com.gongpingjia.carplay.data.history.AlbumViewHistory;
+import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import org.springframework.stereotype.Repository;
 
 /**

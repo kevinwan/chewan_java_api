@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.dao.impl.user;
 
 import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
-import com.gongpingjia.carplay.data.user.Subscriber;
+import com.gongpingjia.carplay.entity.user.Subscriber;
 import org.springframework.stereotype.Repository;
 
 /**

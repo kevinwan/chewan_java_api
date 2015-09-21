@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.common;
+package com.gongpingjia.carplay.entity.common;
 
 /**
  * Created by 123 on 2015/9/19.

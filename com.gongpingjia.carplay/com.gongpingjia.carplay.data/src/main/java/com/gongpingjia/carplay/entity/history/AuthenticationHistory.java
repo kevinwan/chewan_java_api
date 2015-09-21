@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.history;
+package com.gongpingjia.carplay.entity.history;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

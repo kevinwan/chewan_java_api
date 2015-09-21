@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.common;
+package com.gongpingjia.carplay.entity.common;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

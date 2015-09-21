@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.data.user;
+package com.gongpingjia.carplay.entity.user;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

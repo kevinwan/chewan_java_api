@@ -1,7 +1,4 @@
-package com.gongpingjia.carplay.data.user;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.gongpingjia.carplay.entity.user;
 
 /**
  * Created by licheng on 2015/9/21.

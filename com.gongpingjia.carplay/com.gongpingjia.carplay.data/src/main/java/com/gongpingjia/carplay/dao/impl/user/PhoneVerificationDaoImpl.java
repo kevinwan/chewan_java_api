@@ -2,7 +2,7 @@ package com.gongpingjia.carplay.dao.impl.user;
 
 import com.gongpingjia.carplay.dao.impl.BaseDaoImpl;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
-import com.gongpingjia.carplay.data.user.PhoneVerification;
+import com.gongpingjia.carplay.entity.user.PhoneVerification;
 import org.springframework.stereotype.Repository;
 
 /**

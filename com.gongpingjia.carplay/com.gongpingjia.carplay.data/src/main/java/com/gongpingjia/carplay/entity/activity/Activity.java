@@ -1,7 +1,7 @@
-package com.gongpingjia.carplay.data.activity;
+package com.gongpingjia.carplay.entity.activity;
 
-import com.gongpingjia.carplay.data.common.Address;
-import com.gongpingjia.carplay.data.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
