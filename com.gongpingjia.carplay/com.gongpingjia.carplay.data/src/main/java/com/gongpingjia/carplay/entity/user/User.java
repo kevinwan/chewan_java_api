@@ -28,10 +28,6 @@ public class User {
     private String role;
     private boolean invalid;
 
-    //用户会话信息
-    private String token;
-    private Date expire;
-
     //注意环信约束
     private String emchatName;
 
@@ -237,19 +233,4 @@ public class User {
         this.car = car;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Date getExpire() {
-        return expire;
-    }
-
-    public void setExpire(Date expire) {
-        this.expire = expire;
-    }
 }
