@@ -7,6 +7,7 @@ public class Address {
     private String province;
     private String city;
     private String district;
+    private String street;
 
     public String getProvince() {
         return province;
@@ -32,12 +33,21 @@ public class Address {
         this.district = district;
     }
 
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
     @Override
     public String toString() {
         return "Address{" +
                 "province='" + province + '\'' +
                 ", city='" + city + '\'' +
                 ", district='" + district + '\'' +
+                ", street='" + street + '\'' +
                 '}';
     }
 }

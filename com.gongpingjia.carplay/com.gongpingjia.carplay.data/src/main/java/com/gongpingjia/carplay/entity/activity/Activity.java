@@ -15,7 +15,7 @@ import java.util.List;
 @Document
 public class Activity {
     @Id
-    private String id;
+    private String activityId;
     private String organizer;
 
     private String type;
@@ -43,12 +43,12 @@ public class Activity {
     //对接大众点评活动businessID
     private String businessId;
 
-    public String getId() {
-        return id;
+    public String getActivityId() {
+        return activityId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 
     public String getOrganizer() {
@@ -159,7 +159,7 @@ public class Activity {
     @Override
     public String toString() {
         return "Activity{" +
-                "id='" + id + '\'' +
+                "activityId='" + activityId + '\'' +
                 ", organizer='" + organizer + '\'' +
                 ", type='" + type + '\'' +
                 ", pay='" + pay + '\'' +
