@@ -35,8 +35,8 @@ public class PhoneServiceImpl implements PhoneService {
     @Autowired
     private PhoneVerificationDao phoneVerificationDao;
 
-    @Autowired
-    private ParameterChecker checker;
+//    @Autowired
+//    private ParameterChecker checker;
 
     @Override
     public ResponseDo sendVerification(String phone, Integer type) throws ApiException {
@@ -122,7 +122,7 @@ public class PhoneServiceImpl implements PhoneService {
             }
         }
 
-        checker.checkPhoneVerifyCode(phone, code);
+        //checker.checkPhoneVerifyCode(phone, code);
 
         return ResponseDo.buildSuccessResponse();
     }
@@ -154,6 +154,7 @@ public class PhoneServiceImpl implements PhoneService {
             phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
                     PropertiesUtil.getProperty("message.effective.seconds", 7200)));
             phoneVerify.setSendTimes(0);
+            phoneVerify.setModifyTime(DateUtil.getDate());
 
             phoneVerificationDao.save(phoneVerify);
         } else {
@@ -165,6 +166,7 @@ public class PhoneServiceImpl implements PhoneService {
                         PropertiesUtil.getProperty("message.effective.seconds", 7200)));
                 //过期了需要设置次数
                 phoneVerify.setSendTimes(0);
+                phoneVerify.setModifyTime(DateUtil.getDate());
 
                 phoneVerificationDao.update(phoneVerify);
             }
