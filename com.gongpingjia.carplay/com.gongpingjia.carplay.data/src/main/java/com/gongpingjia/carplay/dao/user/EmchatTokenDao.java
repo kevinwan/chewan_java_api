@@ -1,6 +1,6 @@
 package com.gongpingjia.carplay.dao.user;
 
-import com.gongpingjia.carplay.dao.BaseDao;
+import com.gongpingjia.carplay.dao.common.BaseDao;
 import com.gongpingjia.carplay.entity.user.EmchatToken;
 
 /**

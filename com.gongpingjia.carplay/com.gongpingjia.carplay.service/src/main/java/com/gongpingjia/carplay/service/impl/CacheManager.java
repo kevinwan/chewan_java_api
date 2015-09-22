@@ -24,16 +24,12 @@ import com.gongpingjia.carplay.po.TokenVerification;
 @Service
 public class CacheManager {
 
-    @Autowired
     private TokenVerificationDao tokenDao;
 
-    @Autowired
     private PhoneVerificationDao phoneDao;
 
-    @Autowired
     private CacheService cacheService;
 
-    @Autowired
     private EmchatTokenDao emchatTokenDao;
 
     /**

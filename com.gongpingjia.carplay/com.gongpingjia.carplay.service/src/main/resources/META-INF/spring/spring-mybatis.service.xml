@@ -1,62 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context.xsd
-    http://www.springframework.org/schema/tx
-    http://www.springframework.org/schema/tx/spring-tx.xsd
-    http://www.springframework.org/schema/aop
-    http://www.springframework.org/schema/aop/spring-aop.xsd
-    http://www.springframework.org/schema/util 
-    http://www.springframework.org/schema/util/spring-util.xsd">
+    http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<context:component-scan
-		base-package="com.gongpingjia.carplay.dao, com.gongpingjia.carplay.service" />
-	<context:annotation-config />
+    <context:component-scan base-package="com.gongpingjia.carplay.service"/>
+    <context:annotation-config/>
 
-	<!-- 引入jdbc配置文件 -->
-	<context:property-placeholder location="classpath:conf/jdbc.properties"
-		ignore-unresolvable="true" />
-
-	<bean id="beanUtil" class="com.gongpingjia.carplay.common.util.BeanUtil" />
-
-	<!-- org.springframework.jdbc.datasource.DriverManagerDataSource -->
-	<bean id="dataSource" class="org.apache.ibatis.datasource.pooled.PooledDataSource">
-		<property name="driver" value="${jdbc_driverClassName}" />
-		<property name="url" value="${jdbc_url}" />
-		<property name="username" value="${jdbc_username}" />
-		<property name="password" value="${jdbc_password}" />
-		<property name="poolMaximumActiveConnections" value="${jdbc_maxActive}" />
-		<property name="poolMaximumCheckoutTime" value="${jdbc_maxCheckOutTime}" />
-		<property name="poolMaximumIdleConnections" value="${jdbc_maxIdle}" />
-		<property name="poolTimeToWait" value="${jdbc_maxWait}" />
-		<property name="poolPingEnabled" value="${jdbc_pingEnabled}" />
-		<!-- 连接属性 -->
-		<property name="driverProperties">
-			<value>clientEncoding=UTF-8</value>
-		</property>
-	</bean>
-
-	<!-- mybatis文件配置，扫描所有mapper文件 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource"></property>
-		<property name="configLocation" value="classpath:conf/mybatis-config.xml"></property>
-		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
-	</bean>
-	<!-- configLocation为mybatis属性 mapperLocations为所有mapper -->
-
-	<!-- 对数据源进行事务管理 -->
-	<bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource"></property>
-		<!-- 允许事务的嵌套 -->
-		<property name="nestedTransactionAllowed" value="true"></property>
-	</bean>
-	<tx:annotation-driven transaction-manager="transactionManager"
-		mode="proxy" proxy-target-class="false" />
 </beans>

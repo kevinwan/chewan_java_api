@@ -1,6 +1,5 @@
 package com.gongpingjia.carplay.dao.common;
 
-import com.gongpingjia.carplay.dao.BaseDao;
 import com.gongpingjia.carplay.entity.common.Message;
 
 /**
