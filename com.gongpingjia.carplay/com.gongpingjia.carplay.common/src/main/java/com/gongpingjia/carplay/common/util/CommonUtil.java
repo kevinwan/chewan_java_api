@@ -209,8 +209,23 @@ public class CommonUtil {
 	}
 
 	/**
+	 * 获取json对象中key的value值，如果key不存在就返回defaultValue
+	 *
+	 * @param json
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
+	public static String getString(JSONObject json, String key, String defaultValue) {
+		if (isEmpty(json, key)) {
+			return defaultValue;
+		}
+		return json.getString(key);
+	}
+
+	/**
 	 * 批量检查Key值为空的参数,如果存在一个为空的就返回true
-	 * 
+	 *
 	 * @param json
 	 * @param keys
 	 * @return
@@ -224,20 +239,5 @@ public class CommonUtil {
 		}
 
 		return false;
-	}
-
-	/**
-	 * 获取json对象中key的value值，如果key不存在就返回defaultValue
-	 * 
-	 * @param json
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public static String getString(JSONObject json, String key, String defaultValue) {
-		if (isEmpty(json, key)) {
-			return defaultValue;
-		}
-		return json.getString(key);
 	}
 }
