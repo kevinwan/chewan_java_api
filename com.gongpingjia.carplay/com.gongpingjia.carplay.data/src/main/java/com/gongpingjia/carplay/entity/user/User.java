@@ -28,6 +28,8 @@ public class User {
     private String role;
     private boolean invalid;
 
+    private String photoAuthStatus;
+
     //注意环信约束
     private String emchatName;
 
@@ -38,7 +40,7 @@ public class User {
     //用户车辆信息,驾龄
     private Integer drivingYears;
     private String licensePhoto;
-    private String authorizedStatus;
+    private String licenseAuthStatus;
     private DrivingLicense license;
 
     private Car car;
@@ -145,13 +147,6 @@ public class User {
         this.licensePhoto = licensePhoto;
     }
 
-    public String getAuthorizedStatus() {
-        return authorizedStatus;
-    }
-
-    public void setAuthorizedStatus(String authorizedStatus) {
-        this.authorizedStatus = authorizedStatus;
-    }
 
     public Date getRegisterTime() {
         return registerTime;
@@ -233,4 +228,19 @@ public class User {
         this.car = car;
     }
 
+    public String getPhotoAuthStatus() {
+        return photoAuthStatus;
+    }
+
+    public void setPhotoAuthStatus(String photoAuthStatus) {
+        this.photoAuthStatus = photoAuthStatus;
+    }
+
+    public String getLicenseAuthStatus() {
+        return licenseAuthStatus;
+    }
+
+    public void setLicenseAuthStatus(String licenseAuthStatus) {
+        this.licenseAuthStatus = licenseAuthStatus;
+    }
 }
