@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.entity.user;
+package com.gongpingjia.carplay.entity.common;
 
 /**
  * Created by licheng on 2015/9/21.

@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.user;
 
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,7 +21,8 @@ public class User {
     //用户基本信息
     private String nickname;
     private String password;
-    private String phone;
+    //个人头像,avatar.jpg
+    private String avatar;
     private String gender;
     private Date birthday;
     private String photo;
@@ -28,6 +30,8 @@ public class User {
     private String role;
     private boolean invalid;
 
+    //图像认证图片,photo.jpg
+    private String phone;
     private String photoAuthStatus;
 
     //注意环信约束
