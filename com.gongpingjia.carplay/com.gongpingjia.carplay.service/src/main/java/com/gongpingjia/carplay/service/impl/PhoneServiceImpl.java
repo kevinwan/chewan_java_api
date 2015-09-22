@@ -103,7 +103,7 @@ public class PhoneServiceImpl implements PhoneService {
             phoneVerification.setSendTimes(1);
         }
         phoneVerification.setModifyTime(DateUtil.getDate());
-        phoneVerificationDao.update(phoneVerification);
+        phoneVerificationDao.update(phoneVerification.getId(), phoneVerification);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class PhoneServiceImpl implements PhoneService {
                 phoneVerify.setSendTimes(0);
                 phoneVerify.setModifyTime(DateUtil.getDate());
 
-                phoneVerificationDao.update(phoneVerify);
+                phoneVerificationDao.update(phoneVerify.getId(), phoneVerify);
             }
         }
 
