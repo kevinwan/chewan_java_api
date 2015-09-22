@@ -1,10 +1,17 @@
 package com.gongpingjia.carplay.dao.common.impl;
 
 import com.gongpingjia.carplay.dao.common.BaseDao;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
+import net.sf.json.JSONObject;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -19,7 +26,7 @@ import java.util.Map;
  */
 public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
 
-    private Class<T> cls;
+    private Class cls;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -41,18 +48,6 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     @Override
     public T findById(K id) {
         return mongoTemplate.findById(id, getCls());
-    }
-
-    @Override
-    public T findOne(Map<String, Object> params) {
-        Criteria criteria = getCriteriaFromMap(params);
-        return mongoTemplate.findOne(Query.query(criteria), getCls());
-    }
-
-    @Override
-    public List<T> find(Map<String, Object> params) {
-        Criteria criteria = getCriteriaFromMap(params);
-        return mongoTemplate.find(Query.query(criteria), getCls());
     }
 
     @Override
@@ -81,12 +76,6 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
-    public void deleteByParams(Map<String, Object> params) {
-        Criteria criteria = getCriteriaFromMap(params);
-        mongoTemplate.remove(Query.query(criteria), getCls());
-    }
-
-    @Override
     public void delete(Query query) {
         mongoTemplate.remove(query, getCls());
     }
@@ -97,79 +86,21 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
-    public long count(Map<String, Object> params) {
-        Criteria criteria = getCriteriaFromMap(params);
-        return mongoTemplate.count(Query.query(criteria), getCls());
-    }
-
-    @Override
     public long count(Query query) {
         return mongoTemplate.count(query, getCls());
     }
 
     @Override
-    public void update(T entity) {
-        try {
-            //通过id 获取数据
-            K id = (K) BeanUtils.getProperty(entity, "id");
-            Update update = new Update();
-            Field[] fields = this.getCls().getDeclaredFields();
-            for (Field field : fields) {
-                //不包含Transient的属性；
-                if (field.getAnnotation(Transient.class) != null) {
-                    continue;
-                }
-                String fieldName = field.getName();
-                // id不添加其中
-                if (fieldName != null && !"id".equals(fieldName)) {
-                    // 使用set更新器,如果没有就会添加，有就会更新
-                    update.set(fieldName, BeanUtils.getProperty(entity, fieldName));
-                }
-            }
-            this.mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(id)), update, this.getCls());
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void updateNotNull(T entity) {
-        try {
-            //通过id 获取数据
-            K id = (K) BeanUtils.getProperty(entity, "id");
-            Update update = new Update();
-            Field[] fields = this.getCls().getDeclaredFields();
-            for (Field field : fields) {
-                //不包含Transient的属性；
-                if (field.getAnnotation(Transient.class) != null) {
-                    continue;
-                }
-                String fieldName = field.getName();
-                // id不添加其中
-                if (fieldName != null && !"id".equals(fieldName)) {
-                    // 使用set更新器,如果没有就会添加，有就会更新
-                    Object fieldVal = BeanUtils.getProperty(entity, fieldName);
-                    if (null != fieldVal) {
-                        update.set(fieldName, fieldVal);
-                    }
-                }
-            }
-            this.mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(id)), update, this.getCls());
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    public void update(K id, T entity) {
+        BasicDBObject queryObj = new BasicDBObject("_id", new ObjectId(id.toString()));
+        String jsonStr = JSONObject.fromObject(entity).toString();
+        DBObject dbObject = (DBObject) JSON.parse(jsonStr);
+        mongoTemplate.getCollection(getCollectionName(entity)).update(queryObj, dbObject);
     }
 
     @Override
     public void update(Query query, Update update) {
         mongoTemplate.updateMulti(query, update, getCls());
-    }
-
-    @Override
-    public void updateAll(Map<String, Object> queryParams, Map<String, Object> updateParams) {
-        Criteria criteria = getCriteriaFromMap(queryParams);
-        Update update = getUpdateFromMap(updateParams);
-        mongoTemplate.updateMulti(Query.query(criteria), update, getCls());
     }
 
     @Override
@@ -182,19 +113,22 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
         mongoTemplate.updateMulti(query, update, getCls());
     }
 
-    private Criteria getCriteriaFromMap(Map<String, Object> params) {
-        Criteria criteria = new Criteria();
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            criteria.where(param.getKey()).is(param.getValue());
+    private String getCollectionName(Object object) {
+        Document annotation = object.getClass().getAnnotation(Document.class);
+        if (null == annotation) {
+            throw new RuntimeException("the object has no Document Annotation");
         }
-        return criteria;
-    }
-
-    private Update getUpdateFromMap(Map<String, Object> params) {
-        Update update = new Update();
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            update.set(param.getKey(), param.getValue());
+        if (StringUtils.isNotEmpty(annotation.collection())) {
+            return annotation.collection();
+        } else {
+            String simpleName = object.getClass().getSimpleName();
+            char[] chars = simpleName.toCharArray();
+            if (chars[0] >= 'A' && chars[0] <= 'Z') {
+                chars[0] += 32;
+            } else {
+                throw new RuntimeException("the class first letter must be up case");
+            }
+            return new String(chars);
         }
-        return update;
     }
 }

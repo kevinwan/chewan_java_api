@@ -22,13 +22,6 @@ public interface BaseDao<T,K> {
      */
     public T findById(K key);
 
-    /**
-     *
-     */
-    public T findOne(Map<String, Object> params);
-
-    public List<T> find(Map<String, Object> params);
-
     public T findOne(Query query);
 
     public List<T> find(Query query);
@@ -39,28 +32,18 @@ public interface BaseDao<T,K> {
 
     public void deleteByIds(K[] ids);
 
-    public void deleteByParams(Map<String, Object> params);
-
     public void delete(Query query);
 
     public long count();
 
-    //获取查询条件下collection中 document number;
-    public long count(Map<String, Object> params);
-
     public long count(Query query);
 
-    public void update(T entity);
-
-    public void updateNotNull(T entity);
+    public void update(K id,T entity);
 
     public void update(Query query, Update update);
-
-    public void updateAll(Map<String, Object> queryParams, Map<String, Object> updateParams);
 
     public void updateFirst(Query query, Update update);
 
     public void updateAll(Query query, Update update);
 
-//    public void update(Query query, Update update);
 }
