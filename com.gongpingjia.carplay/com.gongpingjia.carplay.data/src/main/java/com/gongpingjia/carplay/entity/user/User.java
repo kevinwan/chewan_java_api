@@ -247,4 +247,12 @@ public class User {
     public void setLicenseAuthStatus(String licenseAuthStatus) {
         this.licenseAuthStatus = licenseAuthStatus;
     }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 }

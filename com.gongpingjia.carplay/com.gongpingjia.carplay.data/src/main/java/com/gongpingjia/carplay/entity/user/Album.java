@@ -15,7 +15,7 @@ import java.util.List;
 @Document
 public class Album {
     @Id
-    private String id;
+    private String albumId;
 
     private String userId;
     private String coverUrl;
@@ -23,12 +23,12 @@ public class Album {
 
     private List<Photo> photos;
 
-    public String getId() {
-        return id;
+    public String getAlbumId() {
+        return albumId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAlbumId(String albumId) {
+        this.albumId = albumId;
     }
 
     public String getUserId() {
@@ -66,7 +66,7 @@ public class Album {
     @Override
     public String toString() {
         return "Album{" +
-                "id='" + id + '\'' +
+                "albumId='" + albumId + '\'' +
                 ", userId='" + userId + '\'' +
                 ", coverUrl='" + coverUrl + '\'' +
                 ", createTime=" + createTime +

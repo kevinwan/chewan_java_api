@@ -16,7 +16,8 @@ import java.util.List;
 public class Activity {
     @Id
     private String activityId;
-    private String organizer;
+    //活动创建人员
+    private String userId;
 
     private String type;
     private String pay;
@@ -51,12 +52,12 @@ public class Activity {
         this.activityId = activityId;
     }
 
-    public String getOrganizer() {
-        return organizer;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setOrganizer(String organizer) {
-        this.organizer = organizer;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getType() {
@@ -160,7 +161,7 @@ public class Activity {
     public String toString() {
         return "Activity{" +
                 "activityId='" + activityId + '\'' +
-                ", organizer='" + organizer + '\'' +
+                ", userId='" + userId + '\'' +
                 ", type='" + type + '\'' +
                 ", pay='" + pay + '\'' +
                 ", destination=" + destination +
