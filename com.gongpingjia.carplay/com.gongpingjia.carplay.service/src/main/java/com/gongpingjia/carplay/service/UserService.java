@@ -24,6 +24,18 @@ public interface UserService {
     @Transactional(rollbackFor = Exception.class)
     ResponseDo register(User user) throws ApiException;
 
+
+    /**
+     * 用户登录
+     *
+     * @param user
+     * @return
+     * @throws ApiException
+     */
+    @Transactional(rollbackFor = Exception.class)
+    ResponseDo loginUser(User user) throws ApiException;
+
+
     /**
      * 检查注册用户的参数是否正确
      *

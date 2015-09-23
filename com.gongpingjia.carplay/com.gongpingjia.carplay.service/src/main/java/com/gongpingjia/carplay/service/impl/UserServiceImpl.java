@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.dao.user.AlbumDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.Album;
 import com.gongpingjia.carplay.entity.user.SnsInfo;
 import com.gongpingjia.carplay.entity.user.User;
@@ -101,13 +102,68 @@ public class UserServiceImpl implements UserService {
         data.put("userId", userId);
         data.put("token", userToken.getToken());
         if (StringUtils.isEmpty(user.getPhoto())) {
-            data.put("photo", "");
+            data.put("avatar", "");
         } else {
-            data.put("photo", CommonUtil.getLocalPhotoServer() + user.getPhoto());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getPhoto());
         }
 
         return ResponseDo.buildSuccessResponse(data);
     }
+
+    @Override
+    public ResponseDo loginUser(User user) throws ApiException {
+
+        Map<String, Object> data = new HashMap<String, Object>(8, 1);
+        // 验证参数
+        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+            LOG.warn("Invalid params, phone:{}", user.getPhone());
+            return ResponseDo.buildFailureResponse("输入参数有误");
+        }
+
+        // 查找用户
+
+        List<User> users = userDao.find(Query.query(Criteria.where("phone").is(user.getPhone())));
+        if (users.isEmpty()) {
+            LOG.warn("Fail to find user");
+            return ResponseDo.buildFailureResponse("用户不存在，请注册后登录");
+        }
+
+        User userData = users.get(0);
+        if (!user.getPassword().equals(userData.getPassword())) {
+            LOG.warn("User password is incorrect");
+            return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
+        }
+
+        data.put("userId", userData.getUserId());
+        data.put("photoAuthStatus", userData.getPhotoAuthStatus());
+        data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
+
+        // 获取用户授权信息
+        data.put("token", getUserToken(userData.getUserId()));
+
+        if (StringUtils.isEmpty(userData.getPhoto())) {
+            data.put("photo", "");
+        } else {
+            data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+        }
+
+        // 查询用户车辆信息
+        Car car = userData.getCar();
+        if (null != car) {
+            data.put("brand", car.getBrand());
+            data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+            data.put("model", car.getModel());
+            data.put("seatNumber", car.getSeat());
+        } else {
+            data.put("brand", "");
+            data.put("brandLogo", "");
+            data.put("model", "");
+            data.put("seatNumber", "");
+        }
+
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
 
     @Override
     public void checkRegisterParameters(User user, JSONObject json) throws ApiException {
@@ -249,4 +305,26 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private String getUserToken(String userId) throws ApiException {
+        UserToken userToken = cacheManager.getUserTokenVerification(userId);
+        if (null == userToken) {
+            LOG.warn("Fail to get token and expire info from token_verification");
+            throw new ApiException("获取用户授权信息失败");
+        }
+
+        // 如果过期 跟新Token
+        if (userToken.getExpire().getTime() > DateUtil.getTime()) {
+            return userToken.getToken();
+        }
+
+        String uuid = CodeGenerator.generatorId();
+        userToken.setToken(uuid);
+        userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
+                PropertiesUtil.getProperty("carplay.token.over.date", 7)));
+        userTokenDao.update(userToken.getId(), userToken);
+
+        cacheManager.setUserToken(userToken);
+
+        return uuid;
+    }
 }

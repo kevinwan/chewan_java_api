@@ -6,6 +6,8 @@ import java.util.HashMap;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.gongpingjia.carplay.cache.CacheService;
@@ -130,7 +132,7 @@ public class CacheManager {
         EmchatToken token = cacheService.get(CacheUtil.CacheName.EMCHAT_TOKEN, EmchatToken.class);
 
         if (token == null) {
-            token = emchatTokenDao.findOne(null);
+            token = emchatTokenDao.findOne(Query.query(Criteria.where("")));
         }
 
         return token;

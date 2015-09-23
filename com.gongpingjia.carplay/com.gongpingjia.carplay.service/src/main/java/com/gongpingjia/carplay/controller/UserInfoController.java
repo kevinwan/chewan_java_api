@@ -32,7 +32,7 @@ public class UserInfoController {
     private UserService userService;
 
     /**
-     * 2.5注册
+     * 注册
      *
      * @param json 参数列表
      * @return 注册结果
@@ -50,7 +50,6 @@ public class UserInfoController {
             User user = new User();
             Address address = new Address();
             user.setPhone(json.getString("phone"));
-            user.setUserId(json.getString("photo"));
             user.setNickname(json.getString("nickname"));
             user.setGender(json.getString("gender"));
             user.setBirthday(new Date(json.getJSONObject("birthday").getLong("time")));
@@ -64,6 +63,30 @@ public class UserInfoController {
             userService.checkRegisterParameters(user, json);
 
             return userService.register(user);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 登录
+     *
+     * @param user 参数列表
+     * @return 登录结果
+     */
+    @RequestMapping(value = "/user/login", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo loginUser(@RequestBody User user) {
+        LOG.debug("login is called, request parameter produce:");
+
+        try {
+            if (StringUtils.isEmpty(user.getPassword()) || StringUtils.isEmpty(user.getPhone())) {
+                LOG.warn("Input parameters password or phone is empty");
+                throw new ApiException("输入参数有误");
+            }
+
+            return userService.loginUser(user);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

@@ -56,7 +56,7 @@ public class ChatCommonService {
         if (token == null) {
             emchatTokenDao.save(refresh);
         } else {
-            emchatTokenDao.update(refresh.getId(),refresh);
+            emchatTokenDao.update(refresh.getApplication(), refresh);
         }
 
         LOG.debug("Update token in the database");
