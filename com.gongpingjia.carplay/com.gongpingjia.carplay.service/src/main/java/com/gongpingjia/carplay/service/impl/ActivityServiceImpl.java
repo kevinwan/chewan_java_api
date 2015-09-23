@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2015/9/22.
+ * Created by heyongyu on 2015/9/22.
  */
 @Service("activityService")
 public class ActivityServiceImpl implements ActivityService {
@@ -40,7 +40,7 @@ public class ActivityServiceImpl implements ActivityService {
     private UserDao userDao;
 
     @Autowired
-    private CacheService cacheService;
+    private ParameterChecker parameterChecker;
 
 
 
@@ -49,12 +49,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
-        //TODO validate userID and token;
-        //创建环状群聊号ID
-        if (StringUtils.isEmpty(cacheService.get(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, userId)))) {
-            throw new ApiException("用户验证参数非法");
-        }
-
+        parameterChecker.checkUserInfo(userId, token);
         List<String> memberIds = new ArrayList<String>(1);
         memberIds.add(userId);
         activity.setMembers(memberIds);
@@ -65,10 +60,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException {
-        //TODO validate userId and token
-        if (StringUtils.isEmpty(cacheService.get(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, userId)))) {
-            throw new ApiException("用户验证参数非法");
-        }
+        parameterChecker.checkUserInfo(userId,token);
         Activity activity = activityDao.findById(userId);
         return ResponseDo.buildSuccessResponse(activity);
     }

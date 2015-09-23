@@ -19,6 +19,17 @@ public class ActivityController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivityController.class);
 
+    /**
+     * 注册活动
+     * 用户id
+     * @param userId
+     *
+     * 用户token
+     * @param token
+     *
+     * 活动信息对应的json
+     * @param activity
+     */
     @Autowired
     private ActivityService activityService;
 
@@ -35,6 +46,17 @@ public class ActivityController {
         }
     }
 
+    /**
+     * 获取活动信息
+     *
+     * 活动主键
+     * @param activityId
+     *
+     * @param  userId
+     *
+     * @param token
+     *
+     */
     @RequestMapping(value = "/activity/${activityId}/info", method = RequestMethod.GET)
     @ResponseBody
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
