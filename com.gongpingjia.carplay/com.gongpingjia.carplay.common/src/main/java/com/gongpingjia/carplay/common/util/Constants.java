@@ -224,4 +224,16 @@ public class Constants {
 
         String ACCEPT = "认证通过";
     }
+
+    /**
+     * 认证的类型
+     */
+    public interface AuthType {
+
+        String PHOTO_AUTH = "图像认证";
+
+        String LICENSE_AUTH = "车主认证";
+
+        String ID_CARD_AUTH = "身份证认证";
+    }
 }

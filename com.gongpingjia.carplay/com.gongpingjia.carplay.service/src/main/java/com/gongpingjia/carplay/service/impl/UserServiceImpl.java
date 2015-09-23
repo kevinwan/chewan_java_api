@@ -1,17 +1,17 @@
 package com.gongpingjia.carplay.service.impl;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
-import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.dao.user.AlbumDao;
+import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.Album;
 import com.gongpingjia.carplay.entity.user.SnsInfo;
 import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
@@ -242,39 +242,6 @@ public class UserServiceImpl implements UserService {
         data.put("token", getUserToken(upUser.getUserId()));
 
         return ResponseDo.buildSuccessResponse(data);
-    }
-
-    @Override
-    public ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException {
-        LOG.debug("Begin apply license authentication");
-
-        checker.checkUserInfo(userId, token);
-
-        User user = userDao.findById(userId);
-        if (user == null) {
-            LOG.warn("User not exist, userId:{}", userId);
-            return ResponseDo.buildFailureResponse("用户不存在");
-        }
-        if (!Constants.AuthStatus.UNAUTHORIZED.equals(user.getLicenseAuthStatus())) {
-            LOG.warn("User already authenticated");
-            return ResponseDo.buildFailureResponse("用户已认证，请勿重复认证");
-        }
-
-        String drivingLicense = MessageFormat.format(Constants.PhotoKey.DRIVING_LICENSE_KEY, json.getString("drivingLicense"));
-        // 判断图片是否存在
-        if (!localFileManager.isExist(drivingLicense)) {
-            LOG.warn("drivingLicense photo not Exist");
-            return ResponseDo.buildFailureResponse("行驶证图片未上传");
-        }
-
-        String driverLicense = MessageFormat.format(Constants.PhotoKey.DRIVER_LICENSE_KEY, json.getString("driverLicense"));
-        // 判断图片是否存在
-        if (!localFileManager.isExist(driverLicense)) {
-            LOG.warn("driverLicense photo not Exist");
-            return ResponseDo.buildFailureResponse("驾驶证图片未上传");
-        }
-
-        return ResponseDo.buildSuccessResponse();
     }
 
 

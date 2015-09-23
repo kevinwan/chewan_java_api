@@ -1,15 +1,11 @@
 package com.gongpingjia.carplay.service;
 
-import java.util.Map;
-
-import net.sf.json.JSONObject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.user.User;
+import net.sf.json.JSONObject;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public interface UserService {
@@ -54,13 +50,4 @@ public interface UserService {
     @Transactional(rollbackFor = Exception.class)
     ResponseDo forgetPassword(User user, String code) throws ApiException;
 
-    /**
-     * 驾驶证，行驶证认证申请
-     *
-     * @param json   入参
-     * @param token  会话token
-     * @param userId 用户Id
-     * @return 返回申请结果
-     */
-    ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException;
 }

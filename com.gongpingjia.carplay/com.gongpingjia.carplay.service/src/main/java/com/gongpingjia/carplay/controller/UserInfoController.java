@@ -107,21 +107,5 @@ public class UserInfoController {
         }
     }
 
-    @RequestMapping(value = "/user/{userId}/license/authentication", method = RequestMethod.POST, headers = {
-            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo licenseAuthenticationApply(@PathVariable(value = "userId") String userId,
-                                                 @RequestParam(value = "token") String token, @RequestBody JSONObject json) {
-        LOG.debug("licenseAuthenticationApply is called, request parameter produce:");
 
-        if (CommonUtil.isEmpty(json, Arrays.asList("brand", "model", "driverLicense", "drivingLicense"))) {
-            return ResponseDo.buildFailureResponse("输入参数有误");
-        }
-
-        try {
-            return userService.licenseAuthenticationApply(json, token, userId);
-        } catch (ApiException e) {
-            LOG.warn(e.getMessage(), e);
-            return ResponseDo.buildFailureResponse(e.getMessage());
-        }
-    }
 }
