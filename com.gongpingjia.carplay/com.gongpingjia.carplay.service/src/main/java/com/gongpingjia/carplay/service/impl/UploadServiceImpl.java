@@ -1,16 +1,16 @@
 package com.gongpingjia.carplay.service.impl;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
+import com.gongpingjia.carplay.common.util.CodeGenerator;
+import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.user.AlbumDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.user.Album;
+import com.gongpingjia.carplay.service.UploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +20,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.photo.PhotoService;
-import com.gongpingjia.carplay.common.util.CodeGenerator;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.common.util.PropertiesUtil;
-
-import com.gongpingjia.carplay.service.UploadService;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class UploadServiceImpl implements UploadService {
@@ -65,13 +63,27 @@ public class UploadServiceImpl implements UploadService {
     private PhotoService localFileManager;
 
     @Override
-    public ResponseDo uploadUserPhoto(MultipartFile multiFile) throws ApiException {
+    public ResponseDo uploadAvatarPhoto(MultipartFile multiFile) throws ApiException {
         LOG.debug("Begin upload file to server");
 
         byte[] data = buildFileBytes(multiFile);
 
         String id = CodeGenerator.generatorId();
-        String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, id);
+        String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, id);
+
+        return uploadLocalServer(id, data, key);
+    }
+
+    @Override
+    public ResponseDo uploadPersonalPhoto(MultipartFile multipartFile, String userId, String token) throws ApiException {
+        LOG.debug("Begin upload file to server");
+
+        checker.checkUserInfo(userId, token);
+
+        byte[] data = buildFileBytes(multipartFile);
+
+        String id = CodeGenerator.generatorId();
+        String key = MessageFormat.format(Constants.PhotoKey.PHOTO_KEY, id);
 
         return uploadLocalServer(id, data, key);
     }
@@ -147,23 +159,23 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public ResponseDo uploadLicensePhoto(String userId, MultipartFile multiFile, String token) throws ApiException {
-        LOG.debug("uploadLicensePhoto to server, userId:{}", userId);
+    public ResponseDo uploadDrivingLicensePhoto(String userId, MultipartFile multiFile, String token) throws ApiException {
+        LOG.debug("uploadDrivingLicensePhoto to server, userId:{}", userId);
 
         checker.checkUserInfo(userId, token);
 
         byte[] data = buildFileBytes(multiFile);
-        String key = MessageFormat.format(Constants.PhotoKey.LICENSE_KEY, userId);
+        String key = MessageFormat.format(Constants.PhotoKey.DRIVING_LICENSE_KEY, userId);
 
         return uploadLocalServer(userId, data, key);
     }
 
-    private ResponseDo uploadLocalServer(String userId, byte[] data, String key) throws ApiException {
+    private ResponseDo uploadLocalServer(String photoId, byte[] data, String key) throws ApiException {
         localFileManager.upload(data, key, true);
 
         Map<String, String> dataMap = new HashMap<String, String>();
         dataMap.put("photoUrl", CommonUtil.getLocalPhotoServer() + key);
-        dataMap.put("photoId", userId);
+        dataMap.put("photoId", photoId);
         return ResponseDo.buildSuccessResponse(dataMap);
     }
 
@@ -234,8 +246,19 @@ public class UploadServiceImpl implements UploadService {
         byte[] data = buildFileBytes(multiFile);
         LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
-        String key = MessageFormat.format(Constants.PhotoKey.USER_KEY, userId);
+        String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, userId);
         return uploadThirdServer(data, userId, key, true);
+    }
 
+    @Override
+    public ResponseDo uploadDriverLicensePhoto(String userId, MultipartFile attach, String token) throws ApiException {
+        LOG.debug("uploadDriverLicensePhoto to server, userId:{}", userId);
+
+        checker.checkUserInfo(userId, token);
+
+        byte[] data = buildFileBytes(attach);
+        String key = MessageFormat.format(Constants.PhotoKey.DRIVER_LICENSE_KEY, userId);
+
+        return uploadLocalServer(userId, data, key);
     }
 }

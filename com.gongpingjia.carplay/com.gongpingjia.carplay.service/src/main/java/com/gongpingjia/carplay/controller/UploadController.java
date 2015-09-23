@@ -34,11 +34,48 @@ public class UploadController {
      * @return 上传结果
      */
     @RequestMapping(value = "/avatar/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
-    public ResponseDo uploadUserPhoto(@RequestBody MultipartFile attach) {
+    public ResponseDo uploadAvatarPhoto(@RequestBody MultipartFile attach) {
         LOG.info("uploadAvatarPhoto attach size: {}", attach.getSize());
 
         try {
-            return service.uploadUserPhoto(attach);
+            return service.uploadAvatarPhoto(attach);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse("上传文件失败");
+        }
+    }
+
+    /**
+     * 上传个人图像，用于个人图像认证
+     *
+     * @param attach 图像附件
+     * @return 返回上传结果
+     */
+    @RequestMapping(value = "/user/{userId}/photo/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
+    public ResponseDo uploadPersonalPhoto(@RequestBody MultipartFile attach, @PathVariable("userId") String userId, @RequestParam("token") String token) {
+        LOG.info("upload user personal photo, attach size:{}", attach.getSize());
+        try {
+            return service.uploadPersonalPhoto(attach, userId, token);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 行驶证上传
+     *
+     * @param userId 用户ID
+     * @param token  用户会话Token
+     * @return 返回结果对象
+     */
+    @RequestMapping(value = "/user/{userId}/drivingLicense/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
+    public ResponseDo uploadDrivingLicensePhoto(@PathVariable(value = "userId") String userId,
+                                                @RequestParam("token") String token, @RequestBody MultipartFile attach) {
+        LOG.info("uploadDrivingLicensePhoto attach size: {}", attach.getSize());
+
+        try {
+            return service.uploadDrivingLicensePhoto(userId, attach, token);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse("上传文件失败");
@@ -52,18 +89,19 @@ public class UploadController {
      * @param token  用户会话Token
      * @return 返回结果对象
      */
-    @RequestMapping(value = "/user/{userId}/drivingLicense/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
-    public ResponseDo uploadLicensePhoto(@PathVariable(value = "userId") String userId,
-                                         @RequestParam("token") String token, @RequestBody MultipartFile attach) {
-        LOG.info("uploadLicensePhoto attach size: {}", attach.getSize());
+    @RequestMapping(value = "/user/{userId}/driverLicense/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
+    public ResponseDo uploadDriverLicensePhoto(@PathVariable(value = "userId") String userId,
+                                               @RequestParam("token") String token, @RequestBody MultipartFile attach) {
+        LOG.info("uploadDrivingLicensePhoto attach size: {}", attach.getSize());
 
         try {
-            return service.uploadLicensePhoto(userId, attach, token);
+            return service.uploadDriverLicensePhoto(userId, attach, token);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse("上传文件失败");
         }
     }
+
 
     /**
      * 活动图片上传
@@ -85,7 +123,7 @@ public class UploadController {
     }
 
     /**
-     * 2.39 相册图片上传
+     * 相册图片上传
      *
      * @param userId  用户ID
      * @param attach  上传的附件
@@ -106,7 +144,7 @@ public class UploadController {
     }
 
     /**
-     * 2.43 上传意见反馈图片
+     * 上传意见反馈图片
      *
      * @param attach  图片资源文件
      * @param request 请求信息
@@ -124,7 +162,7 @@ public class UploadController {
     }
 
     /**
-     * 2.37 更改头像
+     * 更改头像
      *
      * @param userId 用户ID
      * @param token  用户会话Token
@@ -142,4 +180,6 @@ public class UploadController {
             return ResponseDo.buildFailureResponse("上传文件失败");
         }
     }
+
+
 }

@@ -33,7 +33,7 @@ public class PhoneController {
 	private PhoneService service;
 
 	/**
-	 * 2.1 获取注册验证码
+	 * 获取注册验证码
 	 * 
 	 * @param phone
 	 *            手机号
@@ -55,12 +55,10 @@ public class PhoneController {
 	}
 
 	/**
-	 * 2.2 验证码校验
+	 * 验证码校验
 	 * 
 	 * @param phone
 	 *            手机号
-	 * @param request
-	 *            请求体信息
 	 * @return 返回验证结果信息
 	 */
 	@RequestMapping(value = "/phone/{phone}/verification", method = RequestMethod.POST, headers = {

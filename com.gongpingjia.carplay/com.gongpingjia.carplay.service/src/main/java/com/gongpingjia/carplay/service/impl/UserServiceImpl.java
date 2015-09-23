@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -121,7 +120,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (!StringUtils.isEmpty(user.getPhoto())) {
-            user.setPhoto(MessageFormat.format(Constants.PhotoKey.USER_KEY, user.getPhoto()));
+            user.setPhoto(MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, user.getPhoto()));
             // 判断图片是否存在
             if (!localFileManager.isExist(user.getPhoto())) {
                 LOG.warn("photo not exist");
