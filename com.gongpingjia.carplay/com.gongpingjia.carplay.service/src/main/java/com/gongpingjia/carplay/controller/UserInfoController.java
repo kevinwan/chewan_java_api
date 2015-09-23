@@ -85,4 +85,32 @@ public class UserInfoController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    /**
+     * 忘记密码
+     *
+     * @param json 参数列表
+     * @return 忘记密码结果
+     */
+    @RequestMapping(value = "/user/password", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo forgetPassword(@RequestBody JSONObject json) {
+
+        LOG.debug("forgetPassword is called, request parameter produce:");
+
+        try {
+            if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code", "password"))) {
+                throw new ApiException("输入参数有误");
+            }
+
+            User user = new User();
+            user.setPhone(json.getString("phone"));
+            user.setPassword(json.getString("password"));
+
+            return userService.forgetPassword(user, json.getString("code"));
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }
