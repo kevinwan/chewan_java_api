@@ -4,6 +4,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.user.SnsInfo;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 public class UserInfoController {
@@ -44,18 +47,11 @@ public class UserInfoController {
             }
 
             User user = new User();
-
             user.setPhone(json.getString("phone"));
             user.setNickname(json.getString("nickname"));
             user.setGender(json.getString("gender"));
             user.setBirthday(json.getLong("birthday"));
-
-            Address address = new Address();
-            address.setProvince(json.getString("province"));
-            address.setCity(json.getString("city"));
-            address.setDistrict(json.getString("district"));
-            user.setAddress(address);
-            user.setPhoto(json.getString("photo"));
+            user.setAvatar(json.getString("avatar"));
 
             userService.checkRegisterParameters(user, json);
 

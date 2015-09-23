@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -67,19 +68,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseDo register(User user) throws ApiException {
         LOG.debug("Save register data begin");
-        String userId = user.getUserId();
 
-        UserToken userToken = new UserToken();
-        userToken.setUserId(userId);
-        userToken.setToken(CodeGenerator.generatorId());
-        userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
-        userTokenDao.save(userToken);
-
-        Album userAlbum = new Album();
-        userAlbum.setAlbumId(CodeGenerator.generatorId());
-        userAlbum.setUserId(userId);
-        userAlbum.setCreateTime(DateUtil.getTime());
-        albumDao.save(userAlbum);
+        // 注册用户
+        userDao.save(user);
 
         // 注册环信用户
         LOG.debug("Register emchat user by call remote service");
@@ -89,23 +80,36 @@ public class UserServiceImpl implements UserService {
 
         JSONObject result = chatThirdService.registerChatUser(chatCommonService.getChatToken(), chatUser);
         if (result.isEmpty()) {
+            //创建环信用户失败，需要回滚数据库
+            userDao.deleteById(user.getUserId());
             LOG.warn("Create emchat user failure");
             throw new ApiException("未能成功创建环信用户");
         }
 
-        user.setEmchatName(chatCommonService.getUsernameByUserid(user.getUserId()));
-        // 注册用户
-        userDao.save(user);
+        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())),
+                Update.update("emchatName", chatCommonService.getUsernameByUserid(user.getUserId())));
+
+        UserToken userToken = new UserToken();
+        userToken.setUserId(user.getUserId());
+        userToken.setToken(CodeGenerator.generatorId());
+        userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
+        userTokenDao.save(userToken);
+
+        Album userAlbum = new Album();
+        userAlbum.setAlbumId(CodeGenerator.generatorId());
+        userAlbum.setUserId(user.getUserId());
+        userAlbum.setCreateTime(DateUtil.getTime());
+        albumDao.save(userAlbum);
 
         cacheManager.setUserToken(userToken);
 
         Map<String, Object> data = new HashMap<String, Object>(2, 1);
-        data.put("userId", userId);
+        data.put("userId", user.getUserId());
         data.put("token", userToken.getToken());
-        if (StringUtils.isEmpty(user.getPhoto())) {
+        if (StringUtils.isEmpty(user.getAvatar())) {
             data.put("avatar", "");
         } else {
-            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getPhoto());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         }
 
         return ResponseDo.buildSuccessResponse(data);
@@ -170,20 +174,15 @@ public class UserServiceImpl implements UserService {
     public void checkRegisterParameters(User user, JSONObject json) throws ApiException {
         LOG.debug("Begin check input parameters of register");
 
-        // 验证参数
-        if (StringUtils.isEmpty(user.getUserId())) {
-            LOG.debug("User register has not upload photo");
-            user.setUserId(CodeGenerator.generatorId());
-        }
-
-        if (!StringUtils.isEmpty(user.getPhoto())) {
-            user.setPhoto(MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, user.getPhoto()));
+        if (!StringUtils.isEmpty(user.getAvatar())) {
+            user.setAvatar(MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, user.getAvatar()));
             // 判断图片是否存在
-            if (!localFileManager.isExist(user.getPhoto())) {
-                LOG.warn("photo not exist");
-                throw new ApiException("图像未上传");
+            if (!localFileManager.isExist(user.getAvatar())) {
+                LOG.warn("avatar not exist");
+                throw new ApiException("头像未上传");
             }
         }
+
         boolean phoneRegister = isPhoneRegister(json);
         boolean snsRegister = isSnsRegister(json);
 
@@ -289,17 +288,20 @@ public class UserServiceImpl implements UserService {
             String uid = json.getString("snsUid");
             LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
             SnsInfo snsInfo = new SnsInfo();
-            if (Constants.Channel.WECHAT.equals(snsChannel) || Constants.Channel.QQ.equals(snsChannel) || Constants.Channel.SINA_WEIBO.equals(snsChannel)) {
-                snsInfo.setUid(uid);
-                snsInfo.setChannel(snsChannel);
-                //三方注册，未完成
-            }
+            snsInfo.setUid(uid);
+            snsInfo.setChannel(snsChannel);
+
             // 设置第三方登录密码
             StringBuilder builder = new StringBuilder();
             builder.append(uid);
             builder.append(snsChannel);
             builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
+
             user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
+
+            if (!StringUtils.isEmpty(json.getString("snsUserName"))) {
+                user.setNickname(json.getString("snsUserName"));
+            }
         } else {
             user.setPhone(json.getString("phone"));
             user.setPassword(json.getString("password"));
