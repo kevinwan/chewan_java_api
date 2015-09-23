@@ -142,14 +142,15 @@ public class UserServiceImpl implements UserService {
         data.put("userId", userData.getUserId());
         data.put("photoAuthStatus", userData.getPhotoAuthStatus());
         data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
+        data.put("nickname", userData.getNickname());
 
         // 获取用户授权信息
         data.put("token", getUserToken(userData.getUserId()));
 
         if (StringUtils.isEmpty(userData.getPhoto())) {
-            data.put("photo", "");
+            data.put("avatar", "");
         } else {
-            data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
         }
 
         // 查询用户车辆信息
@@ -158,12 +159,12 @@ public class UserServiceImpl implements UserService {
             data.put("brand", car.getBrand());
             data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
             data.put("model", car.getModel());
-            data.put("seatNumber", car.getSeat());
+            data.put("photoCount", car.getSeat());
         } else {
             data.put("brand", "");
             data.put("brandLogo", "");
             data.put("model", "");
-            data.put("seatNumber", "");
+            data.put("photoCount", "");
         }
 
         return ResponseDo.buildSuccessResponse(data);
@@ -196,6 +197,46 @@ public class UserServiceImpl implements UserService {
 
         refreshUserBySnsRegister(user, snsRegister, json);
     }
+
+
+    @Override
+    public ResponseDo forgetPassword(User user, String code) throws ApiException {
+        LOG.debug("Begin reset password by forget password");
+
+        // 验证参数
+        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+            LOG.warn("invalid params");
+            throw new ApiException("输入参数有误");
+        }
+
+        // 验证验证码
+        checker.checkPhoneVerifyCode(user.getPhone(), code);
+
+        // 查询用户注册信息
+        List<User> users = userDao.find(Query.query(Criteria.where("phone").is(user.getPhone())));
+        if (users.isEmpty()) {
+            LOG.warn("Fail to find user");
+            throw new ApiException("用户不存在");
+        }
+        // 跟新密码
+        User upUser = users.get(0);
+        upUser.setPassword(user.getPassword());
+
+        LOG.debug("Begin reset emchat account password by forget password");
+        // 更新环信用户的密码
+        chatThirdService.alterUserPassword(chatCommonService.getChatToken(), upUser.getEmchatName(),
+                upUser.getPassword());
+
+        userDao.update(upUser.getUserId(), upUser);
+
+        Map<String, Object> data = new HashMap<String, Object>(2, 1);
+        // 获取用户授权信息
+        data.put("userId", upUser.getUserId());
+        data.put("token", getUserToken(upUser.getUserId()));
+
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
 
     /**
      * 判断是否为手机注册
