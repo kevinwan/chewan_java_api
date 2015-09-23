@@ -3,6 +3,8 @@ package com.gongpingjia.carplay.entity.activity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -35,6 +37,7 @@ public class Activity {
     //活动创建地
     private Address establish;
     //活动创建地经纬度
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Landmark estabPoint;
 
     //存放userID的列表信息
@@ -42,6 +45,8 @@ public class Activity {
 
     //对接大众点评活动businessID
     private String businessId;
+
+    private Long createTime;
 
     public String getActivityId() {
         return activityId;
@@ -154,6 +159,14 @@ public class Activity {
 
     public void setBusinessId(String businessId) {
         this.businessId = businessId;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 
     @Override
