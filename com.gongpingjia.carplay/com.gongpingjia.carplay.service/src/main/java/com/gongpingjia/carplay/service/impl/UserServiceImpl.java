@@ -142,14 +142,15 @@ public class UserServiceImpl implements UserService {
         data.put("userId", userData.getUserId());
         data.put("photoAuthStatus", userData.getPhotoAuthStatus());
         data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
+        data.put("nickname",userData.getNickname());
 
         // 获取用户授权信息
         data.put("token", getUserToken(userData.getUserId()));
 
         if (StringUtils.isEmpty(userData.getPhoto())) {
-            data.put("photo", "");
+            data.put("avatar", "");
         } else {
-            data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
         }
 
         // 查询用户车辆信息
@@ -158,12 +159,12 @@ public class UserServiceImpl implements UserService {
             data.put("brand", car.getBrand());
             data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
             data.put("model", car.getModel());
-            data.put("seatNumber", car.getSeat());
+            data.put("photoCount", car.getSeat());
         } else {
             data.put("brand", "");
             data.put("brandLogo", "");
             data.put("model", "");
-            data.put("seatNumber", "");
+            data.put("photoCount", "");
         }
 
         return ResponseDo.buildSuccessResponse(data);
