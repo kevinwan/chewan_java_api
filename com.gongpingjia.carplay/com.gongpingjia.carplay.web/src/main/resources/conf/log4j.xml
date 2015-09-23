@@ -45,25 +45,25 @@
 
 	<!--通过<category></category>的定义可以将各个包中的类日志输出到不同的日志文件中 -->
 	<category name="com.gongpingjia.carplay">
-		<priority value="debug" />
-		<appender-ref ref="logFile" />
-		<appender-ref ref="console" />
-	</category>
-
-	<category name="org.springframework">
 		<priority value="DEBUG" />
 		<appender-ref ref="logFile" />
 		<appender-ref ref="console" />
 	</category>
 
+	<category name="org.springframework">
+		<priority value="ERROR" />
+		<appender-ref ref="logFile" />
+		<appender-ref ref="console" />
+	</category>
+
 	<category name="org.mybatis.spring">
-		<priority value="error" />
+		<priority value="ERROR" />
 		<appender-ref ref="logFile" />
 		<appender-ref ref="console" />
 	</category>
 
 	<category name="org.apache.ibatis">
-		<priority value="error" />
+		<priority value="ERROR" />
 		<appender-ref ref="logFile" />
 		<appender-ref ref="console" />
 	</category>

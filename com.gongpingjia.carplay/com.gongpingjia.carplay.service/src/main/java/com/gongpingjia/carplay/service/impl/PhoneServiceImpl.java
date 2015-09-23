@@ -35,8 +35,8 @@ public class PhoneServiceImpl implements PhoneService {
     @Autowired
     private PhoneVerificationDao phoneVerificationDao;
 
-//    @Autowired
-//    private ParameterChecker checker;
+    @Autowired
+    private ParameterChecker checker;
 
     @Override
     public ResponseDo sendVerification(String phone, Integer type) throws ApiException {
@@ -122,7 +122,7 @@ public class PhoneServiceImpl implements PhoneService {
             }
         }
 
-        //checker.checkPhoneVerifyCode(phone, code);
+        checker.checkPhoneVerifyCode(phone, code);
 
         return ResponseDo.buildSuccessResponse();
     }

@@ -179,33 +179,4 @@ public class ParameterChecker {
             throw new ApiException("该验证码已过期，请重新获取验证码");
         }
     }
-
-
-    /**
-     * 验证手机号和验证码是否匹配
-     *
-     * @param phone
-     *            手机号
-     * @param code
-     *            验证码
-     * @throws ApiException
-     *             不匹配抛出异常
-     */
-    public void checkPhoneVerifyCode(String phone, String code) throws ApiException {
-        PhoneVerification phoneVerify = phoneDao.selectByPrimaryKey(phone);
-        if (phoneVerify == null) {
-            LOG.warn("Phone number is not exist in the phone verification table");
-            throw new ApiException("未能获取该手机的验证码");
-        }
-
-        if (!code.equals(phoneVerify.getCode())) {
-            LOG.warn("Phone verify code is not corrected");
-            throw new ApiException("验证码有误");
-        }
-
-        if (phoneVerify.getExpire() < DateUtil.getTime()) {
-            LOG.warn("Phone verify code is expired, please re acquisition");
-            throw new ApiException("该验证码已过期，请重新获取验证码");
-        }
-    }
 }
