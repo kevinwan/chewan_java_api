@@ -130,7 +130,7 @@ public class CacheManager {
         EmchatToken token = cacheService.get(CacheUtil.CacheName.EMCHAT_TOKEN, EmchatToken.class);
 
         if (token == null) {
-            token = emchatTokenDao.findOne(new HashMap<String, Object>(0));
+            token = emchatTokenDao.findOne(null);
         }
 
         return token;

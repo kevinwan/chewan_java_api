@@ -25,7 +25,7 @@ public class ActivityController {
     @RequestMapping(value = "/activity/register", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     @ResponseBody
-    public ResponseDo registerActivity(@RequestParam(value = "userId") String userId, @RequestParam(value = "token") String token, @Validated @RequestParam Activity activity) {
+    public ResponseDo registerActivity(@RequestParam(value = "userId") String userId, @RequestParam(value = "token") String token, @RequestBody Activity activity) {
         LOG.debug("activity/register begin");
         try {
             return activityService.activityRegister(userId, token, activity);

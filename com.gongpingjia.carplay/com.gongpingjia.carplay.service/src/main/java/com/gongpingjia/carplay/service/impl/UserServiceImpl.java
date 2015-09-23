@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -209,10 +211,8 @@ public class UserServiceImpl implements UserService {
             checker.checkPhoneVerifyCode(phone, json.getString("code"));
 
             // 判断用户是否注册过
-            Map<String, Object> param = new HashMap<String, Object>(1);
-            param.put("phone", phone);
-            List<User> users = userDao.find(param);
-            if (users.size() > 0) {
+            User user = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+            if (user != null) {
                 LOG.warn("Phone already registed");
                 throw new ApiException("该手机号已注册");
             }
