@@ -26,8 +26,15 @@ public interface ActivityService {
     public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException;
 
 
+    /**
+     * 获取周边的活动列表
+     */
     public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request) throws ApiException;
 
 
+    /**
+     * 获取周边的活动列表 初始化查询参数
+     * transMap 定义了get/post过来的字段 变成 mongodb查选字段的 转换规则；
+     */
     public Query initQuery(HttpServletRequest request, Map<String, String> transMap);
 }

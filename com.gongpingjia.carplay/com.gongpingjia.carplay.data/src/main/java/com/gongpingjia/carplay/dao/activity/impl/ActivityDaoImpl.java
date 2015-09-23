@@ -20,14 +20,4 @@ import java.util.List;
 @Repository("activityDao")
 public class ActivityDaoImpl extends BaseDaoImpl<Activity,String> implements ActivityDao {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Override
-    public List<Activity> getActivityListNear(Landmark landmark, Date nowTime) {
-        Date maxTime = new Date(nowTime.getTime() - Activity.MAX_EXPIRE_TIME);
-        mongoTemplate.geoNear(NearQuery.near(landmark.getLatitude(), landmark.getLongitude()), Activity.class);
-        mongoTemplate.getCollection("activity").find();
-        return null;
-    }
 }

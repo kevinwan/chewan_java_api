@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/9/21.
  */
-public interface ActivityDao extends BaseDao<Activity,String> {
+public interface ActivityDao extends BaseDao<Activity, String> {
 
-    public List<Activity> getActivityListNear(Landmark landmark, Date nowTime);
 }

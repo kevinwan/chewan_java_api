@@ -16,6 +16,8 @@ public class ActivityWeight implements Comparable<ActivityWeight> {
 
     public static final long MAX_PUB_TIME = 1000000;
 
+    public static final double DEFAULT_MAX_DISTANCE = 1234;
+
     private Activity activity;
 
     //车主认证；
