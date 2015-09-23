@@ -210,4 +210,18 @@ public class Constants {
         public static final String GBK = "GBK";
 
     }
+
+    /**
+     * 认证状态
+     */
+    public interface AuthStatus {
+
+        String UNAUTHORIZED = "未认证";
+
+        String AUTHORIZING = "认证中";
+
+        String REJECT = "认证未通过";
+
+        String ACCEPT = "认证通过";
+    }
 }
