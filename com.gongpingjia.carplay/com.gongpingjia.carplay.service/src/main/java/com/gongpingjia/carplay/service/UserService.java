@@ -54,4 +54,13 @@ public interface UserService {
     @Transactional(rollbackFor = Exception.class)
     ResponseDo forgetPassword(User user, String code) throws ApiException;
 
+    /**
+     * 驾驶证，行驶证认证申请
+     *
+     * @param json   入参
+     * @param token  会话token
+     * @param userId 用户Id
+     * @return 返回申请结果
+     */
+    ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException;
 }

@@ -237,6 +237,39 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(data);
     }
 
+    @Override
+    public ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException {
+        LOG.debug("Begin apply license authentication");
+
+        checker.checkUserInfo(userId, token);
+
+        User user = userDao.findById(userId);
+        if (user == null) {
+            LOG.warn("User not exist, userId:{}", userId);
+            return ResponseDo.buildFailureResponse("用户不存在");
+        }
+        if (!Constants.AuthStatus.UNAUTHORIZED.equals(user.getLicenseAuthStatus())) {
+            LOG.warn("User already authenticated");
+            return ResponseDo.buildFailureResponse("用户已认证，请勿重复认证");
+        }
+
+        String drivingLicense = MessageFormat.format(Constants.PhotoKey.DRIVING_LICENSE_KEY, json.getString("drivingLicense"));
+        // 判断图片是否存在
+        if (!localFileManager.isExist(drivingLicense)) {
+            LOG.warn("drivingLicense photo not Exist");
+            return ResponseDo.buildFailureResponse("行驶证图片未上传");
+        }
+
+        String driverLicense = MessageFormat.format(Constants.PhotoKey.DRIVER_LICENSE_KEY, json.getString("driverLicense"));
+        // 判断图片是否存在
+        if (!localFileManager.isExist(driverLicense)) {
+            LOG.warn("driverLicense photo not Exist");
+            return ResponseDo.buildFailureResponse("驾驶证图片未上传");
+        }
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
 
     /**
      * 判断是否为手机注册
