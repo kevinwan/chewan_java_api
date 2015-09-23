@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import sun.util.calendar.CalendarDate;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
@@ -143,6 +144,10 @@ public class UserServiceImpl implements UserService {
         data.put("photoAuthStatus", userData.getPhotoAuthStatus());
         data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
         data.put("nickname", userData.getNickname());
+        data.put("gender", userData.getGender());
+        data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(userData.getBirthday()).getYear());
+        data.put("drivingYears", userData.getDrivingYears());
+        data.put("photo", userData.getPhoto());
 
         // 获取用户授权信息
         data.put("token", getUserToken(userData.getUserId()));
@@ -153,19 +158,21 @@ public class UserServiceImpl implements UserService {
             data.put("avatar", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
         }
 
+        Map<String, Object> carMap = new HashMap<String, Object>(1, 1);
         // 查询用户车辆信息
         Car car = userData.getCar();
         if (null != car) {
-            data.put("brand", car.getBrand());
-            data.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
-            data.put("model", car.getModel());
-            data.put("photoCount", car.getSeat());
+            carMap.put("brand", car.getBrand());
+            carMap.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+            carMap.put("model", car.getModel());
+            carMap.put("photoCount", car.getSeat());
         } else {
-            data.put("brand", "");
-            data.put("brandLogo", "");
-            data.put("model", "");
-            data.put("photoCount", "");
+            carMap.put("brand", "");
+            carMap.put("brandLogo", "");
+            carMap.put("model", "");
+            carMap.put("photoCount", "");
         }
+        data.put("car", carMap);
 
         return ResponseDo.buildSuccessResponse(data);
     }
