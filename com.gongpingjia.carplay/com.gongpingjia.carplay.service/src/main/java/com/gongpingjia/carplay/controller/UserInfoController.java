@@ -1,27 +1,22 @@
 package com.gongpingjia.carplay.controller;
 
-import java.util.*;
-
+import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.common.util.DateUtil;
-import com.gongpingjia.carplay.common.util.TypeConverUtil;
-import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.entity.common.Address;
-import com.gongpingjia.carplay.service.UserService;
+
+import java.util.Arrays;
 
 @RestController
 public class UserInfoController {
@@ -52,7 +47,7 @@ public class UserInfoController {
             user.setPhone(json.getString("phone"));
             user.setNickname(json.getString("nickname"));
             user.setGender(json.getString("gender"));
-            user.setBirthday(new Date(json.getJSONObject("birthday").getLong("time")));
+            user.setBirthday(json.getLong("birthday"));
 
             address.setProvince(json.getString("province"));
             address.setCity(json.getString("city"));

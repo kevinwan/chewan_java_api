@@ -19,7 +19,7 @@ public class Subscriber {
 
     private String toUser;
 
-    private Date subscribeTime;
+    private Long subscribeTime;
 
     public String getId() {
         return id;
@@ -45,11 +45,11 @@ public class Subscriber {
         this.toUser = toUser;
     }
 
-    public Date getSubscribeTime() {
+    public Long getSubscribeTime() {
         return subscribeTime;
     }
 
-    public void setSubscribeTime(Date subscribeTime) {
+    public void setSubscribeTime(Long subscribeTime) {
         this.subscribeTime = subscribeTime;
     }
 

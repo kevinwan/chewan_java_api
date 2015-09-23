@@ -3,8 +3,6 @@ package com.gongpingjia.carplay.entity.user;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/21.
  */
@@ -18,7 +16,7 @@ public class EmchatToken {
 
     private String token;
 
-    private Date expire;
+    private Long expire;
 
     public String getId() {
         return id;
@@ -44,11 +42,11 @@ public class EmchatToken {
         this.token = token;
     }
 
-    public Date getExpire() {
+    public Long getExpire() {
         return expire;
     }
 
-    public void setExpire(Date expire) {
+    public void setExpire(Long expire) {
         this.expire = expire;
     }
 

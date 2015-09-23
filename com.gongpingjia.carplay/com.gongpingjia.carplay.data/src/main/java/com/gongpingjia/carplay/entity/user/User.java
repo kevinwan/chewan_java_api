@@ -6,7 +6,6 @@ import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,9 +23,9 @@ public class User {
     //个人头像,avatar.jpg
     private String avatar;
     private String gender;
-    private Date birthday;
+    private Long birthday;
     private String photo;
-    private Date registerTime;
+    private Long registerTime;
     private String role;
     private boolean invalid;
 
@@ -123,13 +122,6 @@ public class User {
         this.gender = gender;
     }
 
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
 
     public String getPhoto() {
         return photo;
@@ -163,11 +155,19 @@ public class User {
         this.driverLicense = driverLicense;
     }
 
-    public Date getRegisterTime() {
+    public Long getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Long birthday) {
+        this.birthday = birthday;
+    }
+
+    public Long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Date registerTime) {
+    public void setRegisterTime(Long registerTime) {
         this.registerTime = registerTime;
     }
 

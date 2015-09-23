@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
         Album userAlbum = new Album();
         userAlbum.setAlbumId(CodeGenerator.generatorId());
         userAlbum.setUserId(userId);
-        userAlbum.setCreateTime(DateUtil.getDate());
+        userAlbum.setCreateTime(DateUtil.getTime());
         albumDao.save(userAlbum);
 
         // 注册环信用户
@@ -313,7 +314,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 如果过期 跟新Token
-        if (userToken.getExpire().getTime() > DateUtil.getTime()) {
+        if (userToken.getExpire() > DateUtil.getTime()) {
             return userToken.getToken();
         }
 

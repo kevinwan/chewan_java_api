@@ -24,7 +24,7 @@ public class Message {
 
     private boolean checked;
 
-    private Date createTime;
+    private Long createTime;
 
     public String getId() {
         return id;
@@ -74,11 +74,11 @@ public class Message {
         this.checked = checked;
     }
 
-    public Date getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 

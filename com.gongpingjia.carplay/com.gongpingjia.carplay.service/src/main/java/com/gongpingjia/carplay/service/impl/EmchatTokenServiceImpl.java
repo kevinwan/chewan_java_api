@@ -37,7 +37,7 @@ public class EmchatTokenServiceImpl implements EmchatTokenService {
         LOG.debug("Query chat Token from cache server");
         EmchatToken token = cacheService.get(CacheUtil.CacheName.EMCHAT_TOKEN, EmchatToken.class);
         if (token != null) {
-            if (token.getExpire().getTime() > DateUtil.getTime()) {
+            if (token.getExpire() > DateUtil.getTime()) {
                 // 如果token时间大于当前时间表示没有过期，直接返回
                 return token.getToken();
             }
@@ -48,7 +48,7 @@ public class EmchatTokenServiceImpl implements EmchatTokenService {
         EmchatToken refresh = new EmchatToken();
         refresh.setApplication(json.getString("application"));
         // 注意 聊天服务器返回的时间单位为：秒
-        refresh.setExpire(new Date(DateUtil.getTime() + json.getLong("expires_in") * 1000));
+        refresh.setExpire(DateUtil.getTime() + json.getLong("expires_in") * 1000);
         refresh.setToken(json.getString("access_token"));
         if (token == null) {
             emchatTokenDao.save(refresh);

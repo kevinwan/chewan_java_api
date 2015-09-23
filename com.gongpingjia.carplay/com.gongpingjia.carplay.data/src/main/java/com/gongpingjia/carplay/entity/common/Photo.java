@@ -1,7 +1,5 @@
 package com.gongpingjia.carplay.entity.common;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/19.
  * 用户上传的个人图片
@@ -11,7 +9,7 @@ public class Photo {
     private String id;
     //photoUrl
     private String url;
-    private Date uploadTime;
+    private Long uploadTime;
 
     public String getId() {
         return id;
@@ -29,11 +27,11 @@ public class Photo {
         this.url = url;
     }
 
-    public Date getUploadTime() {
+    public Long getUploadTime() {
         return uploadTime;
     }
 
-    public void setUploadTime(Date uploadTime) {
+    public void setUploadTime(Long uploadTime) {
         this.uploadTime = uploadTime;
     }
 }

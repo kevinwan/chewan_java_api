@@ -19,7 +19,7 @@ public class AuthenticationHistory {
 
     private String remark;
 
-    private Date authDate;
+    private Long authTime;
 
     public String getId() {
         return id;
@@ -53,12 +53,12 @@ public class AuthenticationHistory {
         this.remark = remark;
     }
 
-    public Date getAuthDate() {
-        return authDate;
+    public Long getAuthTime() {
+        return authTime;
     }
 
-    public void setAuthDate(Date authDate) {
-        this.authDate = authDate;
+    public void setAuthTime(Long authTime) {
+        this.authTime = authTime;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class AuthenticationHistory {
                 ", applicationId='" + applicationId + '\'' +
                 ", status='" + status + '\'' +
                 ", remark='" + remark + '\'' +
-                ", authDate=" + authDate +
+                ", authTime=" + authTime +
                 '}';
     }
 }

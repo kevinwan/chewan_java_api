@@ -1,18 +1,16 @@
 package com.gongpingjia.carplay.service.impl;
 
-import net.sf.json.JSONObject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.EncoderHandler;
 import com.gongpingjia.carplay.dao.user.EmchatTokenDao;
 import com.gongpingjia.carplay.entity.user.EmchatToken;
+import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ChatCommonService {
@@ -39,7 +37,7 @@ public class ChatCommonService {
         LOG.debug("Query chat Token from cache server");
         EmchatToken token = cacheManager.getEmchatToken();
         if (token != null) {
-            if (token.getExpire().getTime() > DateUtil.getTime()) {
+            if (token.getExpire() > DateUtil.getTime()) {
                 // 如果token时间大于当前时间表示没有过期，直接返回
                 return token.getToken();
             }
@@ -51,7 +49,7 @@ public class ChatCommonService {
         EmchatToken refresh = new EmchatToken();
         refresh.setApplication(json.getString("application"));
         // 注意 聊天服务器返回的时间单位为：秒
-        refresh.setExpire(DateUtil.getDate(DateUtil.getTime() + json.getLong("expires_in") * 1000));
+        refresh.setExpire(DateUtil.getTime() + json.getLong("expires_in") * 1000);
         refresh.setToken(json.getString("access_token"));
         if (token == null) {
             emchatTokenDao.save(refresh);

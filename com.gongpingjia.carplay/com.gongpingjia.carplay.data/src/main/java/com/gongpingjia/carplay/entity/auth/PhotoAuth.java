@@ -3,8 +3,6 @@ package com.gongpingjia.carplay.entity.auth;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/22.
  * 用户图像认证
@@ -22,9 +20,9 @@ public class PhotoAuth {
      */
     private String status;
 
-    private Date applyTime;
+    private Long applyTime;
 
-    private Date authTime;
+    private Long authTime;
 
     public String getId() {
         return id;
@@ -50,19 +48,19 @@ public class PhotoAuth {
         this.status = status;
     }
 
-    public Date getApplyTime() {
+    public Long getApplyTime() {
         return applyTime;
     }
 
-    public void setApplyTime(Date applyTime) {
+    public void setApplyTime(Long applyTime) {
         this.applyTime = applyTime;
     }
 
-    public Date getAuthTime() {
+    public Long getAuthTime() {
         return authTime;
     }
 
-    public void setAuthTime(Date authTime) {
+    public void setAuthTime(Long authTime) {
         this.authTime = authTime;
     }
 }

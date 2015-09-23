@@ -5,7 +5,6 @@ import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,8 +27,8 @@ public class Activity {
     private Landmark destPoint;
 
     private boolean transfer;
-    private Date start;
-    private Date end;
+    private Long start;
+    private Long end;
 
     private String emchatGroupId;
 
@@ -92,19 +91,19 @@ public class Activity {
         this.transfer = transfer;
     }
 
-    public Date getStart() {
+    public Long getStart() {
         return start;
     }
 
-    public void setStart(Date start) {
+    public void setStart(Long start) {
         this.start = start;
     }
 
-    public Date getEnd() {
+    public Long getEnd() {
         return end;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Long end) {
         this.end = end;
     }
 

@@ -3,8 +3,6 @@ package com.gongpingjia.carplay.entity.history;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/21.
  * 相册查看历史
@@ -19,7 +17,7 @@ public class AlbumViewHistory {
     //userId
     private String viewUser;
 
-    private Date viewTime;
+    private Long viewTime;
 
     public String getId() {
         return id;
@@ -45,11 +43,11 @@ public class AlbumViewHistory {
         this.viewUser = viewUser;
     }
 
-    public Date getViewTime() {
+    public Long getViewTime() {
         return viewTime;
     }
 
-    public void setViewTime(Date viewTime) {
+    public void setViewTime(Long viewTime) {
         this.viewTime = viewTime;
     }
 

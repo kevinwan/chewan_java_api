@@ -14,8 +14,8 @@ public class DrivingLicense {
     private String model;
     private String vehicleNumber;
     private String engineNumber;
-    private Date registerTime;
-    private Date issueTime;
+    private Long registerTime;
+    private Long issueTime;
 
     public String getName() {
         return name;
@@ -73,22 +73,21 @@ public class DrivingLicense {
         this.engineNumber = engineNumber;
     }
 
-    public Date getRegisterTime() {
+    public Long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Date registerTime) {
+    public void setRegisterTime(Long registerTime) {
         this.registerTime = registerTime;
     }
 
-    public Date getIssueTime() {
+    public Long getIssueTime() {
         return issueTime;
     }
 
-    public void setIssueTime(Date issueTime) {
+    public void setIssueTime(Long issueTime) {
         this.issueTime = issueTime;
     }
-
 
     @Override
     public String toString() {

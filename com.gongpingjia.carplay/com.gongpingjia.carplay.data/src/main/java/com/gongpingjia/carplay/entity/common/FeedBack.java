@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.entity.common;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class FeedBack {
 
     private String content;
 
-    private Date createTime;
+    private Long createTime;
 
     public String getId() {
         return id;
@@ -55,11 +54,11 @@ public class FeedBack {
         this.content = content;
     }
 
-    public Date getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 

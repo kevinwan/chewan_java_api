@@ -1,19 +1,5 @@
 package com.gongpingjia.carplay.service.impl;
 
-import java.util.*;
-
-import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
-import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.entity.user.PhoneVerification;
-import com.gongpingjia.carplay.entity.user.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
-
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.phone.MessageService;
@@ -21,8 +7,21 @@ import com.gongpingjia.carplay.common.util.CodeGenerator;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
-
+import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
+import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.user.PhoneVerification;
+import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.PhoneService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class PhoneServiceImpl implements PhoneService {
@@ -89,7 +88,7 @@ public class PhoneServiceImpl implements PhoneService {
 
     private void refreshPhoneVerification(PhoneVerification phoneVerification) {
         Calendar calModify = Calendar.getInstance();
-        calModify.setTime(phoneVerification.getModifyTime());
+        calModify.setTime(new Date(phoneVerification.getModifyTime()));
 
         Calendar calCurrent = Calendar.getInstance();
         calCurrent.setTime(DateUtil.getDate());
@@ -102,7 +101,7 @@ public class PhoneServiceImpl implements PhoneService {
             // 不是同一天
             phoneVerification.setSendTimes(1);
         }
-        phoneVerification.setModifyTime(DateUtil.getDate());
+        phoneVerification.setModifyTime(DateUtil.getTime());
         phoneVerificationDao.update(phoneVerification.getId(), phoneVerification);
     }
 
@@ -154,19 +153,19 @@ public class PhoneServiceImpl implements PhoneService {
             phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
                     PropertiesUtil.getProperty("message.effective.seconds", 7200)));
             phoneVerify.setSendTimes(0);
-            phoneVerify.setModifyTime(DateUtil.getDate());
+            phoneVerify.setModifyTime(DateUtil.getTime());
 
             phoneVerificationDao.save(phoneVerify);
         } else {
             // 已经存在验证码
-            if (DateUtil.getDate().after(phoneVerify.getExpire())) {
+            if (DateUtil.getTime() > phoneVerify.getExpire()) {
                 LOG.debug("Exist phone verifyCode is out of date");
                 phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
                 phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
                         PropertiesUtil.getProperty("message.effective.seconds", 7200)));
                 //过期了需要设置次数
                 phoneVerify.setSendTimes(0);
-                phoneVerify.setModifyTime(DateUtil.getDate());
+                phoneVerify.setModifyTime(DateUtil.getTime());
 
                 phoneVerificationDao.update(phoneVerify.getId(), phoneVerify);
             }

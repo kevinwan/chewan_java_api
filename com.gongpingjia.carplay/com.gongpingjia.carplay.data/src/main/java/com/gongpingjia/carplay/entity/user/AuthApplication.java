@@ -3,8 +3,6 @@ package com.gongpingjia.carplay.entity.user;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/22.
  */
@@ -19,9 +17,9 @@ public class AuthApplication {
 
     private String status;
 
-    private Date applyTime;
+    private Long applyTime;
 
-    private Date authTime;
+    private Long authTime;
 
     public String getApplicationId() {
         return applicationId;
@@ -55,19 +53,19 @@ public class AuthApplication {
         this.status = status;
     }
 
-    public Date getApplyTime() {
+    public Long getApplyTime() {
         return applyTime;
     }
 
-    public void setApplyTime(Date applyTime) {
+    public void setApplyTime(Long applyTime) {
         this.applyTime = applyTime;
     }
 
-    public Date getAuthTime() {
+    public Long getAuthTime() {
         return authTime;
     }
 
-    public void setAuthTime(Date authTime) {
+    public void setAuthTime(Long authTime) {
         this.authTime = authTime;
     }
 }

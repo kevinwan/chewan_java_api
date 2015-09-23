@@ -4,8 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/21.
  */
@@ -20,11 +18,11 @@ public class PhoneVerification {
 
     private String code;
 
-    private Date expire;
+    private Long expire;
 
     private Integer sendTimes;
 
-    private Date modifyTime;
+    private Long modifyTime;
 
     public String getId() {
         return id;
@@ -50,11 +48,11 @@ public class PhoneVerification {
         this.code = code;
     }
 
-    public Date getExpire() {
+    public Long getExpire() {
         return expire;
     }
 
-    public void setExpire(Date expire) {
+    public void setExpire(Long expire) {
         this.expire = expire;
     }
 
@@ -66,11 +64,11 @@ public class PhoneVerification {
         this.sendTimes = sendTimes;
     }
 
-    public Date getModifyTime() {
+    public Long getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
+    public void setModifyTime(Long modifyTime) {
         this.modifyTime = modifyTime;
     }
 

@@ -3,8 +3,6 @@ package com.gongpingjia.carplay.entity.activity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/22.
  * 约会申请
@@ -21,7 +19,7 @@ public class Appointment {
 
     private String invitedUserId;
 
-    private Date createTime;
+    private Long createTime;
 
     private boolean acceptInvited;
 
@@ -59,12 +57,12 @@ public class Appointment {
         this.invitedUserId = invitedUserId;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public Long getCreateTime() {
+        return createTime;
     }
 
     public boolean isAcceptInvited() {

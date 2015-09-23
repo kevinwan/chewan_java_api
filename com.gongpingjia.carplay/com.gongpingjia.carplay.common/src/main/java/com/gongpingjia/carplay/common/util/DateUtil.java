@@ -60,11 +60,11 @@ public class DateUtil {
 	 *            需要加、或者减的时间数
 	 * @return 返回计算后的时间的毫秒数
 	 */
-	public static Date addTime(Date date, int type, int param) {
+	public static Long addTime(Date date, int type, int param) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(type, param);
-		return calendar.getTime();
+		return calendar.getTimeInMillis();
 	}
 
 	/**

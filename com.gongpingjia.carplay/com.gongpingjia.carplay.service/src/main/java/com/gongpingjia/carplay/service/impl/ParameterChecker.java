@@ -58,7 +58,7 @@ public class ParameterChecker {
             throw new ApiException("输入参数有误");
         }
 
-        if (userToken.getExpire().getTime() < DateUtil.getTime()) {
+        if (userToken.getExpire() < DateUtil.getTime()) {
             LOG.error("User token is out of date, userId: {}", userId);
             throw new ApiException("口令已过期，请重新登录获取新口令");
         }
@@ -174,7 +174,7 @@ public class ParameterChecker {
             throw new ApiException("验证码有误");
         }
 
-        if (phoneVerify.getExpire().getTime() < DateUtil.getTime()) {
+        if (phoneVerify.getExpire() < DateUtil.getTime()) {
             LOG.warn("Phone verify code is expired, please re acquisition");
             throw new ApiException("该验证码已过期，请重新获取验证码");
         }

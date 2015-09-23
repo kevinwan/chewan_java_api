@@ -19,7 +19,7 @@ public class Album {
 
     private String userId;
     private String coverUrl;
-    private Date createTime;
+    private Long createTime;
 
     private List<Photo> photos;
 
@@ -47,11 +47,11 @@ public class Album {
         this.coverUrl = coverUrl;
     }
 
-    public Date getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 
