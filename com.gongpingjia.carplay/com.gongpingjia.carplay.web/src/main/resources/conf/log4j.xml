@@ -36,8 +36,6 @@
 		<param name="File" value="log/log4j_debug.log" />
 		<param name="encoding" value="UTF-8" />
 		<param name="Append" value="true" />
-		<param name="MaxFileSize" value="5MB" />
-		<param name="MaxBackupIndex" value="10" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{yyy-MM-dd HH:mm:ss,SSS} %p %c(%l) -- %m%n" />
 		</layout>

@@ -106,8 +106,7 @@ public class UploadController {
     /**
      * 活动图片上传
      *
-     * @param attach  图片资源文件
-     * @param request 请求参数
+     * @param attach 图片资源文件
      * @return 返回上传结果
      */
     @RequestMapping(value = "/activity/cover/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
@@ -125,9 +124,8 @@ public class UploadController {
     /**
      * 相册图片上传
      *
-     * @param userId  用户ID
-     * @param attach  上传的附件
-     * @param request 请求参数
+     * @param userId 用户ID
+     * @param attach 上传的附件
      * @return 返回响应结果信息
      */
     @RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
@@ -146,8 +144,7 @@ public class UploadController {
     /**
      * 上传意见反馈图片
      *
-     * @param attach  图片资源文件
-     * @param request 请求信息
+     * @param attach 图片资源文件
      * @return 返回上传结果信息
      */
     @RequestMapping(value = "/feedback/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
