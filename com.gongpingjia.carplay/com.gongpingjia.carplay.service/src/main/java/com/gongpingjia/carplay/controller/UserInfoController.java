@@ -44,7 +44,7 @@ public class UserInfoController {
         LOG.debug("register is called, request parameter produce:");
         try {
             // 检查必须参数是否为空
-            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthDay"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthday"))) {
                 throw new ApiException("输入参数错误");
             }
             User user = new User();
@@ -53,7 +53,7 @@ public class UserInfoController {
             user.setUserId(json.getString("photo"));
             user.setNickname(json.getString("nickname"));
             user.setGender(json.getString("gender"));
-            user.setBirthday(new Date(json.getJSONObject("birthDay").getLong("time")));
+            user.setBirthday(new Date(json.getJSONObject("birthday").getLong("time")));
 
             address.setProvince(json.getString("province"));
             address.setCity(json.getString("city"));
