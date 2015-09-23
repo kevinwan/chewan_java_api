@@ -43,7 +43,11 @@ public class User {
 
     //用户车辆信息,驾龄
     private Integer drivingYears;
-    private String licensePhoto;
+
+    //驾驶证PhotoUrl
+    private String driverLicense;
+    //行驶证PhotoUrl
+    private String drivingLicense;
     private String licenseAuthStatus;
     private DrivingLicense license;
 
@@ -143,14 +147,21 @@ public class User {
         this.drivingYears = drivingYears;
     }
 
-    public String getLicensePhoto() {
-        return licensePhoto;
+    public String getDrivingLicense() {
+        return drivingLicense;
     }
 
-    public void setLicensePhoto(String licensePhoto) {
-        this.licensePhoto = licensePhoto;
+    public void setDrivingLicense(String drivingLicense) {
+        this.drivingLicense = drivingLicense;
     }
 
+    public String getDriverLicense() {
+        return driverLicense;
+    }
+
+    public void setDriverLicense(String driverLicense) {
+        this.driverLicense = driverLicense;
+    }
 
     public Date getRegisterTime() {
         return registerTime;
