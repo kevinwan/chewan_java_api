@@ -21,7 +21,6 @@ public interface UserService {
      * @return
      * @throws ApiException
      */
-    @Transactional(rollbackFor = Exception.class)
     ResponseDo register(User user) throws ApiException;
 
 
@@ -32,7 +31,6 @@ public interface UserService {
      * @return
      * @throws ApiException
      */
-    @Transactional(rollbackFor = Exception.class)
     ResponseDo loginUser(User user) throws ApiException;
 
 
