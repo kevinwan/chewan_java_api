@@ -66,12 +66,10 @@ public class User {
      */
     private String channel;
 
-    private List<Photo> photographs;
-
     /**
-     * 用户相册信息，相册ID列表
+     * 用户只有一个相册，存放多张相片
      */
-    private List<String> userAlbum;
+    private List<Photo> album;
 
     public Address getAddress() {
         return address;
@@ -210,14 +208,6 @@ public class User {
         this.idCardAuthorized = idCardAuthorized;
     }
 
-    public List<String> getUserAlbum() {
-        return userAlbum;
-    }
-
-    public void setUserAlbum(List<String> userAlbum) {
-        this.userAlbum = userAlbum;
-    }
-
     public DrivingLicense getLicense() {
         return license;
     }
@@ -282,11 +272,11 @@ public class User {
         this.channel = channel;
     }
 
-    public List<Photo> getPhotographs() {
-        return photographs;
+    public List<Photo> getAlbum() {
+        return album;
     }
 
-    public void setPhotographs(List<Photo> photographs) {
-        this.photographs = photographs;
+    public void setAlbum(List<Photo> album) {
+        this.album = album;
     }
 }

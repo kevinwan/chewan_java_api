@@ -21,7 +21,7 @@ public class Appointment {
 
     private Long createTime;
 
-    private boolean acceptInvited;
+    private String acceptStatus;
 
     private String remark;
 
@@ -65,12 +65,12 @@ public class Appointment {
         return createTime;
     }
 
-    public boolean isAcceptInvited() {
-        return acceptInvited;
+    public String getAcceptStatus() {
+        return acceptStatus;
     }
 
-    public void setAcceptInvited(boolean acceptInvited) {
-        this.acceptInvited = acceptInvited;
+    public void setAcceptStatus(String acceptStatus) {
+        this.acceptStatus = acceptStatus;
     }
 
     public String getRemark() {

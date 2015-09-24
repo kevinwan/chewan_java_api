@@ -3,13 +3,11 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
-import com.gongpingjia.carplay.common.util.CodeGenerator;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.common.util.PropertiesUtil;
-import com.gongpingjia.carplay.dao.user.AlbumDao;
+import com.gongpingjia.carplay.common.util.*;
+import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
-import com.gongpingjia.carplay.entity.user.Album;
+import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UploadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +49,8 @@ public class UploadServiceImpl implements UploadService {
     @Autowired
     private UserTokenDao tokenDao;
 
-    /**
-     * 相册Dao
-     */
     @Autowired
-    private AlbumDao albumDao;
+    private UserDao userDao;
 
     /**
      * 对存放在本地文件的操
@@ -200,28 +197,24 @@ public class UploadServiceImpl implements UploadService {
 
         LOG.debug("check user album exist or not");
         // 2.查数据库信息
-        List<Album> userAlbumList = albumDao.find(Query.query(Criteria.where("userId").is(userId)));
-        if (userAlbumList.isEmpty()) {
-            LOG.warn("get userAlbum by userId return empty result");
-            throw new ApiException("获取相册失败");
-        }
-
-        Album album = userAlbumList.get(0);
-
-        LOG.debug("check photos in album is over max count or not");
-        int photosCount = album.getPhotos().size();
-        int maxCount = PropertiesUtil.getProperty("user.album.photo.max.count", 9);
-        if (photosCount >= maxCount) {
-            LOG.error("Photos in album size is {}, nearly over max count{}", photosCount, maxCount);
-            throw new ApiException(MessageFormat.format("相册图片数不能超过{0}张", maxCount));
-        }
+        User user = userDao.findById(userId);
 
         LOG.debug("transfer photo file into byte array and upload photo to server");
         // 3.上传个人相册图片
         byte[] data = buildFileBytes(multiFile);
         String photoId = CodeGenerator.generatorId();
         String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photoId);
-        return uploadThirdServer(data, photoId, key, true);
+
+        ResponseDo response = uploadThirdServer(data, photoId, key, true);
+
+        if (response.success()) {
+            Update update = new Update();
+            update.addToSet("album", new Photo(key, DateUtil.getTime()));
+
+            userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
+        }
+
+        return response;
     }
 
     @Override

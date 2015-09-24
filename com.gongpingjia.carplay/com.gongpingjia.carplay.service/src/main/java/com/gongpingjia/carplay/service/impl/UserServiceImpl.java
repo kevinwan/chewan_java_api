@@ -5,11 +5,9 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
-import com.gongpingjia.carplay.dao.user.AlbumDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.common.Car;
-import com.gongpingjia.carplay.entity.user.Album;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
@@ -25,7 +23,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import sun.util.calendar.CalendarDate;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -50,9 +47,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserTokenDao userTokenDao;
-
-    @Autowired
-    private AlbumDao albumDao;
 
     @Autowired
     private ChatCommonService chatCommonService;
@@ -93,12 +87,6 @@ public class UserServiceImpl implements UserService {
         userToken.setToken(CodeGenerator.generatorId());
         userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
         userTokenDao.save(userToken);
-
-        Album userAlbum = new Album();
-        userAlbum.setAlbumId(CodeGenerator.generatorId());
-        userAlbum.setUserId(user.getUserId());
-        userAlbum.setCreateTime(DateUtil.getTime());
-        albumDao.save(userAlbum);
 
         cacheManager.setUserToken(userToken);
 
@@ -142,7 +130,6 @@ public class UserServiceImpl implements UserService {
         data.put("token", getUserToken(userData.getUserId()));
         data.put("nickname", userData.getNickname());
         data.put("gender", userData.getGender());
-
 
         data.put("age", getAgeByBirthday(userData.getBirthday()));
         data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
