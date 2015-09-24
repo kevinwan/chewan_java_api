@@ -25,6 +25,8 @@ public class Appointment {
 
     private String remark;
 
+    private Long modifyTime;
+
     public String getAppointmentId() {
         return appointmentId;
     }
@@ -79,5 +81,13 @@ public class Appointment {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getModifyTime() {
+        return modifyTime;
+    }
+
+    public void setModifyTime(Long modifyTime) {
+        this.modifyTime = modifyTime;
     }
 }
