@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.entity.user;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -59,7 +60,13 @@ public class User {
     /**
      * 用户第三方登录信息
      */
-    private List<SnsInfo> snsInfos;
+    private String uid;
+    /**
+     * 第三方登录渠道:qq/wechat/sinaWeibo
+     */
+    private String channel;
+
+    private List<Photo> photographs;
 
     /**
      * 用户相册信息，相册ID列表
@@ -203,14 +210,6 @@ public class User {
         this.idCardAuthorized = idCardAuthorized;
     }
 
-    public List<SnsInfo> getSnsInfos() {
-        return snsInfos;
-    }
-
-    public void setSnsInfos(List<SnsInfo> snsInfos) {
-        this.snsInfos = snsInfos;
-    }
-
     public List<String> getUserAlbum() {
         return userAlbum;
     }
@@ -265,5 +264,29 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public List<Photo> getPhotographs() {
+        return photographs;
+    }
+
+    public void setPhotographs(List<Photo> photographs) {
+        this.photographs = photographs;
     }
 }

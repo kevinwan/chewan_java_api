@@ -10,7 +10,6 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.Album;
-import com.gongpingjia.carplay.entity.user.SnsInfo;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
@@ -27,7 +26,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import sun.util.calendar.CalendarDate;
-import sun.util.resources.cldr.aa.CalendarData_aa_ER;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -146,7 +144,7 @@ public class UserServiceImpl implements UserService {
         data.put("gender", userData.getGender());
 
 
-        data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(userData.getBirthday()).getYear());
+        data.put("age", getAgeByBirthday(userData.getBirthday()));
         data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         data.put("photoAuthStatus", userData.getPhotoAuthStatus());
         data.put("drivingYears", userData.getDrivingYears());
@@ -277,7 +275,7 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> data = new HashMap<String, Object>(9, 1);
             data.put("userId", user.getUserId());
             data.put("gender", user.getGender());
-            data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(user.getBirthday()).getYear());
+            data.put("age", getAgeByBirthday(user.getBirthday()));
             data.put("token", getUserToken(user.getUserId()));
             data.put("nickname", user.getNickname());
             data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
@@ -460,10 +458,9 @@ public class UserServiceImpl implements UserService {
             // SNS注册 刷新用户信息
             String snsChannel = json.getString("channel");
             String uid = json.getString("uid");
-            LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
-            SnsInfo snsInfo = new SnsInfo();
-            snsInfo.setUid(uid);
-            snsInfo.setChannel(snsChannel);
+            LOG.debug("Register user by sns way, channel:{}", snsChannel);
+            user.setUid(uid);
+            user.setChannel(snsChannel);
 
             // 设置第三方登录密码
             StringBuilder builder = new StringBuilder();
@@ -506,11 +503,11 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * @param  Birthday 生日
-     *
-     * 计算年龄
-     * */
-    public int getAgeByBirthday(Long Birthday){
+     * @param Birthday 生日
+     *                 <p/>
+     *                 计算年龄
+     */
+    public int getAgeByBirthday(Long Birthday) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(DateUtil.getTime());
         Calendar userCal = Calendar.getInstance();
