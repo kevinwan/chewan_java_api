@@ -21,11 +21,19 @@ public class AuthenticationController {
 
     private AunthenticationService service;
 
+    /**
+     * 车主认证申请
+     *
+     * @param userId 申请人Id
+     * @param token  会话token
+     * @param json   请求接收对象
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/license/authentication", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo licenseAuthenticationApply(@PathVariable(value = "userId") String userId,
                                                  @RequestParam(value = "token") String token, @RequestBody JSONObject json) {
-        LOG.debug("licenseAuthenticationApply is called, request parameter produce:");
+        LOG.debug("licenseAuthenticationApply is called, request parameter produce:{}", json);
 
         if (CommonUtil.isEmpty(json, Arrays.asList("brand", "model", "driverLicense", "drivingLicense"))) {
             return ResponseDo.buildFailureResponse("输入参数有误");
@@ -33,6 +41,24 @@ public class AuthenticationController {
 
         try {
             return service.licenseAuthenticationApply(json, token, userId);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping(value = "/user/{userId}/photo/authentication", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo photoAuthenticationApply(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                               @RequestBody JSONObject json) {
+        LOG.debug("licenseAuthenticationApply is called, request parameter produce:{}", json);
+        if (CommonUtil.isEmpty(json, "photoId")) {
+            return ResponseDo.buildFailureResponse("输入参数有误");
+        }
+
+        try {
+            return service.photoAuthenticationApply(userId, token, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
@@ -55,32 +56,49 @@ public class AunthenticationServiceImpl implements AunthenticationService {
 
         checker.checkUserInfo(userId, token);
 
+        if (!CommonUtil.isUUID(json.getString("drivingLicense")) || !CommonUtil.isUUID(json.getString("driverLicense"))) {
+            LOG.warn("Input parameter drivingLicense or driverLicense is not uuid");
+            throw new ApiException("输入参数有误");
+        }
+
         User user = userDao.findById(userId);
         if (user == null) {
             LOG.warn("User not exist, userId:{}", userId);
-            return ResponseDo.buildFailureResponse("用户不存在");
+            throw new ApiException("用户不存在");
         }
         if (!Constants.AuthStatus.UNAUTHORIZED.equals(user.getLicenseAuthStatus())) {
             LOG.warn("User already authenticated");
-            return ResponseDo.buildFailureResponse("用户已认证，请勿重复认证");
+            throw new ApiException("用户已认证，请勿重复认证");
         }
 
-        String drivingLicense = MessageFormat.format(Constants.PhotoKey.DRIVING_LICENSE_KEY, json.getString("drivingLicense"));
+        String drivingLicenseKey = MessageFormat.format(Constants.PhotoKey.DRIVING_LICENSE_KEY, json.getString("drivingLicense"));
         // 判断图片是否存在
-        if (!localFileManager.isExist(drivingLicense)) {
+        if (!localFileManager.isExist(drivingLicenseKey)) {
             LOG.warn("drivingLicense photo not Exist");
-            return ResponseDo.buildFailureResponse("行驶证图片未上传");
+            throw new ApiException("行驶证图片未上传");
         }
 
-        String driverLicense = MessageFormat.format(Constants.PhotoKey.DRIVER_LICENSE_KEY, json.getString("driverLicense"));
+        String driverLicenseKey = MessageFormat.format(Constants.PhotoKey.DRIVER_LICENSE_KEY, json.getString("driverLicense"));
         // 判断图片是否存在
-        if (!localFileManager.isExist(driverLicense)) {
+        if (!localFileManager.isExist(driverLicenseKey)) {
             LOG.warn("driverLicense photo not Exist");
-            return ResponseDo.buildFailureResponse("驾驶证图片未上传");
+            throw new ApiException("驾驶证图片未上传");
         }
 
         LOG.debug("record application information");
         Long current = DateUtil.getTime();
+
+        Update update = new Update();
+        update.set("driverLicense", driverLicenseKey);
+        update.set("drivingLicense", drivingLicenseKey);
+        update.set("licenseAuthStatus", Constants.AuthStatus.AUTHORIZING);
+
+        Car car = new Car();
+        car.setBrand(json.getString("brand"));
+        car.setModel(json.getString("model"));
+        update.set("car", car);
+
+        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
 
         AuthApplication application = new AuthApplication();
         application.setApplyTime(current);
@@ -96,16 +114,47 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         history.setRemark("车主认证申请");
         historyDao.save(history);
 
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo photoAuthenticationApply(String userId, String token, JSONObject json) throws ApiException {
+        LOG.debug("Begin photo authentication apply check params");
+
+        checker.checkUserInfo(userId, token);
+
+        if (!CommonUtil.isUUID(json.getString("photoId"))) {
+            LOG.warn("Input parameter photoId is not uuid");
+            throw new ApiException("输入参数有误");
+        }
+
+        String photoKey = MessageFormat.format(Constants.PhotoKey.PHOTO_KEY, json.getString("photoId"));
+        if (!localFileManager.isExist(photoKey)) {
+            LOG.warn("user photo not Exist");
+            throw new ApiException("个人图像未上传");
+        }
+
+        LOG.debug("Begin save data");
+        Long current = DateUtil.getTime();
+
         Update update = new Update();
-        update.set("driverLicense", driverLicense);
-        update.set("drivingLicense", drivingLicense);
+        update.set("photo", photoKey);
+        update.set("photoAuthStatus", Constants.AuthStatus.AUTHORIZING);
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
 
-        Car car = new Car();
-        car.setBrand(json.getString("brand"));
-        car.setModel(json.getString("model"));
-        update.set("car", car);
+        AuthApplication application = new AuthApplication();
+        application.setApplyTime(current);
+        application.setStatus(Constants.AuthStatus.AUTHORIZING);
+        application.setType(Constants.AuthType.PHOTO_AUTH);
+        application.setUserId(userId);
+        authApplicationDao.save(application);
 
-        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
+        AuthenticationHistory history = new AuthenticationHistory();
+        history.setApplicationId(application.getApplicationId());
+        history.setStatus(application.getStatus());
+        history.setAuthTime(current);
+        history.setRemark("个人图像认证申请");
+        historyDao.save(history);
 
         return ResponseDo.buildSuccessResponse();
     }

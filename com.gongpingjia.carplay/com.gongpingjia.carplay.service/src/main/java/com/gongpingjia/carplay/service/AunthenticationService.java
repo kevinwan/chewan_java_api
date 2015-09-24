@@ -19,4 +19,13 @@ public interface AunthenticationService {
      */
     ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException;
 
+    /**
+     * 图像认证申请
+     *
+     * @param userId 用户Id
+     * @param token  用户会话token
+     * @param json   请求参数
+     * @return 返回认证申请结果
+     */
+    ResponseDo photoAuthenticationApply(String userId, String token, JSONObject json) throws ApiException;
 }

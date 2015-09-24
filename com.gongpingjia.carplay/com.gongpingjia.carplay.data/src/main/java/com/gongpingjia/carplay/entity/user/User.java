@@ -24,13 +24,13 @@ public class User {
     private String avatar;
     private String gender;
     private Long birthday;
-    private String photo;
     private Long registerTime;
     private String role;
     private boolean invalid;
+    private String phone;
 
     //图像认证图片,photo.jpg
-    private String phone;
+    private String photo;
     private String photoAuthStatus;
 
     //注意环信约束
