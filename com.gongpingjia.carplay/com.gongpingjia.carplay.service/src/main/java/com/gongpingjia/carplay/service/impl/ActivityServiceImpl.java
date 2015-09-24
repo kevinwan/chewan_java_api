@@ -55,6 +55,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
+        activity.setUserId(userId);
         List<String> memberIds = new ArrayList<String>(1);
         memberIds.add(userId);
         activity.setMembers(memberIds);
@@ -66,7 +67,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
-        Activity activity = activityDao.findById(userId);
+        Activity activity = activityDao.findById(activityId);
         return ResponseDo.buildSuccessResponse(activity);
     }
 
@@ -74,12 +75,11 @@ public class ActivityServiceImpl implements ActivityService {
      * 基础参数转换规则；例如 province 需要转换成 destAddress.province 进行查询
      *
      * @param transParams
-     * @param request
-     * step 1: 将基础转换参数 转换成查询参数；
-     * step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
-     * step 3： 查询出基础Activity List
-     * step 4：对技术list 中的activity进行 权重计算 以及排序；
-     * step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
+     * @param request     step 1: 将基础转换参数 转换成查询参数；
+     *                    step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
+     *                    step 3： 查询出基础Activity List
+     *                    step 4：对技术list 中的activity进行 权重计算 以及排序；
+     *                    step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
      */
     @Override
     public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request) throws ApiException {
@@ -123,11 +123,11 @@ public class ActivityServiceImpl implements ActivityService {
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(query);
         //TODO
-       /**
-        *  对所有的基础条件活动进行权重打分，并且排序
-        * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
-        * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
-        */
+        /**
+         *  对所有的基础条件活动进行权重打分，并且排序
+         * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
+         * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
+         */
         List<Activity> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
         return ResponseDo.buildSuccessResponse(rltList);
     }

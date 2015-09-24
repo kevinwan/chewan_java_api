@@ -15,22 +15,22 @@
 		ignore-unresolvable="true" />
 	<!-- For real -->
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-		<property name="maxTotal" value="${redis.pool.maxTotal}" />
-		<property name="maxIdle" value="${redis.pool.maxIdle}" />
-		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
-		<property name="testOnBorrow" value="${redis.pool.testOnBorrow}" />
-		<property name="testOnReturn" value="${redis.pool.testOnReturn}" />
+		<property name="maxTotal" value="1024" />
+		<property name="maxIdle" value="200" />
+		<property name="maxWaitMillis" value="1000" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
 	</bean>
 
 	<bean id="masterRedisServerNode" class="redis.clients.jedis.JedisShardInfo">
-		<constructor-arg index="0" value="${redis.server.ip}" />
-		<constructor-arg index="1" value="${redis.server.port}"
+		<constructor-arg index="0" value="101.200.176.177" />
+		<constructor-arg index="1" value="6379"
 			type="int" />
-		<constructor-arg index="2" value="${redis.server.name}" />
+		<constructor-arg index="2" value="ServerNode" />
 
-		<property name="password" value="${redis.server.password}" />
-		<property name="soTimeout" value="${redis.server.soTimeout}" />
-		<property name="connectionTimeout" value="${redis.server.connectionTimeout}" />
+		<property name="password" value="CarPlay@gongpingjia.com" />
+		<property name="soTimeout" value="2000" />
+		<property name="connectionTimeout" value="60000" />
 	</bean>
 
 	<bean id="shardedJedis" class="redis.clients.jedis.ShardedJedis"
@@ -50,14 +50,14 @@
 				<ref bean="masterRedisServerNode" />
 
 				<bean id="slaveNode" class="redis.clients.jedis.JedisShardInfo">
-					<constructor-arg index="0" value="${redis.slave.ip}" />
-					<constructor-arg index="1" value="${redis.slave.port}"
+					<constructor-arg index="0" value="101.200.176.177" />
+					<constructor-arg index="1" value="6380"
 						type="int" />
-					<constructor-arg index="2" value="${redis.slave.name}" />
+					<constructor-arg index="2" value="SlaveNode" />
 
-					<property name="password" value="${redis.slave.password}" />
-					<property name="soTimeout" value="${redis.slave.soTimeout}" />
-					<property name="connectionTimeout" value="${redis.slave.connectionTimeout}" />
+					<property name="password" value="CarPlay@gongpingjia.com" />
+					<property name="soTimeout" value="2000" />
+					<property name="connectionTimeout" value="60000" />
 				</bean>
 			</list>
 		</constructor-arg>

@@ -37,7 +37,7 @@ public class Activity {
     //活动创建地
     private Address establish;
     //活动创建地经纬度
-    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+    @GeoSpatialIndexed
     private Landmark estabPoint;
 
     //存放userID的列表信息
