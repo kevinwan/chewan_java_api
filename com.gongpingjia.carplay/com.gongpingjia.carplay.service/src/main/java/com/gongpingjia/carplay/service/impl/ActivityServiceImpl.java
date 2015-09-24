@@ -59,8 +59,11 @@ public class ActivityServiceImpl implements ActivityService {
         List<String> memberIds = new ArrayList<String>(1);
         memberIds.add(userId);
         activity.setMembers(memberIds);
+
         activityDao.save(activity);
+
         createEmchatGroup(activity);
+
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -155,7 +158,7 @@ public class ActivityServiceImpl implements ActivityService {
     private void createEmchatGroup(Activity activity) throws ApiException {
         LOG.debug("Begin create chat group");
         User owner = userDao.findById(activity.getUserId());
-        JSONObject json = chatThirdPartyService.createChatGroup(emchatTokenService.getToken(), activity.getType(), activity.getActivityId(), owner.getNickname(), activity.getMembers());
+        JSONObject json = chatThirdPartyService.createChatGroup(emchatTokenService.getToken(), activity.getType(), activity.getActivityId(), owner.getEmchatName(), null);
         if (json.isEmpty()) {
             LOG.warn("Failed to create chat group");
             throw new ApiException("创建聊天群组失败");
