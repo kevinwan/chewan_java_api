@@ -21,7 +21,7 @@ public class Appointment {
 
     private Long createTime;
 
-    private String acceptStatus;
+    private String status;
 
     private String remark;
 
@@ -65,12 +65,12 @@ public class Appointment {
         return createTime;
     }
 
-    public String getAcceptStatus() {
-        return acceptStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setAcceptStatus(String acceptStatus) {
-        this.acceptStatus = acceptStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getRemark() {
