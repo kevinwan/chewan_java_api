@@ -104,13 +104,14 @@ public class ActivityController {
 
     @RequestMapping(value = "/activity/{activityId}/appointment", method = RequestMethod.POST)
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
-        LOG.debug("activity/ {} /join begin",activityId);
+        LOG.debug("activity/ {} /join begin", activityId);
         try {
             return activityService.sendAppointment(activityId, userId, token);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
-
     }
+
+
 }

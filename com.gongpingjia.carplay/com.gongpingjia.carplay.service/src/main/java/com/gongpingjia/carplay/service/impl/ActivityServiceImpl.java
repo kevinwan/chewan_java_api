@@ -161,23 +161,37 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
-        if (activity==null){
-            LOG.warn("No activity exist : {}",activityId);
+        if (activity == null) {
+            LOG.warn("No activity exist : {}", activityId);
             throw new ApiException("未找到该活动");
         }
+        List<String> members = activity.getMembers();
+        for (String member : members) {
+            if (member.equals(userId)) {
+                LOG.warn("Already be a member");
+                throw new ApiException("已是成员，不能重复申请加入活动");
+            }
+        }
+        Appointment appointment = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("applyUserId").is(userId).and("status").is(Constants.AppointmentStatus.APPLYING)));
+        if (appointment != null) {
+            LOG.warn("already applying for this activity");
+            throw new ApiException("该活动已处于申请中，请勿重复申请");
+        }
 
-        Appointment appointment = new Appointment();
+        appointment = new Appointment();
         appointment.setActivityId(activity.getActivityId());
         appointment.setApplyUserId(userId);
         appointment.setInvitedUserId(activity.getUserId());
         appointment.setCreateTime(DateUtil.getTime());
-        appointment.setAcceptStatus(Constants.AppointmentStatus.APPLYING);
-
+        appointment.setStatus(Constants.AppointmentStatus.APPLYING);
+        appointment.setCreateTime(DateUtil.getTime());
+        appointment.setModifyTime(DateUtil.getTime());
 
         appointmentDao.save(appointment);
 
-        return null;
+        return ResponseDo.buildSuccessResponse();
     }
+
 
     /**
      * 根据活动信息创建聊天群

@@ -40,6 +40,6 @@ public interface ActivityService {
 
     /**
      * 约她，发送约会申请
-     * */
+     */
     public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException;
 }
