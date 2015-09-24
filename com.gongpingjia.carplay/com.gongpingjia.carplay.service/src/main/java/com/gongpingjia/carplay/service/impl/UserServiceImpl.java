@@ -293,6 +293,26 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException {
+        LOG.debug("Begin get user infomation, check input parameters");
+        checker.checkUserInfo(viewUser, token);
+
+        User user = userDao.findById(beViewedUser);
+        if (user == null) {
+            LOG.warn("No user exist by userId:{}", beViewedUser);
+            return ResponseDo.buildFailureResponse("用户不存在");
+        }
+
+        String localPhotoServer = CommonUtil.getLocalPhotoServer();
+        user.setAvatar(localPhotoServer + user.getAvatar());
+        user.setPhoto(localPhotoServer + user.getPhoto());
+        user.setDriverLicense(localPhotoServer + user.getDriverLicense());
+        user.setDrivingLicense(localPhotoServer + user.getDrivingLicense());
+
+        return ResponseDo.buildSuccessResponse(user);
+    }
+
     /**
      * 第三方登录，上传图片到本地服务器
      *
