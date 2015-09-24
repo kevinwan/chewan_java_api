@@ -5,14 +5,17 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
+import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
+import com.mongodb.BasicDBObject;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -20,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -61,6 +65,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AppointmentDao appointmentDao;
+
+    @Autowired
+    private ActivityDao activityDao;
 
 
     @Override
@@ -319,13 +326,57 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    public ResponseDo getAppointment(String userId, String token , String status , Integer limit , Integer ignore) throws ApiException {
+    public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
         checker.checkUserInfo(userId, token);
 
+        List<Appointment> appointments;
 
-        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where()));
+        if (status != null && !status.isEmpty()) {
+            appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId).and("status").is(status))
+                    .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
+        } else {
+            appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
+                    .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
+        }
 
-        return null;
+        List<Map<String, Object>> data = new ArrayList<>();
+
+        for (int i = 0; i < appointments.size(); i++) {
+            Appointment appointment = appointments.get(i);
+            Activity activity = activityDao.findById(appointment.getActivityId());
+            User applicantUser = userDao.findById(appointment.getApplyUserId());
+
+            Map<String, Object> appointmentInfo = new HashMap<>();
+
+            appointmentInfo.put("appointmentId", appointment.getAppointmentId());
+            appointmentInfo.put("activityId", activity.getActivityId());
+            appointmentInfo.put("type", activity.getType());
+            appointmentInfo.put("destination", activity.getDestination());
+            appointmentInfo.put("start", activity.getStart());
+            appointmentInfo.put("pay", activity.getPay());
+            appointmentInfo.put("transfer", activity.isTransfer());
+
+            Map<String, Object> applicant = new HashMap<>(9, 1);
+            applicant.put("userId", applicantUser.getUserId());
+            applicant.put("nickname", applicantUser.getNickname());
+            applicant.put("gender", applicantUser.getGender());
+            applicant.put("age", applicantUser);
+            applicant.put("role", applicantUser.getRole());
+            applicant.put("avatar", applicantUser.getAvatar());
+            applicant.put("drivingYears", applicantUser.getDrivingYears());
+            applicant.put("photoAuthStatus", applicantUser.getPhotoAuthStatus());
+            applicant.put("licenseAuthStatus", applicantUser.getLicenseAuthStatus());
+            Map<String, Object> car = new HashMap<>(2, 1);
+            car.put("logo", applicantUser.getCar().getLogo());
+            car.put("model", applicantUser.getCar().getModel());
+            applicant.put("car", car);
+            appointmentInfo.put("applicant", applicant);
+
+            appointmentInfo.put("status", appointment.getStatus());
+            data.add(appointmentInfo);
+        }
+
+        return ResponseDo.buildSuccessResponse(data);
     }
 
     /**
@@ -526,7 +577,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * @param Birthday 生日
-     *                 <p/>
+     *                 <p>
      *                 计算年龄
      */
     public int getAgeByBirthday(Long Birthday) {

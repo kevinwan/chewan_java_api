@@ -166,7 +166,10 @@ public class UserInfoController {
      * 获取我的约会信息
      */
     @RequestMapping(value = "/user/{userId}/appointment", method = RequestMethod.GET)
-    public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("status") String status, @RequestParam("limit") Integer limit, @RequestParam("ignore") Integer ignore) {
+    public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                     @RequestParam(value = "status", defaultValue = "") String status,
+                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                     @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
         try {
             return userService.getAppointment(userId, token, status, limit, ignore);
