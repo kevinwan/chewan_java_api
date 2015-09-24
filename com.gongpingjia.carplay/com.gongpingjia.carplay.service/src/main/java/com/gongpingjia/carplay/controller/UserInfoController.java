@@ -107,5 +107,50 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 三方登录
+     *
+     * @param uid
+     *            三方登录返回的用户唯一标识
+     * @param channel
+     *            wechat 、qq 或 sinaWeibo
+     * @param sign
+     *            API签名，计算方法为 MD5(uid + channel + BundleID) 其中，BundleID 为
+     *            com.gongpingjia.carplay
+     *
+     * @param username
+     *            三方登录返回的用户昵称
+     * @param url
+     *            三方登录返回的用户头像地址
+     * @return 返回登录结果
+     */
+    @RequestMapping(value = "/sns/login", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json" })
+    public ResponseDo snsLogin(@RequestBody JSONObject json) {
+        LOG.info("snsLogin begin");
+
+        try {
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "sign"))) {
+                throw new ApiException("输入参数有误");
+            }
+
+            String username = null;
+            if (!CommonUtil.isEmpty(json, "username")) {
+                username = json.getString("username");
+            }
+
+            String url = null;
+            if (!CommonUtil.isEmpty(json, "url")) {
+                url = json.getString("url");
+            }
+
+            return userService.snsLogin(json.getString("uid"), json.getString("channel"), json.getString("sign"),
+                    username, url);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
 
 }

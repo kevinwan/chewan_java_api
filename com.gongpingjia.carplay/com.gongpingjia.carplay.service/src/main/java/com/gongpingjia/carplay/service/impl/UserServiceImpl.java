@@ -15,6 +15,8 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import sun.util.calendar.CalendarDate;
+import sun.util.resources.cldr.aa.CalendarData_aa_ER;
 
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -141,21 +141,21 @@ public class UserServiceImpl implements UserService {
         }
 
         data.put("userId", userData.getUserId());
-        data.put("photoAuthStatus", userData.getPhotoAuthStatus());
-        data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
+        data.put("token", getUserToken(userData.getUserId()));
         data.put("nickname", userData.getNickname());
         data.put("gender", userData.getGender());
-        data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(userData.getBirthday()).getYear());
-        data.put("drivingYears", userData.getDrivingYears());
-        data.put("photo", userData.getPhoto());
 
-        // 获取用户授权信息
-        data.put("token", getUserToken(userData.getUserId()));
+
+        data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(userData.getBirthday()).getYear());
+        data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+        data.put("photoAuthStatus", userData.getPhotoAuthStatus());
+        data.put("drivingYears", userData.getDrivingYears());
+        data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
 
         if (StringUtils.isEmpty(userData.getPhoto())) {
-            data.put("avatar", "");
+            data.put("photo", "");
         } else {
-            data.put("avatar", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+            data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
         }
 
         Map<String, Object> carMap = new HashMap<String, Object>(1, 1);
@@ -165,12 +165,12 @@ public class UserServiceImpl implements UserService {
             carMap.put("brand", car.getBrand());
             carMap.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
             carMap.put("model", car.getModel());
-            carMap.put("photoCount", car.getSeat());
+            carMap.put("slug", car.getSlug());
         } else {
             carMap.put("brand", "");
             carMap.put("brandLogo", "");
             carMap.put("model", "");
-            carMap.put("photoCount", "");
+            carMap.put("slug", "");
         }
         data.put("car", carMap);
 
@@ -244,6 +244,132 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(data);
     }
 
+    @Override
+    public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url)
+            throws ApiException {
+        checkSnsLoginParameters(uid, channel, sign);
+
+        LOG.debug("Save data begin");
+        List<User> users = userDao.find(Query.query(Criteria.where("snsInfos.uid").is(uid)));
+
+        if (users.isEmpty()) {
+            // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
+            LOG.debug("No exist user in the system, register new user by client call register interface");
+
+            // 头像ID
+            String avatarId = CodeGenerator.generatorId();
+            String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, avatarId);
+
+            uploadPhotoToServer(url, key);
+
+            Map<String, String> data = new HashMap<String, String>(5, 1);
+            data.put("uid", uid);
+            data.put("nickname", username);
+            data.put("channel", channel);
+            data.put("avatar", avatarId);
+
+            return ResponseDo.buildSuccessResponse(data);
+        } else {
+            // 用户已经存在于系统中
+            LOG.debug("User is exist in the system, return login infor");
+            User user = users.get(0);
+
+            Map<String, Object> data = new HashMap<String, Object>(9, 1);
+            data.put("userId", user.getUserId());
+            data.put("gender", user.getGender());
+            data.put("age", DateUtil.getDate().getYear() - DateUtil.getDate(user.getBirthday()).getYear());
+            data.put("token", getUserToken(user.getUserId()));
+            data.put("nickname", user.getNickname());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+            if (StringUtils.isEmpty(user.getPhoto())) {
+                data.put("photo", "");
+            } else {
+                data.put("photo", CommonUtil.getLocalPhotoServer() + user.getPhoto());
+            }
+            data.put("photoAuthStatus", user.getPhotoAuthStatus());
+            data.put("drivingYears", user.getDrivingYears());
+            data.put("licenseAuthStatus", user.getLicenseAuthStatus());
+
+            Map<String, Object> carMap = new HashMap<String, Object>(4, 1);
+            Car car = user.getCar();
+            if (car != null) {
+                carMap.put("brand", CommonUtil.ifNull(car.getBrand(), ""));
+                carMap.put("logo", CommonUtil.getGPJBrandLogoPrefix() + CommonUtil.ifNull(car.getLogo(), ""));
+                carMap.put("model", CommonUtil.ifNull(car.getModel(), ""));
+                carMap.put("slug", car.getSlug());
+            } else {
+                carMap.put("brand", "");
+                carMap.put("logo", "");
+                carMap.put("model", "");
+                carMap.put("slug", "");
+            }
+            data.put("car", carMap);
+            return ResponseDo.buildSuccessResponse(data);
+        }
+    }
+
+    /**
+     * 第三方登录，上传图片到本地服务器
+     *
+     * @param url 请求URL
+     * @param key 图片 Key值
+     * @throws ApiException 业务异常
+     */
+    private void uploadPhotoToServer(String url, String key) throws ApiException {
+        LOG.debug("Download user photo from internet, url:{}", url);
+        if (StringUtils.isEmpty(url)) {
+            LOG.warn("Failed to obtain user photo from server");
+            throw new ApiException("未能从三方登录获取头像信息");
+        }
+
+        CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
+                0), Constants.Charset.UTF8);
+        if (!HttpClientUtil.isStatusOK(response)) {
+            LOG.warn("Failed to obtain user photo from server");
+            HttpClientUtil.close(response);
+            throw new ApiException("未能从三方登录获取头像信息");
+        }
+
+        byte[] imageBytes = HttpClientUtil.parseResponseGetBytes(response);
+        HttpClientUtil.close(response);
+
+        LOG.debug("Upload photo to photo server");
+        Map<String, String> uploadResult = localFileManager.upload(imageBytes, key, true);
+        if (!Constants.Result.SUCCESS.equals(uploadResult.get("result"))) {
+            // 上传失败了
+            LOG.warn("Failed to upload photo to the server");
+            throw new ApiException("未能成功上传图像");
+        }
+    }
+
+    private void checkSnsLoginParameters(String uid, String channel, String sign) throws ApiException {
+        LOG.debug("Check input parameters");
+
+        if (!Constants.Channel.CHANNEL_LIST.contains(channel)) {
+            // Channel不在范围内
+            LOG.warn("Input channel is not in the list, input channel:{}", channel);
+            throw new ApiException("输入参数有误");
+        }
+
+        if (!isPassSignCheck(uid, channel, sign)) {
+            // 检查sign不通过
+            LOG.warn("Input sign correct");
+            throw new ApiException("输入参数有误");
+        }
+    }
+
+    private boolean isPassSignCheck(String uid, String channel, String sign) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(uid);
+        builder.append(channel);
+        builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
+
+        String pass = EncoderHandler.encodeByMD5(builder.toString());
+        if (pass.equals(sign)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 判断是否为手机注册
@@ -332,8 +458,8 @@ public class UserServiceImpl implements UserService {
     private void refreshUserBySnsRegister(User user, boolean snsRegister, JSONObject json) {
         if (snsRegister) {
             // SNS注册 刷新用户信息
-            String snsChannel = json.getString("snsChannel");
-            String uid = json.getString("snsUid");
+            String snsChannel = json.getString("channel");
+            String uid = json.getString("uid");
             LOG.debug("Register user by sns way, snsChannel:{}", snsChannel);
             SnsInfo snsInfo = new SnsInfo();
             snsInfo.setUid(uid);
@@ -347,8 +473,8 @@ public class UserServiceImpl implements UserService {
 
             user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
 
-            if (!StringUtils.isEmpty(json.getString("snsUserName"))) {
-                user.setNickname(json.getString("snsUserName"));
+            if (!StringUtils.isEmpty(json.getString("nickname"))) {
+                user.setNickname(json.getString("nickname"));
             }
         } else {
             user.setPhone(json.getString("phone"));
@@ -377,5 +503,18 @@ public class UserServiceImpl implements UserService {
         cacheManager.setUserToken(userToken);
 
         return uuid;
+    }
+
+    /**
+     * @param  Birthday 生日
+     *
+     * 计算年龄
+     * */
+    public int getAgeByBirthday(Long Birthday){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtil.getTime());
+        Calendar userCal = Calendar.getInstance();
+        userCal.setTimeInMillis(Birthday);
+        return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
     }
 }
