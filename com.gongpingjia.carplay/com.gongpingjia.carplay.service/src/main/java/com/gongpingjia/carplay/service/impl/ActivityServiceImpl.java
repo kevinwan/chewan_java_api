@@ -3,6 +3,8 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
@@ -169,6 +171,8 @@ public class ActivityServiceImpl implements ActivityService {
         appointment.setApplyUserId(userId);
         appointment.setInvitedUserId(activity.getUserId());
         appointment.setCreateTime(DateUtil.getTime());
+        appointment.setAcceptStatus(Constants.AppointmentStatus.APPLYING);
+
 
         appointmentDao.save(appointment);
 
