@@ -236,4 +236,16 @@ public class Constants {
 
         String ID_CARD_AUTH = "身份证认证";
     }
+
+    /**
+     * 约会状态
+     */
+    public interface AppointmentStatus {
+
+        String ACCEPT = "应邀";
+
+        String REJECT = "拒绝";
+
+        String APPLYING = "申请中";
+    }
 }
