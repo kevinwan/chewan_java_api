@@ -42,8 +42,8 @@ public class ParameterChecker {
      */
     public void checkUserInfo(String userId, String token) throws ApiException {
 
-        if ((!CommonUtil.isUUID(userId)) || (!CommonUtil.isUUID(token))) {
-            LOG.error("userId or token is not correct format UUID string, userId:{}, token:{}", userId, token);
+        if (!CommonUtil.isUUID(token)) {
+            LOG.error("token is not correct format UUID string, token:{}", token);
             throw new ApiException("输入参数有误");
         }
 

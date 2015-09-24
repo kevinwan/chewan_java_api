@@ -17,6 +17,8 @@ public class UserToken {
     private String token;
     private Long expire;
 
+
+
     public String getId() {
         return id;
     }

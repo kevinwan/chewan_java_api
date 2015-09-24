@@ -1,15 +1,11 @@
 package com.gongpingjia.carplay.service;
 
-import java.util.Map;
-
-import net.sf.json.JSONObject;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.user.User;
+import net.sf.json.JSONObject;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public interface UserService {
