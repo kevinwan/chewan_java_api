@@ -102,6 +102,9 @@ public class ActivityController {
         return keyTranMap;
     }
 
+    /**
+     * 约她，发送约会申请
+     */
     @RequestMapping(value = "/activity/{activityId}/appointment", method = RequestMethod.POST)
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/ {} /join begin", activityId);
@@ -112,6 +115,5 @@ public class ActivityController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
-
 
 }

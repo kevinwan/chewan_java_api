@@ -159,6 +159,7 @@ public class UserInfoController {
                                   @RequestParam("viewUser") String viewUser, @RequestParam("token") String token) {
         LOG.info("Begin user:{} infomation", beViewedUser);
 
+
         try {
             return userService.getUserInfo(beViewedUser, viewUser, token);
         } catch (ApiException e) {
@@ -166,4 +167,19 @@ public class UserInfoController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    /**
+     * 获取我的约会信息
+     */
+    @RequestMapping(value = "/user/{userId}/appointment", method = RequestMethod.GET)
+    public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("status") String status, @RequestParam("limit") Integer limit, @RequestParam("ignore") Integer ignore) {
+        LOG.debug("/user/{}/appointment", userId);
+        try {
+            return userService.getAppointment(userId, token, status, limit, ignore);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
 }

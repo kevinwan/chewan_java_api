@@ -5,8 +5,10 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
+import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
@@ -56,6 +58,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private AppointmentDao appointmentDao;
 
 
     @Override
@@ -311,6 +316,16 @@ public class UserServiceImpl implements UserService {
         user.setDrivingLicense(localPhotoServer + user.getDrivingLicense());
 
         return ResponseDo.buildSuccessResponse(user);
+
+    }
+
+    public ResponseDo getAppointment(String userId, String token , String status , Integer limit , Integer ignore) throws ApiException {
+        checker.checkUserInfo(userId, token);
+
+
+        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where()));
+
+        return null;
     }
 
     /**

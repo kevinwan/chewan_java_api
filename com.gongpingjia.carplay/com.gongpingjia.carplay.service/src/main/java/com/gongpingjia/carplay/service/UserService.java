@@ -61,7 +61,7 @@ public interface UserService {
      * @return 返回登录结果
      * @throws ApiException
      */
-    ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
+    public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
 
     /**
      * 查看用户详细信息
@@ -72,4 +72,9 @@ public interface UserService {
      * @return 返回查看结果
      */
     ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException;
+
+    /**
+     * 获取我的约会信息
+     */
+    public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException;
 }
