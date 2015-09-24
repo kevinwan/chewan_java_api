@@ -30,11 +30,12 @@ public class ActivityController {
     /**
      * 注册活动
      * 用户id
-     * @param userId
      *
+     * @param userId
+     * <p>
      * 用户token
      * @param token
-     *
+     * <p>
      * 活动信息对应的json
      * @param activity
      */
@@ -57,14 +58,12 @@ public class ActivityController {
 
     /**
      * 获取活动信息
-     *
+     * <p>
      * 活动主键
+     *
      * @param activityId
-     *
-     * @param  userId
-     *
+     * @param userId
      * @param token
-     *
      */
     @RequestMapping(value = "/activity/${activityId}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
@@ -78,11 +77,11 @@ public class ActivityController {
     }
 
 
-    @RequestMapping(value = "/activity/list",method = RequestMethod.GET)
-    public ResponseDo getNearByActivityList(HttpServletRequest request,@RequestParam("userId")String userId,@RequestParam("token")String token) {
-        LOG.debug("activity/{activityId}/info begin");
+    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
+    public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("activity/{activityId}/list begin");
         try {
-            return activityService.getNearActivityList(initTransParam(request),request);
+            return activityService.getNearActivityList(initTransParam(request), request);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -94,8 +93,8 @@ public class ActivityController {
      */
     private Map<String, String> initTransParam(HttpServletRequest request) {
         Map<String, String> keyTranMap = new HashMap<>();
-        keyTranMap.put("pay","pay");
-        keyTranMap.put("type","type");
+        keyTranMap.put("pay", "pay");
+        keyTranMap.put("type", "type");
         keyTranMap.put("province", "establish.province");
         keyTranMap.put("city", "establish.city");
         keyTranMap.put("district", "establish.district");
@@ -103,4 +102,15 @@ public class ActivityController {
         return keyTranMap;
     }
 
+    @RequestMapping(value = "/activity/{activityId}/appointment", method = RequestMethod.POST)
+    public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("activity/ {} /join begin",activityId);
+        try {
+            return activityService.sendAppointment(activityId, userId, token);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+
+    }
 }

@@ -5,8 +5,10 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
+import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
+import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -21,6 +23,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import sun.rmi.runtime.Log;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -51,6 +54,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private ActivityUtil activityUtil;
+
+    @Autowired
+    private AppointmentDao appointmentDao;
 
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
@@ -147,6 +153,26 @@ public class ActivityServiceImpl implements ActivityService {
         }
         query.addCriteria(criteria);
         return query;
+    }
+
+    @Override
+    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
+        parameterChecker.checkUserInfo(userId, token);
+        Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
+        if (activity==null){
+            LOG.warn("No activity exist : {}",activityId);
+            throw new ApiException("未找到该活动");
+        }
+
+        Appointment appointment = new Appointment();
+        appointment.setActivityId(activity.getActivityId());
+        appointment.setApplyUserId(userId);
+        appointment.setInvitedUserId(activity.getUserId());
+        appointment.setCreateTime(DateUtil.getTime());
+
+        appointmentDao.save(appointment);
+
+        return null;
     }
 
     /**
