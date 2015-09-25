@@ -12,10 +12,8 @@ public class AlbumViewHistory {
     @Id
     private String id;
 
-    private String userId;
-
     //userId
-    private String viewUser;
+    private String viewUserId;
 
     private Long viewTime;
 
@@ -27,20 +25,12 @@ public class AlbumViewHistory {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getViewUserId() {
+        return viewUserId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getViewUser() {
-        return viewUser;
-    }
-
-    public void setViewUser(String viewUser) {
-        this.viewUser = viewUser;
+    public void setViewUserId(String viewUserId) {
+        this.viewUserId = viewUserId;
     }
 
     public Long getViewTime() {
@@ -49,15 +39,5 @@ public class AlbumViewHistory {
 
     public void setViewTime(Long viewTime) {
         this.viewTime = viewTime;
-    }
-
-    @Override
-    public String toString() {
-        return "AlbumViewHistory{" +
-                "id='" + id + '\'' +
-                ", userId='" + userId + '\'' +
-                ", viewUser='" + viewUser + '\'' +
-                ", viewTime=" + viewTime +
-                '}';
     }
 }

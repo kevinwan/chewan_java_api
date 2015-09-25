@@ -116,8 +116,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDo loginUser(User user) throws ApiException {
-
-        Map<String, Object> data = new HashMap<String, Object>(8, 1);
         // 验证参数
         if (!CommonUtil.isPhoneNumber(user.getPhone())) {
             LOG.warn("Invalid params, phone:{}", user.getPhone());
@@ -125,53 +123,38 @@ public class UserServiceImpl implements UserService {
         }
 
         // 查找用户
-
-        List<User> users = userDao.find(Query.query(Criteria.where("phone").is(user.getPhone())));
-        if (users.isEmpty()) {
+        User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
+        if (userData == null) {
             LOG.warn("Fail to find user");
             return ResponseDo.buildFailureResponse("用户不存在，请注册后登录");
         }
 
-        User userData = users.get(0);
         if (!user.getPassword().equals(userData.getPassword())) {
             LOG.warn("User password is incorrect");
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-        data.put("userId", userData.getUserId());
-        data.put("token", getUserToken(userData.getUserId()));
-        data.put("nickname", userData.getNickname());
-        data.put("gender", userData.getGender());
-
-        data.put("age", getAgeByBirthday(userData.getBirthday()));
-        data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-        data.put("photoAuthStatus", userData.getPhotoAuthStatus());
-        data.put("drivingYears", userData.getDrivingYears());
-        data.put("licenseAuthStatus", userData.getLicenseAuthStatus());
+        JSONObject jsonObject = JSONObject.fromObject(userData);
+        jsonObject.put("token", getUserToken(userData.getUserId()));
+        jsonObject.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
 
         if (StringUtils.isEmpty(userData.getPhoto())) {
-            data.put("photo", "");
+            jsonObject.put("photo", "");
         } else {
-            data.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
+            jsonObject.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
         }
 
         Map<String, Object> carMap = new HashMap<String, Object>(1, 1);
         // 查询用户车辆信息
-        Car car = userData.getCar();
-        if (null != car) {
-            carMap.put("brand", car.getBrand());
-            carMap.put("brandLogo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
-            carMap.put("model", car.getModel());
-            carMap.put("slug", car.getSlug());
-        } else {
+        if (userData.getCar() == null) {
             carMap.put("brand", "");
             carMap.put("brandLogo", "");
             carMap.put("model", "");
             carMap.put("slug", "");
         }
-        data.put("car", carMap);
+        jsonObject.put("car", carMap);
 
-        return ResponseDo.buildSuccessResponse(data);
+        return ResponseDo.buildSuccessResponse(jsonObject);
     }
 
 
@@ -538,8 +521,6 @@ public class UserServiceImpl implements UserService {
             String snsChannel = json.getString("channel");
             String uid = json.getString("uid");
             LOG.debug("Register user by sns way, channel:{}", snsChannel);
-            user.setUid(uid);
-            user.setChannel(snsChannel);
 
             // 设置第三方登录密码
             StringBuilder builder = new StringBuilder();
@@ -548,13 +529,6 @@ public class UserServiceImpl implements UserService {
             builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
 
             user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
-
-            if (!StringUtils.isEmpty(json.getString("nickname"))) {
-                user.setNickname(json.getString("nickname"));
-            }
-        } else {
-            user.setPhone(json.getString("phone"));
-            user.setPassword(json.getString("password"));
         }
     }
 
@@ -583,7 +557,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * @param Birthday 生日
-     *                 <p>
+     *                 <p/>
      *                 计算年龄
      */
     public int getAgeByBirthday(Long Birthday) {
