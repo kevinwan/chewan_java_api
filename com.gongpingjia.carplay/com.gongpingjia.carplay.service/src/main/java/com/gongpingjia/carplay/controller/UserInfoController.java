@@ -179,4 +179,17 @@ public class UserInfoController {
         }
     }
 
+
+    @RequestMapping(value = "/user/{userId}/view/history")
+    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("/user/{}/view/history", userId);
+        try {
+            return userService.getViewHistory(userId, token);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+
+    }
+
 }

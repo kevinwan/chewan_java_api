@@ -77,4 +77,10 @@ public interface UserService {
      * 获取我的约会信息
      */
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException;
+
+
+    /**
+     * 获取相册的查看信息；
+     */
+    public ResponseDo getViewHistory(String userId, String token) throws ApiException;
 }

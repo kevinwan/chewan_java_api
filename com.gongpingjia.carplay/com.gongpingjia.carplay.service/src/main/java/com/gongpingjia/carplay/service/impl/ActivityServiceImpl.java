@@ -62,7 +62,7 @@ public class ActivityServiceImpl implements ActivityService {
         memberIds.add(userId);
         activity.setMembers(memberIds);
         activityDao.save(activity);
-//        createEmchatGroup(activity);
+        createEmchatGroup(activity);
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -73,14 +73,15 @@ public class ActivityServiceImpl implements ActivityService {
         User organizer = userDao.findById(activity.getUserId());
         JSONObject jsonObject = JSONObject.fromObject(activity);
         jsonObject.put("organizer", organizer);
-        return ResponseDo.buildSuccessResponse(jsonObject.toString());
+        return ResponseDo.buildSuccessResponse(jsonObject);
     }
 
     /**
      * 基础参数转换规则；例如 province 需要转换成 destAddress.province 进行查询
      *
      * @param transParams
-     * @param request     step 1: 将基础转换参数 转换成查询参数；
+     * @param request     request中需要其他的信息 ；limit ignore 分页信息；longitude latitude 当前的经纬度；maxDistance 最大搜索距离 不是必须的；
+     *                    step 1: 将基础转换参数 转换成查询参数；
      *                    step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
      *                    step 3： 查询出基础Activity List
      *                    step 4：对技术list 中的activity进行 权重计算 以及排序；
@@ -142,11 +143,13 @@ public class ActivityServiceImpl implements ActivityService {
         List<User> userList = userDao.findByIds((String[]) userIds.toArray());
         for (ActivityWeight activityWeight : rltList) {
             JSONObject item = JSONObject.fromObject(activityWeight.getActivity());
+            //初始化活动的组织者信息；
             item.put("organizer", findById(userList, activityWeight.getActivity().getUserId()));
+            //距离信息；
             item.put("distance", activityWeight.getDistance());
             jsonArray.add(item);
         }
-        return ResponseDo.buildSuccessResponse(jsonArray.toString());
+        return ResponseDo.buildSuccessResponse(jsonArray);
     }
 
     @Override
@@ -185,6 +188,11 @@ public class ActivityServiceImpl implements ActivityService {
                 return user;
             }
         }
+        return null;
+    }
+
+    @Override
+    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
         return null;
     }
 }

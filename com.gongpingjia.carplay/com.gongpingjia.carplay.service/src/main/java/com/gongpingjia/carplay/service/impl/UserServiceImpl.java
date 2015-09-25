@@ -587,4 +587,16 @@ public class UserServiceImpl implements UserService {
         userCal.setTimeInMillis(Birthday);
         return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
     }
+
+
+    @Override
+    public ResponseDo getViewHistory(String userId, String token) throws ApiException {
+        checker.checkUserInfo(userId, token);
+
+        //
+
+
+
+        return ResponseDo.buildSuccessResponse();
+    }
 }

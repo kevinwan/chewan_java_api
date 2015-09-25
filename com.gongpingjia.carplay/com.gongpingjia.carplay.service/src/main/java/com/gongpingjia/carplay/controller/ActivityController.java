@@ -77,7 +77,18 @@ public class ActivityController {
         }
     }
 
-
+    /**
+     * @param request     request 中需要封装在initTransListParam中的基本信息
+     *                    pay 不是必填    请我 我请客 AA制度；                   需要进行转换；//TODO
+     *                    type 类型；
+     *                    province
+     *                    city
+     *                    district
+     *                    street
+     *
+     *@param userId 用户ID
+     *@param token 用户token
+     */
     @RequestMapping(value = "/activity/list",method = RequestMethod.GET)
     public ResponseDo getNearByActivityList(HttpServletRequest request,@RequestParam("userId")String userId,@RequestParam("token")String token) {
         LOG.debug("activity/{activityId}/info begin");

@@ -65,7 +65,7 @@ public class PushInfoServiceImpl implements PushInfoService {
         getAlbumViewHistoryInfo(jsonObject, userId);
         getSubscriberInfo(jsonObject, userId);
         getOfficialInfo(jsonObject, userId);
-        return ResponseDo.buildSuccessResponse(jsonObject.toString());
+        return ResponseDo.buildSuccessResponse(jsonObject);
     }
 
 
@@ -109,18 +109,18 @@ public class PushInfoServiceImpl implements PushInfoService {
     }
 
     /**
-     * 获取相册访问记录 10条信息；
+     * 获取相册访问记录最近的一条信息；
      */
     private void getAlbumViewHistoryInfo(JSONObject json, String userId) {
         User user = userDao.findById(userId);
         Criteria criteria = new Criteria();
-        criteria.where("albumId").in(user.getUserAlbum());
-        AlbumViewHistory viewPhoto = albumViewHistoryDao.findOne(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).limit(10));
+//        criteria.where("albumId").in(user);
+        AlbumViewHistory viewPhoto = albumViewHistoryDao.findOne(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))));
         json.put("viewPhoto", viewPhoto);
     }
 
     /**
-     * 获取最近的关注我的 人 User 10条记录；
+     * 获取最近的关注我的 人 最近的一个信息；
      */
     private void getSubscriberInfo(JSONObject json, String userId) {
         Criteria criteria = new Criteria();
@@ -128,7 +128,7 @@ public class PushInfoServiceImpl implements PushInfoService {
         Query query = new Query();
         query.addCriteria(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime")));
-        query.limit(10);
+//        query.limit(10);
         Subscriber subscriber = subscriberDao.findOne(query);
         json.put("subscriber", subscriber);
     }

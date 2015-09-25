@@ -22,7 +22,20 @@
 		/> <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"> 
 		<property name="interceptors"> <list> <ref bean="commonInterceptor" /> </list> 
 		</property> </bean> -->
-
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="mediaTypes">
+			<map>
+				<!-- 告诉视图解析器，返回的类型为json格式 -->
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<!-- ModelAndView里的数据变成JSON -->
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+			</list>
+		</property>
+	</bean>
 	<mvc:interceptors>
 		<!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
 		<bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor" />
