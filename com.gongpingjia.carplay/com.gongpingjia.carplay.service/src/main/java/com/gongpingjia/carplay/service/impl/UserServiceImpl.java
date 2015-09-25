@@ -7,15 +7,23 @@ import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
+import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
+import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
+import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
+import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
+import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
+import com.gongpingjia.carplay.entity.user.AuthApplication;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
+import com.gongpingjia.carplay.util.DistanceUtil;
 import com.mongodb.BasicDBObject;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -68,6 +76,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ActivityDao activityDao;
+
+    @Autowired
+    private AlbumViewHistoryDao albumViewHistoryDao;
+
+    @Autowired
+    private AuthenticationHistoryDao authenticationHistoryDao;
+
+    @Autowired
+    private AuthApplicationDao authApplicationDao;
 
 
     @Override
@@ -570,13 +587,73 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseDo getViewHistory(String userId, String token) throws ApiException {
+    public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException {
         checker.checkUserInfo(userId, token);
 
-        //
+        //获取用户当前的位置信息；
+        User nowUser = userDao.findById(userId);
 
+        Query query = new Query();
+        Criteria criteria = Criteria.where("userId").is(userId);
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).skip(ignore).limit(limit);
+        List<AlbumViewHistory> viewHistoryList = albumViewHistoryDao.find(query);
+        LinkedHashSet<String> userIdSet = new LinkedHashSet<>();
+        for (AlbumViewHistory item : viewHistoryList) {
+            userIdSet.add(item.getViewUserId());
+        }
+        List<User> userList = userDao.findByIds((String[]) userIdSet.toArray());
+        //计算distance
+        JSONArray jsonArr = new JSONArray();
+        for (String itemUId : userIdSet) {
+            User userItem = getUserFromList(userList, itemUId);
+            JSONObject jsonItem = JSONObject.fromObject(userItem);
+            double distance = DistanceUtil.calculateDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(), userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
+            jsonItem.put("distance", distance);
+            jsonArr.add(jsonItem);
+        }
+        return ResponseDo.buildSuccessResponse(jsonArr);
+    }
 
+    @Override
+    public ResponseDo getAuthHistory(String userId, String token, int limit, int ignore) throws ApiException {
+        checker.checkUserInfo(userId, token);
 
-        return ResponseDo.buildSuccessResponse();
+        Criteria criteria = Criteria.where("applyUserId").is(userId);
+        Query query = Query.query(criteria);
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "authTime")));
+        query.skip(ignore).limit(limit);
+        List<AuthenticationHistory> authenticationHistoryList = authenticationHistoryDao.find(query);
+
+//        //将所有的认证种类查询出来；
+//        HashSet<String> applicationIds = new HashSet<>();
+//        for (AuthenticationHistory history : authenticationHistoryList) {
+//            applicationIds.add(history.getApplicationId());
+//        }
+//        List<AuthApplication> authApplications = authApplicationDao.findByIds((String[])applicationIds.toArray());
+
+        //查询出所有的认证官方的信息；
+        HashSet<String> authUserIds = new HashSet<>();
+        for (AuthenticationHistory item : authenticationHistoryList) {
+            authUserIds.add(item.getAuthId());
+        }
+        List<User> userList = userDao.findByIds((String[]) authUserIds.toArray());
+
+        //封装返回数据
+        //封装了 认证历史记录 以及 认证人的信息； authUserId 例如 对应着 车玩官方；
+        JSONArray jsonArr = new JSONArray();
+        for (AuthenticationHistory history : authenticationHistoryList) {
+            JSONObject jsonObject = JSONObject.fromObject(history);
+            jsonObject.put("authUser", getUserFromList(userList, history.getAuthId()));
+        }
+        return ResponseDo.buildSuccessResponse(jsonArr);
+    }
+
+    private User getUserFromList(List<User> users, String id) {
+        for (User item : users) {
+            if (item.getUserId().equals(id)) {
+                return item;
+            }
+        }
+        return null;
     }
 }

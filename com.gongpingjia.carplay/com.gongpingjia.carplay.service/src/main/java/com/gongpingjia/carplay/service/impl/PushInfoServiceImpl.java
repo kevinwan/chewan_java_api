@@ -114,13 +114,13 @@ public class PushInfoServiceImpl implements PushInfoService {
     private void getAlbumViewHistoryInfo(JSONObject json, String userId) {
         User user = userDao.findById(userId);
         Criteria criteria = new Criteria();
-//        criteria.where("albumId").in(user);
-        AlbumViewHistory viewPhoto = albumViewHistoryDao.findOne(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))));
+//        criteria.where("albumId").in(user.getUserAlbum());
+        AlbumViewHistory viewPhoto = albumViewHistoryDao.findOne(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).limit(10));
         json.put("viewPhoto", viewPhoto);
     }
 
     /**
-     * 获取最近的关注我的 人 最近的一个信息；
+     * 获取最近的关注我的 人 User 10条记录；
      */
     private void getSubscriberInfo(JSONObject json, String userId) {
         Criteria criteria = new Criteria();

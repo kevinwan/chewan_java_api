@@ -12,6 +12,8 @@ public class AlbumViewHistory {
     @Id
     private String id;
 
+    private String userId;
+
     //userId
     private String viewUserId;
 
@@ -23,6 +25,14 @@ public class AlbumViewHistory {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getViewUserId() {

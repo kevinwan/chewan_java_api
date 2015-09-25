@@ -82,5 +82,7 @@ public interface UserService {
     /**
      * 获取相册的查看信息；
      */
-    public ResponseDo getViewHistory(String userId, String token) throws ApiException;
+    public ResponseDo getViewHistory(String userId, String token,int limit,int ignore) throws ApiException;
+
+    public ResponseDo getAuthHistory(String userId,String token,int limit,int ignore) throws ApiException;
 }

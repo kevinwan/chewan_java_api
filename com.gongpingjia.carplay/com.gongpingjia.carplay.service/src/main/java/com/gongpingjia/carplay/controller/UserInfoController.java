@@ -175,15 +175,27 @@ public class UserInfoController {
 
 
     @RequestMapping(value = "/user/{userId}/view/history")
-    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,@RequestParam("limit")int limit,@RequestParam("ignore")int ignore) {
         LOG.debug("/user/{}/view/history", userId);
         try {
-            return userService.getViewHistory(userId, token);
+            return userService.getViewHistory(userId, token, limit, ignore);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
+    }
 
+    @RequestMapping(value = "/user/{userId}/auth/history")
+    public ResponseDo getAuthHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                     @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
+
+        LOG.debug("/user/{}/auth/history", userId);
+        try {
+            return userService.getAuthHistory(userId, token, limit, ignore);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 }

@@ -6,7 +6,7 @@ import com.gongpingjia.carplay.entity.activity.Appointment;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by Administrator on 2015/9/24.
+ * Created by heyongyu on 2015/9/24.
  */
 @Repository("appointmentDao")
 public class AppointmentDaoImpl extends BaseDaoImpl<Appointment, String> implements AppointmentDao {

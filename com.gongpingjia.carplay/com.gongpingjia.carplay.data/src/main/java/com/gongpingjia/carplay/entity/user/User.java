@@ -5,8 +5,11 @@ import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +32,8 @@ public class User {
     private String role;
     private boolean invalid;
     private String phone;
+    @Transient
+    private Integer age;
 
     //图像认证图片,photo.jpg
     private String photo;
@@ -122,6 +127,14 @@ public class User {
         this.phone = phone;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -169,6 +182,7 @@ public class User {
 
     public void setBirthday(Long birthday) {
         this.birthday = birthday;
+        this.age = calculateAge(birthday);
     }
 
     public Long getRegisterTime() {
@@ -290,4 +304,15 @@ public class User {
     public void setDistance(Double distance) {
         this.distance = distance;
     }
+
+    private int calculateAge(Long birthday) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(new Date().getTime());
+
+        Calendar userCal = Calendar.getInstance();
+        userCal.setTimeInMillis(birthday);
+
+        return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
+    }
+
 }

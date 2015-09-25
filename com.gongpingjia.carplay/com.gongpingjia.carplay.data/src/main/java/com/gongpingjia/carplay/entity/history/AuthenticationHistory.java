@@ -13,6 +13,10 @@ public class AuthenticationHistory {
     @Id
     private String id;
 
+    private String applyUserId;
+
+    private String authId;
+
     private String applicationId;
 
     private String type;
@@ -29,6 +33,22 @@ public class AuthenticationHistory {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getApplyUserId() {
+        return applyUserId;
+    }
+
+    public void setApplyUserId(String applyUserId) {
+        this.applyUserId = applyUserId;
+    }
+
+    public String getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(String authId) {
+        this.authId = authId;
     }
 
     public String getApplicationId() {

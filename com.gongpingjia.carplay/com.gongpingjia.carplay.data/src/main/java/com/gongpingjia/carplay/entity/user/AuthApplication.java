@@ -11,8 +11,13 @@ public class AuthApplication {
     @Id
     private String applicationId;
 
-    private String userId;
+    private String applyUserId;
 
+    private String authUserId;
+
+    /**
+     * 认证申请名称 如 车主认证；
+     */
     private String type;
 
     private String status;
@@ -29,12 +34,20 @@ public class AuthApplication {
         this.applicationId = applicationId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getApplyUserId() {
+        return applyUserId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setApplyUserId(String applyUserId) {
+        this.applyUserId = applyUserId;
+    }
+
+    public String getAuthUserId() {
+        return authUserId;
+    }
+
+    public void setAuthUserId(String authUserId) {
+        this.authUserId = authUserId;
     }
 
     public String getType() {

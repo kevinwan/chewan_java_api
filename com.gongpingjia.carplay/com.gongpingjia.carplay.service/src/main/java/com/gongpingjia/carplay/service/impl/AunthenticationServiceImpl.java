@@ -104,7 +104,7 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         application.setApplyTime(current);
         application.setStatus(Constants.AuthStatus.AUTHORIZING);
         application.setType(Constants.AuthType.LICENSE_AUTH);
-        application.setUserId(userId);
+        application.setApplyUserId(userId);
         authApplicationDao.save(application);
 
         AuthenticationHistory history = new AuthenticationHistory();
@@ -146,7 +146,7 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         application.setApplyTime(current);
         application.setStatus(Constants.AuthStatus.AUTHORIZING);
         application.setType(Constants.AuthType.PHOTO_AUTH);
-        application.setUserId(userId);
+        application.setApplyUserId(userId);
         authApplicationDao.save(application);
 
         AuthenticationHistory history = new AuthenticationHistory();
