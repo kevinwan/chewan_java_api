@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
         // 注册环信用户
         LOG.debug("Register emchat user by call remote service");
-        Map<String, String> chatUser = new HashMap<String, String>(2, 1);
+        Map<String, String> chatUser = new HashMap<>(2, 1);
         chatUser.put("username", chatCommonService.getUsernameByUserid(user.getUserId()));
         chatUser.put("password", user.getPassword());
 
@@ -310,7 +310,7 @@ public class UserServiceImpl implements UserService {
         List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
-        List<Map<String, Object>> data = new ArrayList<>();
+        List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
@@ -530,20 +530,6 @@ public class UserServiceImpl implements UserService {
 
         return uuid;
     }
-
-    /**
-     * @param Birthday 生日
-     *                 <p/>
-     *                 计算年龄
-     */
-    public int getAgeByBirthday(Long Birthday) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(DateUtil.getTime());
-        Calendar userCal = Calendar.getInstance();
-        userCal.setTimeInMillis(Birthday);
-        return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
-    }
-
 
     @Override
     public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException {
