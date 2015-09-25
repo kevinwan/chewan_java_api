@@ -107,5 +107,76 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 三方登录
+     *
+     * @return 返回登录结果
+     */
+    @RequestMapping(value = "/sns/login", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo snsLogin(@RequestBody JSONObject json) {
+        LOG.info("snsLogin begin");
+
+        try {
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "sign"))) {
+                throw new ApiException("输入参数有误");
+            }
+
+            String username = null;
+            if (!CommonUtil.isEmpty(json, "username")) {
+                username = json.getString("username");
+            }
+
+            String url = null;
+            if (!CommonUtil.isEmpty(json, "url")) {
+                url = json.getString("url");
+            }
+
+            return userService.snsLogin(json.getString("uid"), json.getString("channel"), json.getString("sign"),
+                    username, url);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 个人详情，获取个人信息，当beViewUser与viewUser相同，表示查看自己的个人信息，否则为查看他的详情
+     *
+     * @param beViewedUser 被查看的用户
+     * @param viewUser     当前查看的人
+     * @param token        当前查看的人的会话Token
+     * @return 返回个人详情结果
+     */
+    @RequestMapping(value = "/user/{beViewedUser}/info", method = RequestMethod.GET)
+    public ResponseDo getUserInfo(@PathVariable("beViewedUser") String beViewedUser,
+                                  @RequestParam("viewUser") String viewUser, @RequestParam("token") String token) {
+        LOG.info("Begin user:{} infomation", beViewedUser);
+
+
+        try {
+            return userService.getUserInfo(beViewedUser, viewUser, token);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取我的约会信息
+     */
+    @RequestMapping(value = "/user/{userId}/appointment", method = RequestMethod.GET)
+    public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                     @RequestParam(value = "status", defaultValue = "") String status,
+                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                     @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+        LOG.debug("/user/{}/appointment", userId);
+        try {
+            return userService.getAppointment(userId, token, status, limit, ignore);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 
 }

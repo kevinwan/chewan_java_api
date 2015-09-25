@@ -62,7 +62,7 @@ public class PhoneServiceImpl implements PhoneService {
             }
         } else {
             LOG.warn("Request parameter type is not 1 or 0");
-            throw new ApiException("参数错误");
+            throw new ApiException("输入参数错误");
         }
 
         PhoneVerification phoneVerification = savePhoneVerification(phone);
@@ -88,7 +88,7 @@ public class PhoneServiceImpl implements PhoneService {
 
     private void refreshPhoneVerification(PhoneVerification phoneVerification) {
         Calendar calModify = Calendar.getInstance();
-        calModify.setTime(new Date(phoneVerification.getModifyTime()));
+        calModify.setTimeInMillis(phoneVerification.getModifyTime());
 
         Calendar calCurrent = Calendar.getInstance();
         calCurrent.setTime(DateUtil.getDate());
@@ -163,8 +163,6 @@ public class PhoneServiceImpl implements PhoneService {
                 phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
                 phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
                         PropertiesUtil.getProperty("message.effective.seconds", 7200)));
-                //过期了需要设置次数
-                phoneVerify.setSendTimes(0);
                 phoneVerify.setModifyTime(DateUtil.getTime());
 
                 phoneVerificationDao.update(phoneVerify.getId(), phoneVerify);

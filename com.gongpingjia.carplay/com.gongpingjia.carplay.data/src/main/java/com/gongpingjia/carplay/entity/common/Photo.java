@@ -9,7 +9,16 @@ public class Photo {
     private String id;
     //photoUrl
     private String url;
+
     private Long uploadTime;
+
+    public Photo() {
+    }
+
+    public Photo(String url, Long uploadTime) {
+        this.url = url;
+        this.uploadTime = uploadTime;
+    }
 
     public String getId() {
         return id;

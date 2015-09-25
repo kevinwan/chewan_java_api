@@ -47,7 +47,34 @@ public interface UserService {
      * @return 业务结果
      * @throws ApiException
      */
-    @Transactional(rollbackFor = Exception.class)
     ResponseDo forgetPassword(User user, String code) throws ApiException;
 
+    /**
+     * 第三方登录
+     *
+     * @param uid      三方登录返回的用户唯一标识
+     * @param channel  wechat 、qq 或 sinaWeibo
+     * @param sign     API签名，计算方法为 MD5(uid + channel + BundleID) 其中，BundleID 为
+     *                 com.gongpingjia.carplay
+     * @param username 三方登录返回的用户昵称
+     * @param url      三方登录返回的用户头像地址
+     * @return 返回登录结果
+     * @throws ApiException
+     */
+    public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
+
+    /**
+     * 查看用户详细信息
+     *
+     * @param beViewedUser 被查看的用户
+     * @param viewUser     查看的用户
+     * @param token        会话Token
+     * @return 返回查看结果
+     */
+    ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException;
+
+    /**
+     * 获取我的约会信息
+     */
+    public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException;
 }

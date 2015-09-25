@@ -63,37 +63,38 @@ public class Constants {
         /**
          * 用户头像上传的Key值
          */
-        public static final String AVATAR_KEY = "asset/user/{0}/avatar.jpg";
+        String AVATAR_KEY = "asset/user/{0}/avatar.jpg";
 
         /**
          * 用户认证图像上传的Key值
          */
-        public static final String PHOTO_KEY = "asset/user/{0}/photo.jpg";
+        String PHOTO_KEY = "asset/user/{0}/photo.jpg";
+
 
         /**
          * 车主认证行驶证图像上传Key值
          */
-        public static final String DRIVING_LICENSE_KEY = "asset/user/{0}/drivingLicense.jpg";
+        String DRIVING_LICENSE_KEY = "asset/user/{0}/drivingLicense.jpg";
 
         /**
          * 车主认证驾驶证图像上传Key值
          */
-        public static final String DRIVER_LICENSE_KEY = "asset/user/{0}/driverLicense.jpg";
+        String DRIVER_LICENSE_KEY = "asset/user/{0}/driverLicense.jpg";
 
         /**
          * 活动上传图片Key值
          */
-        public static final String COVER_KEY = "asset/activity/cover/{0}/cover.jpg";
+        String COVER_KEY = "asset/activity/cover/{0}/cover.jpg";
 
         /**
          * 个人相册图片Key值
          */
-        public static final String USER_ALBUM_KEY = "asset/user/{0}/album/{1}.jpg";
+        String USER_ALBUM_KEY = "asset/user/{0}/album/{1}.jpg";
 
         /**
          * 用户反馈图片Key值
          */
-        public static final String FEEDBACK_KEY = "asset/feedback/{0}.jpg";
+        String FEEDBACK_KEY = "asset/feedback/{0}.jpg";
     }
 
     /**
@@ -235,5 +236,17 @@ public class Constants {
         String LICENSE_AUTH = "车主认证";
 
         String ID_CARD_AUTH = "身份证认证";
+    }
+
+    /**
+     * 约会状态
+     */
+    public interface AppointmentStatus {
+
+        String ACCEPT = "应邀";
+
+        String REJECT = "拒绝";
+
+        String APPLYING = "申请中";
     }
 }
