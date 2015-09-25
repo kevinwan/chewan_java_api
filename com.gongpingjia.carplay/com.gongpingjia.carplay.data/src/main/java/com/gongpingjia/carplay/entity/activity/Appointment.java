@@ -5,18 +5,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by licheng on 2015/9/22.
- * 约会申请
+ * 邀请加入活动的信息，ActivityIntention为applyUser的活动意向信息
  */
 @Document
-public class Appointment {
+public class Appointment extends ActivityIntention {
 
     @Id
     private String appointmentId;
 
     private String activityId;
 
+    //邀请申请人
     private String applyUserId;
-
+    //应邀人员
     private String invitedUserId;
 
     private Long createTime;
