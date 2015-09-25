@@ -1,12 +1,6 @@
-package com.gongpingjia.carplay.util;
+package com.gongpingjia.carplay.service.util;
 
 import com.gongpingjia.carplay.entity.activity.Activity;
-import com.gongpingjia.carplay.entity.common.Landmark;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Administrator on 2015/9/23.

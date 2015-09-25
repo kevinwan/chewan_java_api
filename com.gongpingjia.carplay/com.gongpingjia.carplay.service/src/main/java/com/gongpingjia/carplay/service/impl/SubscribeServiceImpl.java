@@ -9,7 +9,7 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.SubscribeService;
-import com.gongpingjia.carplay.util.DistanceUtil;
+import com.gongpingjia.carplay.service.util.DistanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
