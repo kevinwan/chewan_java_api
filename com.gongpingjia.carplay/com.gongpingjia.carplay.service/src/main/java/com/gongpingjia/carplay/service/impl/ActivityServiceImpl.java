@@ -13,6 +13,7 @@ import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.EmchatTokenService;
 import com.gongpingjia.carplay.util.ActivityUtil;
 import com.gongpingjia.carplay.util.ActivityWeight;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -55,12 +56,13 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
+        activity.setActivityId(null);
         activity.setUserId(userId);
         List<String> memberIds = new ArrayList<String>(1);
         memberIds.add(userId);
         activity.setMembers(memberIds);
         activityDao.save(activity);
-        createEmchatGroup(activity);
+//        createEmchatGroup(activity);
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -68,7 +70,10 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findById(activityId);
-        return ResponseDo.buildSuccessResponse(activity);
+        User organizer = userDao.findById(activity.getUserId());
+        JSONObject jsonObject = JSONObject.fromObject(activity);
+        jsonObject.put("organizer", organizer);
+        return ResponseDo.buildSuccessResponse(jsonObject.toString());
     }
 
     /**
@@ -118,7 +123,7 @@ public class ActivityServiceImpl implements ActivityService {
         //查询创建在此时间之前的活动；
         long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) ActivityWeight.MAX_PUB_TIME));
         //查询在最大距离内的 活动；
-        Criteria.where("createTime").gte(gtTime).where("landMark").near(new Point(landmark.getLatitude(), landmark.getLongitude())).maxDistance(maxDistance);
+        Criteria.where("createTime").gte(gtTime).where("landMark").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
         query.addCriteria(criteria);
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(query);
@@ -128,8 +133,20 @@ public class ActivityServiceImpl implements ActivityService {
          * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
-        List<Activity> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
-        return ResponseDo.buildSuccessResponse(rltList);
+        List<ActivityWeight> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
+        JSONArray jsonArray = new JSONArray();
+        Set<String> userIds = new HashSet<>();
+        for (ActivityWeight activityWeight : rltList) {
+            userIds.add(activityWeight.getActivity().getUserId());
+        }
+        List<User> userList = userDao.findByIds((String[]) userIds.toArray());
+        for (ActivityWeight activityWeight : rltList) {
+            JSONObject item = JSONObject.fromObject(activityWeight.getActivity());
+            item.put("organizer", findById(userList, activityWeight.getActivity().getUserId()));
+            item.put("distance", activityWeight.getDistance());
+            jsonArray.add(item);
+        }
+        return ResponseDo.buildSuccessResponse(jsonArray.toString());
     }
 
     @Override
@@ -160,5 +177,14 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.warn("Failed to create chat group");
             throw new ApiException("创建聊天群组失败");
         }
+    }
+
+    private User findById(List<User> users, String id) {
+        for (User user : users) {
+            if (user.getUserId().equals(id)) {
+                return user;
+            }
+        }
+        return null;
     }
 }

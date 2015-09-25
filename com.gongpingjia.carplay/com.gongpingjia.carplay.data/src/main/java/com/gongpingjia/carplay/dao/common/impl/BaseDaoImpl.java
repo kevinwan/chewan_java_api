@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,16 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     @Override
     public T findOne(Query query) {
         return mongoTemplate.findOne(query, getCls());
+    }
+
+    @Override
+    public List<T> findByIds(List<K> ids) {
+        return mongoTemplate.find(Query.query(Criteria.where("_id").in(ids)), getCls());
+    }
+
+    @Override
+    public List<T> findByIds(K[] ids) {
+        return mongoTemplate.find(Query.query(Criteria.where("_id").in(ids)), getCls());
     }
 
     @Override

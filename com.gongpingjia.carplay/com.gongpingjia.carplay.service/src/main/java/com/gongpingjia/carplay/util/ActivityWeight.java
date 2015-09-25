@@ -20,6 +20,8 @@ public class ActivityWeight implements Comparable<ActivityWeight> {
 
     private Activity activity;
 
+    private double distance;
+
     //车主认证；
     private boolean carOwnerFlag = false;
 
@@ -44,6 +46,14 @@ public class ActivityWeight implements Comparable<ActivityWeight> {
 
     public void setActivity(Activity activity) {
         this.activity = activity;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
     public double getWeight() {

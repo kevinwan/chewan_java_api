@@ -19,9 +19,9 @@ public class ActivityUtil {
     @Autowired
     private UserDao userDao;
 
-    public List<Activity> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance) {
+    public List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
-        ArrayList<Activity> retList = new ArrayList<>(activities.size());
+        ArrayList<ActivityWeight> retList = new ArrayList<>(activities.size());
         for (Activity activity : activities) {
             ActivityWeight aw = new ActivityWeight(activity);
             User user = userDao.findById(activity.getUserId());
@@ -41,16 +41,14 @@ public class ActivityUtil {
             awList.add(aw);
         }
         Collections.sort(awList);
-        for (ActivityWeight activityWeight : awList) {
-            retList.add(activityWeight.getActivity());
-        }
-        return retList;
+        return awList;
     }
 
     private static void initWeight(Date currentTime, Landmark nowLandmark, ActivityWeight activityWeight, double maxDistance) {
         Activity activity = activityWeight.getActivity();
         double weight = 0;
-        double distance = DistanceUtil.getDistance(nowLandmark.getLatitude(), nowLandmark.getLongitude(), activity.getDestPoint().getLatitude(), activity.getDestPoint().getLongitude());
+        double distance = DistanceUtil.getDistance(nowLandmark.getLongitude(), nowLandmark.getLatitude(), activity.getDestPoint().getLongitude(), activity.getDestPoint().getLatitude());
+        activityWeight.setDistance(distance);
         double distanceRate = 1 - distance / maxDistance;
         weight += distanceRate * 0.2;
         double timeRate = 1 - ((currentTime.getTime() - activity.getStart()) / (1000 * 60)) / ActivityWeight.MAX_PUB_TIME;
@@ -76,21 +74,21 @@ public class ActivityUtil {
         activityWeight.setWeight(weight);
     }
 
-    public List<Activity> getPageInfo(List<Activity> activities, int skip, int limit) {
+    public List<ActivityWeight> getPageInfo(List<ActivityWeight> awList, int skip, int limit) {
         //访问更高效点
         int offset = 0;
         int len = 0;
-        if (skip > activities.size()) {
+        if (skip > awList.size()) {
             return null;
         }
-        if (skip + limit > activities.size()) {
-            offset = activities.size();
+        if (skip + limit > awList.size()) {
+            offset = awList.size();
         } else {
             offset = skip + limit;
         }
         len = offset - skip;
-        ArrayList<Activity> toList = new ArrayList<>(len);
-        Iterator<Activity> iterator = activities.iterator();
+        ArrayList<ActivityWeight> toList = new ArrayList<>(len);
+        Iterator<ActivityWeight> iterator = awList.iterator();
         int index = 0;
         do {
             if (index > skip) {

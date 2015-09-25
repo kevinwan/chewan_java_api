@@ -66,7 +66,7 @@ public class ActivityController {
      * @param token
      *
      */
-    @RequestMapping(value = "/activity/${activityId}/info", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
@@ -82,17 +82,24 @@ public class ActivityController {
     public ResponseDo getNearByActivityList(HttpServletRequest request,@RequestParam("userId")String userId,@RequestParam("token")String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            return activityService.getNearActivityList(initTransParam(request),request);
+            return activityService.getNearActivityList(initTransListParam(request), request);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
 
+    @RequestMapping(value = "/activity/{activityId}/join",method = RequestMethod.POST,headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo joinActivity(@PathVariable("activityId")String activityId,@RequestParam("userId")String userId,@RequestParam("token")String token){
+        LOG.debug("activity/{activityId}/info begin");
+        return null;
+    }
+
     /**
      * type=$type&pay=$pay&province=$province&city=$city&district=$district&street=$street&transfer=$transfer&ignore=$ignore&limit=$limit&longitude=$longitude&latitude=$latitude &maxDistance=$maxDistance
      */
-    private Map<String, String> initTransParam(HttpServletRequest request) {
+    private Map<String, String> initTransListParam(HttpServletRequest request) {
         Map<String, String> keyTranMap = new HashMap<>();
         keyTranMap.put("pay","pay");
         keyTranMap.put("type","type");

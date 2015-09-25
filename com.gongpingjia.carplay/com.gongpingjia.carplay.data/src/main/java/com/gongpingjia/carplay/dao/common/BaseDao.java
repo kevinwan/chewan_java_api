@@ -24,6 +24,10 @@ public interface BaseDao<T,K> {
 
     public T findOne(Query query);
 
+    public List<T> findByIds(List<K> ids);
+
+    public List<T> findByIds(K []ids);
+
     public List<T> find(Query query);
 
     public void save(T entity);

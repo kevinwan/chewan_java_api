@@ -2,7 +2,9 @@ package com.gongpingjia.carplay.entity.activity;
 
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,6 +38,7 @@ public class Activity {
 
     //活动创建地
     private Address establish;
+
     //活动创建地经纬度
     @GeoSpatialIndexed
     private Landmark estabPoint;
