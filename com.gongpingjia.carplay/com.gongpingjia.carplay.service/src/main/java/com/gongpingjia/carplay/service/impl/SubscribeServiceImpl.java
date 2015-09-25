@@ -13,6 +13,7 @@ import com.gongpingjia.carplay.util.DistanceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -112,7 +113,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     @Override
     public ResponseDo unPayAttention(Subscriber userSubscription, String token) throws ApiException {
         LOG.debug("un pay attention to other user");
-        
+
         checker.checkUserInfo(userSubscription.getFromUser(), token);
         // 是否已关注
         Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser()).and("toUser").is(userSubscription.getToUser())));
@@ -124,6 +125,29 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         return ResponseDo.buildSuccessResponse();
     }
+
+    @Override
+    public ResponseDo getUserSubscribedHistory(String userId, String token) throws ApiException {
+        LOG.debug("getUserSubscribedHistory was called");
+        List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))).with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime"))));
+
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (Subscriber sub : beSubscribed) {
+            Map<String, Object> userInfo = new HashMap<>();
+            User user = userDao.findById(sub.getFromUser());
+            userInfo.put("userId", user.getUserId());
+            userInfo.put("nickname", user.getNickname());
+            userInfo.put("gender", user.getGender());
+            userInfo.put("age", user.calculateAge(Long birthday));
+            userInfo.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+            userInfo.put("distance", user.getDistance());
+            userInfo.put("subscribeTime", sub.getSubscribeTime());
+
+            data.add(userInfo);
+        }
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
 
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         String avatarServer = CommonUtil.getLocalPhotoServer();

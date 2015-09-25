@@ -90,4 +90,20 @@ public class SubscribeController {
 
     }
 
+
+    /**
+     * 别人关注我的历史
+     * */
+    @RequestMapping(value = "/user/{userId}/subscribe/history", method = RequestMethod.GET)
+    public ResponseDo getUserSubscribedHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+        LOG.info("getUserSubscribes begin");
+
+        try {
+            return service.getUserSubscribedHistory(userId, token);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
 }

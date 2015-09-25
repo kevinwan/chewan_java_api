@@ -23,4 +23,6 @@ public interface SubscribeService {
     ResponseDo payAttention(Subscriber userSubscription, String token) throws ApiException;
 
     ResponseDo unPayAttention(Subscriber userSubscription, String token) throws ApiException;
+
+    ResponseDo getUserSubscribedHistory(String userId, String token) throws ApiException;
 }
