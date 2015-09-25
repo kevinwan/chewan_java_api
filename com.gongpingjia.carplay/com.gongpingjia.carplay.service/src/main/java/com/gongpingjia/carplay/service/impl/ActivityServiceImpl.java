@@ -241,8 +241,4 @@ public class ActivityServiceImpl implements ActivityService {
         return null;
     }
 
-    @Override
-    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
-        return null;
-    }
 }
