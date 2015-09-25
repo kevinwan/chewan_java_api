@@ -184,6 +184,7 @@ public class UserInfoController {
 
     /**
      * 查看用户的官方认证的审核结果信息
+     *
      * @param userId
      * @param token
      * @param limit
@@ -203,7 +204,14 @@ public class UserInfoController {
         }
     }
 
-
+    /**
+     * 修改用户信息
+     *
+     * @param userId
+     * @param token
+     * @param user
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
     public ResponseDo alterUserInfo(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody User user) {
         LOG.debug("alter user information");

@@ -24,6 +24,12 @@ public class SubscribeController {
     @Autowired
     private SubscribeService service;
 
+    /**
+     * 获取用户的关注信息
+     * @param userId
+     * @param token
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/subscribe", method = RequestMethod.GET)
     public ResponseDo getUserSubscribes(@PathVariable("userId") String userId, @RequestParam("token") String token) {
         LOG.info("getUserSubscribes begin");
@@ -87,7 +93,6 @@ public class SubscribeController {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
-
     }
 
 

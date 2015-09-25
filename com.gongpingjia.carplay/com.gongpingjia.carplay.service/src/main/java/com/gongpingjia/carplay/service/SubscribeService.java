@@ -20,9 +20,32 @@ public interface SubscribeService {
      */
     ResponseDo getUserSubscribeInfo(String userId, String token) throws ApiException;
 
+    /**
+     * 关注其他用户
+     *
+     * @param userSubscription
+     * @param token
+     * @return
+     * @throws ApiException
+     */
     ResponseDo payAttention(Subscriber userSubscription, String token) throws ApiException;
 
+    /**
+     * 取消关注其他用户
+     *
+     * @param userSubscription
+     * @param token
+     * @return
+     * @throws ApiException
+     */
     ResponseDo unPayAttention(Subscriber userSubscription, String token) throws ApiException;
 
+    /**
+     * 获取用户被关注的历史信息
+     * @param userId
+     * @param token
+     * @return
+     * @throws ApiException
+     */
     ResponseDo getUserSubscribedHistory(String userId, String token) throws ApiException;
 }
