@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.entity.user.Subscriber;
 
 /**
  * Created by licheng on 2015/9/24.
@@ -18,4 +19,8 @@ public interface SubscribeService {
      * @return 返回查询结果信息
      */
     ResponseDo getUserSubscribeInfo(String userId, String token) throws ApiException;
+
+    ResponseDo payAttention(Subscriber userSubscription, String token) throws ApiException;
+
+    ResponseDo unPayAttention(Subscriber userSubscription, String token) throws ApiException;
 }

@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.Subscriber;
@@ -83,6 +84,45 @@ public class SubscribeServiceImpl implements SubscribeService {
         data.put("beSubscribed", beSubscribedUsers);
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    @Override
+    public ResponseDo payAttention(Subscriber userSubscription, String token) throws ApiException {
+        LOG.debug("Pay attention to other user");
+
+        checker.checkUserInfo(userSubscription.getFromUser(), token);
+        User user = userDao.findById(userSubscription.getToUser());
+        if (user == null) {
+            LOG.warn("User not exist");
+            throw new ApiException("关注用户不存在");
+        }
+        // 是否已关注
+        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser()).and("toUser").is(userSubscription.getToUser())));
+        if (userSub != null) {
+            LOG.warn("already listened to this person before");
+            throw new ApiException("已关注该用户，请勿重复关注");
+        }
+        userSubscription.setSubscribeTime(DateUtil.getTime());
+        // 关注
+        subscriberDao.save(userSubscription);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo unPayAttention(Subscriber userSubscription, String token) throws ApiException {
+        LOG.debug("un pay attention to other user");
+        
+        checker.checkUserInfo(userSubscription.getFromUser(), token);
+        // 是否已关注
+        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser()).and("toUser").is(userSubscription.getToUser())));
+        if (userSub == null) {
+            LOG.warn("cannot unlisten as not listened before");
+            throw new ApiException("没有关注该用户，不能取消关注");
+        }
+        subscriberDao.deleteById(userSub.getId());
+
+        return ResponseDo.buildSuccessResponse();
     }
 
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
