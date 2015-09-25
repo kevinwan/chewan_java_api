@@ -138,7 +138,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             userInfo.put("userId", user.getUserId());
             userInfo.put("nickname", user.getNickname());
             userInfo.put("gender", user.getGender());
-            userInfo.put("age", user.calculateAge(Long birthday));
+            userInfo.put("age", user.getAge());
             userInfo.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
             userInfo.put("distance", user.getDistance());
             userInfo.put("subscribeTime", sub.getSubscribeTime());
