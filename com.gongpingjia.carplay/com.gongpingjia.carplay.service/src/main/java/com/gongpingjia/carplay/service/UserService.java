@@ -52,16 +52,10 @@ public interface UserService {
     /**
      * 第三方登录
      *
-     * @param uid      三方登录返回的用户唯一标识
-     * @param channel  wechat 、qq 或 sinaWeibo
-     * @param sign     API签名，计算方法为 MD5(uid + channel + BundleID) 其中，BundleID 为
-     *                 com.gongpingjia.carplay
-     * @param username 三方登录返回的用户昵称
-     * @param url      三方登录返回的用户头像地址
      * @return 返回登录结果
      * @throws ApiException
      */
-    public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url) throws ApiException;
+    public ResponseDo snsLogin(User user) throws ApiException;
 
     /**
      * 查看用户详细信息
@@ -82,7 +76,12 @@ public interface UserService {
     /**
      * 获取相册的查看信息；
      */
-    public ResponseDo getViewHistory(String userId, String token,int limit,int ignore) throws ApiException;
+    public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException;
 
-    public ResponseDo getAuthHistory(String userId,String token,int limit,int ignore) throws ApiException;
+    public ResponseDo getAuthHistory(String userId, String token, int limit, int ignore) throws ApiException;
+
+    /**
+     * 修改用户信息
+     */
+    ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException;
 }

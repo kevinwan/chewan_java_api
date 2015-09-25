@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.entity.common;
 
+import org.springframework.data.annotation.Transient;
+
 /**
  * Created by licheng on 2015/9/19.
  * 用户上传的个人图片
@@ -7,7 +9,11 @@ package com.gongpingjia.carplay.entity.common;
 public class Photo {
     //photoId
     private String id;
-    //photoUrl
+    //photoUrl key
+    private String key;
+
+    //url 不存储到DB中
+    @Transient
     private String url;
 
     private Long uploadTime;
@@ -15,8 +21,8 @@ public class Photo {
     public Photo() {
     }
 
-    public Photo(String url, Long uploadTime) {
-        this.url = url;
+    public Photo(String key, Long uploadTime) {
+        this.key = key;
         this.uploadTime = uploadTime;
     }
 
@@ -26,6 +32,14 @@ public class Photo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getUrl() {

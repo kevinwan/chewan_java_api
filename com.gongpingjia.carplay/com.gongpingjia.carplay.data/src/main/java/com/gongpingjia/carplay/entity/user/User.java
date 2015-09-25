@@ -6,7 +6,9 @@ import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.StringUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +33,8 @@ public class User {
     private Long registerTime;
     private String role;
     private boolean invalid;
+
+    @Indexed(unique = true)
     private String phone;
     @Transient
     private Integer age;
@@ -78,6 +82,25 @@ public class User {
 
     //仅用于计算距离，不存储到DB
     private Double distance;
+
+    public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer) {
+        if (StringUtils.isEmpty(this.avatar)) {
+            this.avatar = localPhotoServer + this.avatar;
+        }
+        if (StringUtils.isEmpty(this.photo)) {
+            this.photo = localPhotoServer + this.photo;
+        }
+        if (StringUtils.isEmpty(this.driverLicense)) {
+            this.driverLicense = localPhotoServer + this.driverLicense;
+        }
+        if (StringUtils.isEmpty(this.drivingLicense)) {
+            this.drivingLicense = localPhotoServer + this.drivingLicense;
+        }
+
+        for (Photo photo : album) {
+            photo.setUrl(remotePhotoServer + photo.getKey());
+        }
+    }
 
     public Address getAddress() {
         return address;
@@ -142,7 +165,6 @@ public class User {
     public void setGender(String gender) {
         this.gender = gender;
     }
-
 
     public String getPhoto() {
         return photo;

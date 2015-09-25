@@ -24,6 +24,9 @@ import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.util.DistanceUtil;
 import com.mongodb.BasicDBObject;
 import net.sf.json.JSONArray;
+import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.entity.user.UserToken;
+import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -86,6 +89,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthApplicationDao authApplicationDao;
 
+    @Autowired
+    private AlbumViewHistoryDao historyDao;
 
     @Override
     public ResponseDo register(User user) throws ApiException {
@@ -217,39 +222,35 @@ public class UserServiceImpl implements UserService {
         checker.checkPhoneVerifyCode(user.getPhone(), code);
 
         // 查询用户注册信息
-        List<User> users = userDao.find(Query.query(Criteria.where("phone").is(user.getPhone())));
-        if (users.isEmpty()) {
+        User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
+        if (userData == null) {
             LOG.warn("Fail to find user");
             throw new ApiException("用户不存在");
         }
-        // 跟新密码
-        User upUser = users.get(0);
-        upUser.setPassword(user.getPassword());
+
+        // 更新环信用户的密码
+        chatThirdService.alterUserPassword(chatCommonService.getChatToken(), userData.getEmchatName(), user.getPassword());
 
         LOG.debug("Begin reset emchat account password by forget password");
-        // 更新环信用户的密码
-        chatThirdService.alterUserPassword(chatCommonService.getChatToken(), upUser.getEmchatName(),
-                upUser.getPassword());
 
-        userDao.update(upUser.getUserId(), upUser);
+        userDao.update(Query.query(Criteria.where("userId").is(userData.getUserId())), Update.update("password", user.getPassword()));
 
         Map<String, Object> data = new HashMap<String, Object>(2, 1);
         // 获取用户授权信息
-        data.put("userId", upUser.getUserId());
-        data.put("token", getUserToken(upUser.getUserId()));
+        data.put("userId", userData.getUserId());
+        data.put("token", getUserToken(userData.getUserId()));
 
         return ResponseDo.buildSuccessResponse(data);
     }
 
     @Override
-    public ResponseDo snsLogin(String uid, String channel, String sign, String username, String url)
-            throws ApiException {
-        checkSnsLoginParameters(uid, channel, sign);
+    public ResponseDo snsLogin(User user) throws ApiException {
+        checkSnsLoginParameters(user.getUid(), user.getChannel(), user.getPassword());
 
         LOG.debug("Save data begin");
-        List<User> users = userDao.find(Query.query(Criteria.where("snsInfos.uid").is(uid)));
+        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
 
-        if (users.isEmpty()) {
+        if (user == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
             LOG.debug("No exist user in the system, register new user by client call register interface");
 
@@ -257,57 +258,23 @@ public class UserServiceImpl implements UserService {
             String avatarId = CodeGenerator.generatorId();
             String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, avatarId);
 
-            uploadPhotoToServer(url, key);
+            uploadPhotoToServer(user.getAvatar(), key);
 
-            Map<String, String> data = new HashMap<String, String>(5, 1);
-            data.put("uid", uid);
-            data.put("nickname", username);
-            data.put("channel", channel);
-            data.put("avatar", avatarId);
-
-            return ResponseDo.buildSuccessResponse(data);
+            user.setAvatar(avatarId);
+            return ResponseDo.buildSuccessResponse(user);
         } else {
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login infor");
-            User user = users.get(0);
-
-            Map<String, Object> data = new HashMap<String, Object>(9, 1);
-            data.put("userId", user.getUserId());
-            data.put("gender", user.getGender());
-            data.put("age", getAgeByBirthday(user.getBirthday()));
-            data.put("token", getUserToken(user.getUserId()));
-            data.put("nickname", user.getNickname());
-            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-            if (StringUtils.isEmpty(user.getPhoto())) {
-                data.put("photo", "");
-            } else {
-                data.put("photo", CommonUtil.getLocalPhotoServer() + user.getPhoto());
+            if (userData.getCar() == null) {
+                userData.setCar(new Car());
             }
-            data.put("photoAuthStatus", user.getPhotoAuthStatus());
-            data.put("drivingYears", user.getDrivingYears());
-            data.put("licenseAuthStatus", user.getLicenseAuthStatus());
-
-            Map<String, Object> carMap = new HashMap<String, Object>(4, 1);
-            Car car = user.getCar();
-            if (car != null) {
-                carMap.put("brand", CommonUtil.ifNull(car.getBrand(), ""));
-                carMap.put("logo", CommonUtil.getGPJBrandLogoPrefix() + CommonUtil.ifNull(car.getLogo(), ""));
-                carMap.put("model", CommonUtil.ifNull(car.getModel(), ""));
-                carMap.put("slug", car.getSlug());
-            } else {
-                carMap.put("brand", "");
-                carMap.put("logo", "");
-                carMap.put("model", "");
-                carMap.put("slug", "");
-            }
-            data.put("car", carMap);
-            return ResponseDo.buildSuccessResponse(data);
+            return ResponseDo.buildSuccessResponse(userData);
         }
     }
 
     @Override
     public ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException {
-        LOG.debug("Begin get user infomation, check input parameters");
+        LOG.debug("Begin get user information, check input parameters");
         checker.checkUserInfo(viewUser, token);
 
         User user = userDao.findById(beViewedUser);
@@ -316,73 +283,65 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("用户不存在");
         }
 
-        String localPhotoServer = CommonUtil.getLocalPhotoServer();
-        user.setAvatar(localPhotoServer + user.getAvatar());
-        user.setPhoto(localPhotoServer + user.getPhoto());
-        user.setDriverLicense(localPhotoServer + user.getDriverLicense());
-        user.setDrivingLicense(localPhotoServer + user.getDrivingLicense());
+        if (!viewUser.equals(beViewedUser)) {
+            //表示不是自己查看自己，beViewedUser被别人看过,记录相册查看的历史信息
+            AlbumViewHistory history = new AlbumViewHistory();
+            history.setViewTime(DateUtil.getTime());
+            history.setViewUserId(viewUser);
+            history.setUserId(beViewedUser);
+            historyDao.save(history);
+        }
+
+        user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
 
         return ResponseDo.buildSuccessResponse(user);
 
     }
 
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
+
+        LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
-        List<Appointment> appointments;
-
-        if (status != null && !status.isEmpty()) {
-            appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId).and("status").is(status))
-                    .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
-        } else {
-            appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
-                    .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
+        Criteria criteria = Criteria.where("invitedUserId").is(userId);
+        if (!StringUtils.isEmpty(status)) {
+            criteria.and("status").is(status);
         }
+        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
         List<Map<String, Object>> data = new ArrayList<>();
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
-            Activity activity = activityDao.findById(appointment.getActivityId());
             User applicantUser = userDao.findById(appointment.getApplyUserId());
 
-            Map<String, Object> appointmentInfo = new HashMap<>();
-
-            appointmentInfo.put("appointmentId", appointment.getAppointmentId());
-            appointmentInfo.put("activityId", activity.getActivityId());
-            appointmentInfo.put("type", activity.getType());
-            appointmentInfo.put("destination", activity.getDestination());
-            appointmentInfo.put("start", activity.getStart());
-            appointmentInfo.put("pay", activity.getPay());
-            appointmentInfo.put("transfer", activity.isTransfer());
-
-            Map<String, Object> applicant = new HashMap<>(9, 1);
-            applicant.put("userId", applicantUser.getUserId());
-            applicant.put("nickname", applicantUser.getNickname());
-            applicant.put("gender", applicantUser.getGender());
-            applicant.put("age", getAgeByBirthday(applicantUser.getBirthday()));
-            applicant.put("role", applicantUser.getRole());
-            applicant.put("avatar", applicantUser.getAvatar());
-            applicant.put("drivingYears", applicantUser.getDrivingYears());
-            applicant.put("photoAuthStatus", applicantUser.getPhotoAuthStatus());
-            applicant.put("licenseAuthStatus", applicantUser.getLicenseAuthStatus());
-
-            Map<String, Object> car = new HashMap<>(2, 1);
-            if (applicantUser.getCar() != null) {
-                car.put("logo", applicantUser.getCar().getLogo());
-                car.put("model", applicantUser.getCar().getModel());
-            } else {
-                car.put("logo", "");
-                car.put("model", "");
+            if (applicantUser.getCar() == null) {
+                applicantUser.setCar(new Car());
             }
-            applicant.put("car", car);
-            appointmentInfo.put("applicant", applicant);
 
-            appointmentInfo.put("status", appointment.getStatus());
-            data.add(appointmentInfo);
+            JSONObject jsonObject = JSONObject.fromObject(appointment);
+            jsonObject.put("applicant", applicantUser);
+
+            data.add(jsonObject);
         }
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    @Override
+    public ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException {
+        LOG.debug("Begin alert user info");
+
+        checker.checkUserInfo(userId, token);
+
+        Update update = new Update();
+        update.set("nickname", user.getNickname());
+        update.set("birthday", user.getBirthday());
+
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
+
+        return ResponseDo.buildSuccessResponse();
     }
 
     /**
@@ -399,8 +358,8 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("未能从三方登录获取头像信息");
         }
 
-        CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0), new ArrayList<Header>(
-                0), Constants.Charset.UTF8);
+        CloseableHttpResponse response = HttpClientUtil.get(url, new HashMap<String, String>(0),
+                new ArrayList<Header>(0), Constants.Charset.UTF8);
         if (!HttpClientUtil.isStatusOK(response)) {
             LOG.warn("Failed to obtain user photo from server");
             HttpClientUtil.close(response);
@@ -419,7 +378,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void checkSnsLoginParameters(String uid, String channel, String sign) throws ApiException {
+    private void checkSnsLoginParameters(String uid, String channel, String password) throws ApiException {
         LOG.debug("Check input parameters");
 
         if (!Constants.Channel.CHANNEL_LIST.contains(channel)) {
@@ -428,21 +387,21 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("输入参数有误");
         }
 
-        if (!isPassSignCheck(uid, channel, sign)) {
+        if (!isPassSignCheck(uid, channel, password)) {
             // 检查sign不通过
             LOG.warn("Input sign correct");
             throw new ApiException("输入参数有误");
         }
     }
 
-    private boolean isPassSignCheck(String uid, String channel, String sign) {
+    private boolean isPassSignCheck(String uid, String channel, String password) {
         StringBuilder builder = new StringBuilder();
         builder.append(uid);
         builder.append(channel);
         builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
 
         String pass = EncoderHandler.encodeByMD5(builder.toString());
-        if (pass.equals(sign)) {
+        if (pass.equals(password)) {
             return true;
         }
         return false;

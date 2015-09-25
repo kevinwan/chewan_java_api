@@ -41,7 +41,6 @@ public class UserInfoController {
 
             User user = (User) JSONObject.toBean(json, User.class);
 
-
             userService.checkRegisterParameters(user, json);
 
             return userService.register(user);
@@ -92,7 +91,7 @@ public class UserInfoController {
                 throw new ApiException("输入参数有误");
             }
 
-            User user = (User)JSONObject.toBean(json, User.class);
+            User user = (User) JSONObject.toBean(json, User.class);
 
             return userService.forgetPassword(user, json.getString("code"));
         } catch (ApiException e) {
@@ -112,22 +111,13 @@ public class UserInfoController {
         LOG.info("snsLogin begin");
 
         try {
-            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "sign"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "nickname", "url", "channel", "sign"))) {
                 throw new ApiException("输入参数有误");
             }
 
-            String username = null;
-            if (!CommonUtil.isEmpty(json, "username")) {
-                username = json.getString("username");
-            }
+            User user = (User) JSONObject.toBean(json, User.class);
 
-            String url = null;
-            if (!CommonUtil.isEmpty(json, "url")) {
-                url = json.getString("url");
-            }
-
-            return userService.snsLogin(json.getString("uid"), json.getString("channel"), json.getString("sign"),
-                    username, url);
+            return userService.snsLogin(user);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -145,8 +135,7 @@ public class UserInfoController {
     @RequestMapping(value = "/user/{beViewedUser}/info", method = RequestMethod.GET)
     public ResponseDo getUserInfo(@PathVariable("beViewedUser") String beViewedUser,
                                   @RequestParam("viewUser") String viewUser, @RequestParam("token") String token) {
-        LOG.info("Begin user:{} infomation", beViewedUser);
-
+        LOG.info("Begin get user information, user:{}", beViewedUser);
 
         try {
             return userService.getUserInfo(beViewedUser, viewUser, token);
@@ -173,9 +162,8 @@ public class UserInfoController {
         }
     }
 
-
     @RequestMapping(value = "/user/{userId}/view/history")
-    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,@RequestParam("limit")int limit,@RequestParam("ignore")int ignore) {
+    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
         LOG.debug("/user/{}/view/history", userId);
         try {
             return userService.getViewHistory(userId, token, limit, ignore);
@@ -193,6 +181,19 @@ public class UserInfoController {
         try {
             return userService.getAuthHistory(userId, token, limit, ignore);
         } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
+    public ResponseDo alterUserInfo(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody User user) {
+        LOG.debug("alter user information");
+
+        try {
+            return userService.alterUserInfo(userId, token, user);
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
