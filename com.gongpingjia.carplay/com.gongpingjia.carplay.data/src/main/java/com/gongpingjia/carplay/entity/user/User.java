@@ -81,6 +81,7 @@ public class User {
     private List<Photo> album;
 
     //仅用于计算距离，不存储到DB
+    @Transient
     private Double distance;
 
     public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer) {

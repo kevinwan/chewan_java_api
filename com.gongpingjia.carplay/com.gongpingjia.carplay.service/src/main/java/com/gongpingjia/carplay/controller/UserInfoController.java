@@ -162,6 +162,15 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 获取用户信息、相册被查看的历史信息
+     *
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/view/history")
     public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
         LOG.debug("/user/{}/view/history", userId);
@@ -173,6 +182,14 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 查看用户的官方认证的审核结果信息
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/auth/history")
     public ResponseDo getAuthHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                      @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {

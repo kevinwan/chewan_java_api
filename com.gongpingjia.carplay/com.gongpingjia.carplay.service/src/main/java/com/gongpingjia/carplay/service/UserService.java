@@ -78,6 +78,15 @@ public interface UserService {
      */
     public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException;
 
+    /**
+     * 获取车玩官方认证的历史信息
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     * @throws ApiException
+     */
     public ResponseDo getAuthHistory(String userId, String token, int limit, int ignore) throws ApiException;
 
     /**

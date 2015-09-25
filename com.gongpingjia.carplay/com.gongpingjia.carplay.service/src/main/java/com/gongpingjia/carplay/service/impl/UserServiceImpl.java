@@ -533,6 +533,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException {
+        LOG.debug("get user view history information, userId:{}", userId);
         checker.checkUserInfo(userId, token);
 
         //获取用户当前的位置信息；
@@ -542,21 +543,23 @@ public class UserServiceImpl implements UserService {
         Criteria criteria = Criteria.where("userId").is(userId);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).skip(ignore).limit(limit);
         List<AlbumViewHistory> viewHistoryList = albumViewHistoryDao.find(query);
+
         LinkedHashSet<String> userIdSet = new LinkedHashSet<>();
         for (AlbumViewHistory item : viewHistoryList) {
             userIdSet.add(item.getViewUserId());
         }
+
         List<User> userList = userDao.findByIds((String[]) userIdSet.toArray());
         //计算distance
-        JSONArray jsonArr = new JSONArray();
+        List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {
             User userItem = getUserFromList(userList, itemUId);
-            JSONObject jsonItem = JSONObject.fromObject(userItem);
-            double distance = DistanceUtil.calculateDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(), userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
-            jsonItem.put("distance", distance);
-            jsonArr.add(jsonItem);
+            double distance = DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
+                    userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
+            userItem.setDistance(distance);
+            users.add(userItem);
         }
-        return ResponseDo.buildSuccessResponse(jsonArr);
+        return ResponseDo.buildSuccessResponse(users);
     }
 
     @Override
