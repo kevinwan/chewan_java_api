@@ -12,7 +12,7 @@ public class AlbumViewHistory {
     @Id
     private String id;
 
-    private String albumId;
+    private String userId;
 
     //userId
     private String viewUser;
@@ -27,12 +27,12 @@ public class AlbumViewHistory {
         this.id = id;
     }
 
-    public String getAlbumId() {
-        return albumId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setAlbumId(String albumId) {
-        this.albumId = albumId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getViewUser() {
@@ -55,7 +55,7 @@ public class AlbumViewHistory {
     public String toString() {
         return "AlbumViewHistory{" +
                 "id='" + id + '\'' +
-                ", albumId='" + albumId + '\'' +
+                ", userId='" + userId + '\'' +
                 ", viewUser='" + viewUser + '\'' +
                 ", viewTime=" + viewTime +
                 '}';
