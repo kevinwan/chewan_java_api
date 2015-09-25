@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
+import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
@@ -173,7 +174,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
+    public ResponseDo sendAppointment(String activityId, String userId, String token, ActivityIntention activityIntention) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
         if (activity == null) {
@@ -201,6 +202,13 @@ public class ActivityServiceImpl implements ActivityService {
         appointment.setStatus(Constants.AppointmentStatus.APPLYING);
         appointment.setCreateTime(DateUtil.getTime());
         appointment.setModifyTime(DateUtil.getTime());
+
+        //活动意向
+        appointment.setType(activityIntention.getType());
+        appointment.setDestination(activityIntention.getDestination());
+        appointment.setDestPoint(activityIntention.getDestPoint());
+        appointment.setPay(activityIntention.getPay());
+        appointment.setTransfer(activityIntention.isTransfer());
 
         appointmentDao.save(appointment);
 
