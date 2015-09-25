@@ -35,16 +35,12 @@ public class UserInfoController {
         LOG.debug("register is called, request parameter produce:");
         try {
             // 检查必须参数是否为空
-            if (CommonUtil.isEmpty(json, Arrays.asList("phone", "nickname", "gender", "birthday", "avatar"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthday", "avatar"))) {
                 throw new ApiException("输入参数错误");
             }
 
-            User user = new User();
-            user.setPhone(json.getString("phone"));
-            user.setNickname(json.getString("nickname"));
-            user.setGender(json.getString("gender"));
-            user.setBirthday(json.getLong("birthday"));
-            user.setAvatar(json.getString("avatar"));
+            User user = (User) JSONObject.toBean(json, User.class);
+
 
             userService.checkRegisterParameters(user, json);
 
@@ -96,9 +92,7 @@ public class UserInfoController {
                 throw new ApiException("输入参数有误");
             }
 
-            User user = new User();
-            user.setPhone(json.getString("phone"));
-            user.setPassword(json.getString("password"));
+            User user = (User)JSONObject.toBean(json, User.class);
 
             return userService.forgetPassword(user, json.getString("code"));
         } catch (ApiException e) {

@@ -3,10 +3,13 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
+import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
+import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -52,6 +55,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private ActivityUtil activityUtil;
+
+    @Autowired
+    private AppointmentDao appointmentDao;
 
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
@@ -165,6 +171,42 @@ public class ActivityServiceImpl implements ActivityService {
         query.addCriteria(criteria);
         return query;
     }
+
+    @Override
+    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException {
+        parameterChecker.checkUserInfo(userId, token);
+        Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
+        if (activity == null) {
+            LOG.warn("No activity exist : {}", activityId);
+            throw new ApiException("未找到该活动");
+        }
+        List<String> members = activity.getMembers();
+        for (String member : members) {
+            if (member.equals(userId)) {
+                LOG.warn("Already be a member");
+                throw new ApiException("已是成员，不能重复申请加入活动");
+            }
+        }
+        Appointment appointment = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("applyUserId").is(userId).and("status").is(Constants.AppointmentStatus.APPLYING)));
+        if (appointment != null) {
+            LOG.warn("already applying for this activity");
+            throw new ApiException("该活动已处于申请中，请勿重复申请");
+        }
+
+        appointment = new Appointment();
+        appointment.setActivityId(activity.getActivityId());
+        appointment.setApplyUserId(userId);
+        appointment.setInvitedUserId(activity.getUserId());
+        appointment.setCreateTime(DateUtil.getTime());
+        appointment.setStatus(Constants.AppointmentStatus.APPLYING);
+        appointment.setCreateTime(DateUtil.getTime());
+        appointment.setModifyTime(DateUtil.getTime());
+
+        appointmentDao.save(appointment);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
 
     /**
      * 根据活动信息创建聊天群

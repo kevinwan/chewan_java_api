@@ -15,6 +15,8 @@ public class AuthenticationHistory {
 
     private String applicationId;
 
+    private String type;
+
     private String status;
 
     private String remark;
@@ -35,6 +37,14 @@ public class AuthenticationHistory {
 
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getStatus() {

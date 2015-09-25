@@ -71,6 +71,9 @@ public class User {
      */
     private List<Photo> album;
 
+    //仅用于计算距离，不存储到DB
+    private Double distance;
+
     public Address getAddress() {
         return address;
     }
@@ -278,5 +281,13 @@ public class User {
 
     public void setAlbum(List<Photo> album) {
         this.album = album;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
     }
 }
