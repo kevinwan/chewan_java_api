@@ -360,15 +360,21 @@ public class UserServiceImpl implements UserService {
             applicant.put("userId", applicantUser.getUserId());
             applicant.put("nickname", applicantUser.getNickname());
             applicant.put("gender", applicantUser.getGender());
-            applicant.put("age", applicantUser);
+            applicant.put("age", getAgeByBirthday(applicantUser.getBirthday()));
             applicant.put("role", applicantUser.getRole());
             applicant.put("avatar", applicantUser.getAvatar());
             applicant.put("drivingYears", applicantUser.getDrivingYears());
             applicant.put("photoAuthStatus", applicantUser.getPhotoAuthStatus());
             applicant.put("licenseAuthStatus", applicantUser.getLicenseAuthStatus());
+
             Map<String, Object> car = new HashMap<>(2, 1);
-            car.put("logo", applicantUser.getCar().getLogo());
-            car.put("model", applicantUser.getCar().getModel());
+            if (applicantUser.getCar() != null) {
+                car.put("logo", applicantUser.getCar().getLogo());
+                car.put("model", applicantUser.getCar().getModel());
+            } else {
+                car.put("logo", "");
+                car.put("model", "");
+            }
             applicant.put("car", car);
             appointmentInfo.put("applicant", applicant);
 
