@@ -4,6 +4,7 @@ package com.gongpingjia.carplay.service;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.Activity;
+import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ public interface ActivityService {
     public Query initQuery(HttpServletRequest request, Map<String, String> transMap);
 
     /**
-     * 约她，发送约会申请
+     * “约她”申请加入活动
      */
-    public ResponseDo sendAppointment(String activityId, String userId, String token) throws ApiException;
+    public ResponseDo sendAppointment(String activityId, String userId, String token,ActivityIntention activityIntention) throws ApiException;
 }
