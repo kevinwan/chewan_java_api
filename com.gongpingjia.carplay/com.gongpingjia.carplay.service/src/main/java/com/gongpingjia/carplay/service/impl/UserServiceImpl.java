@@ -14,6 +14,7 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.User;
@@ -334,6 +335,17 @@ public class UserServiceImpl implements UserService {
         update.set("birthday", user.getBirthday());
 
         userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo changeLocation(String userId, String token, Landmark landmark) throws ApiException {
+        LOG.debug("Begin check input parameters");
+
+        checker.checkUserInfo(userId, token);
+
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("landmark", landmark));
 
         return ResponseDo.buildSuccessResponse();
     }

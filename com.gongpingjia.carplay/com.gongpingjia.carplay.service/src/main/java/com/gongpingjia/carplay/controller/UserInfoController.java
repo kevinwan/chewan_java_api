@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
@@ -219,6 +220,31 @@ public class UserInfoController {
         try {
             return userService.alterUserInfo(userId, token, user);
         } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 变更用户位置信息
+     *
+     * @param json 请求Body参数信息
+     * @return 变更结果信息
+     */
+    @RequestMapping(value = "/user/location", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo changeLocation(@RequestBody JSONObject json) {
+        try {
+            LOG.debug("Begin change user loaction, request:{}", json);
+            if (CommonUtil.isEmpty(json, Arrays.asList("userId", "token", "longitude", "latitude"))) {
+                throw new ApiException("输入参数有误");
+            }
+            String userId = json.getString("userId");
+            String token = json.getString("token");
+            Landmark landmark = (Landmark)JSONObject.toBean(json,Landmark.class);
+
+            return userService.changeLocation(userId, token,landmark);
+        } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }

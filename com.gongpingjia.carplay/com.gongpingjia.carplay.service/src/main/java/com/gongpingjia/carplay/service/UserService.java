@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,7 @@ public interface UserService {
 
     /**
      * 获取车玩官方认证的历史信息
+     *
      * @param userId
      * @param token
      * @param limit
@@ -93,4 +95,6 @@ public interface UserService {
      * 修改用户信息
      */
     ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException;
+
+    ResponseDo changeLocation(String userId, String token, Landmark landmark) throws ApiException;
 }
