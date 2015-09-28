@@ -247,6 +247,6 @@ public class Constants {
 
         String REJECT = "拒绝";
 
-        String APPLYING = "申请中";
+        String APPLYING = "邀请中";
     }
 }
