@@ -84,6 +84,12 @@ public class User {
     @Transient
     private Double distance;
 
+    /**
+     * 刷新user相关的photo的URL地址
+     *
+     * @param localPhotoServer  本地服务器
+     * @param remotePhotoServer 远程服务器
+     */
     public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer) {
         if (StringUtils.isEmpty(this.avatar)) {
             this.avatar = localPhotoServer + this.avatar;

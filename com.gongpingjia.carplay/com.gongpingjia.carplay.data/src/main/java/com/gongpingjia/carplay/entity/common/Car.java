@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.entity.common;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Created by licheng on 2015/9/21.
  */
@@ -40,6 +42,17 @@ public class Car {
         this.model = model;
         this.color = color;
         this.price = price;
+    }
+
+    /**
+     * 给logo添加服务器前缀
+     *
+     * @param photoServerUrl 服务器前缀
+     */
+    public void refreshPhotoInfo(String photoServerUrl) {
+        if (!StringUtils.isEmpty(this.logo)) {
+            this.logo = photoServerUrl + this.logo;
+        }
     }
 
     public String getId() {
