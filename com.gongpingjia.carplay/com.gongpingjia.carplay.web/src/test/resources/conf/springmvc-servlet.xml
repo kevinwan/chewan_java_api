@@ -1,43 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:beans="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context 
     http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/mvc 
     http://www.springframework.org/schema/mvc/spring-mvc.xsd
     http://www.springframework.org/schema/util
-    http://www.springframework.org/schema/util/spring-util.xsd">
+    http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
-	<!-- 默认扫描的包路径 -->
-	<context:component-scan base-package="com.gongpingjia.carplay" />
+    <!-- 默认扫描的包路径 -->
+    <context:component-scan base-package="com.gongpingjia.carplay"/>
 
-	<!-- 添加注解驱动 -->
-	<mvc:annotation-driven />
+    <!-- 添加注解驱动 -->
+    <mvc:annotation-driven/>
 
-	<!-- <bean id="commonInterceptor" class="com.gongpingjia.carplay.interceptor.CommonInterceptor" 
-		/> <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"> 
-		<property name="interceptors"> <list> <ref bean="commonInterceptor" /> </list> 
-		</property> </bean> -->
-	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-		<property name="mediaTypes">
-			<map>
-				<!-- 告诉视图解析器，返回的类型为json格式 -->
-				<entry key="json" value="application/json" />
-			</map>
-		</property>
-		<property name="defaultViews">
-			<list>
-				<!-- ModelAndView里的数据变成JSON -->
-				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
-			</list>
-		</property>
-	</bean>
-	<mvc:interceptors>
-		<!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
-		<bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor" />
-	</mvc:interceptors>
+    <!-- <bean id="commonInterceptor" class="com.gongpingjia.carplay.interceptor.CommonInterceptor"
+        /> <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors"> <list> <ref bean="commonInterceptor" /> </list>
+        </property> </bean> -->
+
+    <mvc:interceptors>
+        <!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
+        <bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor"/>
+    </mvc:interceptors>
+
+    <bean id="jsonConverter"
+          class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+        <property name="supportedMediaTypes" value="application/json;charset=UTF-8"/>
+        <property name="features">
+            <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                <value>DisableCircularReferenceDetect</value>
+            </array>
+        </property>
+    </bean>
+    <bean id="DisableCircularReferenceDetect"
+          class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField"
+                  value="com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect"></property>
+    </bean>
+
+    <bean
+            class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="viewResolvers">
+            <list>
+                <bean
+                        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+                    <property name="prefix" value="/WEB-INF/views/"/>
+                    <property name="suffix" value=".jsp"></property>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="com.alibaba.fastjson.support.spring.FastJsonJsonView"/>
+            </list>
+        </property>
+    </bean>
 </beans>
