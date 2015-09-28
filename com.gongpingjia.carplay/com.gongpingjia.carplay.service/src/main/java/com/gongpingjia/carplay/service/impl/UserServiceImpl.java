@@ -92,6 +92,11 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Save register data begin");
 
         // 注册用户
+
+        user.setRegisterTime(DateUtil.getTime());
+        user.setRole(Constants.UserCatalog.COMMON);
+        user.setPhotoAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
+        user.setLicenseAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
         userDao.save(user);
 
         // 注册环信用户
