@@ -158,7 +158,7 @@ public class User {
     }
 
     public Integer getAge() {
-        return age;
+        return calculateAge(birthday);
     }
 
     public void setAge(Integer age) {
@@ -211,7 +211,6 @@ public class User {
 
     public void setBirthday(Long birthday) {
         this.birthday = birthday;
-        this.age = calculateAge(birthday);
     }
 
     public Long getRegisterTime() {
