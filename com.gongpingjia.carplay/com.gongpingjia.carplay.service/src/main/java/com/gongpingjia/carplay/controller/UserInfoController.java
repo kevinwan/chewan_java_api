@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
@@ -162,6 +163,15 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 获取用户信息、相册被查看的历史信息
+     *
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/view/history")
     public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
         LOG.debug("/user/{}/view/history", userId);
@@ -173,6 +183,15 @@ public class UserInfoController {
         }
     }
 
+    /**
+     * 查看用户的官方认证的审核结果信息
+     *
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/auth/history")
     public ResponseDo getAuthHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                      @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
@@ -186,7 +205,14 @@ public class UserInfoController {
         }
     }
 
-
+    /**
+     * 修改用户信息
+     *
+     * @param userId
+     * @param token
+     * @param user
+     * @return
+     */
     @RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
     public ResponseDo alterUserInfo(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody User user) {
         LOG.debug("alter user information");
@@ -194,6 +220,31 @@ public class UserInfoController {
         try {
             return userService.alterUserInfo(userId, token, user);
         } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 变更用户位置信息
+     *
+     * @param json 请求Body参数信息
+     * @return 变更结果信息
+     */
+    @RequestMapping(value = "/user/location", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo changeLocation(@RequestBody JSONObject json) {
+        try {
+            LOG.debug("Begin change user loaction, request:{}", json);
+            if (CommonUtil.isEmpty(json, Arrays.asList("userId", "token", "longitude", "latitude"))) {
+                throw new ApiException("输入参数有误");
+            }
+            String userId = json.getString("userId");
+            String token = json.getString("token");
+            Landmark landmark = (Landmark)JSONObject.toBean(json,Landmark.class);
+
+            return userService.changeLocation(userId, token,landmark);
+        } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }

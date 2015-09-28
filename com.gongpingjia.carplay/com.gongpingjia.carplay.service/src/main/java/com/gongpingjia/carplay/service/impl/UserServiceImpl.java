@@ -12,21 +12,16 @@ import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
-import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
-import com.gongpingjia.carplay.entity.user.AuthApplication;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
-import com.gongpingjia.carplay.util.DistanceUtil;
-import com.mongodb.BasicDBObject;
+import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
-import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.entity.user.UserToken;
-import com.gongpingjia.carplay.service.UserService;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -101,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
         // 注册环信用户
         LOG.debug("Register emchat user by call remote service");
-        Map<String, String> chatUser = new HashMap<String, String>(2, 1);
+        Map<String, String> chatUser = new HashMap<>(2, 1);
         chatUser.put("username", chatCommonService.getUsernameByUserid(user.getUserId()));
         chatUser.put("password", user.getPassword());
 
@@ -310,7 +305,7 @@ public class UserServiceImpl implements UserService {
         List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
-        List<Map<String, Object>> data = new ArrayList<>();
+        List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
@@ -340,6 +335,17 @@ public class UserServiceImpl implements UserService {
         update.set("birthday", user.getBirthday());
 
         userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo changeLocation(String userId, String token, Landmark landmark) throws ApiException {
+        LOG.debug("Begin check input parameters");
+
+        checker.checkUserInfo(userId, token);
+
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("landmark", landmark));
 
         return ResponseDo.buildSuccessResponse();
     }
@@ -531,22 +537,9 @@ public class UserServiceImpl implements UserService {
         return uuid;
     }
 
-    /**
-     * @param Birthday 生日
-     *                 <p/>
-     *                 计算年龄
-     */
-    public int getAgeByBirthday(Long Birthday) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(DateUtil.getTime());
-        Calendar userCal = Calendar.getInstance();
-        userCal.setTimeInMillis(Birthday);
-        return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
-    }
-
-
     @Override
     public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException {
+        LOG.debug("get user view history information, userId:{}", userId);
         checker.checkUserInfo(userId, token);
 
         //获取用户当前的位置信息；
@@ -556,21 +549,23 @@ public class UserServiceImpl implements UserService {
         Criteria criteria = Criteria.where("userId").is(userId);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).skip(ignore).limit(limit);
         List<AlbumViewHistory> viewHistoryList = albumViewHistoryDao.find(query);
+
         LinkedHashSet<String> userIdSet = new LinkedHashSet<>();
         for (AlbumViewHistory item : viewHistoryList) {
             userIdSet.add(item.getViewUserId());
         }
+
         List<User> userList = userDao.findByIds((String[]) userIdSet.toArray());
         //计算distance
-        JSONArray jsonArr = new JSONArray();
+        List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {
             User userItem = getUserFromList(userList, itemUId);
-            JSONObject jsonItem = JSONObject.fromObject(userItem);
-            double distance = DistanceUtil.calculateDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(), userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
-            jsonItem.put("distance", distance);
-            jsonArr.add(jsonItem);
+            double distance = DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
+                    userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
+            userItem.setDistance(distance);
+            users.add(userItem);
         }
-        return ResponseDo.buildSuccessResponse(jsonArr);
+        return ResponseDo.buildSuccessResponse(users);
     }
 
     @Override

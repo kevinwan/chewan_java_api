@@ -1,9 +1,7 @@
 package com.gongpingjia.carplay.common.exception;
 
+import com.gongpingjia.carplay.common.domain.ResponseDo;
 import net.sf.json.JSONException;
-
-import org.apache.ibatis.binding.BindingException;
-import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.NestedServletException;
-
-import com.gongpingjia.carplay.common.domain.ResponseDo;
 
 /**
  * 统一异常处理
@@ -57,24 +53,6 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(NestedServletException.class)
 	public final ResponseEntity<?> handleNestedServletException(NestedServletException ex, WebRequest request) {
 		LOG.warn("Handle NestedServletException, it is database mapping exception");
-		LOG.error(ex.getMessage(), ex);
-		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
-		HttpHeaders headers = new HttpHeaders();
-		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
-	}
-
-	@ExceptionHandler(PersistenceException.class)
-	public final ResponseEntity<?> handlePersistenceException(PersistenceException ex, WebRequest request) {
-		LOG.warn("Handle NestedServletException, it is database mapping exception");
-		LOG.error(ex.getMessage(), ex);
-		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
-		HttpHeaders headers = new HttpHeaders();
-		return handleExceptionInternal(ex, response, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
-	}
-
-	@ExceptionHandler(BindingException.class)
-	public final ResponseEntity<?> handleBindingException(BindingException ex, WebRequest request) {
-		LOG.warn("Handle BindingException, it is database mapping exception");
 		LOG.error(ex.getMessage(), ex);
 		ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
 		HttpHeaders headers = new HttpHeaders();

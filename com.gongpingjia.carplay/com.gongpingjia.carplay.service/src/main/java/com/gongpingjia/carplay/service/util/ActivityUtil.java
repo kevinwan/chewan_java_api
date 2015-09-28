@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.util;
+package com.gongpingjia.carplay.service.util;
 
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
