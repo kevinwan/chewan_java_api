@@ -14,6 +14,14 @@ import java.util.List;
  */
 @Document
 public class Activity extends ActivityIntention {
+
+    public static final String PAY_TYPE_TREAT = "";
+
+    public static final String PAY_TYPE_INVITED = "";
+
+    public static final String PAY_TYPE_AA = "";
+
+
     @Id
     private String activityId;
     //活动创建人员

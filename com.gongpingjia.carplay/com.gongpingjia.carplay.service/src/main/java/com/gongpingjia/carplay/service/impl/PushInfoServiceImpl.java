@@ -15,6 +15,8 @@ import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.PushInfoService;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -29,6 +31,8 @@ import java.util.List;
  */
 @Service("pushInfoService")
 public class PushInfoServiceImpl implements PushInfoService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PushInfoServiceImpl.class);
 
     @Autowired
     private ActivityDao activityDao;
@@ -49,16 +53,20 @@ public class PushInfoServiceImpl implements PushInfoService {
     private MessageDao messageDao;
 
     /**
+     * @param userId
      * step 1 获取感兴趣的人信息：  查询感兴趣的人中所有的创建的活动的 按照时间的 倒排；即离当前时间最近的 活动；
-     * <p/>
+     *
      * step 2 查询 别人邀请我的/我邀请别人的 appointment 最近的一个 appointment
-     * <p/>
+     *
      * step 3 有人看过我的照片 取最近的一条；
-     * <p/>
-     * step 4 谁关注我       关注表 取最近的一条；
+     *
+     * step 4 谁关注我 取最近的一条；
+     *
+     * step 5 获取官方认证等信息；
      */
     @Override
     public ResponseDo getPushInfo(String userId) {
+        LOG.debug("getPushInfo");
         JSONObject jsonObject = new JSONObject();
         getSubscribeUserInfo(jsonObject, userId);
         getAppointmentInfo(jsonObject, userId);
@@ -96,6 +104,8 @@ public class PushInfoServiceImpl implements PushInfoService {
     }
 
     /**
+     * @param json
+     * @param userId
      * 获取时间最近的 第一个 约会/被约会信息；
      */
     private void getAppointmentInfo(JSONObject json, String userId) {
@@ -109,6 +119,8 @@ public class PushInfoServiceImpl implements PushInfoService {
     }
 
     /**
+     * @param json
+     * @param userId
      * 获取相册访问记录最近的一条信息；
      */
     private void getAlbumViewHistoryInfo(JSONObject json, String userId) {
@@ -121,6 +133,8 @@ public class PushInfoServiceImpl implements PushInfoService {
 
     /**
      * 获取最近的关注我的 人 User 10条记录；
+     * @param json
+     * @param userId
      */
     private void getSubscriberInfo(JSONObject json, String userId) {
         Criteria criteria = new Criteria();
@@ -137,6 +151,10 @@ public class PushInfoServiceImpl implements PushInfoService {
     //获取官方活动；
     //读取message中的信息；
 
+    /**
+     *@param json
+     * @param userId
+     */
     public void getOfficialInfo(JSONObject json, String userId) {
         Criteria criteria = Criteria.where("toUser").is(userId).where("checked").is(false);
         Query query = Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));

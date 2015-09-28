@@ -17,7 +17,22 @@
 		base-package="com.gongpingjia.carplay.controller,com.gongpingjia.carplay.common.exception" />
 
 	<!-- 添加注解驱动 -->
-	<mvc:annotation-driven />
+	<!--<mvc:annotation-driven />-->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean class="com.gongpingjia.carplay.common.util.CustomHttpMessageConverter">
+				<property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+				<property name="features">
+					<array>
+						<value>QuoteFieldNames</value>
+						<value>WriteMapNullValue</value>
+						<value>WriteNullStringAsEmpty</value>
+						<value>WriteNullListAsEmpty</value>
+					</array>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
 
 	<mvc:interceptors>
 		<!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->

@@ -26,6 +26,12 @@ public class PushInfoController {
     @Autowired
     private ParameterChecker parameterChecker;
 
+
+    /**
+     * 获取动态信息
+     *@param userId
+     *@param token
+     */
     @RequestMapping(value = "/user/{userId}/pushInfo", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");

@@ -46,7 +46,6 @@ public class ActivityController {
             return activityService.activityRegister(userId, token, activity);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
-            e.printStackTrace();
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }

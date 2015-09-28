@@ -17,49 +17,29 @@
     <context:component-scan base-package="com.gongpingjia.carplay"/>
 
     <!-- 添加注解驱动 -->
-    <mvc:annotation-driven/>
+    <!--<mvc:annotation-driven/>-->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="com.gongpingjia.carplay.common.util.CustomHttpMessageConverter">
+                <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+                <property name="features">
+                    <array>
+                        <value>QuoteFieldNames</value>
+                        <value>WriteMapNullValue</value>
+                        <value>WriteNullStringAsEmpty</value>
+                        <value>WriteNullListAsEmpty</value>
+                    </array>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
-    <!-- <bean id="commonInterceptor" class="com.gongpingjia.carplay.interceptor.CommonInterceptor"
-        /> <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <property name="interceptors"> <list> <ref bean="commonInterceptor" /> </list>
-        </property> </bean> -->
 
     <mvc:interceptors>
         <!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
         <bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor"/>
     </mvc:interceptors>
 
-    <bean id="jsonConverter"
-          class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
-        <property name="supportedMediaTypes" value="application/json;charset=UTF-8"/>
-        <property name="features">
-            <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
-                <value>DisableCircularReferenceDetect</value>
-            </array>
-        </property>
-    </bean>
-    <bean id="DisableCircularReferenceDetect"
-          class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
-        <property name="staticField"
-                  value="com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect"></property>
-    </bean>
 
-    <bean
-            class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-        <property name="viewResolvers">
-            <list>
-                <bean
-                        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-                    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-                    <property name="prefix" value="/WEB-INF/views/"/>
-                    <property name="suffix" value=".jsp"></property>
-                </bean>
-            </list>
-        </property>
-        <property name="defaultViews">
-            <list>
-                <bean class="com.alibaba.fastjson.support.spring.FastJsonJsonView"/>
-            </list>
-        </property>
-    </bean>
+
 </beans>

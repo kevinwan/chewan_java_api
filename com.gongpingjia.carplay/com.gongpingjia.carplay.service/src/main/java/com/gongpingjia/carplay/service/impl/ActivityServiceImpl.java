@@ -62,19 +62,30 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
+        LOG.debug("activityRegister");
         parameterChecker.checkUserInfo(userId, token);
         activity.setActivityId(null);
+        //设置活动的创建人ID
         activity.setUserId(userId);
         List<String> memberIds = new ArrayList<String>(1);
+        //创建人默认加入到活动成员列表中
         memberIds.add(userId);
         activity.setMembers(memberIds);
+
         activityDao.save(activity);
-        createEmchatGroup(activity);
+        try {
+            createEmchatGroup(activity);
+        } catch (ApiException e) {
+            //创建环信群组失败的时候，需要删除mongodb中的对应的群组；
+            activityDao.deleteById(activity.getActivityId());
+            LOG.error(e.getMessage(), e);
+        }
         return ResponseDo.buildSuccessResponse();
     }
 
     @Override
     public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException {
+        LOG.debug("getActivityInfo");
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findById(activityId);
         User organizer = userDao.findById(activity.getUserId());
@@ -96,6 +107,7 @@ public class ActivityServiceImpl implements ActivityService {
      */
     @Override
     public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request) throws ApiException {
+        LOG.debug("getNearActivityList");
         //从request读取初始化信息；
         //limit 是分页参数
         int limit = 10;
@@ -103,6 +115,7 @@ public class ActivityServiceImpl implements ActivityService {
         int ignore = 0;
         //默认的最大距离参数
         double maxDistance = ActivityWeight.DEFAULT_MAX_DISTANCE;
+
         String limitStr = request.getParameter("limit");
         String ignoreStr = request.getParameter("ignore");
         if (StringUtils.isNotEmpty(limitStr)) {
@@ -114,9 +127,13 @@ public class ActivityServiceImpl implements ActivityService {
         String longitude = request.getParameter("longitude");
         String latitude = request.getParameter("latitude");
         if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
+            LOG.error("longitude or latitude has not inited");
             throw new ApiException("param not match");
         }
+        LOG.debug("longitude is:" + longitude);
+        LOG.debug("latitude is:" + latitude);
         String maxDistanceStr = request.getParameter("maxDistance");
+        LOG.debug("maxDistanceStr is:" + maxDistanceStr);
         if (StringUtils.isNotEmpty(maxDistanceStr)) {
             maxDistance = Double.parseDouble(maxDistanceStr);
         }
@@ -124,17 +141,26 @@ public class ActivityServiceImpl implements ActivityService {
         landmark.setLatitude(Double.parseDouble(latitude));
         landmark.setLongitude(Double.parseDouble(longitude));
 
+        LOG.debug("init Query");
         //从request读取基础查询参数；
         Query query = initQuery(request, transParams);
+
         // 添加 距离  时间 查询参数；
         Criteria criteria = new Criteria();
         //查询创建在此时间之前的活动；
         long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) ActivityWeight.MAX_PUB_TIME));
+        criteria.where("createTime").gte(gtTime);
+
         //查询在最大距离内的 活动；
-        Criteria.where("createTime").gte(gtTime).where("landMark").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+        criteria.where("landMark").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
         query.addCriteria(criteria);
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(query);
+        if(allActivityList == null || allActivityList.size() == 0) {
+            LOG.warn("all Activity list is empty");
+            return ResponseDo.buildSuccessResponse("[]");
+        }
+        LOG.debug("allActivityList size is:" + allActivityList.size());
         //TODO
         /**
          *  对所有的基础条件活动进行权重打分，并且排序
@@ -142,6 +168,9 @@ public class ActivityServiceImpl implements ActivityService {
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
         List<ActivityWeight> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
+        LOG.debug("rltList size is:" + rltList.size());
+
+        //添加activity的组织者信息；和 distance 信息；
         JSONArray jsonArray = new JSONArray();
         Set<String> userIds = new HashSet<>();
         for (ActivityWeight activityWeight : rltList) {
@@ -161,12 +190,25 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Query initQuery(HttpServletRequest request, Map<String, String> transMap) {
+        //初始化query信息
         Query query = new Query();
         Criteria criteria = new Criteria();
         for (Map.Entry<String, String> transItem : transMap.entrySet()) {
             String requestVal = request.getParameter(transItem.getKey());
             if (StringUtils.isNotEmpty(requestVal)) {
-                criteria.where(transItem.getValue()).is(requestVal);
+                //付款类型转换 请我变成 请客  请客变成 请我 AA不变；
+                //TODO
+                if (transItem.getKey().equals("pay")) {
+                    if (requestVal.equals(Activity.PAY_TYPE_INVITED)) {
+                        criteria.where(transItem.getValue()).is(Activity.PAY_TYPE_TREAT);
+                    } else if (requestVal.equals(Activity.PAY_TYPE_TREAT)) {
+                        criteria.where(transItem.getKey()).is(Activity.PAY_TYPE_INVITED);
+                    } else {
+                        criteria.where(transItem.getKey()).is(Activity.PAY_TYPE_AA);
+                    }
+                } else {
+                    criteria.where(transItem.getValue()).is(requestVal);
+                }
             }
         }
         query.addCriteria(criteria);
