@@ -2,7 +2,9 @@ package com.gongpingjia.carplay.entity.activity;
 
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -42,6 +44,9 @@ public class Activity extends ActivityIntention {
     //活动创建人员
     private String userId;
 
+    @Transient
+    private User organizer;
+
     private Long start;
     private Long end;
 
@@ -63,6 +68,9 @@ public class Activity extends ActivityIntention {
 
     private Long createTime;
 
+    @Transient
+    private Double distance;
+
     public String getActivityId() {
         return activityId;
     }
@@ -77,6 +85,14 @@ public class Activity extends ActivityIntention {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public User getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(User organizer) {
+        this.organizer = organizer;
     }
 
     public Long getStart() {
@@ -141,5 +157,13 @@ public class Activity extends ActivityIntention {
 
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
     }
 }

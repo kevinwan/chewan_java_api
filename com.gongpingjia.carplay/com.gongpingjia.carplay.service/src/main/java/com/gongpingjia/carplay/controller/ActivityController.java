@@ -27,10 +27,10 @@ public class ActivityController {
      * 用户id
      *
      * @param userId
-     * <p>
+     * <p/>
      * 用户token
      * @param token
-     * <p>
+     * <p/>
      * 活动信息对应的json
      * @param activity
      */
@@ -52,7 +52,7 @@ public class ActivityController {
 
     /**
      * 获取活动信息
-     * <p>
+     * <p/>
      * 活动主键
      *
      * @param activityId
@@ -63,7 +63,8 @@ public class ActivityController {
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            return activityService.getActivityInfo(userId, token, activityId);
+            ResponseDo responseDo = activityService.getActivityInfo(userId, token, activityId);
+            return responseDo;
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -84,8 +85,9 @@ public class ActivityController {
 
     /**
      * 约她 申请加入活动
+     *
      * @param activityId 活动Id
-     * @param userId 申请人
+     * @param userId     申请人
      * @param token
      * @param json
      * @return

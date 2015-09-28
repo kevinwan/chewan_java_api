@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,14 +72,17 @@ public class ActivityServiceImpl implements ActivityService {
         //创建人默认加入到活动成员列表中
         memberIds.add(userId);
         activity.setMembers(memberIds);
+        activity.setCreateTime(new Date().getTime());
 
         activityDao.save(activity);
         try {
-            createEmchatGroup(activity);
+            String groupId = createEmchatGroup(activity);
+            activityDao.update(Query.query(Criteria.where("_id").is(activity.getActivityId())), Update.update("emchatGroupId", groupId));
         } catch (ApiException e) {
             //创建环信群组失败的时候，需要删除mongodb中的对应的群组；
             activityDao.deleteById(activity.getActivityId());
             LOG.error(e.getMessage(), e);
+            throw new ApiException("创建环信群组失败");
         }
         return ResponseDo.buildSuccessResponse();
     }
@@ -89,9 +93,8 @@ public class ActivityServiceImpl implements ActivityService {
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findById(activityId);
         User organizer = userDao.findById(activity.getUserId());
-        JSONObject jsonObject = JSONObject.fromObject(activity);
-        jsonObject.put("organizer", organizer);
-        return ResponseDo.buildSuccessResponse(jsonObject);
+        activity.setOrganizer(organizer);
+        return ResponseDo.buildSuccessResponse(activity);
     }
 
     /**
@@ -152,11 +155,11 @@ public class ActivityServiceImpl implements ActivityService {
         criteria.where("createTime").gte(gtTime);
 
         //查询在最大距离内的 活动；
-        criteria.where("landMark").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+        criteria.where("destPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
         query.addCriteria(criteria);
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(query);
-        if(allActivityList == null || allActivityList.size() == 0) {
+        if (allActivityList == null || allActivityList.size() == 0) {
             LOG.warn("all Activity list is empty");
             return ResponseDo.buildSuccessResponse("[]");
         }
@@ -170,22 +173,20 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivityWeight> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
         LOG.debug("rltList size is:" + rltList.size());
 
+
         //添加activity的组织者信息；和 distance 信息；
-        JSONArray jsonArray = new JSONArray();
         Set<String> userIds = new HashSet<>();
         for (ActivityWeight activityWeight : rltList) {
             userIds.add(activityWeight.getActivity().getUserId());
         }
         List<User> userList = userDao.findByIds((String[]) userIds.toArray());
+        List<Activity> activityList = new ArrayList<>(rltList.size());
         for (ActivityWeight activityWeight : rltList) {
-            JSONObject item = JSONObject.fromObject(activityWeight.getActivity());
-            //初始化活动的组织者信息；
-            item.put("organizer", findById(userList, activityWeight.getActivity().getUserId()));
-            //距离信息；
-            item.put("distance", activityWeight.getDistance());
-            jsonArray.add(item);
+            Activity activity = activityWeight.getActivity();
+            activity.setDistance(activityWeight.getDistance());
+            activity.setOrganizer(findById(userList, activity.getUserId()));
         }
-        return ResponseDo.buildSuccessResponse(jsonArray);
+        return ResponseDo.buildSuccessResponse(activityList);
     }
 
     @Override
@@ -264,14 +265,17 @@ public class ActivityServiceImpl implements ActivityService {
      * @param activity 活动信息
      * @throws ApiException 创建群聊失败时
      */
-    private void createEmchatGroup(Activity activity) throws ApiException {
+    private String createEmchatGroup(Activity activity) throws ApiException {
         LOG.debug("Begin create chat group");
         User owner = userDao.findById(activity.getUserId());
-        JSONObject json = chatThirdPartyService.createChatGroup(emchatTokenService.getToken(), activity.getType(), activity.getActivityId(), owner.getNickname(), activity.getMembers());
+        JSONObject json = chatThirdPartyService.createChatGroup(emchatTokenService.getToken(), activity.getType(), activity.getActivityId(), owner.getEmchatName(), null);
         if (json.isEmpty()) {
             LOG.warn("Failed to create chat group");
             throw new ApiException("创建聊天群组失败");
         }
+        String groupId = json.getJSONObject("data").getString("groupid");
+        return groupId;
+
     }
 
     private User findById(List<User> users, String id) {
