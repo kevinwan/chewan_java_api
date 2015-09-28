@@ -151,27 +151,15 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-        JSONObject jsonObject = JSONObject.fromObject(userData);
-        jsonObject.put("token", getUserToken(userData.getUserId()));
-        jsonObject.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-
-        if (StringUtils.isEmpty(userData.getPhoto())) {
-            jsonObject.put("photo", "");
-        } else {
-            jsonObject.put("photo", CommonUtil.getLocalPhotoServer() + userData.getPhoto());
-        }
-
-        Map<String, Object> carMap = new HashMap<String, Object>(1, 1);
+        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
         if (userData.getCar() == null) {
-            carMap.put("brand", "");
-            carMap.put("brandLogo", "");
-            carMap.put("model", "");
-            carMap.put("slug", "");
+            userData.setCar(new Car());
+        } else {
+            userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
         }
-        jsonObject.put("car", carMap);
 
-        return ResponseDo.buildSuccessResponse(jsonObject);
+        return ResponseDo.buildSuccessResponse(userData);
     }
 
 

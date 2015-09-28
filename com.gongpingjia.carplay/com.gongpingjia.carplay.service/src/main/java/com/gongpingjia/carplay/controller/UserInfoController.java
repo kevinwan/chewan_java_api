@@ -149,7 +149,7 @@ public class UserInfoController {
     /**
      * 获取我的约会信息
      */
-    @RequestMapping(value = "/user/{userId}/appointment", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
     public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                      @RequestParam(value = "status", defaultValue = "") String status,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,

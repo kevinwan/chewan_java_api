@@ -82,6 +82,14 @@ public class ActivityController {
         }
     }
 
+    /**
+     * 约她 申请加入活动
+     * @param activityId 活动Id
+     * @param userId 申请人
+     * @param token
+     * @param json
+     * @return
+     */
     @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
