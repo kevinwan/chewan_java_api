@@ -32,13 +32,6 @@
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>
 
-    <!--<mongo:mongo id="mongo" host="${mongo.host}" port="${mongo.port}" />-->
-
-    <!--<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">-->
-    <!--<constructor-arg ref="mongo" />-->
-    <!--<constructor-arg value="${mongo.database}" />-->
-    <!--</bean>-->
-
     <mongo:repositories base-package="com.gongpingjia.carplay.entity"/>
 
     <context:component-scan base-package="com.gongpingjia.carplay.dao"/>

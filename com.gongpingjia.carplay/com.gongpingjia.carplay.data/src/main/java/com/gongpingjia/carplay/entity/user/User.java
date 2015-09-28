@@ -31,7 +31,7 @@ public class User {
     private String gender;
     private Long birthday;
     private Long registerTime;
-    private String role;
+    private String role = "";
     private boolean invalid;
 
     @Indexed(unique = true)

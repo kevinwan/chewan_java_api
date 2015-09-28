@@ -1,7 +1,9 @@
 package com.gongpingjia.carplay.entity.common;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+
 /**
- * Created by 123 on 2015/9/19.
+ * Created by licheng on 2015/9/19.
  */
 public class Address {
     private String province;

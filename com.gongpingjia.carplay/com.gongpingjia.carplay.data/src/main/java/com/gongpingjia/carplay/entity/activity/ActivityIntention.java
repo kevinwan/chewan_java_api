@@ -8,7 +8,7 @@ import com.gongpingjia.carplay.entity.common.Landmark;
  */
 public class ActivityIntention {
 
-    //活动类型
+    //活动类型,吃饭，唱歌，KTV
     protected String type;
     //付费类型
     protected String pay;
