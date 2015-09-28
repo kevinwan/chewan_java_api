@@ -15,11 +15,26 @@ import java.util.List;
 @Document
 public class Activity extends ActivityIntention {
 
-    public static final String PAY_TYPE_TREAT = "";
+    public static final String ACTIVITY_TYPE_DINE = "吃饭";
 
-    public static final String PAY_TYPE_INVITED = "";
+    public static final String ACTIVITY_TYPE_FILM = "看电影";
 
-    public static final String PAY_TYPE_AA = "";
+    public static final String ACTIVITY_TYPE_SING = "唱歌";
+
+    public static final String ACTIVITY_TYPE_TRAVEL = "旅行";
+
+    public static final String ACTIVITY_TYPE_SPORT = "运动";
+
+    public static final String ACTIVITY_TYPE_CAR_SHARING = "拼车";
+
+    public static final String ACTIVITY_TYPE_PILOT = "代驾";
+
+
+    public static final String PAY_TYPE_TREAT = "请客";
+
+    public static final String PAY_TYPE_INVITED = "请我";
+
+    public static final String PAY_TYPE_AA = "AA";
 
 
     @Id
