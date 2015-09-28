@@ -30,17 +30,4 @@ public class TestController {
         jsonObject.put("test", "test");
         return ResponseDo.buildSuccessResponse(jsonObject);
     }
-
-    @RequestMapping(value = "/test/obj", method = RequestMethod.GET)
-    public ResponseDo testObj() {
-        User user = new User();
-        Address address = new Address();
-        address.setCity("NJ");
-        address.setProvince("JS");
-        address.setDistrict("qi xia");
-        user.setAddress(address);
-        user.setNickname("nick user");
-//        JSONObject object =
-        return ResponseDo.buildSuccessResponse();
-    }
 }
