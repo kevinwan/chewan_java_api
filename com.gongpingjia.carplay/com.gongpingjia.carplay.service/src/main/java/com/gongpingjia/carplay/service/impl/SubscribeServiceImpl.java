@@ -156,10 +156,10 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         for (User user : mySubscribeUsers) {
+            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
             if (user.getDistance() != null) {
                 user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
                         myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
-                user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
             }
         }
     }
