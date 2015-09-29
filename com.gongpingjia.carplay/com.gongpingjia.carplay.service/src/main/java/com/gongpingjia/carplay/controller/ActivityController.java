@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
+import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
@@ -118,8 +119,8 @@ public class ActivityController {
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("activity/ {} /join begin", activityId);
         try {
-            ActivityIntention activityIntention = (ActivityIntention) JSONObject.toBean(json, Activity.class);
-            return activityService.sendAppointment(activityId, userId, token, activityIntention);
+            Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
+            return activityService.sendAppointment(activityId, userId, token, appointment);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -142,13 +143,17 @@ public class ActivityController {
                                              @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("/application/{applicationId}/process");
         try {
-            boolean accept = json.getBoolean("accept");
+            if (CommonUtil.isEmpty(json, "accept")) {
+                throw new ApiException("输入参数错误");
+            }
             parameterChecker.checkUserInfo(userId, token);
+
+            boolean accept = json.getBoolean("accept");
             return activityService.applyJoinActivity(appointmentId, userId, accept);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
         }
-        return ResponseDo.buildSuccessResponse();
     }
 
     /**

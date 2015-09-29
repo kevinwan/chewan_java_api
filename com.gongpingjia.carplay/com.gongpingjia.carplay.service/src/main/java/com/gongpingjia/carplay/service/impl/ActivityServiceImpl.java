@@ -178,7 +178,7 @@ public class ActivityServiceImpl implements ActivityService {
         query.addCriteria(criteria);
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(query);
-        if (allActivityList == null || allActivityList.size() == 0) {
+        if (allActivityList.isEmpty()) {
             LOG.warn("all Activity list is empty");
             return ResponseDo.buildSuccessResponse("[]");
         }
@@ -236,13 +236,14 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo sendAppointment(String activityId, String userId, String token, ActivityIntention activityIntention) throws ApiException {
+    public ResponseDo sendAppointment(String activityId, String userId, String token, Appointment appointment) throws ApiException {
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
         if (activity == null) {
             LOG.warn("No activity exist : {}", activityId);
             throw new ApiException("未找到该活动");
         }
+
         List<String> members = activity.getMembers();
         for (String member : members) {
             if (member.equals(userId)) {
@@ -250,29 +251,24 @@ public class ActivityServiceImpl implements ActivityService {
                 throw new ApiException("已是成员，不能重复申请加入活动");
             }
         }
-        Appointment appointment = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("applyUserId").is(userId).and("status").is(Constants.AppointmentStatus.APPLYING)));
-        if (appointment != null) {
+
+        Appointment appointmentData = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
+                .and("applyUserId").is(userId)
+                .and("status").is(Constants.AppointmentStatus.APPLYING)));
+        if (appointmentData != null) {
             LOG.warn("already applying for this activity");
             throw new ApiException("该活动已处于申请中，请勿重复申请");
         }
 
-        appointment = new Appointment();
+        Long current = DateUtil.getTime();
         appointment.setActivityId(activity.getActivityId());
         appointment.setApplyUserId(userId);
         appointment.setInvitedUserId(activity.getUserId());
-        appointment.setCreateTime(DateUtil.getTime());
+        appointment.setCreateTime(current);
         appointment.setStatus(Constants.AppointmentStatus.APPLYING);
-        appointment.setCreateTime(DateUtil.getTime());
-        appointment.setModifyTime(DateUtil.getTime());
+        appointment.setModifyTime(current);
 
         appointment.setActivityCategory(Constants.ActivityCatalog.COMMON);
-
-        //活动意向
-        appointment.setType(activityIntention.getType());
-        appointment.setDestination(activityIntention.getDestination());
-        appointment.setDestPoint(activityIntention.getDestPoint());
-        appointment.setPay(activityIntention.getPay());
-        appointment.setTransfer(activityIntention.isTransfer());
 
         appointmentDao.save(appointment);
 
@@ -311,42 +307,12 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
         LOG.debug("applyJoinActivity");
+        Appointment appointment = checkAppointment(appointmentId, userId);
 
-        //判断申请appointment 是否存在
-        Appointment appointment = appointmentDao.findById(appointmentId);
-        //
-        if (appointment == null) {
-            LOG.warn("appoint not exist");
-            throw new ApiException("该邀请不存在");
-        }
-
-        if (!StringUtils.equals(userId, appointment.getInvitedUserId())) {
-            LOG.warn("appoint not belong this user");
-            throw new ApiException("该活动不属于你");
-        }
-
-        String applyUserId = appointment.getApplyUserId();
-
-        if (StringUtils.equals(appointment.getStatus(),Constants.AppointmentStatus.APPLYING)){
-            LOG.warn("appoint has done");
-            throw new ApiException("该邀请已经处理过了");
-        }
-
-        //判断活动是否存在
-        Activity activity = activityDao.findById(appointment.getActivityId());
-        if (activity == null) {
-            LOG.warn("activity not exist");
-            throw new ApiException("活动不存在");
-        }
-        for (String memberId : activity.getMembers()) {
-            if (StringUtils.equals(memberId,applyUserId)) {
-                LOG.warn("user has in the activity");
-                throw new ApiException("用户已经在当前活动中");
-            }
-        }
+        Activity activity = checkAppointmentActivity(appointment);
 
         //判断申请用户是否存在
-        User applyUser = userDao.findById(applyUserId);
+        User applyUser = userDao.findById(appointment.getApplyUserId());
         if (applyUser == null) {
             LOG.warn("申请用户不存在");
             throw new ApiException("申请用户不存在");
@@ -363,19 +329,74 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), activity.getEmchatGroupId(), applyUser.getEmchatName());
         } catch (ApiException e) {
-            LOG.error(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
             //添加环信用户失败；
-            throw e;
+            throw new ApiException("添加到聊天群组失败");
         }
 
         //activity 中members 中添加该用户;
         Update activityUpdate = new Update();
-        activityUpdate.addToSet("members", applyUserId);
+        activityUpdate.addToSet("members", appointment.getApplyUserId());
         activityDao.update(activity.getActivityId(), activityUpdate);
 
         //appointment中 更新status字段；
         appointmentDao.update(appointment.getAppointmentId(), Update.update("status", Constants.AppointmentStatus.ACCEPT));
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    /**
+     * 检查邀请的申请对应的活动信息
+     *
+     * @param appointment
+     * @return
+     * @throws ApiException
+     */
+    private Activity checkAppointmentActivity(Appointment appointment) throws ApiException {
+        //判断活动是否存在
+        Activity activity = activityDao.findById(appointment.getActivityId());
+        if (activity == null) {
+            LOG.warn("activity not exist");
+            throw new ApiException("活动不存在");
+        }
+
+        for (String memberId : activity.getMembers()) {
+            if (memberId.equals(appointment.getApplyUserId())) {
+                LOG.warn("user has in the activity");
+                throw new ApiException("用户已经在当前活动中");
+            }
+        }
+
+        return activity;
+    }
+
+    /**
+     * 检查appointment对象与user是否相符，如果不相符就不能操作
+     *
+     * @param appointmentId
+     * @param userId
+     * @return
+     * @throws ApiException
+     */
+    private Appointment checkAppointment(String appointmentId, String userId) throws ApiException {
+        //判断申请appointment 是否存在
+        Appointment appointment = appointmentDao.findById(appointmentId);
+        //
+        if (appointment == null) {
+            LOG.warn("appoint not exist");
+            throw new ApiException("该邀请不存在");
+        }
+
+        if (!userId.equals(appointment.getInvitedUserId())) {
+            LOG.warn("appoint not belong this user");
+            throw new ApiException("输入参数有误");
+        }
+
+        if (!Constants.AppointmentStatus.APPLYING.equals(appointment.getStatus())) {
+            LOG.warn("appoint has done");
+            throw new ApiException("该邀请已经处理过了");
+        }
+
+        return appointment;
     }
 }

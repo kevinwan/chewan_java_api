@@ -61,6 +61,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
         Long current = DateUtil.getTime();
         activity.setCreateTime(current);
+        
         List<Photo> covers = activity.getCovers();
         //根据传入的图片资源数组，检查图片资源是否存在
         for (int i = 0; i < coverArray.size(); i++) {

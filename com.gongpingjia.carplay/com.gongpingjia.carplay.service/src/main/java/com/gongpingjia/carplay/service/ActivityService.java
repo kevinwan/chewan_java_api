@@ -4,7 +4,7 @@ package com.gongpingjia.carplay.service;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.Activity;
-import com.gongpingjia.carplay.entity.activity.ActivityIntention;
+import com.gongpingjia.carplay.entity.activity.Appointment;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +42,15 @@ public interface ActivityService {
     /**
      * “约她”申请加入活动
      */
-    public ResponseDo sendAppointment(String activityId, String userId, String token,ActivityIntention activityIntention) throws ApiException;
+    public ResponseDo sendAppointment(String activityId, String userId, String token, Appointment appointment) throws ApiException;
 
-    public ResponseDo applyJoinActivity(String appointmentId, String userId,boolean acceptFlag) throws ApiException;
+    /**
+     * 处理活动加入申请
+     * @param appointmentId
+     * @param userId
+     * @param acceptFlag
+     * @return
+     * @throws ApiException
+     */
+    public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException;
 }

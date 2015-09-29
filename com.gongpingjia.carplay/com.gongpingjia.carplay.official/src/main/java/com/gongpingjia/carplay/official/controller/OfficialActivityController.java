@@ -49,6 +49,7 @@ public class OfficialActivityController {
                     "description", "price", "priceDesc", "instruction", "maleLimit", "femaleLimit"));
 
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+            activity.setOfficialActivityId(null);
             activity.setUserId(userId);
 
             return service.registerActivity(activity, json);
