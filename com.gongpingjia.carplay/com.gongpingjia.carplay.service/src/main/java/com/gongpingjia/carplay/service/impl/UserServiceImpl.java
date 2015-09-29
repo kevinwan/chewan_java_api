@@ -17,6 +17,7 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.Subscriber;
@@ -324,15 +325,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException {
+    public ResponseDo alterUserInfo(String userId, String token, JSONObject json) throws ApiException {
         LOG.debug("Begin alert user info");
 
         checker.checkUserInfo(userId, token);
 
         Update update = new Update();
-        update.set("nickname", user.getNickname());
-        update.set("birthday", user.getBirthday());
+        if (!CommonUtil.isEmpty(json, "nickname")) {
+            update.set("nickname", json.getString("nickname"));
+        }
 
+        if (!CommonUtil.isEmpty(json, "birthday")) {
+            update.set("birthday", json.getLong("birthday"));
+        }
+
+        if (!CommonUtil.isEmpty(json, "idle")) {
+            update.set("idle", json.getBoolean("idle"));
+        }
         userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
 
         return ResponseDo.buildSuccessResponse();
@@ -377,6 +386,43 @@ public class UserServiceImpl implements UserService {
         }
 
         return ResponseDo.buildSuccessResponse(activitiesData);
+    }
+
+    @Override
+    public ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException {
+        LOG.debug("Begin check input parameters");
+        checker.checkUserInfo(userId, token);
+        if (!CommonUtil.isArrayEmpty(json, "photos")) {
+            LOG.warn("Input parameters photos is empty");
+            throw new ApiException("输入参数有误");
+        }
+        String[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
+        User user = userDao.findById(userId);
+        List<Photo> userPhotos = user.getAlbum();
+        //待存入数据库的数据
+        List<Photo> newAlbum = userPhotos;
+        LOG.debug("check photos is exit or not");
+        for (int photosIndex = 0; photosIndex < photos.length; photosIndex++) {
+            for (int userPhotosIndex = 0; userPhotosIndex < userPhotos.size(); userPhotosIndex++) {
+                if (photos[photosIndex].equals(userPhotos.get(userPhotosIndex).getId())) {
+                    newAlbum.remove(userPhotosIndex);
+                    break;
+                }
+                if (userPhotosIndex == userPhotos.size() - 1) {
+                    LOG.warn("The photo is not exit! photo:{}", photos[photosIndex]);
+                    throw new ApiException("有相片不存在");
+                }
+            }
+        }
+
+        LOG.debug("delete photo in qiniu");
+        for (String photo : photos) {
+            photoService.delete(MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photo));
+        }
+        LOG.debug("delete photo in DB");
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("album", newAlbum));
+
+        return ResponseDo.buildSuccessResponse(photos);
     }
 
     /**

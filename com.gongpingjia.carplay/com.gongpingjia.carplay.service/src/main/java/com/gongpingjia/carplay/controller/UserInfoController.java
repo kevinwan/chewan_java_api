@@ -40,6 +40,15 @@ public class UserInfoController {
                 throw new ApiException("输入参数错误");
             }
 
+            if (!json.containsKey("landmark")) {
+                LOG.warn("Input parameter landmark is not exist");
+                throw new ApiException("输入参数错误");
+            }
+            JSONObject jsonObject = json.getJSONObject("landmark");
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("longitude", "latitude"))) {
+                throw new ApiException("输入参数错误");
+            }
+
             User user = (User) JSONObject.toBean(json, User.class);
 
             userService.checkRegisterParameters(user, json);
@@ -210,15 +219,15 @@ public class UserInfoController {
      *
      * @param userId
      * @param token
-     * @param user
+     * @param json   修改的属性参数信息
      * @return
      */
     @RequestMapping(value = "/user/{userId}/info", method = RequestMethod.POST)
-    public ResponseDo alterUserInfo(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody User user) {
+    public ResponseDo alterUserInfo(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("alter user information");
 
         try {
-            return userService.alterUserInfo(userId, token, user);
+            return userService.alterUserInfo(userId, token, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -284,7 +293,12 @@ public class UserInfoController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo deleteAlbumPhotos(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                         @RequestBody JSONObject json) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            LOG.debug("Begin delete user's album photos , user : {}", userId);
+            return userService.deleteAlbumPhotos(userId, token, json);
+        } catch (Exception e) {
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
@@ -297,6 +311,22 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/authentication/history", method = RequestMethod.GET)
     public ResponseDo getAuthenticationHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+        return ResponseDo.buildSuccessResponse();
+    }
+
+
+    /**
+     * 用户绑定手机号，通过三方登录，参加活动时，需要绑定手机号码
+     *
+     * @param userId 用户Id
+     * @param token  用户会话Token
+     * @param json   请求Body
+     * @return 返回处理结果
+     */
+    @RequestMapping(value = "/user/{userId}/binding", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo bindingPhone(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                   @RequestBody JSONObject json) {
         return ResponseDo.buildSuccessResponse();
     }
 }
