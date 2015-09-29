@@ -51,8 +51,7 @@ public class CarServiceImpl implements CarService {
         LOG.debug("Begin request gongpingjia server");
         CloseableHttpResponse response = null;
         try {
-            response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(0), Arrays.asList(header),
-                    Constants.Charset.UTF8);
+            response = HttpClientUtil.get(gpjUrl, new HashMap<String, String>(0), Arrays.asList(header), Constants.Charset.UTF8);
 
             String data = HttpClientUtil.parseResponse(response);
 
@@ -60,10 +59,8 @@ public class CarServiceImpl implements CarService {
             dataJson = json.getJSONArray("brand");
 
             for (int i = 0; i < dataJson.size(); i++) {
-                dataJson.getJSONObject(i).put(
-                        "logo_img",
-                        PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "")
-                                + dataJson.getJSONObject(i).remove("logo_img"));
+                dataJson.getJSONObject(i).put("logo_img",
+                        PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + dataJson.getJSONObject(i).remove("logo_img"));
             }
 
             LOG.debug("Refresh brand info in cache server");

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * Created by licheng on 2015/9/28.
  * 官方活动相关操作
  */
+@RestController
 public class OfficialController {
 
     private static Logger LOG = Logger.getLogger(OfficialController.class);
@@ -39,7 +40,7 @@ public class OfficialController {
     public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
                                    @RequestParam("userId") String userId, @RequestParam String token) {
         try {
-            parameterChecker.checkUserInfo(userId,token);
+            parameterChecker.checkUserInfo(userId, token);
             return officialService.applyJoinActivity(activityId, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -61,7 +62,7 @@ public class OfficialController {
                                       @RequestParam("userId") String userId, @RequestParam("token") String token) {
 
         try {
-            parameterChecker.checkUserInfo(userId,token);
+            parameterChecker.checkUserInfo(userId, token);
             return officialService.getActivityInfo(activityId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -88,12 +89,12 @@ public class OfficialController {
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         try {
-            parameterChecker.checkUserInfo(userId,token);
+            parameterChecker.checkUserInfo(userId, token);
             Address address = new Address();
             address.setCity(city);
             address.setProvince(province);
             address.setDistrict(district);
-            return officialService.getActivityList(address,limit,ignore);
+            return officialService.getActivityList(address, limit, ignore);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -103,6 +104,7 @@ public class OfficialController {
 
     /**
      * 约她同去参加官方活动
+     *
      * @param activityId
      * @param userId
      * @param token
@@ -119,7 +121,7 @@ public class OfficialController {
             String invitedUserId = json.getString("invitedUserId");
             Boolean transfer = json.getBoolean("transfer");
             parameterChecker.checkUserInfo(userId, token);
-            return officialService.inviteUserTogether(activityId,userId,invitedUserId,transfer);
+            return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
