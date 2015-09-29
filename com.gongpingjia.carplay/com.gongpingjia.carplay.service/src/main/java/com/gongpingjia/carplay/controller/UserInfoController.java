@@ -40,6 +40,15 @@ public class UserInfoController {
                 throw new ApiException("输入参数错误");
             }
 
+            if (!json.containsKey("landmark")) {
+                LOG.warn("Input parameter landmark is not exist");
+                throw new ApiException("输入参数错误");
+            }
+            JSONObject jsonObject = json.getJSONObject("landmark");
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("longitude", "latitude"))) {
+                throw new ApiException("输入参数错误");
+            }
+
             User user = (User) JSONObject.toBean(json, User.class);
 
             userService.checkRegisterParameters(user, json);
