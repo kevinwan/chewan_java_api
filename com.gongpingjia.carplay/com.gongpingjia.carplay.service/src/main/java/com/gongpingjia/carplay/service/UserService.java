@@ -102,4 +102,6 @@ public interface UserService {
     ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException;
 
     ResponseDo bindingPhone(String userId, String token, String phone, String code) throws ApiException;
+
+    ResponseDo getAuthenticationHistory(String userId, String token) throws ApiException;
 }

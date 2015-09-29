@@ -311,7 +311,14 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/authentication/history", method = RequestMethod.GET)
     public ResponseDo getAuthenticationHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
-        return ResponseDo.buildSuccessResponse();
+
+        try {
+            LOG.debug("Begin getAuthenticationHistory ,user : {}", userId);
+            return userService.getAuthenticationHistory(userId, token);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
