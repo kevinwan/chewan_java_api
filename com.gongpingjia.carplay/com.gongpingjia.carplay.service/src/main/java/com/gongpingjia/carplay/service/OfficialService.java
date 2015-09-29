@@ -25,4 +25,7 @@ public interface OfficialService {
      * @return
      */
     public ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
+
+
+    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId,boolean transfer) throws ApiException;
 }

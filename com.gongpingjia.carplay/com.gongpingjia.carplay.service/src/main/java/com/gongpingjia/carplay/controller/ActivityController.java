@@ -55,6 +55,7 @@ public class ActivityController {
         }
     }
 
+
     /**
      * 获取活动信息
      * <p/>

@@ -1,14 +1,31 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.service.OfficialService;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
+import org.omg.CORBA.PRIVATE_MEMBER;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 
 /**
  * Created by licheng on 2015/9/28.
  * 官方活动相关操作
  */
 public class OfficialController {
+
+    private static Logger LOG = Logger.getLogger(OfficialController.class);
+
+    @Autowired
+    private OfficialService officialService;
+
+    @Autowired
+    private ParameterChecker parameterChecker;
+
     /**
      * 申请加入到官方活动中
      *
@@ -21,7 +38,13 @@ public class OfficialController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
                                    @RequestParam("userId") String userId, @RequestParam String token) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            parameterChecker.checkUserInfo(userId,token);
+            return officialService.applyJoinActivity(activityId, userId);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
@@ -36,7 +59,14 @@ public class OfficialController {
     @RequestMapping(value = "/official/activity/{activityId}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
                                       @RequestParam("userId") String userId, @RequestParam("token") String token) {
-        return ResponseDo.buildSuccessResponse();
+
+        try {
+            parameterChecker.checkUserInfo(userId,token);
+            return officialService.getActivityInfo(activityId);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
@@ -57,7 +87,17 @@ public class OfficialController {
                                      @RequestParam("province") String province, @RequestParam("city") String city, @RequestParam("district") String district,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            parameterChecker.checkUserInfo(userId,token);
+            Address address = new Address();
+            address.setCity(city);
+            address.setProvince(province);
+            address.setDistrict(district);
+            return officialService.getActivityList(address,limit,ignore);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
@@ -74,6 +114,15 @@ public class OfficialController {
     public ResponseDo inviteUserTogether(@PathVariable("activityId") String activityId,
                                          @RequestParam("userId") String userId, @RequestParam("token") String token,
                                          @RequestBody JSONObject json) {
-        return ResponseDo.buildSuccessResponse();
+
+        try {
+            String invitedUserId = json.getString("invitedUserId");
+            Boolean transfer = json.getBoolean("transfer");
+            parameterChecker.checkUserInfo(userId, token);
+            return officialService.inviteUserTogether(activityId,userId,invitedUserId,transfer);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 }

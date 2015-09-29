@@ -7,10 +7,12 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
+import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -51,6 +53,8 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private ParameterChecker parameterChecker;
 
+    @Autowired
+    private OfficialActivityDao officialActivityDao;
 
     @Autowired
     private ActivityDao activityDao;
@@ -295,6 +299,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         //判断申请appointment 是否存在
         Appointment appointment = appointmentDao.findById(appointmentId);
+        //
         if (appointment == null) {
             LOG.warn("appoint not exist");
             throw new ApiException("该邀请不存在");

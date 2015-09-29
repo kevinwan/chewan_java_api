@@ -31,6 +31,8 @@ public class OfficialActivity {
 
     private List<String> members;
 
+    private String emchatGroupId;
+
 
     //官方活动--------开始
     //官方活动封面图片
@@ -129,6 +131,14 @@ public class OfficialActivity {
 
     public void setMembers(List<String> members) {
         this.members = members;
+    }
+
+    public String getEmchatGroupId() {
+        return emchatGroupId;
+    }
+
+    public void setEmchatGroupId(String emchatGroupId) {
+        this.emchatGroupId = emchatGroupId;
     }
 
     public List<Photo> getCovers() {
