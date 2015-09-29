@@ -36,7 +36,7 @@ public class UserInfoController {
         LOG.debug("register is called, request parameter produce:");
         try {
             // 检查必须参数是否为空
-            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthday", "avatar"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthday", "avatar", "landmark"))) {
                 throw new ApiException("输入参数错误");
             }
 
