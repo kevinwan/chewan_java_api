@@ -1,10 +1,8 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import net.sf.json.JSONObject;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -54,10 +52,28 @@ public class OfficialController {
      * @param ignore   忽略条数
      * @return 返回查询结果
      */
+    @RequestMapping(value = "/official/activity/list", method = RequestMethod.GET)
     public ResponseDo listActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,
                                      @RequestParam("province") String province, @RequestParam("city") String city, @RequestParam("district") String district,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+        return ResponseDo.buildSuccessResponse();
+    }
+
+
+    /**
+     * 约她同去参加官方活动
+     * @param activityId
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/official/activity/{activityId}/invite", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo inviteUserTogether(@PathVariable("activityId") String activityId,
+                                         @RequestParam("userId") String userId, @RequestParam("token") String token,
+                                         @RequestBody JSONObject json) {
         return ResponseDo.buildSuccessResponse();
     }
 }
