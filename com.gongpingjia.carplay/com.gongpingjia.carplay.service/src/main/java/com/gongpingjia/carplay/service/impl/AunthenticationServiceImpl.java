@@ -142,18 +142,7 @@ public class AunthenticationServiceImpl implements AunthenticationService {
 
         checker.checkUserInfo(userId, token);
 
-        if (!CommonUtil.isUUID(json.getString("photoId"))) {
-            LOG.warn("Input parameter photoId is not uuid");
-            throw new ApiException("输入参数有误");
-        }
-
-
-
-        String photoKey = MessageFormat.format(Constants.PhotoKey.PHOTO_KEY, json.getString("photoId"));
-        if (!localFileManager.isExist(photoKey)) {
-            LOG.warn("user photo not Exist");
-            throw new ApiException("个人图像未上传");
-        }
+        String photoKey = checkUserPhotoAuthentication(userId, json);
 
         LOG.debug("Begin save data");
         Long current = DateUtil.getTime();
@@ -178,5 +167,37 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         historyDao.save(history);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    /**
+     * 检查用户的图像认证申请参数的正确性
+     *
+     * @param userId
+     * @param json
+     * @return
+     * @throws ApiException
+     */
+    private String checkUserPhotoAuthentication(String userId, JSONObject json) throws ApiException {
+        if (!CommonUtil.isUUID(json.getString("photoId"))) {
+            LOG.warn("Input parameter photoId is not uuid");
+            throw new ApiException("输入参数有误");
+        }
+
+        String photoKey = MessageFormat.format(Constants.PhotoKey.PHOTO_KEY, json.getString("photoId"));
+        if (!localFileManager.isExist(photoKey)) {
+            LOG.warn("user photo not Exist");
+            throw new ApiException("个人图像未上传");
+        }
+
+        User user = userDao.findById(userId);
+        if (Constants.AuthStatus.AUTHORIZING.equals(user.getPhotoAuthStatus())) {
+            LOG.warn("user already apply photo authentication");
+            throw new ApiException("用户图像认证中，请勿重复申请");
+        }
+        if (Constants.AuthStatus.ACCEPT.equals(user.getPhotoAuthStatus())) {
+            LOG.warn("user already accept photo authentication");
+            throw new ApiException("用户图像已认证，请勿重复认证");
+        }
+        return photoKey;
     }
 }
