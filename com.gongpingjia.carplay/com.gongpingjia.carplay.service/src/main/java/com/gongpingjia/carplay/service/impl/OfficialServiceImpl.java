@@ -35,6 +35,8 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Override
     public ResponseDo getActivityInfo(String activityId) {
+        LOG.debug("getActivityInfo");
+
         OfficialActivity officialActivity = officialActivityDao.findById(activityId);
         return ResponseDo.buildSuccessResponse(officialActivity);
     }
@@ -47,6 +49,8 @@ public class OfficialServiceImpl implements OfficialService {
      */
     @Override
     public ResponseDo getActivityList(Address address, int limit, int ignore) {
+        LOG.debug("getActivityList");
+
         Criteria criteria = Criteria.where("destination.province").is(address.getProvince()).where("destination.city").is(address.getCity())
                 .where("destination.district").is(address.getDistrict());
         Query query = Query.query(criteria);
