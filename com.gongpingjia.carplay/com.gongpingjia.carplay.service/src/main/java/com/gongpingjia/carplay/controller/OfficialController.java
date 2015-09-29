@@ -37,7 +37,7 @@ public class OfficialController {
      */
     @RequestMapping(value = "/official/activity/{activityId}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
-                                      @RequestParam("userId") String userId, @RequestParam("token") String token) {
+                                      @RequestParam(value = "userId", required = false) String userId, @RequestParam(value = "token", required = false) String token) {
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -54,7 +54,8 @@ public class OfficialController {
      * @param ignore   忽略条数
      * @return 返回查询结果
      */
-    public ResponseDo listActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,
+    @RequestMapping(value = "/official/activity/list", method = RequestMethod.GET)
+    public ResponseDo listActivities(@RequestParam(value = "userId", required = false) String userId, @RequestParam(value = "token", required = false) String token,
                                      @RequestParam("province") String province, @RequestParam("city") String city, @RequestParam("district") String district,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {

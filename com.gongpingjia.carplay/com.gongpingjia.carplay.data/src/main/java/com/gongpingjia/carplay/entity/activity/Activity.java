@@ -81,6 +81,11 @@ public class Activity extends ActivityIntention {
     private List<Flow> flows;
 
     private String instruction;
+
+    //官方活动男性成员上限
+    private Integer maleLimit;
+    //官方活动女性成员上限
+    private Integer femaleLimit;
     //官方活动---------结束
 
     public String getActivityId() {
@@ -241,5 +246,29 @@ public class Activity extends ActivityIntention {
 
     public void setCovers(List<Photo> covers) {
         this.covers = covers;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Integer getMaleLimit() {
+        return maleLimit;
+    }
+
+    public void setMaleLimit(Integer maleLimit) {
+        this.maleLimit = maleLimit;
+    }
+
+    public Integer getFemaleLimit() {
+        return femaleLimit;
+    }
+
+    public void setFemaleLimit(Integer femaleLimit) {
+        this.femaleLimit = femaleLimit;
     }
 }

@@ -81,6 +81,11 @@ public class User {
      */
     private List<Photo> album;
 
+    /**
+     * 表示是否处于空闲装态，true表示空闲，false表示忙，默认空闲
+     */
+    private Boolean idle;
+
     //仅用于计算距离，不存储到DB
     @Transient
     private Double distance;
@@ -94,6 +99,7 @@ public class User {
         this.car = new Car();
         this.landmark = new Landmark();
         this.license = new DrivingLicense();
+        this.idle = true;
     }
 
     /**

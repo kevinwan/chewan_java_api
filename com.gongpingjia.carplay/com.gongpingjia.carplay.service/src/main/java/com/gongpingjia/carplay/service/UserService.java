@@ -94,7 +94,7 @@ public interface UserService {
     /**
      * 修改用户信息
      */
-    ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException;
+    ResponseDo alterUserInfo(String userId, String token, JSONObject json) throws ApiException;
 
     ResponseDo changeLocation(String userId, String token, Landmark landmark) throws ApiException;
 

@@ -325,15 +325,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo alterUserInfo(String userId, String token, User user) throws ApiException {
+    public ResponseDo alterUserInfo(String userId, String token, JSONObject json) throws ApiException {
         LOG.debug("Begin alert user info");
 
         checker.checkUserInfo(userId, token);
 
         Update update = new Update();
-        update.set("nickname", user.getNickname());
-        update.set("birthday", user.getBirthday());
+        if (!CommonUtil.isEmpty(json, "nickname")) {
+            update.set("nickname", json.getString("nickname"));
+        }
 
+        if (!CommonUtil.isEmpty(json, "birthday")) {
+            update.set("birthday", json.getLong("birthday"));
+        }
+
+        if (!CommonUtil.isEmpty(json, "idle")) {
+            update.set("idle", json.getBoolean("idle"));
+        }
         userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
 
         return ResponseDo.buildSuccessResponse();
