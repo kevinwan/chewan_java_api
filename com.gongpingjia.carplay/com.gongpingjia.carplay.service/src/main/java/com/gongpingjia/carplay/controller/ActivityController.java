@@ -27,8 +27,11 @@ public class ActivityController {
     @Autowired
     private ParameterChecker parameterChecker;
 
+    @Autowired
+    private ActivityService activityService;
+
     /**
-     * 注册活动
+     * 发布意向活动，注册活动
      * 用户id
      *
      * @param userId
@@ -37,14 +40,12 @@ public class ActivityController {
      * @param token
      * <p/>
      * 活动信息对应的json
-     * @param activity
+     * @param jsonObject
      */
-    @Autowired
-    private ActivityService activityService;
-
     @RequestMapping(value = "/activity/register", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo registerActivity(@RequestParam(value = "userId") String userId, @RequestParam(value = "token") String token, @RequestBody JSONObject jsonObject) {
+    public ResponseDo registerActivity(@RequestParam(value = "userId") String userId, @RequestParam(value = "token") String token,
+                                       @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
@@ -77,6 +78,13 @@ public class ActivityController {
     }
 
 
+    /**
+     * 获取附近的活动
+     * @param request
+     * @param userId
+     * @param token
+     * @return
+     */
     @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
     public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
