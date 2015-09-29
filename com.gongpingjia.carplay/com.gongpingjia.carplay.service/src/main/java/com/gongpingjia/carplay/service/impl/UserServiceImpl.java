@@ -361,7 +361,9 @@ public class UserServiceImpl implements UserService {
         }
 
         List<User> organizers = userDao.findByIds(toUserIds);
-        List<Activity> activitiesData = activityDao.find(Query.query(Criteria.where("userId").in(toUserIds)));
+
+        Query query = Query.query(Criteria.where("userId").in(toUserIds)).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))).skip(ignore).limit(limit);
+        List<Activity> activitiesData = activityDao.find(query);
 
         //将活动创建者与用户一一对应
         for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
@@ -369,6 +371,7 @@ public class UserServiceImpl implements UserService {
                 if (organizers.get(orgIndex).getUserId().equals(activitiesData.get(actIndex).getUserId())) {
                     organizers.get(orgIndex).refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
                     activitiesData.get(actIndex).setOrganizer(organizers.get(orgIndex));
+                    break;
                 }
             }
         }
