@@ -21,7 +21,8 @@ public class Photo {
     public Photo() {
     }
 
-    public Photo(String key, Long uploadTime) {
+    public Photo(String id, String key, Long uploadTime) {
+        this.id = id;
         this.key = key;
         this.uploadTime = uploadTime;
     }
