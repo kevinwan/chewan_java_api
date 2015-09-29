@@ -623,12 +623,15 @@ public class UserServiceImpl implements UserService {
 
         //封装返回数据
         //封装了 认证历史记录 以及 认证人的信息； authUserId 例如 对应着 车玩官方；
-        JSONArray jsonArr = new JSONArray();
         for (AuthenticationHistory history : authenticationHistoryList) {
-            JSONObject jsonObject = JSONObject.fromObject(history);
-            jsonObject.put("authUser", getUserFromList(userList, history.getAuthId()));
+            history.setAuthUser(getUserFromList(userList, history.getAuthId()));
         }
-        return ResponseDo.buildSuccessResponse(jsonArr);
+//        JSONArray jsonArr = new JSONArray();
+//        for (AuthenticationHistory history : authenticationHistoryList) {
+//            JSONObject jsonObject = JSONObject.fromObject(history);
+//            jsonObject.put("authUser", getUserFromList(userList, history.getAuthId()));
+//        }
+        return ResponseDo.buildSuccessResponse(authenticationHistoryList);
     }
 
     private User getUserFromList(List<User> users, String id) {

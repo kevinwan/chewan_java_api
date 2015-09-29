@@ -191,6 +191,23 @@ public class Constants {
         public static final String OFFICIAL = "官方活动";
     }
 
+    public interface ActivityType {
+
+        public static final String DINE = "吃饭";
+
+        public static final String SING = "唱歌";
+
+        public static final String FILM = "电影";
+
+        public static final String TRAVEL = "旅行";
+
+        public static final String SPORT = "运动";
+
+        public static final String CAR_POLL = "拼车";
+
+        public static final String PILOT = "代驾";
+    }
+
     public interface UserCatalog {
 
         public static final String COMMON = "普通用户";
@@ -248,5 +265,9 @@ public class Constants {
         String REJECT = "拒绝";
 
         String APPLYING = "邀请中";
+    }
+
+    public interface Product{
+        public static final String DEFAULT_NAME = "android";
     }
 }

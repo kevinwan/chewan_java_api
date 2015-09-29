@@ -116,7 +116,7 @@ public class ActivityServiceImpl implements ActivityService {
         int limit = 10;
         //ignore是跳过的参数
         int ignore = 0;
-        //默认的最大距离参数
+        //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
         double maxDistance = ActivityWeight.DEFAULT_MAX_DISTANCE;
 
         String limitStr = request.getParameter("limit");

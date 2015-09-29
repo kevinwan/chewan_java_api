@@ -24,6 +24,7 @@ public class Activity extends ActivityIntention {
 
     public static final String PAY_TYPE_AA = "AA";
 
+
     @Id
     private String activityId;
     //活动创建人员

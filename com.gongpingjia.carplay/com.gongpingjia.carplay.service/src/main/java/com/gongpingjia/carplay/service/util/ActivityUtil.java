@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.service.util;
 
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.common.Landmark;
@@ -21,17 +22,21 @@ public class ActivityUtil {
 
     public List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
-        ArrayList<ActivityWeight> retList = new ArrayList<>(activities.size());
+        HashSet<String> userIds = new HashSet<>(awList.size());
+        for (Activity activity : activities) {
+            userIds.add(activity.getUserId());
+        }
+        List<User> userList = userDao.findByIds((String[]) userIds.toArray());
         for (Activity activity : activities) {
             ActivityWeight aw = new ActivityWeight(activity);
-            User user = userDao.findById(activity.getUserId());
-            if (StringUtils.isNotEmpty(user.getAvatar())) {
-                aw.setAvatarFlag(true);
-            }
-            //TODO
-            //判断方式有误
-            if (StringUtils.isNotEmpty(user.getLicenseAuthStatus())) {
+            User user = findUserById(aw.getActivity().getUserId(), userList);
+            //  车主认证；
+            if (StringUtils.equals(user.getLicenseAuthStatus(), Constants.AuthStatus.ACCEPT)) {
                 aw.setCarOwnerFlag(true);
+            }
+            //头像认证
+            if (StringUtils.equals(user.getPhotoAuthStatus(), Constants.AuthStatus.ACCEPT)) {
+                aw.setAvatarFlag(true);
             }
             //TODO
             //身份认证 现在没有提供身份认证接口
@@ -68,7 +73,7 @@ public class ActivityUtil {
         if (activity.getDestination() != null) {
             weight += 0.15;
         }
-        if (activity.getEnd() != null) {
+        if (activity.getStart() != null) {
             weight += 0.05;
         }
         activityWeight.setWeight(weight);
@@ -106,6 +111,16 @@ public class ActivityUtil {
 //            toList.add(activities.get(index));
 //        }
 //        return toList;
+    }
+
+
+    private static User findUserById(String userId, List<User> users) {
+        for (User user : users) {
+            if (user.getUserId().equals(userId)) {
+                return user;
+            }
+        }
+        return null;
     }
 
 }
