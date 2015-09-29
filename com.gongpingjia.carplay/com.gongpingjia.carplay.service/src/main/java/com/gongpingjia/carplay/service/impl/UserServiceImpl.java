@@ -10,13 +10,16 @@ import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
+import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
+import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
@@ -86,6 +89,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AlbumViewHistoryDao historyDao;
+
+    @Autowired
+    private SubscriberDao subscriberDao;
 
     @Override
     public ResponseDo register(User user) throws ApiException {
@@ -341,6 +347,36 @@ public class UserServiceImpl implements UserService {
         userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("landmark", landmark));
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo listInterests(String userId, String token, Integer ignore, Integer limit) throws ApiException {
+        LOG.debug("Begin check input parameters");
+        checker.checkUserInfo(userId, token);
+
+        List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        List<String> toUserIds = new ArrayList<>();
+        for (Subscriber subscriber : subscribers) {
+            toUserIds.add(subscriber.getToUser());
+        }
+
+        List<User> organizers = userDao.findByIds(toUserIds);
+
+        Query query = Query.query(Criteria.where("userId").in(toUserIds)).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))).skip(ignore).limit(limit);
+        List<Activity> activitiesData = activityDao.find(query);
+
+        //将活动创建者与用户一一对应
+        for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
+            for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
+                if (organizers.get(orgIndex).getUserId().equals(activitiesData.get(actIndex).getUserId())) {
+                    organizers.get(orgIndex).refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+                    activitiesData.get(actIndex).setOrganizer(organizers.get(orgIndex));
+                    break;
+                }
+            }
+        }
+
+        return ResponseDo.buildSuccessResponse(activitiesData);
     }
 
     /**

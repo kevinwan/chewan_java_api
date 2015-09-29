@@ -115,6 +115,12 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
+    public void update(K id, Update update) {
+        Query idQuery = Query.query(Criteria.where("_id").is(id));
+        mongoTemplate.updateFirst(idQuery, update,getCls());
+    }
+
+    @Override
     public void updateFirst(Query query, Update update) {
         mongoTemplate.updateFirst(query, update, getCls());
     }

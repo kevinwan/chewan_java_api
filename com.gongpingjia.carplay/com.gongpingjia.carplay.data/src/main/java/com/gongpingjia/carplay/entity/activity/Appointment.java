@@ -17,7 +17,9 @@ public class Appointment extends ActivityIntention {
 
     //邀请申请人
     private String applyUserId;
+
     //应邀人员
+    //创建该活动的人；
     private String invitedUserId;
 
     private Long createTime;

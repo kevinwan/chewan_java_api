@@ -262,7 +262,13 @@ public class UserInfoController {
     public ResponseDo listInterests(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                     @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            LOG.debug("Begin get user listInterests,user:{}", userId);
+            return userService.listInterests(userId, token, ignore, limit);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
