@@ -327,6 +327,18 @@ public class UserInfoController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo bindingPhone(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                    @RequestBody JSONObject json) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            LOG.debug("Begin user binding phone,user:{}", userId);
+            if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code"))) {
+                throw new ApiException("输入参数有误");
+            }
+            String phone = json.getString("phone");
+            String code = json.getString("code");
+
+            return userService.bindingPhone(userId, token, phone, code);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 }
