@@ -284,7 +284,12 @@ public class UserInfoController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo deleteAlbumPhotos(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                         @RequestBody JSONObject json) {
-        return ResponseDo.buildSuccessResponse();
+        try {
+            LOG.debug("Begin delete user's album photos , user : {}", userId);
+            return userService.deleteAlbumPhotos(userId, token, json);
+        } catch (Exception e) {
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 
