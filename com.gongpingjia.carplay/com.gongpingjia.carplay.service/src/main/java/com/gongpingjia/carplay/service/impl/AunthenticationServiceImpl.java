@@ -147,6 +147,8 @@ public class AunthenticationServiceImpl implements AunthenticationService {
             throw new ApiException("输入参数有误");
         }
 
+
+
         String photoKey = MessageFormat.format(Constants.PhotoKey.PHOTO_KEY, json.getString("photoId"));
         if (!localFileManager.isExist(photoKey)) {
             LOG.warn("user photo not Exist");

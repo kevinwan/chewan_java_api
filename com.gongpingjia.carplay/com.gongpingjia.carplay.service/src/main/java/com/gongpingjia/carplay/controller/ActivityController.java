@@ -50,10 +50,10 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination.province", "destination.city",
-                    "destination.street", "estabPoint.longitude", "estabPoint.latitude", "establish.province", "establish.city", "establish.district", "establish.transfer"))) {
-                throw new ApiException("参数非法");
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination", "estabPoint", "establish", "transfer"))) {
+                throw new ApiException("输入参数有误");
             }
+
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, token, activity);
         } catch (Exception e) {
