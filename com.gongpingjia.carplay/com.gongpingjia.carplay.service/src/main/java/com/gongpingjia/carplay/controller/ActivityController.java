@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -10,9 +11,11 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,12 +37,10 @@ public class ActivityController {
      * 发布意向活动，注册活动
      * 用户id
      *
-     * @param userId
-     * <p/>
-     * 用户token
-     * @param token
-     * <p/>
-     * 活动信息对应的json
+     * @param userId     <p/>
+     *                   用户token
+     * @param token      <p/>
+     *                   活动信息对应的json
      * @param jsonObject
      */
     @RequestMapping(value = "/activity/register", method = RequestMethod.POST, headers = {
@@ -48,6 +49,10 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination.province", "destination.city",
+                    "destination.street", "estabPoint.longitude", "estabPoint.latitude", "establish.province", "establish.city", "establish.district", "establish.transfer"))) {
+                throw new ApiException("参数非法");
+            }
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, token, activity);
         } catch (Exception e) {
@@ -81,6 +86,7 @@ public class ActivityController {
 
     /**
      * 获取附近的活动
+     *
      * @param request
      * @param userId
      * @param token
@@ -136,7 +142,7 @@ public class ActivityController {
                                              @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("/application/{applicationId}/process");
         try {
-            boolean accept = (Boolean) json.get("accept");
+            boolean accept = json.getBoolean("accept");
             parameterChecker.checkUserInfo(userId, token);
             return activityService.applyJoinActivity(appointmentId, userId, accept);
         } catch (ApiException e) {

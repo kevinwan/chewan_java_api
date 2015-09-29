@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
@@ -31,7 +32,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by heyongyu on 2015/9/22.
@@ -96,7 +99,15 @@ public class ActivityServiceImpl implements ActivityService {
         LOG.debug("getActivityInfo");
         parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findById(activityId);
+        if (null == activity) {
+            LOG.warn("activity not exist");
+            throw new ApiException("活动id 找不到对应的活动");
+        }
         User organizer = userDao.findById(activity.getUserId());
+        if (null == organizer) {
+            LOG.warn("organizer is null");
+            throw new ApiException("该活动找不到对应的 User");
+        }
         activity.setOrganizer(organizer);
         return ResponseDo.buildSuccessResponse(activity);
     }
@@ -121,7 +132,8 @@ public class ActivityServiceImpl implements ActivityService {
         //ignore是跳过的参数
         int ignore = 0;
         //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
-        double maxDistance = ActivityWeight.DEFAULT_MAX_DISTANCE;
+
+        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
 
         String limitStr = request.getParameter("limit");
         String ignoreStr = request.getParameter("ignore");
@@ -134,7 +146,7 @@ public class ActivityServiceImpl implements ActivityService {
         String longitude = request.getParameter("longitude");
         String latitude = request.getParameter("latitude");
         if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
-            LOG.error("longitude or latitude has not inited");
+            LOG.error("longitude or latitude has not init");
             throw new ApiException("param not match");
         }
         LOG.debug("longitude is:" + longitude);
@@ -154,8 +166,11 @@ public class ActivityServiceImpl implements ActivityService {
 
         // 添加 距离  时间 查询参数；
         Criteria criteria = new Criteria();
+
+        long max_pub_time = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
+
         //查询创建在此时间之前的活动；
-        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) ActivityWeight.MAX_PUB_TIME));
+        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) max_pub_time));
         criteria.where("createTime").gte(gtTime);
 
         //查询在最大距离内的 活动；
@@ -305,14 +320,14 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("该邀请不存在");
         }
 
-        if (!appointment.getInvitedUserId().equals(userId)) {
+        if (!StringUtils.equals(userId, appointment.getInvitedUserId())) {
             LOG.warn("appoint not belong this user");
             throw new ApiException("该活动不属于你");
         }
 
         String applyUserId = appointment.getApplyUserId();
 
-        if (!appointment.getStatus().equals(Constants.AppointmentStatus.APPLYING)) {
+        if (StringUtils.equals(appointment.getStatus(),Constants.AppointmentStatus.APPLYING)){
             LOG.warn("appoint has done");
             throw new ApiException("该邀请已经处理过了");
         }
@@ -324,7 +339,7 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("活动不存在");
         }
         for (String memberId : activity.getMembers()) {
-            if (memberId.equals(applyUserId)) {
+            if (StringUtils.equals(memberId,applyUserId)) {
                 LOG.warn("user has in the activity");
                 throw new ApiException("用户已经在当前活动中");
             }
