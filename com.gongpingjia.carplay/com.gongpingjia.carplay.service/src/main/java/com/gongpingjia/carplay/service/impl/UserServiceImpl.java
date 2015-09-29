@@ -355,16 +355,18 @@ public class UserServiceImpl implements UserService {
         checker.checkUserInfo(userId, token);
 
         List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        List<String> toUserIds =new ArrayList<>();
-        for (Subscriber subscriber : subscribers){
+        List<String> toUserIds = new ArrayList<>();
+        for (Subscriber subscriber : subscribers) {
             toUserIds.add(subscriber.getToUser());
         }
 
         List<User> organizers = userDao.findByIds(toUserIds);
-        List<Activity> activitiesData =activityDao.find(Query.query(Criteria.where("userId").in(toUserIds)));
-        for(int orgIndex=0;orgIndex<organizers.size();orgIndex++){
-            for(int actIndex=0;actIndex<activitiesData.size();actIndex++){
-                if(organizers.get(orgIndex).getUserId().equals(activitiesData.get(actIndex).getUserId())){
+        List<Activity> activitiesData = activityDao.find(Query.query(Criteria.where("userId").in(toUserIds)));
+
+        //将活动创建者与用户一一对应
+        for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
+            for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
+                if (organizers.get(orgIndex).getUserId().equals(activitiesData.get(actIndex).getUserId())) {
                     organizers.get(orgIndex).refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
                     activitiesData.get(actIndex).setOrganizer(organizers.get(orgIndex));
                 }
