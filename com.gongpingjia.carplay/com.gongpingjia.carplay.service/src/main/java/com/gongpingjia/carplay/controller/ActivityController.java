@@ -92,8 +92,8 @@ public class ActivityController {
      * @param json
      * @return
      */
-    @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST, headers = {
-            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("activity/ {} /join begin", activityId);
@@ -104,6 +104,23 @@ public class ActivityController {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
+    }
+
+
+    /**
+     * 处理用户 邀请加入
+     *
+     * @param applicationId 申请Id
+     * @param userId        用户Id
+     * @param token         用户会话Token
+     * @param json          请求参数
+     * @return 返回处理结果
+     */
+    @RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo processJoinApplication(@PathVariable("applicationId") String applicationId, @RequestParam("userId") String userId,
+                                             @RequestParam("token") String token, @RequestBody JSONObject json) {
+        return ResponseDo.buildSuccessResponse();
     }
 
     /**
@@ -119,5 +136,6 @@ public class ActivityController {
         keyTranMap.put("street", "establish.street");
         return keyTranMap;
     }
+
 
 }

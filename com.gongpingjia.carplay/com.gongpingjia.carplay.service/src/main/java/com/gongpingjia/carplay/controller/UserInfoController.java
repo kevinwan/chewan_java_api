@@ -231,23 +231,52 @@ public class UserInfoController {
      * @param json 请求Body参数信息
      * @return 变更结果信息
      */
-    @RequestMapping(value = "/user/location", method = RequestMethod.POST, headers = {
-            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo changeLocation(@RequestBody JSONObject json) {
+    @RequestMapping(value = "/user/{userId}/location", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo changeLocation(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                     @RequestBody JSONObject json) {
         try {
             LOG.debug("Begin change user loaction, request:{}", json);
             if (CommonUtil.isEmpty(json, Arrays.asList("userId", "token", "longitude", "latitude"))) {
                 throw new ApiException("输入参数有误");
             }
-            String userId = json.getString("userId");
-            String token = json.getString("token");
-            Landmark landmark = (Landmark)JSONObject.toBean(json,Landmark.class);
+            Landmark landmark = (Landmark) JSONObject.toBean(json, Landmark.class);
 
-            return userService.changeLocation(userId, token,landmark);
+            return userService.changeLocation(userId, token, landmark);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
 
+    /**
+     * 获取用户的感兴趣的人
+     *
+     * @param userId 用户Id
+     * @param token  会话Token
+     * @param ignore 忽略记录数
+     * @param limit  查询记录数
+     * @return 返回结果信息
+     */
+    @RequestMapping(value = "/user/{userId}/interest/list", method = RequestMethod.GET)
+    public ResponseDo listInterests(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                    @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+        return ResponseDo.buildSuccessResponse();
+    }
+
+
+    /**
+     * 删除用户相册中的照片
+     * @param userId 用户Id
+     * @param token 用户会话Token
+     * @param json  请求JSON对象
+     * @return 返回处理结果
+     */
+    @RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo deleteAlbumPhotos(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                        @RequestBody JSONObject json) {
+        return ResponseDo.buildSuccessResponse();
+    }
 }
