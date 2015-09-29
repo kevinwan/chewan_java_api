@@ -26,7 +26,7 @@ public class OfficialApproveController {
      */
     @RequestMapping(value = "/official/approve", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo approveUserApply(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo approveUserApply(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 
         return ResponseDo.buildSuccessResponse();
     }
@@ -40,7 +40,7 @@ public class OfficialApproveController {
      * @return 返回审批结果
      */
     @RequestMapping(value = "/official/approve/list", method = RequestMethod.GET)
-    public ResponseDo approveList(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
 
         return ResponseDo.buildSuccessResponse();
     }
