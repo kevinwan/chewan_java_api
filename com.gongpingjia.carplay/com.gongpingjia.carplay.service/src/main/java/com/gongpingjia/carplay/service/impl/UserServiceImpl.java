@@ -25,7 +25,6 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -445,6 +444,45 @@ public class UserServiceImpl implements UserService {
         userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("phone", phone));
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo getAuthenticationHistory(String userId, String token) throws ApiException {
+        LOG.debug("check parameters");
+        checker.checkUserInfo(userId, token);
+        List<AuthenticationHistory> authenticationHistories = authenticationHistoryDao.find(Query.query(Criteria.where("applyUserId").is(userId)));
+        List<String> authIds = new ArrayList<>(authenticationHistories.size());
+        for (AuthenticationHistory authenticationHistory : authenticationHistories) {
+            authIds.add(authenticationHistory.getAuthId());
+        }
+        List<User> authUsers = userDao.findByIds(authIds);
+
+        LOG.debug("Input map parameter");
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (AuthenticationHistory authenticationHistory : authenticationHistories) {
+            Map<String, Object> map = new HashMap<>(7, 1);
+            User user = findById(authUsers, authenticationHistory.getAuthId());
+            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+            map.put("userID", authenticationHistory.getAuthId());
+            map.put("nickname", user.getNickname());
+            map.put("avatar", user.getAvatar());
+            map.put("authTime", authenticationHistory.getAuthTime());
+            map.put("type", authenticationHistory.getType());
+            map.put("status", authenticationHistory.getStatus());
+            map.put("content", authenticationHistory.getRemark());
+            data.add(map);
+        }
+
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
+    private User findById(List<User> users, String id) {
+        for (User user : users) {
+            if (user.getUserId().equals(id)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     /**
