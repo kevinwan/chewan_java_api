@@ -392,7 +392,7 @@ public class UserServiceImpl implements UserService {
     public ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException {
         LOG.debug("Begin check input parameters");
         checker.checkUserInfo(userId, token);
-        if (!CommonUtil.isArrayEmpty(json, "photos")) {
+        if (CommonUtil.isArrayEmpty(json, "photos")) {
             LOG.warn("Input parameters photos is empty");
             throw new ApiException("输入参数有误");
         }
