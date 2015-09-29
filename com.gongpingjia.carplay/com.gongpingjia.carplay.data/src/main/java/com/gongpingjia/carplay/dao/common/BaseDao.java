@@ -46,6 +46,8 @@ public interface BaseDao<T,K> {
 
     public void update(Query query, Update update);
 
+    public void update(K id, Update update);
+
     public void updateFirst(Query query, Update update);
 
     public void updateAll(Query query, Update update);

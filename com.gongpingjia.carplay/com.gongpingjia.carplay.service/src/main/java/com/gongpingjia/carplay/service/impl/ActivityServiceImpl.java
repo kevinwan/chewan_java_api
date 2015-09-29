@@ -287,4 +287,73 @@ public class ActivityServiceImpl implements ActivityService {
         return null;
     }
 
+    @Override
+    public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
+        LOG.debug("applyJoinActivity");
+
+        //判断申请appointment 是否存在
+        Appointment appointment = appointmentDao.findById(appointmentId);
+        if (appointment == null) {
+            LOG.warn("appoint not exist");
+            throw new ApiException("该邀请不存在");
+        }
+
+        if (!appointment.getInvitedUserId().equals(userId)) {
+            LOG.warn("appoint not belong this user");
+            throw new ApiException("该活动不属于你");
+        }
+
+        String applyUserId = appointment.getApplyUserId();
+
+        if (!appointment.getStatus().equals(Constants.AppointmentStatus.APPLYING)) {
+            LOG.warn("appoint has done");
+            throw new ApiException("该邀请已经处理过了");
+        }
+
+        //判断活动是否存在
+        Activity activity = activityDao.findById(appointment.getActivityId());
+        if (activity == null) {
+            LOG.warn("activity not exist");
+            throw new ApiException("活动不存在");
+        }
+        for (String memberId : activity.getMembers()) {
+            if (memberId.equals(applyUserId)) {
+                LOG.warn("user has in the activity");
+                throw new ApiException("用户已经在当前活动中");
+            }
+        }
+
+        //判断申请用户是否存在
+        User applyUser = userDao.findById(applyUserId);
+        if (applyUser == null) {
+            LOG.warn("申请用户不存在");
+            throw new ApiException("申请用户不存在");
+        }
+
+        //不同意
+        if (!acceptFlag) {
+            appointmentDao.update(appointment.getAppointmentId(), Update.update("status", Constants.AppointmentStatus.ACCEPT));
+            return ResponseDo.buildSuccessResponse();
+        }
+
+        //同意
+        //添加到环信群组中；
+        try {
+            chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), activity.getEmchatGroupId(), applyUser.getEmchatName());
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            //添加环信用户失败；
+            throw e;
+        }
+
+        //activity 中members 中添加该用户;
+        Update activityUpdate = new Update();
+        activityUpdate.addToSet("members", applyUserId);
+        activityDao.update(activity.getActivityId(), activityUpdate);
+
+        //appointment中 更新status字段；
+        appointmentDao.update(appointment.getAppointmentId(), Update.update("status", Constants.AppointmentStatus.ACCEPT));
+
+        return ResponseDo.buildSuccessResponse();
+    }
 }

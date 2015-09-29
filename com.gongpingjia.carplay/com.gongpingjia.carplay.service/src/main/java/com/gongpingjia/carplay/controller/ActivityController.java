@@ -1,9 +1,11 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.service.ActivityService;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,9 @@ import java.util.Map;
 public class ActivityController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivityController.class);
+
+    @Autowired
+    private ParameterChecker parameterChecker;
 
     /**
      * 注册活动
@@ -110,16 +115,24 @@ public class ActivityController {
     /**
      * 处理用户 邀请加入
      *
-     * @param applicationId 申请Id
+     * @param appointmentId 申请Id
      * @param userId        用户Id
      * @param token         用户会话Token
      * @param json          请求参数
      * @return 返回处理结果
      */
-    @RequestMapping(value = "/application/{applicationId}/process", method = RequestMethod.POST,
+    @RequestMapping(value = "/application/{appointmentId}/process", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo processJoinApplication(@PathVariable("applicationId") String applicationId, @RequestParam("userId") String userId,
+    public ResponseDo processJoinApplication(@PathVariable("appointmentId") String appointmentId, @RequestParam("userId") String userId,
                                              @RequestParam("token") String token, @RequestBody JSONObject json) {
+        LOG.debug("/application/{applicationId}/process");
+        try {
+            boolean accept = (Boolean) json.get("accept");
+            parameterChecker.checkUserInfo(userId, token);
+            return activityService.applyJoinActivity(appointmentId, userId, accept);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+        }
         return ResponseDo.buildSuccessResponse();
     }
 

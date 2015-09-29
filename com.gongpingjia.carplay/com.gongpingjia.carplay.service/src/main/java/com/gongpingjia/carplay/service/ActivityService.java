@@ -43,4 +43,6 @@ public interface ActivityService {
      * “约她”申请加入活动
      */
     public ResponseDo sendAppointment(String activityId, String userId, String token,ActivityIntention activityIntention) throws ApiException;
+
+    public ResponseDo applyJoinActivity(String appointmentId, String userId,boolean acceptFlag) throws ApiException;
 }
