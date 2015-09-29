@@ -268,15 +268,29 @@ public class UserInfoController {
 
     /**
      * 删除用户相册中的照片
+     *
      * @param userId 用户Id
-     * @param token 用户会话Token
-     * @param json  请求JSON对象
+     * @param token  用户会话Token
+     * @param json   请求JSON对象
      * @return 返回处理结果
      */
     @RequestMapping(value = "/user/{userId}/album/photos", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo deleteAlbumPhotos(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                         @RequestBody JSONObject json) {
+        return ResponseDo.buildSuccessResponse();
+    }
+
+
+    /**
+     * 获取用户的审批历史信息
+     *
+     * @param userId 用户Id
+     * @param token  用户会话token
+     * @return 返回查询的结果信息
+     */
+    @RequestMapping(value = "/user/{userId}/authentication/history", method = RequestMethod.GET)
+    public ResponseDo getAuthenticationHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
         return ResponseDo.buildSuccessResponse();
     }
 }

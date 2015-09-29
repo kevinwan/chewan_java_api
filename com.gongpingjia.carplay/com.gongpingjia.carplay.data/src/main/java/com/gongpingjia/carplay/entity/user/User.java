@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -85,27 +86,40 @@ public class User {
     private Double distance;
 
     /**
+     * 构造函数初始化对象
+     */
+    public User() {
+        this.album = new ArrayList<Photo>(0);
+        this.address = new Address();
+        this.car = new Car();
+        this.landmark = new Landmark();
+        this.license = new DrivingLicense();
+    }
+
+    /**
      * 刷新user相关的photo的URL地址
      *
      * @param localPhotoServer  本地服务器
      * @param remotePhotoServer 远程服务器
      */
     public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer) {
-        if (StringUtils.isEmpty(this.avatar)) {
+        if (!StringUtils.isEmpty(this.avatar)) {
             this.avatar = localPhotoServer + this.avatar;
         }
-        if (StringUtils.isEmpty(this.photo)) {
+        if (!StringUtils.isEmpty(this.photo)) {
             this.photo = localPhotoServer + this.photo;
         }
-        if (StringUtils.isEmpty(this.driverLicense)) {
+        if (!StringUtils.isEmpty(this.driverLicense)) {
             this.driverLicense = localPhotoServer + this.driverLicense;
         }
-        if (StringUtils.isEmpty(this.drivingLicense)) {
+        if (!StringUtils.isEmpty(this.drivingLicense)) {
             this.drivingLicense = localPhotoServer + this.drivingLicense;
         }
 
-        for (Photo photo : album) {
-            photo.setUrl(remotePhotoServer + photo.getKey());
+        if (this.album != null) {
+            for (Photo photo : album) {
+                photo.setUrl(remotePhotoServer + photo.getKey());
+            }
         }
     }
 
