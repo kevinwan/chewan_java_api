@@ -209,7 +209,7 @@ public class UploadServiceImpl implements UploadService {
 
         if (response.success()) {
             Update update = new Update();
-            update.addToSet("album", new Photo(key, DateUtil.getTime()));
+            update.addToSet("album", new Photo(photoId, key, DateUtil.getTime()));
 
             userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
         }
