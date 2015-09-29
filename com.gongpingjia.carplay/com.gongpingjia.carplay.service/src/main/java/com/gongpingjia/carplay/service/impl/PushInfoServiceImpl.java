@@ -53,16 +53,15 @@ public class PushInfoServiceImpl implements PushInfoService {
     private MessageDao messageDao;
 
     /**
-     * @param userId
-     * step 1 获取感兴趣的人信息：  查询感兴趣的人中所有的创建的活动的 按照时间的 倒排；即离当前时间最近的 活动；
-     *
-     * step 2 查询 别人邀请我的/我邀请别人的 appointment 最近的一个 appointment
-     *
-     * step 3 有人看过我的照片 取最近的一条；
-     *
-     * step 4 谁关注我 取最近的一条；
-     *
-     * step 5 获取官方认证等信息；
+     * @param userId step 1 获取感兴趣的人信息：  查询感兴趣的人中所有的创建的活动的 按照时间的 倒排；即离当前时间最近的 活动；
+     *               <p/>
+     *               step 2 查询 别人邀请我的/我邀请别人的 appointment 最近的一个 appointment
+     *               <p/>
+     *               step 3 有人看过我的照片 取最近的一条；
+     *               <p/>
+     *               step 4 谁关注我 取最近的一条；
+     *               <p/>
+     *               step 5 获取官方认证等信息；
      */
     @Override
     public ResponseDo getPushInfo(String userId) {
@@ -80,7 +79,8 @@ public class PushInfoServiceImpl implements PushInfoService {
     //获取关注的所有的人创建的 所有的活动 按照 创建时间的 倒排序；
     private void getSubscribeUserInfo(JSONObject json, String userId) {
         List<Subscriber> subscriberList = subscriberDao.find(Query.query(Criteria.where("toUser").is(userId)));
-        if (subscriberList == null || subscriberList.size() == 0) {
+        if (subscriberList.isEmpty()) {
+            LOG.info("No subscriber users");
             //没有关注人
             return;
         }
@@ -94,19 +94,18 @@ public class PushInfoServiceImpl implements PushInfoService {
         criteria.where("_id").in(subUserIds);
         query.addCriteria(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
-        List<Activity> activities = activityDao.find(query);
-        if (activities == null || activities.size() == 0) {
-            return;
+        Activity lastActivity = activityDao.findOne(query);
+        if (lastActivity == null) {
+            json.put("interests", "");
+        } else {
+            User user = userDao.findById(lastActivity.getUserId());
+            json.put("interests", user);
         }
-        Activity lastActivity = activities.get(0);
-        User user = userDao.findById(lastActivity.getUserId());
-        json.put("interests", user);
     }
 
     /**
      * @param json
-     * @param userId
-     * 获取时间最近的 第一个 约会/被约会信息；
+     * @param userId 获取时间最近的 第一个 约会/被约会信息；
      */
     private void getAppointmentInfo(JSONObject json, String userId) {
         //自己创建的约会需要是 已接受；别人创建的约会必须是申请中
@@ -115,24 +114,32 @@ public class PushInfoServiceImpl implements PushInfoService {
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         Appointment appointment = appointmentDao.findOne(query);
-        json.put("appointments", appointment);
+        if (appointment == null) {
+            json.put("appointments", "");
+        } else {
+            json.put("appointments", appointment);
+        }
     }
 
     /**
      * @param json
-     * @param userId
-     * 获取相册访问记录最近的一条信息；
+     * @param userId 获取相册访问记录最近的一条信息；
      */
     private void getAlbumViewHistoryInfo(JSONObject json, String userId) {
         User user = userDao.findById(userId);
         Criteria criteria = new Criteria();
 //        criteria.where("albumId").in(user.getUserAlbum());
         AlbumViewHistory viewPhoto = albumViewHistoryDao.findOne(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).limit(10));
-        json.put("viewPhoto", viewPhoto);
+        if (viewPhoto == null) {
+            json.put("viewPhoto", "");
+        } else {
+            json.put("viewPhoto", viewPhoto);
+        }
     }
 
     /**
      * 获取最近的关注我的 人 User 10条记录；
+     *
      * @param json
      * @param userId
      */
@@ -144,7 +151,11 @@ public class PushInfoServiceImpl implements PushInfoService {
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime")));
 //        query.limit(10);
         Subscriber subscriber = subscriberDao.findOne(query);
-        json.put("subscriber", subscriber);
+        if (subscriber == null) {
+            json.put("subscriber", "");
+        } else {
+            json.put("subscriber", subscriber);
+        }
     }
 
     //TODO
@@ -152,13 +163,17 @@ public class PushInfoServiceImpl implements PushInfoService {
     //读取message中的信息；
 
     /**
-     *@param json
+     * @param json
      * @param userId
      */
     public void getOfficialInfo(JSONObject json, String userId) {
         Criteria criteria = Criteria.where("toUser").is(userId).where("checked").is(false);
         Query query = Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         Message official = messageDao.findOne(query);
-        json.put("official", official);
+        if (official == null) {
+            json.put("official", "");
+        } else {
+            json.put("official", official);
+        }
     }
 }
