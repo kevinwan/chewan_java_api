@@ -96,6 +96,8 @@ public class OfficialServiceImpl implements OfficialService {
         appointment.setCreateTime(DateUtil.getTime());
         appointment.setModifyTime(DateUtil.getTime());
 
+        appointment.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);
+
         appointmentDao.save(appointment);
 
         return ResponseDo.buildSuccessResponse();

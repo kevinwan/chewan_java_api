@@ -246,6 +246,8 @@ public class ActivityServiceImpl implements ActivityService {
         appointment.setCreateTime(DateUtil.getTime());
         appointment.setModifyTime(DateUtil.getTime());
 
+        appointment.setActivityCategory(Constants.ActivityCatalog.COMMON);
+
         //活动意向
         appointment.setType(activityIntention.getType());
         appointment.setDestination(activityIntention.getDestination());

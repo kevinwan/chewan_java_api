@@ -15,6 +15,8 @@ public class Appointment extends ActivityIntention {
 
     private String activityId;
 
+    private String activityCategory;
+
     //邀请申请人
     private String applyUserId;
 
@@ -52,6 +54,14 @@ public class Appointment extends ActivityIntention {
 
     public void setApplyUserId(String applyUserId) {
         this.applyUserId = applyUserId;
+    }
+
+    public String getActivityCategory() {
+        return activityCategory;
+    }
+
+    public void setActivityCategory(String activityCategory) {
+        this.activityCategory = activityCategory;
     }
 
     public String getInvitedUserId() {
