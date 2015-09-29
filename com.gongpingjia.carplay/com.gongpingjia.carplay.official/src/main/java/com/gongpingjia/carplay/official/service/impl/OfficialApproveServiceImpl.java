@@ -36,7 +36,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo getAuthApplicationList(String userId,String status,Long start,Long end) {
+    public ResponseDo getAuthApplicationList(String userId,String status,Long start,Long end,int ignore,int limit) {
         LOG.debug("getAuthApplicationList start");
 
         Criteria criteria = new Criteria();
@@ -52,6 +52,10 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "applyTime")));
+        query.limit(limit);
+        if (ignore != 0) {
+            query.skip(ignore);
+        }
         List<AuthApplication> authApplicationList = authApplicationDao.find(query);
         return ResponseDo.buildSuccessResponse(authApplicationList);
     }

@@ -1,8 +1,11 @@
 package com.gongpingjia.carplay.official.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class OfficialApproveController {
 
+    private static Logger LOG = Logger.getLogger(OfficialApproveController.class);
+
     @Autowired
-    private OfficialApproveService service;
+    private OfficialApproveService officialApproveService;
+
+    @Autowired
+    private ParameterChecker parameterChecker;
 
     /**
      * 官方认证审批
@@ -27,8 +35,15 @@ public class OfficialApproveController {
     @RequestMapping(value = "/official/approve", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo approveUserApply(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
-
-        return ResponseDo.buildSuccessResponse();
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+            String applicationId = json.getString("applicationId");
+            String status = json.getString("status");
+            return officialApproveService.saveAuthApplication(applicationId, status);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
     /**
@@ -41,7 +56,24 @@ public class OfficialApproveController {
      */
     @RequestMapping(value = "/official/approve/list", method = RequestMethod.GET)
     public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
-
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+            String status = json.getString("status");
+            Long start = json.getLong("start");
+            Long end = json.getLong("end");
+            Integer limit = json.getInt("limit");
+            Integer ignore = json.getInt("ignore");
+            if (null == limit){
+                limit = 10;
+            }
+            if (null == ignore) {
+                ignore = 0;
+            }
+            officialApproveService.getAuthApplicationList(userId, status, start, end, ignore, limit);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
         return ResponseDo.buildSuccessResponse();
     }
 }
