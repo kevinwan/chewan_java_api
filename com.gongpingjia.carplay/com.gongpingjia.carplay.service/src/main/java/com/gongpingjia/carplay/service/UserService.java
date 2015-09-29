@@ -6,7 +6,6 @@ import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public interface UserService {
@@ -101,4 +100,6 @@ public interface UserService {
     ResponseDo listInterests(String userId, String token, Integer ignore, Integer limit) throws ApiException;
 
     ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException;
+
+    ResponseDo bindingPhone(String userId, String token, String phone, String code) throws ApiException;
 }

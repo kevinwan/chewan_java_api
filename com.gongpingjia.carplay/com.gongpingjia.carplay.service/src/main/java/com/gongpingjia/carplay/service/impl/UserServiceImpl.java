@@ -425,6 +425,28 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(photos);
     }
 
+    @Override
+    public ResponseDo bindingPhone(String userId, String token, String phone, String code) throws ApiException {
+        LOG.debug("begin parameter check");
+        checker.checkUserInfo(userId, token);
+        User user = userDao.findById(userId);
+        if (!CommonUtil.isPhoneNumber(phone)) {
+            LOG.warn("Phone number is not correct format");
+            throw new ApiException("不是有效的手机号");
+        }
+
+        checker.checkPhoneVerifyCode(phone, code);
+
+        if (!user.getPhone().isEmpty()) {
+            LOG.warn("The user have phone Number");
+            throw new ApiException("该用户已有手机号");
+        }
+        LOG.debug("update the user phone :{} ", phone);
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("phone", phone));
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
     /**
      * 第三方登录，上传图片到本地服务器
      *
