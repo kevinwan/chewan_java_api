@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by licheng on 2015/9/24.
- * <p>
+ * <p/>
  * 关注相关的操作
  */
 @RestController
@@ -26,6 +26,7 @@ public class SubscribeController {
 
     /**
      * 获取用户的关注信息
+     *
      * @param userId
      * @param token
      * @return
@@ -98,13 +99,15 @@ public class SubscribeController {
 
     /**
      * 别人关注我的历史
-     * */
+     */
     @RequestMapping(value = "/user/{userId}/subscribe/history", method = RequestMethod.GET)
-    public ResponseDo getUserSubscribedHistory(@PathVariable("userId") String userId, @RequestParam("token") String token) {
+    public ResponseDo getUserSubscribedHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                               @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                               @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.info("getUserSubscribes begin");
 
         try {
-            return service.getUserSubscribedHistory(userId, token);
+            return service.getUserSubscribedHistory(userId, token, limit, ignore);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());

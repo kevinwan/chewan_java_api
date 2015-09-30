@@ -47,5 +47,5 @@ public interface SubscribeService {
      * @return
      * @throws ApiException
      */
-    ResponseDo getUserSubscribedHistory(String userId, String token) throws ApiException;
+    ResponseDo getUserSubscribedHistory(String userId, String token, Integer limit, Integer ignore) throws ApiException;
 }

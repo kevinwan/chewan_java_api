@@ -100,7 +100,8 @@ public class SubscribeServiceImpl implements SubscribeService {
         }
 
         // 是否已关注
-        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser()).and("toUser").is(userSubscription.getToUser())));
+        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser())
+                .and("toUser").is(userSubscription.getToUser())));
         if (userSub != null) {
             LOG.warn("already listened to this person before");
             throw new ApiException("已关注该用户，请勿重复关注");
@@ -119,10 +120,11 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         checker.checkUserInfo(userSubscription.getFromUser(), token);
         // 是否已关注
-        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser()).and("toUser").is(userSubscription.getToUser())));
+        Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser())
+                .and("toUser").is(userSubscription.getToUser())));
         if (userSub == null) {
             LOG.warn("cannot unlisten as not listened before");
-            throw new ApiException("没有关注该用户，不能取消关注");
+            throw new ApiException("没有关注该用户");
         }
 
         subscriberDao.deleteById(userSub.getId());
@@ -131,14 +133,15 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public ResponseDo getUserSubscribedHistory(String userId, String token) throws ApiException {
+    public ResponseDo getUserSubscribedHistory(String userId, String token, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("getUserSubscribedHistory was called");
 
         checker.checkUserInfo(userId, token);
         User myself = userDao.findById(userId);
 
         List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId)))
-                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime"))));
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime")))
+                .skip(ignore).limit(limit));
 
         List<String> subUserIdSet = new ArrayList<String>(beSubscribed.size());
         for (Subscriber sub : beSubscribed) {
@@ -153,14 +156,17 @@ public class SubscribeServiceImpl implements SubscribeService {
         return ResponseDo.buildSuccessResponse(users);
     }
 
-
+    /**
+     * 刷新用户信息
+     *
+     * @param myself
+     * @param mySubscribeUsers
+     */
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         for (User user : mySubscribeUsers) {
             user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
-            if (user.getDistance() != null) {
-                user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                        myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
-            }
+            user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
         }
     }
 

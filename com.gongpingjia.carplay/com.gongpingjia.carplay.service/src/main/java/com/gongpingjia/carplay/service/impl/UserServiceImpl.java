@@ -244,7 +244,7 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Save data begin");
         User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
 
-        if (user == null) {
+        if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
             LOG.debug("No exist user in the system, register new user by client call register interface");
 
@@ -253,9 +253,13 @@ public class UserServiceImpl implements UserService {
             String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, avatarId);
 
             uploadPhotoToServer(user.getAvatar(), key);
-
             user.setAvatar(avatarId);
-            return ResponseDo.buildSuccessResponse(user);
+            Map<String, Object> data = new HashMap<>(4, 1);
+            data.put("uid", user.getUid());
+            data.put("nickname", user.getNickname());
+            data.put("channel", user.getChannel());
+            data.put("avatar", user.getAvatar());
+            return ResponseDo.buildSuccessResponse(data);
         } else {
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login infor");
@@ -577,19 +581,19 @@ public class UserServiceImpl implements UserService {
      * @return 第三方注册，返回true
      */
     private boolean isSnsRegister(JSONObject json) {
-        if (CommonUtil.isEmpty(json, "snsUid")) {
+        if (CommonUtil.isEmpty(json, "uid")) {
             return false;
         }
 
-        if (CommonUtil.isEmpty(json, "snsUserName")) {
+        if (CommonUtil.isEmpty(json, "nickname")) {
             return false;
         }
 
-        if (CommonUtil.isEmpty(json, "snsChannel")) {
+        if (CommonUtil.isEmpty(json, "channel")) {
             return false;
         }
 
-        String snsChannel = json.getString("snsChannel");
+        String snsChannel = json.getString("channel");
         if (!Constants.Channel.CHANNEL_LIST.contains(snsChannel)) {
             // 检查Channel是否包含在Channel——List中
             LOG.warn("Input channel:{} is not in the channel list", snsChannel);
