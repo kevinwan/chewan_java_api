@@ -253,9 +253,13 @@ public class UserServiceImpl implements UserService {
             String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, avatarId);
 
             uploadPhotoToServer(user.getAvatar(), key);
-
             user.setAvatar(avatarId);
-            return ResponseDo.buildSuccessResponse(user);
+            Map<String, Object> data = new HashMap<>(4, 1);
+            data.put("uid", user.getUid());
+            data.put("nickname", user.getNickname());
+            data.put("channel", user.getChannel());
+            data.put("avatar", user.getAvatar());
+            return ResponseDo.buildSuccessResponse(data);
         } else {
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login infor");
