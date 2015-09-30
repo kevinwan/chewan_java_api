@@ -577,19 +577,19 @@ public class UserServiceImpl implements UserService {
      * @return 第三方注册，返回true
      */
     private boolean isSnsRegister(JSONObject json) {
-        if (CommonUtil.isEmpty(json, "snsUid")) {
+        if (CommonUtil.isEmpty(json, "uid")) {
             return false;
         }
 
-        if (CommonUtil.isEmpty(json, "snsUserName")) {
+        if (CommonUtil.isEmpty(json, "nickname")) {
             return false;
         }
 
-        if (CommonUtil.isEmpty(json, "snsChannel")) {
+        if (CommonUtil.isEmpty(json, "channel")) {
             return false;
         }
 
-        String snsChannel = json.getString("snsChannel");
+        String snsChannel = json.getString("channel");
         if (!Constants.Channel.CHANNEL_LIST.contains(snsChannel)) {
             // 检查Channel是否包含在Channel——List中
             LOG.warn("Input channel:{} is not in the channel list", snsChannel);
