@@ -121,7 +121,7 @@ public class UserInfoController {
         LOG.info("snsLogin begin");
 
         try {
-            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "nickname", "url", "channel", "sign"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "nickname", "avatar", "channel", "password"))) {
                 throw new ApiException("输入参数有误");
             }
 

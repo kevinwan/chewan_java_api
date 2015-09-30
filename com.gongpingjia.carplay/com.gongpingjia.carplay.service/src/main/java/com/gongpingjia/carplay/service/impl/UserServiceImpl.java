@@ -244,7 +244,7 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Save data begin");
         User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
 
-        if (user == null) {
+        if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
             LOG.debug("No exist user in the system, register new user by client call register interface");
 
