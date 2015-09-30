@@ -301,6 +301,14 @@ public class ActivityServiceImpl implements ActivityService {
         return null;
     }
 
+    /**
+     * 申请加入活动
+     * @param appointmentId
+     * @param userId
+     * @param acceptFlag
+     * @return
+     * @throws ApiException
+     */
     @Override
     public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
         LOG.debug("applyJoinActivity");
