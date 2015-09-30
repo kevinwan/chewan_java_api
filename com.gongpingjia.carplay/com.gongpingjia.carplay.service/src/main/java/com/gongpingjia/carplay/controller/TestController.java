@@ -32,4 +32,20 @@ public class TestController {
         userList.add(user);
         return ResponseDo.buildSuccessResponse(userList);
     }
+
+
+    @RequestMapping(value = "/test/string", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo testPost() {
+        User user = new User();
+        Address address = new Address();
+        address.setCity("NJ");
+        address.setProvince("JS");
+        address.setDistrict("qi xia");
+        user.setAddress(address);
+        user.setNickname("nick user");
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        return ResponseDo.buildSuccessResponse(userList);
+    }
 }

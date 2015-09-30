@@ -44,8 +44,9 @@
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
-                        <value>apolication/json; charset=UTF-8</value>
-                        <value>text/html;charset=UTF-8</value>
+                        <value>apolication/json</value>
+                        <value>text/html</value>
+                        <value>text/plain</value>
                     </list>
                 </property>
                 <property name="objectMapper" ref="customObjectMapper"/>
