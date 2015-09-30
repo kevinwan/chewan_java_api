@@ -90,6 +90,10 @@ public class User {
     @Transient
     private Double distance;
 
+    //仅用于返回到客户端，存储到数据库
+    @Transient
+    private String token;
+
     /**
      * 构造函数初始化对象
      */
@@ -351,6 +355,22 @@ public class User {
 
     public void setDistance(Double distance) {
         this.distance = distance;
+    }
+
+    public Boolean getIdle() {
+        return idle;
+    }
+
+    public void setIdle(Boolean idle) {
+        this.idle = idle;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     private int calculateAge(Long birthday) {

@@ -163,6 +163,9 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
+        //刷新用户Token
+        userData.setToken(refreshUserToken(user.getUserId()));
+
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
         if (userData.getCar() == null) {
@@ -233,7 +236,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> data = new HashMap<String, Object>(2, 1);
         // 获取用户授权信息
         data.put("userId", userData.getUserId());
-        data.put("token", getUserToken(userData.getUserId()));
+        data.put("token", refreshUserToken(userData.getUserId()));
 
         return ResponseDo.buildSuccessResponse(data);
     }
@@ -267,6 +270,9 @@ public class UserServiceImpl implements UserService {
             if (userData.getCar() == null) {
                 userData.setCar(new Car());
             }
+
+            //刷新用户会话Token
+            userData.setToken(refreshUserToken(userData.getUserId()));
             return ResponseDo.buildSuccessResponse(userData);
         }
     }
@@ -654,16 +660,19 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private String getUserToken(String userId) throws ApiException {
-        UserToken userToken = cacheManager.getUserTokenVerification(userId);
+    /**
+     * 刷新用户的会话信息
+     *
+     * @param userId 用户Id
+     * @return 返回会话Token字符串
+     * @throws ApiException
+     */
+    private String refreshUserToken(String userId) throws ApiException {
+        UserToken userToken = cacheManager.getUserToken(userId);
         if (null == userToken) {
-            LOG.warn("Fail to get token and expire info from token_verification");
-            throw new ApiException("获取用户授权信息失败");
-        }
-
-        // 如果过期 跟新Token
-        if (userToken.getExpire() > DateUtil.getTime()) {
-            return userToken.getToken();
+            LOG.warn("Fail to get token and expire info from userToken, new a token");
+            userToken = new UserToken();
+            userToken.setUserId(userId);
         }
 
         String uuid = CodeGenerator.generatorId();
