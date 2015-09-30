@@ -134,7 +134,14 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
     @Override
-    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId,boolean transfer) throws ApiException {
+    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException {
+
+        //查询是否已经邀请过了
+        Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
+                .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
+        if (null != toFind) {
+            throw new ApiException("已经邀请过此用户");
+        }
         Appointment appointment = new Appointment();
         appointment.setActivityId(activityId);
         appointment.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);

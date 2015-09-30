@@ -26,6 +26,7 @@ import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.ListUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
@@ -681,11 +682,16 @@ public class UserServiceImpl implements UserService {
         LOG.debug("get user view history information, userId:{}", userId);
         checker.checkUserInfo(userId, token);
 
-        //获取用户当前的位置信息；
+        //获取当前的用户信息；
         User nowUser = userDao.findById(userId);
 
-        Query query = new Query();
+        if (null == nowUser) {
+            LOG.warn("null nowUser");
+            throw new ApiException("用户数据异常");
+        }
+
         Criteria criteria = Criteria.where("userId").is(userId);
+        Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).skip(ignore).limit(limit);
         List<AlbumViewHistory> viewHistoryList = albumViewHistoryDao.find(query);
 
@@ -696,6 +702,9 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userDao.findByIds((String[]) userIdSet.toArray());
         //计算distance
+        if (null == userList || userList.size() == 0) {
+            return ResponseDo.buildSuccessResponse("[]");
+        }
         List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {
             User userItem = getUserFromList(userList, itemUId);
