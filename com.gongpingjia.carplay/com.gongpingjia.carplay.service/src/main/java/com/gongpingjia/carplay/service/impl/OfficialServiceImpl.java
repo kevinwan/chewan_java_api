@@ -53,6 +53,9 @@ public class OfficialServiceImpl implements OfficialService {
         LOG.debug("getActivityInfo");
 
         OfficialActivity officialActivity = officialActivityDao.findById(activityId);
+        if (null == officialActivity) {
+
+        }
         return ResponseDo.buildSuccessResponse(officialActivity);
     }
 
@@ -67,13 +70,13 @@ public class OfficialServiceImpl implements OfficialService {
         LOG.debug("getActivityList");
         Criteria criteria = new Criteria();
         if (StringUtils.isNotEmpty(address.getProvince())) {
-            criteria.where("destination.province").is(address.getProvince());
+            criteria.and("destination.province").is(address.getProvince());
         }
         if (StringUtils.isNotEmpty(address.getCity())) {
-            criteria.where("destination.city").is(address.getCity());
+            criteria.and("destination.city").is(address.getCity());
         }
         if (StringUtils.isNotEmpty(address.getDistrict())) {
-            criteria.where("destination.district").is(address.getDistrict());
+            criteria.and("destination.district").is(address.getDistrict());
         }
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));

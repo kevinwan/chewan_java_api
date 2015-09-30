@@ -90,8 +90,7 @@ public class PushInfoServiceImpl implements PushInfoService {
             subUserIds.add(subscriber.getFromUser());
         }
         Query query = new Query();
-        Criteria criteria = new Criteria();
-        criteria.where("_id").in(subUserIds);
+        Criteria criteria = Criteria.where("_id").in(subUserIds);
         query.addCriteria(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         Activity lastActivity = activityDao.findOne(query);
@@ -110,7 +109,7 @@ public class PushInfoServiceImpl implements PushInfoService {
     private void getAppointmentInfo(JSONObject json, String userId) {
         //自己创建的约会需要是 已接受；别人创建的约会必须是申请中
         //TODO 暂时约定
-        Criteria criteria = Criteria.where("applyUserId").is(userId).where("acceptInvited").is("1").orOperator(Criteria.where("invitedUserId").is(userId).and("acceptInvited").is("0"));
+        Criteria criteria = Criteria.where("applyUserId").is(userId).and("acceptInvited").is("1").orOperator(Criteria.where("invitedUserId").is(userId).and("acceptInvited").is("0"));
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         Appointment appointment = appointmentDao.findOne(query);
@@ -145,7 +144,7 @@ public class PushInfoServiceImpl implements PushInfoService {
      */
     private void getSubscriberInfo(JSONObject json, String userId) {
         Criteria criteria = new Criteria();
-        criteria.where("toUser").is(userId);
+        criteria.and("toUser").is(userId);
         Query query = new Query();
         query.addCriteria(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime")));
@@ -167,7 +166,7 @@ public class PushInfoServiceImpl implements PushInfoService {
      * @param userId
      */
     public void getOfficialInfo(JSONObject json, String userId) {
-        Criteria criteria = Criteria.where("toUser").is(userId).where("checked").is(false);
+        Criteria criteria = Criteria.where("toUser").is(userId).and("checked").is(false);
         Query query = Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         Message official = messageDao.findOne(query);
         if (official == null) {

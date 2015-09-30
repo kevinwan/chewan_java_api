@@ -162,22 +162,22 @@ public class ActivityServiceImpl implements ActivityService {
 
         LOG.debug("init Query");
         //从request读取基础查询参数；
-        Query query = initQuery(request, transParams);
+        Criteria criteria = initQuery(request, transParams);
+
 
         // 添加 距离  时间 查询参数；
-        Criteria criteria = new Criteria();
 
         long max_pub_time = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
 
         //查询创建在此时间之前的活动；
         long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) max_pub_time));
-        criteria.where("createTime").gte(gtTime);
+        criteria.and("createTime").gte(gtTime);
 
         //查询在最大距离内的 活动；
-        criteria.where("destPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
-        query.addCriteria(criteria);
+        criteria.and("destPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+
         //获得所有的满足基础条件的活动；
-        List<Activity> allActivityList = activityDao.find(query);
+        List<Activity> allActivityList = activityDao.find(Query.query(criteria));
         if (allActivityList.isEmpty()) {
             LOG.warn("all Activity list is empty");
             return ResponseDo.buildSuccessResponse("[]");
@@ -209,30 +209,27 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Query initQuery(HttpServletRequest request, Map<String, String> transMap) {
+    public Criteria initQuery(HttpServletRequest request, Map<String, String> transMap) {
         //初始化query信息
-        Query query = new Query();
         Criteria criteria = new Criteria();
         for (Map.Entry<String, String> transItem : transMap.entrySet()) {
             String requestVal = request.getParameter(transItem.getKey());
             if (StringUtils.isNotEmpty(requestVal)) {
                 //付款类型转换 请我变成 请客  请客变成 请我 AA不变；
-                //TODO
                 if (transItem.getKey().equals("pay")) {
                     if (requestVal.equals(Activity.PAY_TYPE_INVITED)) {
-                        criteria.where(transItem.getValue()).is(Activity.PAY_TYPE_TREAT);
+                        criteria.and(transItem.getValue()).is(Activity.PAY_TYPE_TREAT);
                     } else if (requestVal.equals(Activity.PAY_TYPE_TREAT)) {
-                        criteria.where(transItem.getKey()).is(Activity.PAY_TYPE_INVITED);
+                        criteria.and(transItem.getKey()).is(Activity.PAY_TYPE_INVITED);
                     } else {
-                        criteria.where(transItem.getKey()).is(Activity.PAY_TYPE_AA);
+                        criteria.and(transItem.getKey()).is(Activity.PAY_TYPE_AA);
                     }
                 } else {
-                    criteria.where(transItem.getValue()).is(requestVal);
+                    criteria.and(transItem.getValue()).is(requestVal);
                 }
             }
         }
-        query.addCriteria(criteria);
-        return query;
+        return criteria;
     }
 
     @Override

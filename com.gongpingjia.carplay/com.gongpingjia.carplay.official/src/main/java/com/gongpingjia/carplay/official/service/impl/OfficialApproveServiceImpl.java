@@ -36,18 +36,18 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo getAuthApplicationList(String userId,String status,Long start,Long end,int ignore,int limit) {
+    public ResponseDo getAuthApplicationList(String userId, String status, Long start, Long end, int ignore, int limit) {
         LOG.debug("getAuthApplicationList start");
 
         Criteria criteria = new Criteria();
         if (StringUtils.isNotEmpty(status)) {
-            criteria.where("status").is(status);
+            criteria.and("status").is(status);
         }
         if (null != start) {
-            criteria.gte(start);
+            criteria.and("start").gte(start);
         }
         if (null != end) {
-            criteria.lte(end);
+            criteria.and("end").lte(end);
         }
 
         Query query = Query.query(criteria);
