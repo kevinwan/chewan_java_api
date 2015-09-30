@@ -354,6 +354,9 @@ public class User {
     }
 
     private int calculateAge(Long birthday) {
+        if (null == birthday) {
+            return 0;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(new Date().getTime());
 

@@ -33,5 +33,12 @@ public class ObjectMappingCustom extends ObjectMapper {
                 jgen.writeString("");
             }
         });
+
+        this.getSerializerProvider().setDefaultKeySerializer(new JsonSerializer<Object>() {
+            @Override
+            public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+
+            }
+        });
     }
 }

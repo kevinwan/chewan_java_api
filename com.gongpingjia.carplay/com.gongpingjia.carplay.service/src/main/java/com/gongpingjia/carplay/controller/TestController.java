@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +29,7 @@ public class TestController {
         address.setDistrict("qi xia");
         user.setAddress(address);
         user.setNickname("nick user");
+        user.setBirthday(new Date().getTime());
         List<User> userList = new ArrayList<>();
         userList.add(user);
         return ResponseDo.buildSuccessResponse(userList);
