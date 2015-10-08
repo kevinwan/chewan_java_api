@@ -299,6 +299,7 @@ public class UserServiceImpl implements UserService {
 
         user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
 
+
         return ResponseDo.buildSuccessResponse(user);
 
     }
