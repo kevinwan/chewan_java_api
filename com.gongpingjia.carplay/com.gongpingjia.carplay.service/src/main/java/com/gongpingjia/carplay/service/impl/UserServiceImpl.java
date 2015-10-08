@@ -94,7 +94,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SubscriberDao subscriberDao;
 
-
     @Override
     public ResponseDo register(User user) throws ApiException {
         LOG.debug("Save register data begin");
@@ -164,8 +163,9 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-        //TODO
-        //
+        /刷新用户Token
+        userData.setToken(refreshUserToken(user.getUserId()));
+        
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
         if (userData.getCar() == null) {
@@ -246,7 +246,7 @@ public class UserServiceImpl implements UserService {
         checkSnsLoginParameters(user.getUid(), user.getChannel(), user.getPassword());
 
         LOG.debug("Save data begin");
-        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid()).and("channel").is(user.getChannel())));
+        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid()).and("channel").is(user.getChannel())));;
 
         if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
@@ -265,14 +265,14 @@ public class UserServiceImpl implements UserService {
             data.put("avatar", user.getAvatar());
             return ResponseDo.buildSuccessResponse(data);
         } else {
-            //TODO
             // 用户已经存在于系统中
-            //校验密码 返回token
             LOG.debug("User is exist in the system, return login infor");
             if (userData.getCar() == null) {
                 userData.setCar(new Car());
             }
 
+            //刷新用户会话Token
+            userData.setToken(refreshUserToken(userData.getUserId()));
             return ResponseDo.buildSuccessResponse(userData);
         }
     }
@@ -305,7 +305,6 @@ public class UserServiceImpl implements UserService {
 
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
 
-        //TODO
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
@@ -313,12 +312,10 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(status)) {
             criteria.and("status").is(status);
         }
-        List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
+        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
         List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
-
-        //TODO
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
@@ -667,14 +664,10 @@ public class UserServiceImpl implements UserService {
         UserToken userToken = cacheManager.getUserTokenVerification(userId);
         if (null == userToken) {
             LOG.warn("Fail to get token and expire info from token_verification");
-            throw new ApiException("获取用户授权信息失败");
+            userToken = new UserToken();
+            userToken.setUserId(userId);
         }
-
-        // 如果过期 跟新Token
-        if (userToken.getExpire() > DateUtil.getTime()) {
-            return userToken.getToken();
-        }
-
+        
         String uuid = CodeGenerator.generatorId();
         userToken.setToken(uuid);
         userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,

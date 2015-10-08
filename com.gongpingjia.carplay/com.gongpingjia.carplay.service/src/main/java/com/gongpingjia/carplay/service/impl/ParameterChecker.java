@@ -1,6 +1,5 @@
 package com.gongpingjia.carplay.service.impl;
 
-import com.gongpingjia.carplay.cache.CacheService;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.DateUtil;
@@ -41,9 +40,7 @@ public class ParameterChecker {
      * @throws ApiException 如果参数错误则抛出异常
      */
     public void checkUserInfo(String userId, String token) throws ApiException {
-
-
-        UserToken userToken = cacheManager.getUserTokenVerification(userId);
+        UserToken userToken = cacheManager.getUserToken(userId);
         if (userToken == null) {
             LOG.error("No user token exist in the system, userId:{}", userId);
             throw new ApiException("用户不存在");
@@ -67,7 +64,7 @@ public class ParameterChecker {
      * @return 用户存在返回true， 用户不存在返回false
      */
     public boolean isUserExist(String userId) {
-        UserToken userToken = cacheManager.getUserTokenVerification(userId);
+        UserToken userToken = cacheManager.getUserToken(userId);
         if (userToken == null) {
             LOG.warn("No user token exist in the system, userId:{}", userId);
             return false;

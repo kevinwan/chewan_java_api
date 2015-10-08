@@ -45,7 +45,7 @@ public class CacheManager {
      * @param userId 用户ID
      * @return Token对象
      */
-    public UserToken getUserTokenVerification(String userId) {
+    public UserToken getUserToken(String userId) {
         UserToken userToken = cacheService.get(MessageFormat.format(CacheUtil.CacheName.USER_TOKEN, userId),
                 UserToken.class);
 
