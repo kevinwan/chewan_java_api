@@ -19,13 +19,13 @@ public interface ActivityService {
     /**
      * 注册活动
      */
-    public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException;
+    public ResponseDo activityRegister(String userId, Activity activity) throws ApiException;
 
 
     /**
      * 获取活动信息
      */
-    public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException;
+    public ResponseDo getActivityInfo(String userId, String activityId) throws ApiException;
 
 
     /**
@@ -43,7 +43,7 @@ public interface ActivityService {
     /**
      * “约她”申请加入活动
      */
-    public ResponseDo sendAppointment(String activityId, String userId, String token, Appointment appointment) throws ApiException;
+    public ResponseDo sendAppointment(String activityId, String userId, Appointment appointment) throws ApiException;
 
     /**
      * 处理活动加入申请

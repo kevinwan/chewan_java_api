@@ -54,11 +54,6 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private UserDao userDao;
 
-    @Autowired
-    private ParameterChecker parameterChecker;
-
-    @Autowired
-    private OfficialActivityDao officialActivityDao;
 
     @Autowired
     private ActivityDao activityDao;
@@ -68,9 +63,8 @@ public class ActivityServiceImpl implements ActivityService {
     private AppointmentDao appointmentDao;
 
     @Override
-    public ResponseDo activityRegister(String userId, String token, Activity activity) throws ApiException {
+    public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
         LOG.debug("activityRegister");
-        parameterChecker.checkUserInfo(userId, token);
         activity.setActivityId(null);
         //设置活动的创建人ID
         activity.setUserId(userId);
@@ -94,9 +88,8 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo getActivityInfo(String userId, String token, String activityId) throws ApiException {
+    public ResponseDo getActivityInfo(String userId, String activityId) throws ApiException {
         LOG.debug("getActivityInfo");
-        parameterChecker.checkUserInfo(userId, token);
         Activity activity = activityDao.findById(activityId);
         if (null == activity) {
             LOG.warn("activity not exist");
@@ -227,8 +220,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo sendAppointment(String activityId, String userId, String token, Appointment appointment) throws ApiException {
-        parameterChecker.checkUserInfo(userId, token);
+    public ResponseDo sendAppointment(String activityId, String userId, Appointment appointment) throws ApiException {
         Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId)));
         if (activity == null) {
             LOG.warn("No activity exist : {}", activityId);

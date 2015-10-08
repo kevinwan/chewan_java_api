@@ -50,12 +50,13 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
+            parameterChecker.checkUserInfo(userId,token);
             if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
-            return activityService.activityRegister(userId, token, activity);
+            return activityService.activityRegister(userId, activity);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -76,7 +77,8 @@ public class ActivityController {
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            ResponseDo responseDo = activityService.getActivityInfo(userId, token, activityId);
+            parameterChecker.checkUserInfo(userId,token);
+            ResponseDo responseDo = activityService.getActivityInfo(userId, activityId);
             return responseDo;
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
@@ -121,8 +123,9 @@ public class ActivityController {
         LOG.debug("activity/ {} /join begin", activityId);
         try {
             //TODO validator
+            parameterChecker.checkUserInfo(userId,token);
             Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
-            return activityService.sendAppointment(activityId, userId, token, appointment);
+            return activityService.sendAppointment(activityId, userId, appointment);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -149,7 +152,6 @@ public class ActivityController {
                 throw new ApiException("输入参数错误");
             }
             parameterChecker.checkUserInfo(userId, token);
-
             boolean accept = json.getBoolean("accept");
             return activityService.applyJoinActivity(appointmentId, userId, accept);
         } catch (ApiException e) {
