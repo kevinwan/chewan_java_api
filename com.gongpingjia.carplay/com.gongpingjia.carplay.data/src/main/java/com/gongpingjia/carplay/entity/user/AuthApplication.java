@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.user;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -25,6 +26,9 @@ public class AuthApplication {
     private Long applyTime;
 
     private Long authTime;
+
+    @Transient
+    private User applyUser;
 
     public String getApplicationId() {
         return applicationId;
@@ -80,5 +84,13 @@ public class AuthApplication {
 
     public void setAuthTime(Long authTime) {
         this.authTime = authTime;
+    }
+
+    public User getApplyUser() {
+        return applyUser;
+    }
+
+    public void setApplyUser(User applyUser) {
+        this.applyUser = applyUser;
     }
 }

@@ -29,21 +29,6 @@ public class Car {
 
     private String slug;
 
-    public Car() {
-        this.brand = "";
-        this.model = "";
-        this.color = "";
-        this.slug = "";
-    }
-
-    public Car(String brand, String logo, String model, String color, Double price) {
-        this.brand = brand;
-        this.logo = logo;
-        this.model = model;
-        this.color = color;
-        this.price = price;
-    }
-
     /**
      * 给logo添加服务器前缀
      *

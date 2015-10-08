@@ -99,7 +99,6 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Save register data begin");
 
         // 注册用户
-
         user.setRegisterTime(DateUtil.getTime());
         user.setRole(Constants.UserCatalog.COMMON);
         user.setPhotoAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
@@ -168,11 +167,12 @@ public class UserServiceImpl implements UserService {
 
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
-        if (userData.getCar() == null) {
-            userData.setCar(new Car());
-        } else {
+        if (userData.getCar() != null) {
             userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
         }
+
+        //不传输到客户端
+        userData.setLicense(null);
 
         return ResponseDo.buildSuccessResponse(userData);
     }

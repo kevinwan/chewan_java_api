@@ -1,42 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/context 
     http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/mvc 
-    http://www.springframework.org/schema/mvc/spring-mvc.xsd
-    http://www.springframework.org/schema/util
-    http://www.springframework.org/schema/util/spring-util.xsd">
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- 默认扫描的包路径 -->
     <context:component-scan
-            base-package="com.gongpingjia.carplay.controller,com.gongpingjia.carplay.common.exception"/>
-
-    <!-- 添加注解驱动 -->
-    <!--<mvc:annotation-driven/>-->
-    <!--<mvc:annotation-driven>-->
-    <!--<mvc:message-converters register-defaults="true">-->
-    <!--<bean class="com.gongpingjia.carplay.common.util.CustomHttpMessageConverter">-->
-    <!--<property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>-->
-    <!--<property name="features">-->
-    <!--<array>-->
-    <!--<value>QuoteFieldNames</value>-->
-    <!--<value>WriteMapNullValue</value>-->
-    <!--<value>WriteNullStringAsEmpty</value>-->
-    <!--<value>WriteNullListAsEmpty</value>-->
-    <!--</array>-->
-    <!--</property>-->
-    <!--</bean>-->
-    <!--</mvc:message-converters>-->
-    <!--</mvc:annotation-driven>-->
-
+            base-package="com.gongpingjia.carplay.controller, com.gongpingjia.carplay.common.exception, com.gongpingjia.carplay.official.controller"/>
+    <context:annotation-config/>
 
     <bean id="customObjectMapper" class="com.gongpingjia.carplay.common.util.CustomObjectMapper">
-
     </bean>
 
     <mvc:annotation-driven>
@@ -53,36 +32,6 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
-
-    <!--<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">-->
-    <!--<mvc:message-converters register-defaults="true">-->
-    <!--&lt;!&ndash; 将StringHttpMessageConverter的默认编码设为UTF-8 &ndash;&gt;-->
-    <!--<bean class="org.springframework.http.converter.StringHttpMessageConverter">-->
-    <!--<constructor-arg value="UTF-8">-->
-    <!--</constructor-arg>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash; 将Jackson2HttpMessageConverter的默认格式化输出为true &ndash;&gt;-->
-    <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
-    <!--<property name="objectMapper">-->
-    <!--<bean class="com.gongpingjia.carplay.common.util.CustomObjectMapper">-->
-    <!--</bean>-->
-    <!--</property>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash;&lt;!&ndash; 使用XML格式输出数据 &ndash;&gt;&ndash;&gt;-->
-    <!--&lt;!&ndash;<bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">&ndash;&gt;-->
-    <!--&lt;!&ndash;<constructor-arg>&ndash;&gt;-->
-    <!--&lt;!&ndash;<bean class="org.springframework.oxm.xstream.XStreamMarshaller">&ndash;&gt;-->
-    <!--&lt;!&ndash;<property name="streamDriver">&ndash;&gt;-->
-    <!--&lt;!&ndash;<bean class="com.thoughtworks.xstream.io.xml.StaxDriver">&ndash;&gt;-->
-    <!--&lt;!&ndash;</bean></property>&ndash;&gt;-->
-
-    <!--&lt;!&ndash;</bean>&ndash;&gt;-->
-    <!--&lt;!&ndash;</constructor-arg>&ndash;&gt;-->
-    <!--&lt;!&ndash;<property name="supportedMediaTypes" value="application/xml"></property>&ndash;&gt;-->
-    <!--&lt;!&ndash;</bean>&ndash;&gt;-->
-    <!--</mvc:message-converters>-->
-    <!--</mvc:annotation-driven>-->
-
 
     <mvc:interceptors>
         <!-- <mvc:interceptor> <mvc:mapping path=""/></mvc:interceptor> -->
