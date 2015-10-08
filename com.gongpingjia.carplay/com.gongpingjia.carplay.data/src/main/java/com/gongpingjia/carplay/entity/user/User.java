@@ -94,17 +94,6 @@ public class User {
     @Transient
     private String token;
 
-    /**
-     * 构造函数初始化对象
-     */
-    public User() {
-        this.album = new ArrayList<Photo>(0);
-        this.address = new Address();
-        this.car = new Car();
-        this.landmark = new Landmark();
-        this.license = new DrivingLicense();
-        this.idle = true;
-    }
 
     /**
      * 刷新user相关的photo的URL地址

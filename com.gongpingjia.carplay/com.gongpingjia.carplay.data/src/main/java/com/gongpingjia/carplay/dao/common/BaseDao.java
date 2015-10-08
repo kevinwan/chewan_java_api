@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.dao.common;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ public interface BaseDao<T,K> {
     public T findById(K key);
 
     public T findOne(Query query);
+
+    public List<T> findByIds(Collection<K> ids);
 
     public List<T> findByIds(List<K> ids);
 

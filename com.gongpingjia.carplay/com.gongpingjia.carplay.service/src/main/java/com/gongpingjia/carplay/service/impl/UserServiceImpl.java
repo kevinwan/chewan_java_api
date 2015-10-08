@@ -466,7 +466,7 @@ public class UserServiceImpl implements UserService {
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
             authIds.add(authenticationHistory.getAuthId());
         }
-        List<User> authUsers = userDao.findByIds((String[]) authIds.toArray());
+        List<User> authUsers = userDao.findByIds(authIds);
 
         LOG.debug("Input map parameter");
         List<Map<String, Object>> data = new ArrayList<>();
@@ -709,7 +709,7 @@ public class UserServiceImpl implements UserService {
             userIdSet.add(item.getViewUserId());
         }
 
-        List<User> userList = userDao.findByIds((String[]) userIdSet.toArray());
+        List<User> userList = userDao.findByIds(userIdSet);
         //计算distance
         if (null == userList || userList.size() == 0) {
             return ResponseDo.buildSuccessResponse("[]");
@@ -747,7 +747,7 @@ public class UserServiceImpl implements UserService {
         for (AuthenticationHistory item : authenticationHistoryList) {
             authUserIds.add(item.getAuthId());
         }
-        List<User> userList = userDao.findByIds((String[]) authUserIds.toArray());
+        List<User> userList = userDao.findByIds(authUserIds);
 
         //封装返回数据
         //封装了 认证历史记录 以及 认证人的信息； authUserId 例如 对应着 车玩官方；

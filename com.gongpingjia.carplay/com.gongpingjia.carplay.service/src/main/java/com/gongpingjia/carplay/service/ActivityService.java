@@ -31,7 +31,7 @@ public interface ActivityService {
     /**
      * 获取周边的活动列表
      */
-    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request) throws ApiException;
+    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request,String userId) throws ApiException;
 
 
     /**

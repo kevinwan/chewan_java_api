@@ -20,6 +20,7 @@ import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.EmchatTokenService;
 import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.ActivityWeight;
+import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -62,8 +63,6 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private ActivityDao activityDao;
 
-    @Autowired
-    private ActivityUtil activityUtil;
 
     @Autowired
     private AppointmentDao appointmentDao;
@@ -124,7 +123,7 @@ public class ActivityServiceImpl implements ActivityService {
      *                    step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
      */
     @Override
-    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request) throws ApiException {
+    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request,String userId) throws ApiException {
         LOG.debug("getNearActivityList");
         //从request读取初始化信息；
         //limit 是分页参数
@@ -167,14 +166,17 @@ public class ActivityServiceImpl implements ActivityService {
 
         // 添加 距离  时间 查询参数；
 
-        long max_pub_time = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
+        long maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
 
         //查询创建在此时间之前的活动；
-        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) max_pub_time));
+        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
         criteria.and("createTime").gte(gtTime);
 
         //查询在最大距离内的 活动；
-        criteria.and("destPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+
+        //非用户自己创建的活动
+        criteria.and("userId").ne(userId);
 
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(Query.query(criteria));
@@ -182,30 +184,22 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.warn("all Activity list is empty");
             return ResponseDo.buildSuccessResponse("[]");
         }
+
         LOG.debug("allActivityList size is:" + allActivityList.size());
-        //TODO
+
+        //查询出Activity的 组织者，并初始化
+        initOrganizer(allActivityList);
+
         /**
          *  对所有的基础条件活动进行权重打分，并且排序
          * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
-        List<ActivityWeight> rltList = activityUtil.getPageInfo(activityUtil.sortActivityList(allActivityList, new Date(), landmark, maxDistance), ignore, limit);
+        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit);
         LOG.debug("rltList size is:" + rltList.size());
 
 
-        //添加activity的组织者信息；和 distance 信息；
-        Set<String> userIds = new HashSet<>();
-        for (ActivityWeight activityWeight : rltList) {
-            userIds.add(activityWeight.getActivity().getUserId());
-        }
-        List<User> userList = userDao.findByIds((String[]) userIds.toArray());
-        List<Activity> activityList = new ArrayList<>(rltList.size());
-        for (ActivityWeight activityWeight : rltList) {
-            Activity activity = activityWeight.getActivity();
-            activity.setDistance(activityWeight.getDistance());
-            activity.setOrganizer(findById(userList, activity.getUserId()));
-        }
-        return ResponseDo.buildSuccessResponse(activityList);
+        return ResponseDo.buildSuccessResponse(rltList);
     }
 
     @Override
@@ -292,17 +286,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-    private User findById(List<User> users, String id) {
-        for (User user : users) {
-            if (user.getUserId().equals(id)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     /**
      * 申请加入活动
+     *
      * @param appointmentId
      * @param userId
      * @param acceptFlag
@@ -403,5 +389,27 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         return appointment;
+    }
+
+
+    /**
+     * 将activityList中的User信息从数据库中查询出来，并初始化
+     * @param activityList
+     * @throws ApiException
+     */
+    private void initOrganizer(List<Activity> activityList) throws ApiException {
+        Set<String> userIdSet = new HashSet<>(activityList.size());
+        for (Activity activity : activityList) {
+            userIdSet.add(activity.getUserId());
+        }
+        List<User> users = userDao.findByIds(userIdSet);
+
+        for (Activity activity : activityList) {
+            User organizer = FetchUtil.getUserFromList(users, activity.getUserId());
+            if (null == organizer) {
+                throw new ApiException("数据非法 该Activity没有找到对应的Organizer");
+            }
+            activity.setOrganizer(organizer);
+        }
     }
 }

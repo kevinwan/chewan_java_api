@@ -8,9 +8,10 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 public class ActivityWeight implements Comparable<ActivityWeight> {
 
 
-    public static final long MAX_PUB_TIME = 1000000;
+    public static final long MAX_PUB_TIME = 60000L;
 
-    public static final double DEFAULT_MAX_DISTANCE = 1234;
+    //20km
+    public static final double DEFAULT_MAX_DISTANCE = 20000;
 
     private Activity activity;
 

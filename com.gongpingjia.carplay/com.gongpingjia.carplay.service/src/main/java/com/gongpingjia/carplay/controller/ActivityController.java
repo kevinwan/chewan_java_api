@@ -97,7 +97,8 @@ public class ActivityController {
     public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            return activityService.getNearActivityList(initTransListParam(request), request);
+            parameterChecker.checkUserInfo(userId,token);
+            return activityService.getNearActivityList(initTransListParam(request), request,userId);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -113,7 +114,7 @@ public class ActivityController {
      * @param json
      * @return
      */
-    @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST,
+        @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
