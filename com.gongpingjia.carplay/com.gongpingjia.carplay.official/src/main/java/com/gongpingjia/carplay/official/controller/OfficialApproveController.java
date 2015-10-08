@@ -36,6 +36,7 @@ public class OfficialApproveController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo approveUserApply(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         try {
+            LOG.info("Begin approve user apply");
             parameterChecker.checkUserInfo(userId, token);
             String applicationId = json.getString("applicationId");
             String status = json.getString("status");
@@ -51,29 +52,22 @@ public class OfficialApproveController {
      *
      * @param userId 审批人用户Id
      * @param token  审批人会话Token
-     * @param json   请求JSON对象
      * @return 返回审批结果
      */
     @RequestMapping(value = "/official/approve/list", method = RequestMethod.GET)
-    public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                  @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+                                  @RequestParam(value = "status", required = false) String status,
+                                  @RequestParam("start") Long start, @RequestParam("end") Long end) {
         try {
+            LOG.info("Begin obtian approve list");
             parameterChecker.checkUserInfo(userId, token);
-            String status = json.getString("status");
-            Long start = json.getLong("start");
-            Long end = json.getLong("end");
-            Integer limit = json.getInt("limit");
-            Integer ignore = json.getInt("ignore");
-            if (null == limit){
-                limit = 10;
-            }
-            if (null == ignore) {
-                ignore = 0;
-            }
-            officialApproveService.getAuthApplicationList(userId, status, start, end, ignore, limit);
+
+            return officialApproveService.getAuthApplicationList(userId, status, start, end, ignore, limit);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
-        return ResponseDo.buildSuccessResponse();
     }
 }

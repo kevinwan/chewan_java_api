@@ -10,5 +10,5 @@ public interface OfficialApproveService {
 
     public ResponseDo saveAuthApplication(String applicationId, String status);
 
-    public ResponseDo getAuthApplicationList(String userId,String status,Long start,Long end,int ignore,int limit);
+    public ResponseDo getAuthApplicationList(String userId, String status, Long start, Long end, int ignore, int limit);
 }

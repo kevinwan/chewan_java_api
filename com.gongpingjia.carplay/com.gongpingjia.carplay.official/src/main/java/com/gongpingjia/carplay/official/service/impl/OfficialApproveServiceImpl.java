@@ -1,9 +1,12 @@
 package com.gongpingjia.carplay.official.service.impl;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
+import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.AuthApplication;
+import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,6 +30,9 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     @Autowired
     private AuthApplicationDao authApplicationDao;
 
+    @Autowired
+    private UserDao userDao;
+
     @Override
     public ResponseDo saveAuthApplication(String applicationId, String status) {
         LOG.debug("saveAuthApplication start");
@@ -43,12 +49,8 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         if (StringUtils.isNotEmpty(status)) {
             criteria.and("status").is(status);
         }
-        if (null != start) {
-            criteria.and("start").gte(start);
-        }
-        if (null != end) {
-            criteria.and("end").lte(end);
-        }
+        criteria.and("start").gte(start);
+        criteria.and("end").lte(end);
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "applyTime")));
@@ -57,6 +59,18 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             query.skip(ignore);
         }
         List<AuthApplication> authApplicationList = authApplicationDao.find(query);
+
+        LOG.debug("Query apply user information");
+        for (AuthApplication application : authApplicationList) {
+            User applyUser = userDao.findById(application.getApplyUserId());
+            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+            if (applyUser.getCar() != null) {
+                applyUser.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
+            }
+
+            application.setApplyUser(applyUser);
+        }
+
         return ResponseDo.buildSuccessResponse(authApplicationList);
     }
 }

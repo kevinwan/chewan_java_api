@@ -7,7 +7,7 @@
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="com.gongpingjia.carplay.official"/>
+    <context:component-scan base-package="com.gongpingjia.carplay.official.service"/>
     <context:annotation-config/>
 
 </beans>
