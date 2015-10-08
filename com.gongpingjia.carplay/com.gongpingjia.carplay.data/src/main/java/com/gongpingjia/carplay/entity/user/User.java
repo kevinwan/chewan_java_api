@@ -32,7 +32,7 @@ public class User {
     private String gender;
     private Long birthday;
     private Long registerTime;
-    private String role = "";
+    private String role;
     private boolean invalid;
 
     @Indexed(unique = true)
@@ -93,7 +93,6 @@ public class User {
     //仅用于返回到客户端，存储到数据库
     @Transient
     private String token;
-
 
     /**
      * 刷新user相关的photo的URL地址
@@ -375,4 +374,12 @@ public class User {
         return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
     }
 
+    /**
+     * 隐藏用户的隐私信息
+     */
+    public void hideSecretInfo() {
+        this.token = null;
+        this.password = null;
+        this.license = null;
+    }
 }

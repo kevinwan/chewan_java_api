@@ -123,8 +123,8 @@ public class PushInfoServiceImpl implements PushInfoService {
     private void getAppointmentInfo(Map<String, Object> json, String userId) {
         // userId = invitedUserId 即 这个活动是自己创建的， 别人可以申请加入 状态应该是    申请中； 别人申请；
         // userId = applyUserId 即这个活动 是别人创建的，我是申请的， 需要看到 状态是  接受 或者是 拒绝；
-        String[] findStatus = {Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT};
-        Criteria criteria = Criteria.where("applyUserId").is(userId).and("acceptInvited").in(findStatus)
+        Criteria criteria = Criteria.where("applyUserId").is(userId).and("acceptInvited")
+                .in(Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT)
                 .orOperator(Criteria.where("invitedUserId").is(userId).and("acceptInvited").is(Constants.AppointmentStatus.APPLYING));
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
