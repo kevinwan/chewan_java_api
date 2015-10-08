@@ -119,6 +119,7 @@ public class ActivityController {
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("activity/ {} /join begin", activityId);
         try {
+            //TODO validator
             Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
             return activityService.sendAppointment(activityId, userId, token, appointment);
         } catch (Exception e) {

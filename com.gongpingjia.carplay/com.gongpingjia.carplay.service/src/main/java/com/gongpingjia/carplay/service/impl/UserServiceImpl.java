@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SubscriberDao subscriberDao;
 
+
     @Override
     public ResponseDo register(User user) throws ApiException {
         LOG.debug("Save register data begin");
@@ -163,6 +164,8 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
+        //TODO
+        //
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
         if (userData.getCar() == null) {
@@ -243,7 +246,7 @@ public class UserServiceImpl implements UserService {
         checkSnsLoginParameters(user.getUid(), user.getChannel(), user.getPassword());
 
         LOG.debug("Save data begin");
-        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
+        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid()).and("channel").is(user.getChannel())));
 
         if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
@@ -262,11 +265,14 @@ public class UserServiceImpl implements UserService {
             data.put("avatar", user.getAvatar());
             return ResponseDo.buildSuccessResponse(data);
         } else {
+            //TODO
             // 用户已经存在于系统中
+            //校验密码 返回token
             LOG.debug("User is exist in the system, return login infor");
             if (userData.getCar() == null) {
                 userData.setCar(new Car());
             }
+
             return ResponseDo.buildSuccessResponse(userData);
         }
     }
@@ -299,6 +305,7 @@ public class UserServiceImpl implements UserService {
 
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
 
+        //TODO
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
@@ -306,10 +313,12 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(status)) {
             criteria.and("status").is(status);
         }
-        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
+        List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
         List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
+
+        //TODO
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
@@ -368,7 +377,7 @@ public class UserServiceImpl implements UserService {
         checker.checkUserInfo(userId, token);
 
         List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        List<String> toUserIds = new ArrayList<>();
+        List<String> toUserIds = new ArrayList<>(subscribers.size());
         for (Subscriber subscriber : subscribers) {
             toUserIds.add(subscriber.getToUser());
         }
@@ -441,7 +450,7 @@ public class UserServiceImpl implements UserService {
 
         checker.checkPhoneVerifyCode(phone, code);
 
-        if (!user.getPhone().isEmpty()) {
+        if (!StringUtils.isEmpty(user.getPhone())) {
             LOG.warn("The user have phone Number");
             throw new ApiException("该用户已有手机号");
         }
@@ -456,11 +465,11 @@ public class UserServiceImpl implements UserService {
         LOG.debug("check parameters");
         checker.checkUserInfo(userId, token);
         List<AuthenticationHistory> authenticationHistories = authenticationHistoryDao.find(Query.query(Criteria.where("applyUserId").is(userId)));
-        List<String> authIds = new ArrayList<>(authenticationHistories.size());
+        Set<String> authIds = new HashSet<>(authenticationHistories.size());
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
             authIds.add(authenticationHistory.getAuthId());
         }
-        List<User> authUsers = userDao.findByIds(authIds);
+        List<User> authUsers = userDao.findByIds((String[]) authIds.toArray());
 
         LOG.debug("Input map parameter");
         List<Map<String, Object>> data = new ArrayList<>();
