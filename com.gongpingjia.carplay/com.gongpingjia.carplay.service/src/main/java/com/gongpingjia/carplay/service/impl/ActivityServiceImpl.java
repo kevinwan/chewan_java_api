@@ -116,7 +116,7 @@ public class ActivityServiceImpl implements ActivityService {
      *                    step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
      */
     @Override
-    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request,String userId) throws ApiException {
+    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request, String userId) throws ApiException {
         LOG.debug("getNearActivityList");
         //从request读取初始化信息；
         //limit 是分页参数
@@ -191,8 +191,19 @@ public class ActivityServiceImpl implements ActivityService {
         List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit);
         LOG.debug("rltList size is:" + rltList.size());
 
-
-        return ResponseDo.buildSuccessResponse(rltList);
+        JSONArray jsonArray = new JSONArray();
+        for (Activity activity : rltList) {
+            JSONObject jsonItem = new JSONObject();
+            jsonItem.put("type", activity.getType());
+            jsonItem.put("activityId", activity.getActivityId());
+            JSONObject itemOrganizer = new JSONObject();
+            itemOrganizer.put("userId", activity.getOrganizer().getUserId());
+            itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
+            itemOrganizer.put("avatar", activity.getOrganizer().getAvatar());
+            jsonItem.put("organizer", itemOrganizer);
+            jsonArray.add(jsonItem);
+        }
+        return ResponseDo.buildSuccessResponse(jsonArray);
     }
 
     @Override
@@ -288,18 +299,18 @@ public class ActivityServiceImpl implements ActivityService {
      * @throws ApiException
      */
     @Override
-    public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
+    public ResponseDo processAppointment(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
         LOG.debug("applyJoinActivity");
         Appointment appointment = checkAppointment(appointmentId, userId);
 
-        Activity activity = checkAppointmentActivity(appointment);
-
-        //判断申请用户是否存在
-        User applyUser = userDao.findById(appointment.getApplyUserId());
-        if (applyUser == null) {
-            LOG.warn("申请用户不存在");
-            throw new ApiException("申请用户不存在");
-        }
+//        Activity activity = checkAppointmentActivity(appointment);
+//
+//        //判断申请用户是否存在
+//        User applyUser = userDao.findById(appointment.getApplyUserId());
+//        if (applyUser == null) {
+//            LOG.warn("申请用户不存在");
+//            throw new ApiException("申请用户不存在");
+//        }
 
         //不同意
         if (!acceptFlag) {
@@ -307,20 +318,20 @@ public class ActivityServiceImpl implements ActivityService {
             return ResponseDo.buildSuccessResponse();
         }
 
-        //同意
-        //添加到环信群组中；
-        try {
-            chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), activity.getEmchatGroupId(), applyUser.getEmchatName());
-        } catch (ApiException e) {
-            LOG.warn(e.getMessage(), e);
-            //添加环信用户失败；
-            throw new ApiException("添加到聊天群组失败");
-        }
+//        //同意
+//        //添加到环信群组中；
+//        try {
+//            chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), activity.getEmchatGroupId(), applyUser.getEmchatName());
+//        } catch (ApiException e) {
+//            LOG.warn(e.getMessage(), e);
+//            //添加环信用户失败；
+//            throw new ApiException("添加到聊天群组失败");
+//        }
 
-        //activity 中members 中添加该用户;
-        Update activityUpdate = new Update();
-        activityUpdate.addToSet("members", appointment.getApplyUserId());
-        activityDao.update(activity.getActivityId(), activityUpdate);
+//        //activity 中members 中添加该用户;
+//        Update activityUpdate = new Update();
+//        activityUpdate.addToSet("members", appointment.getApplyUserId());
+//        activityDao.update(activity.getActivityId(), activityUpdate);
 
         //appointment中 更新status字段；
         appointmentDao.update(appointment.getAppointmentId(), Update.update("status", Constants.AppointmentStatus.ACCEPT));
@@ -386,6 +397,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 将activityList中的User信息从数据库中查询出来，并初始化
+     *
      * @param activityList
      * @throws ApiException
      */

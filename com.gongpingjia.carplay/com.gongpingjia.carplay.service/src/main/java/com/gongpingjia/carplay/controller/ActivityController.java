@@ -153,7 +153,7 @@ public class ActivityController {
             }
             parameterChecker.checkUserInfo(userId, token);
             boolean accept = json.getBoolean("accept");
-            return activityService.applyJoinActivity(appointmentId, userId, accept);
+            return activityService.processAppointment(appointmentId, userId, accept);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

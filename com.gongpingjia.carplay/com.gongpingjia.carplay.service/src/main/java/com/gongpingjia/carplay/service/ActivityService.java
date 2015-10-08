@@ -53,5 +53,5 @@ public interface ActivityService {
      * @return
      * @throws ApiException
      */
-    public ResponseDo applyJoinActivity(String appointmentId, String userId, boolean acceptFlag) throws ApiException;
+    public ResponseDo processAppointment(String appointmentId, String userId, boolean acceptFlag) throws ApiException;
 }
