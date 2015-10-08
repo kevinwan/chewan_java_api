@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
         }
 
         //刷新用户Token
-        userData.setToken(refreshUserToken(user.getUserId()));
+        userData.setToken(refreshUserToken(userData.getUserId()));
 
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
