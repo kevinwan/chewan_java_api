@@ -299,9 +299,9 @@ public class UserServiceImpl implements UserService {
 
         user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
 
+        user.hideSecretInfo();
 
         return ResponseDo.buildSuccessResponse(user);
-
     }
 
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
@@ -321,10 +321,7 @@ public class UserServiceImpl implements UserService {
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
             User applicantUser = userDao.findById(appointment.getApplyUserId());
-
-            if (applicantUser.getCar() == null) {
-                applicantUser.setCar(new Car());
-            }
+            applicantUser.hideSecretInfo();
 
             JSONObject jsonObject = JSONObject.fromObject(appointment);
             jsonObject.put("applicant", applicantUser);
@@ -387,10 +384,13 @@ public class UserServiceImpl implements UserService {
 
         //将活动创建者与用户一一对应
         for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
+            User organizer = organizers.get(orgIndex);
             for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
-                if (organizers.get(orgIndex).getUserId().equals(activitiesData.get(actIndex).getUserId())) {
-                    organizers.get(orgIndex).refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
-                    activitiesData.get(actIndex).setOrganizer(organizers.get(orgIndex));
+                Activity activity = activitiesData.get(actIndex);
+                if (organizer.getUserId().equals(activity.getUserId())) {
+                    organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+                    organizer.hideSecretInfo();
+                    activity.setOrganizer(organizer);
                     break;
                 }
             }
@@ -470,19 +470,12 @@ public class UserServiceImpl implements UserService {
         List<User> authUsers = userDao.findByIds(authIds);
 
         LOG.debug("Input map parameter");
-        List<Map<String, Object>> data = new ArrayList<>();
+        List<User> data = new ArrayList<>();
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
-            Map<String, Object> map = new HashMap<>(7, 1);
             User user = findById(authUsers, authenticationHistory.getAuthId());
             user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
-            map.put("userID", authenticationHistory.getAuthId());
-            map.put("nickname", user.getNickname());
-            map.put("avatar", user.getAvatar());
-            map.put("authTime", authenticationHistory.getAuthTime());
-            map.put("type", authenticationHistory.getType());
-            map.put("status", authenticationHistory.getStatus());
-            map.put("content", authenticationHistory.getRemark());
-            data.add(map);
+            user.hideSecretInfo();
+            data.add(user);
         }
 
         return ResponseDo.buildSuccessResponse(data);
@@ -721,6 +714,7 @@ public class UserServiceImpl implements UserService {
             double distance = DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
                     userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
             userItem.setDistance(distance);
+            userItem.hideSecretInfo();
             users.add(userItem);
         }
         return ResponseDo.buildSuccessResponse(users);
