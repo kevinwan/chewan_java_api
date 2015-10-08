@@ -163,9 +163,9 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-        /刷新用户Token
+        //刷新用户Token
         userData.setToken(refreshUserToken(user.getUserId()));
-        
+
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
         // 查询用户车辆信息
         if (userData.getCar() == null) {
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> data = new HashMap<String, Object>(2, 1);
         // 获取用户授权信息
         data.put("userId", userData.getUserId());
-        data.put("token", getUserToken(userData.getUserId()));
+        data.put("token", refreshUserToken(userData.getUserId()));
 
         return ResponseDo.buildSuccessResponse(data);
     }
@@ -246,7 +246,7 @@ public class UserServiceImpl implements UserService {
         checkSnsLoginParameters(user.getUid(), user.getChannel(), user.getPassword());
 
         LOG.debug("Save data begin");
-        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid()).and("channel").is(user.getChannel())));;
+        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
 
         if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
@@ -447,7 +447,7 @@ public class UserServiceImpl implements UserService {
 
         checker.checkPhoneVerifyCode(phone, code);
 
-        if (!StringUtils.isEmpty(user.getPhone())) {
+        if (!user.getPhone().isEmpty()) {
             LOG.warn("The user have phone Number");
             throw new ApiException("该用户已有手机号");
         }
@@ -660,14 +660,21 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private String getUserToken(String userId) throws ApiException {
-        UserToken userToken = cacheManager.getUserTokenVerification(userId);
+    /**
+     * 刷新用户的会话信息
+     *
+     * @param userId 用户Id
+     * @return 返回会话Token字符串
+     * @throws ApiException
+     */
+    private String refreshUserToken(String userId) throws ApiException {
+        UserToken userToken = cacheManager.getUserToken(userId);
         if (null == userToken) {
-            LOG.warn("Fail to get token and expire info from token_verification");
+            LOG.warn("Fail to get token and expire info from userToken, new a token");
             userToken = new UserToken();
             userToken.setUserId(userId);
         }
-        
+
         String uuid = CodeGenerator.generatorId();
         userToken.setToken(uuid);
         userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
