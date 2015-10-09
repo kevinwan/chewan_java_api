@@ -24,7 +24,7 @@ public class CustomObjectMapper extends ObjectMapper {
         // 字段和值都加引号
         this.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         // 数字也加引号
-        this.configure(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS, true);
+        this.configure(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS, false);
         this.configure(JsonGenerator.Feature.QUOTE_NON_NUMERIC_NUMBERS, true);
         // 空值处理为空串
 
