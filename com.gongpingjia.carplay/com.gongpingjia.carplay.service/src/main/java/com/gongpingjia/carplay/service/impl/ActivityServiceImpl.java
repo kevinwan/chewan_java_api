@@ -100,6 +100,7 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.warn("organizer is null");
             throw new ApiException("该活动找不到对应的 User");
         }
+        organizer.hideSecretInfo();
         activity.setOrganizer(organizer);
         return ResponseDo.buildSuccessResponse(activity);
     }
@@ -413,6 +414,7 @@ public class ActivityServiceImpl implements ActivityService {
             if (null == organizer) {
                 throw new ApiException("数据非法 该Activity没有找到对应的Organizer");
             }
+//            organizer.hideSecretInfo();
             activity.setOrganizer(organizer);
         }
     }

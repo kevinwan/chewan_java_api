@@ -16,9 +16,9 @@ import java.util.*;
  */
 public class ActivityUtil {
 
-    public static List<Activity> getSortResult(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance,long maxPubTime
-                                                    ,int skip,int limit) {
-        List<ActivityWeight> activityWeights =    getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime), skip, limit);
+    public static List<Activity> getSortResult(List<Activity> activities, Date currentTime, Landmark nowLandmark,
+                                               double maxDistance, long maxPubTime, int skip, int limit) {
+        List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime), skip, limit);
         ArrayList<Activity> rltList = new ArrayList<>(activityWeights.size());
         for (ActivityWeight activityWeight : activityWeights) {
             rltList.add(activityWeight.getActivity());
@@ -27,7 +27,7 @@ public class ActivityUtil {
     }
 
 
-    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance,long maxPubTime) {
+    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
         for (Activity activity : activities) {
             ActivityWeight aw = new ActivityWeight(activity);
@@ -44,14 +44,14 @@ public class ActivityUtil {
             //身份认证 现在没有提供身份认证接口
 
             //初始化权重
-            initWeight(currentTime, nowLandmark, aw, maxDistance,maxPubTime);
+            initWeight(currentTime, nowLandmark, aw, maxDistance, maxPubTime);
             awList.add(aw);
         }
         Collections.sort(awList);
         return awList;
     }
 
-    private  static void initWeight(Date currentTime, Landmark nowLandmark, ActivityWeight activityWeight, double maxDistance,long maxPubTime) {
+    private static void initWeight(Date currentTime, Landmark nowLandmark, ActivityWeight activityWeight, double maxDistance, long maxPubTime) {
         Activity activity = activityWeight.getActivity();
         double weight = 0;
         double distance = DistanceUtil.getDistance(nowLandmark.getLongitude(), nowLandmark.getLatitude(), activity.getDestPoint().getLongitude(), activity.getDestPoint().getLatitude());
@@ -81,8 +81,7 @@ public class ActivityUtil {
         }
         activityWeight.setWeight(weight);
     }
-    
-    
+
 
     private static List<ActivityWeight> getPageInfo(List<ActivityWeight> awList, int skip, int limit) {
         //访问更高效点
