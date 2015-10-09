@@ -10,9 +10,9 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'AuthApiPrefix
     function (authService, restProxyService, AuthApiPrefix) {
 
         return {
-            logIn: function (username, password) {
+            logIn: function (phone, password) {
                 return restProxyService.sendHttpPost(AuthApiPrefix, '/user/login', {
-                    username: username,
+                    phone: phone,
                     password: password
                 });
             },
