@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="gpjApp">
+<head>
+    <meta charset="utf-8"/>
+    <title>车玩后台管理系统-登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- basic styles -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
+
+    <!--[if IE 7]>
+    <link rel="stylesheet" href="css/font-awesome-ie7.min.css"/>
+    <![endif]-->
+
+    <!-- page specific plugin styles -->
+
+    <link rel="stylesheet" href="css/jquery-ui-1.10.3.full.min.css"/>
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="css/ace.min.css"/>
+    <link rel="stylesheet" href="css/ace-rtl.min.css"/>
+
+    <!-- angular -->
+    <link rel="stylesheet" href="css/angular-busy.min.css"/>
+    <link rel="stylesheet" href="css/notification.min.css"/>
+
+    <!-- yryj -->
+    <link rel="stylesheet" href="css/yryj.css"/>
+
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="css/ace-ie.min.css"/>
+    <![endif]-->
+
+    <!-- inline styles related to this page -->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+
+    <!--[if lt IE 9]>
+    <script src="js/lib/ace/html5shiv.js"></script>
+    <script src="js/lib/ace/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="login-layout" onkeydown="keyProcess();">
+
+<!-- jQuery -->
+<script src="js/lib/ace/jquery-2.0.3.min.js"></script>
+<script src="js/lib/ace/jquery.dataTables.min.js"></script>
+<script src="js/lib/ace/jquery-ui-1.10.3.custom.min.js"></script>
+
+<!-- AngularJS -->
+<script src="js/lib/angular/angular.min.js"></script>
+<script src="js/lib/angular/angular-resource.min.js"></script>
+<script src="js/lib/angular/angular-route.min.js"></script>
+<script src="js/lib/angular/angular-sanitize.min.js"></script>
+<script src="js/lib/angular/angular-animate.min.js"></script>
+<script src="js/lib/angular/angular-busy.min.js"></script>
+<script src="js/lib/angular/angular-datatables.min.js"></script>
+<script src="js/lib/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
+<script src="js/lib/angular/angular-strap.min.js"></script>
+<script src="js/lib/angular/angular-strap.tpl.min.js"></script>
+<script src="js/lib/angular/angular-md5.min.js"></script>
+<script src="js/lib/angular/moment.min.js"></script>
+<script src="js/lib/angular/angular-moment.min.js"></script>
+<script src="js/lib/angular/angular-charts.min.js"></script>
+<script src="js/lib/angular/notification.js"></script>
+
+<!-- D3 -->
+<script src="js/lib/d3/d3.min.js"></script>
+
+<!-- date.js -->
+<script src="js/lib/ace/date.js"></script>
+
+<!-- Common -->
+<script src="js/app.js"></script>
+<script src="js/directives/ngEnter.js"></script>
+<script src="js/service/common/restProxyService.js"></script>
+<script src="js/service/common/authService.js"></script>
+<script src="js/service/common/userService.js"></script>
+<script src="js/controllers/common/loginController.js"></script>
+
+<div class="main-container">
+    <div class="main-content">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class="login-container">
+                    <div class="center">
+                        <h1>
+                            <i class="icon-leaf green"></i> <span class="red">车玩</span> <span
+                                class="white">后台管理系统</span>
+                        </h1>
+                        <h4 class="blue">&copy;2015 南京价公信息技术有限公司</h4>
+                    </div>
+
+                    <div class="space-6"></div>
+
+                    <div class="position-relative">
+                        <div id="login-box"
+                             class="login-box visible widget-box no-border">
+                            <div class="widget-body">
+                                <div class="widget-main">
+                                    <h4 class="header blue lighter bigger">
+                                        <i class="icon-coffee green"></i> 请输入您的账号信息
+                                    </h4>
+
+                                    <div class="space-6"></div>
+
+                                    <form ng-controller="loginController">
+                                        <fieldset>
+                                            <label class="block clearfix"> <span
+                                                    class="block input-icon input-icon-right"> <input
+                                                    type="text" class="form-control" ng-model="user.username"
+                                                    placeholder="用户名"/> <i class="icon-user"></i>
+												</span>
+                                            </label> <label class="block clearfix"> <span
+                                                class="block input-icon input-icon-right"> <input
+                                                type="password" class="form-control"
+                                                ng-model="user.password" placeholder="密码"/> <i
+                                                class="icon-lock"></i>
+												</span>
+                                        </label>
+
+                                            <div class="space"></div>
+
+                                            <div class="clearfix">
+                                                <button type="button" id="loginButton"
+                                                        class="width-35 pull-right btn btn-sm btn-primary"
+                                                        ng-click="login(user)" ng-enter="login(user)">
+                                                    <i class="icon-key"></i> 登录
+                                                </button>
+                                            </div>
+
+                                            <div class="space-4"></div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- /widget-body -->
+                        </div>
+                    </div>
+                    <!-- /position-relative -->
+                </div>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+</div>
+<!-- /.main-container -->
+
+<script type="text/javascript">
+    function keyProcess() {
+        if (event.keyCode == 13) {
+            event.cancelBubble = true;
+            event.returnValue = false;
+            document.getElementById('loginButton').click();
+        }
+    }
+</script>
+
+</body>
+</html>

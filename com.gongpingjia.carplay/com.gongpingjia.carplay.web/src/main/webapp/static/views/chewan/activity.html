@@ -1,0 +1,121 @@
+<div class="page-header">
+    <h1>活动信息</h1>
+</div>
+<!-- /.page-header -->
+<form class="form-horizontal" role="form">
+
+    <div class="form-inline col-md-12">
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="city">城市</label>
+
+            <div class="controls">
+                <select id="city" ng-init="criteria.city=''"
+                        data-ng-model="criteria.city" style="width:100%;">
+                    <option value="">全部</option>
+                    <option ng-repeat="cityOption in cityOptions" ng-value="cityOption.currentCity">
+                        {{cityOption.currentCity}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="type">活动类型</label>
+
+            <div class="controls">
+                <select id="type" ng-init="criteria.type=''"
+                        data-ng-model="criteria.type" style="width:100%;">
+                    <option value="">全部</option>
+                    <option value="吃饭">吃饭</option>
+                    <option value="唱歌">唱歌</option>
+                    <option value="看电影">看电影</option>
+                    <option value="周边游">周边游</option>
+                    <option value="运动">运动</option>
+                    <option value="拼车">拼车</option>
+                    <option value="购物">购物</option>
+                    <option value="亲子游">亲子游</option>
+                </select>
+            </div>
+        </div>
+
+        <!--<div class="col-md-2">
+            <label class="control-label bolder blue" for="city">排序</label>
+
+            <div class="controls">
+                <select id="key" ng-init="criteria.key='latest'"
+                        data-ng-model="criteria.key" style="width:100%;">
+                    <option value="latest">最新</option>
+                    <option value="hot">最热</option>
+                </select>
+            </div>
+        </div>-->
+    </div>
+
+    <div class="form-inline col-md-12">
+        <div class="clearfix visible‐xs‐block"></div>
+        <div class="control-group pull-right">
+            <button type="button" class="btn btn-info" ng-disabled="" ng-hide=""
+                    ng-click="searchActivities(criteria)">查询
+            </button>
+            <button type="button" class="btn" ng-click="resetCriteria()">清除</button>
+        </div>
+    </div>
+
+    <div class="control-group col-md-12">
+        <table datatable="ng" dt-options="dtOptions"
+               dt-columns="dtColumnDefs" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>发布时间</th>
+                <th>活动介绍</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>发起人</th>
+                <th>活动类型</th>
+                <th>付款类型</th>
+                <th>座位总数</th>
+                <th>参加人数</th>
+                <th>市</th>
+                <th>区</th>
+                <th></th>
+                <th style="display: none"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="activity in activities">
+                <td>{{ activity.publishTime | date:"yyyy-MM-dd HH:mm"}}</td>
+                <td>{{ activity.introduction  | limitTo:10 }}</td>
+                <td>{{ activity.start | date:"yyyy-MM-dd HH:mm"}}</td>
+                <td>{{ activity.endTime | date:"yyyy-MM-dd HH:mm"}}</td>
+                <td>{{ activity.organizer.nickname }}</td>
+                <td>{{ activity.type }}</td>
+                <td>{{ activity.pay }}</td>
+                <td>{{ activity.totalSeat }}</td>
+                <td>{{ activity.holdingSeat }}</td>
+                <td>{{ activity.currentCity }}</td>
+                <td>{{ activity.currentDistrict }}</td>
+                <td class="center">
+                    <button type="button" ng-click="viewActivity(activity.activityId)"
+                            class="btn btn-danger">
+                        <i class="fa fa-edit">详情</i>
+                    </button>
+                </td>
+                <td style="display: none">{{ activity.activityId }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <table class="pull-right">
+        <thead>
+        <tr>
+            <th>
+                <div><span>总计{{activities.length ? activities.length : 0}}条</span></div>
+            </th>
+        </tr>
+        </thead>
+    </table>
+</form>
+
+
+
