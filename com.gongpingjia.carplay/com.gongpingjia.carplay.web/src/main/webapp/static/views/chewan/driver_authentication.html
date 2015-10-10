@@ -22,9 +22,9 @@
                 <select id="status" ng-init="criteria.status=''"
                         data-ng-model="criteria.status" style="width:100%;">
                     <option value="">全部</option>
-                    <option value="待处理">待处理</option>
-                    <option value="已同意">已同意</option>
-                    <option value="已拒绝">已拒绝</option>
+                    <option value="认证中">认证中</option>
+                    <option value="认证通过">认证通过</option>
+                    <option value="认证未通过">认证未通过</option>
                 </select>
             </div>
         </div>
@@ -60,26 +60,26 @@
                dt-columns="dtColumnDefs" class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>申请时间</th>
+                <th>时间</th>
                 <th>状态</th>
-                <th>用户昵称</th>
+                <th>昵称</th>
                 <th>手机</th>
                 <th>品牌</th>
-                <th>Logo</th>
+                <th>车标</th>
                 <th>车型</th>
-                <th></th>
+                <th>操作</th>
                 <th style="display: none"></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="application in applications">
-                <td>{{ application.createTime | date:"yyyy-MM-dd HH:mm"}}</td>
+                <td>{{ application.applyTime | date:"yyyy-MM-dd HH:mm"}}</td>
                 <td ng-style="getStatusColor(application.status)">{{ application.status}}</td>
-                <td>{{ application.nickname }}</td>
-                <td>{{ application.phone }}</td>
-                <td>{{ application.brand }}</td>
-                <td><img src="{{application.brandLogo}}" width="30px" height="30px"></td>
-                <td>{{ application.model }}</td>
+                <td>{{ application.applyUser.nickname }}</td>
+                <td>{{ application.applyUser.phone }}</td>
+                <td>{{ application.applyUser.car.brand }}</td>
+                <td><img src="{{application.applyUser.car.logo}}" width="30px" height="30px"></td>
+                <td>{{ application.applyUser.car.model }}</td>
                 <td class="center">
                     <button type="button" ng-click="viewApplication(application.id)"
                             ng-show="{{application.status === '待处理'}}"

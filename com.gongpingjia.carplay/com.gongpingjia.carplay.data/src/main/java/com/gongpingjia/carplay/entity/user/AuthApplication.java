@@ -1,8 +1,11 @@
 package com.gongpingjia.carplay.entity.user;
 
+import net.sf.json.JSONObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 /**
  * Created by licheng on 2015/9/22.
@@ -92,5 +95,16 @@ public class AuthApplication {
 
     public void setApplyUser(User applyUser) {
         this.applyUser = applyUser;
+    }
+
+    public static  void main(String[] args){
+        AuthApplication application = new AuthApplication();
+        application.setType("车主认证");
+        application.setStatus("认证中");
+        application.setApplyTime(new Date().getTime());
+        application.setApplyUserId("5608a74ae28c15187144fba9");
+
+        JSONObject jsonObject = JSONObject.fromObject(application);
+        System.out.println(jsonObject);
     }
 }

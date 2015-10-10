@@ -6,13 +6,13 @@
  * @constructor
  */
 
-gpjApp.factory('userService', ['authService', 'restProxyService', 'AuthApiPrefix',
-    function (authService, restProxyService, AuthApiPrefix) {
+gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanApiProvider', 'ChewanApiEndPoint',
+    function (authService, restProxyService, ChewanApiProvider, ChewanApiEndPoint) {
 
         return {
-            logIn: function (username, password) {
-                return restProxyService.sendHttpPost(AuthApiPrefix, '/user/login', {
-                    username: username,
+            logIn: function (phone, password) {
+                return restProxyService.sendHttpPost(ChewanApiProvider + ChewanApiEndPoint, '/user/login', {
+                    phone: phone,
                     password: password
                 });
             },

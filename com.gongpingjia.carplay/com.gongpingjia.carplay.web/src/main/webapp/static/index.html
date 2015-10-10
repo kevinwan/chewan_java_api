@@ -102,8 +102,7 @@
 						</span> <i class="icon-caret-down"></i>
                 </a>
 
-                    <ul
-                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                    <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
                         <li><a href=""> <i class="icon-cog"></i> 设置
                         </a></li>
 
@@ -144,30 +143,45 @@
                 } catch (e) {
                 }
             </script>
+
             <ul class="nav nav-list">
-                <li ng-show="userRole === 'ADMIN'"><a href="#operation/main"> <i class="icon-dashboard"></i> <span
+                <!--<li ng-show="userRole === 'ADMIN'"><a href="#operation/main"> <i class="icon-dashboard"></i> <span
                         class="menu-text"> 运营数据 </span>
+                </a></li>-->
+
+                <li ng-show="userRole === 'ADMIN'"><a href="#officialActivity/list"> <i class="icon-calendar-empty"></i> <span
+                        class="menu-text"> 官方活动 </span>
                 </a></li>
-            </ul>
-            <ul class="nav nav-list">
+
+                <li class="open">
+                    <a href="#" class="dropdown-toggle">
+                        <i class="icon-envelope"></i>
+                        <span class="menu-text"> 认证信息 </span>
+                        <b class="arrow icon-angle-down"></b>
+                    </a>
+                    <ul class="submenu" style="display: block;">
+                        <li ng-show="userRole === 'ADMIN'"><a href="#driverAuthentication/list"> <i
+                                class="icon-envelope"></i> <span
+                                class="menu-text"> 车主认证 </span>
+                        </a></li>
+                        <li ng-show="userRole === 'ADMIN'"><a href="#photoAuthentication/list"> <i
+                                class="icon-envelope"></i> <span
+                                class="menu-text"> 图像认证 </span>
+                        </a></li>
+                    </ul>
+                </li>
+
                 <li ng-show="userRole === 'ADMIN'"><a href="#user/list"> <i class="icon-male"></i> <span
                         class="menu-text"> 用户信息 </span>
                 </a></li>
-            </ul>
-            <ul class="nav nav-list">
+
                 <li ng-show="userRole === 'ADMIN'"><a href="#activity/list"> <i class="icon-calendar"></i> <span
                         class="menu-text"> 活动信息 </span>
                 </a></li>
-            </ul>
-            <ul class="nav nav-list">
-                <li ng-show="userRole === 'ADMIN'"><a href="#authentication/list"> <i class="icon-envelope"></i> <span
-                        class="menu-text"> 车主认证 </span>
-                </a></li>
-            </ul>
-            <ul class="nav nav-list">
-                <li ng-show="userRole === 'ADMIN'"><a href="#feedback/list"> <i class="icon-edit"></i> <span
-                        class="menu-text"> 意见反馈 </span>
-                </a></li>
+
+                <!--                <li ng-show="userRole === 'ADMIN'"><a href="#feedback/list"> <i class="icon-edit"></i> <span
+                                        class="menu-text"> 意见反馈 </span>
+                                </a></li>-->
             </ul>
             <!-- /.nav-list -->
 
