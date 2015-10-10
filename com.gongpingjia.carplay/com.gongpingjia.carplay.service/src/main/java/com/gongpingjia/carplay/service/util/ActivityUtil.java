@@ -59,7 +59,7 @@ public class ActivityUtil {
         activityWeight.getActivity().setDistance(distance);
         double distanceRate = 1 - distance / maxDistance;
         weight += distanceRate * 0.2;
-        double timeRate = 1 - ((currentTime.getTime() - activity.getStart()) / (1000 * 60)) / maxPubTime;
+        double timeRate = 1 - ((currentTime.getTime() - activity.getCreateTime()) / (1000 * 60)) / maxPubTime;
         weight += timeRate;
         //车主认证
         if (activityWeight.isCarOwnerFlag()) {
