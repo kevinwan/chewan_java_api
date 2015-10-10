@@ -30,8 +30,13 @@ public class AuthApplication {
 
     private Long authTime;
 
+    private String remark;
+
     @Transient
     private User applyUser;
+
+    @Transient
+    private UserAuthentication authentication;
 
     public String getApplicationId() {
         return applicationId;
@@ -97,14 +102,19 @@ public class AuthApplication {
         this.applyUser = applyUser;
     }
 
-    public static  void main(String[] args){
-        AuthApplication application = new AuthApplication();
-        application.setType("车主认证");
-        application.setStatus("认证中");
-        application.setApplyTime(new Date().getTime());
-        application.setApplyUserId("5608a74ae28c15187144fba9");
+    public UserAuthentication getAuthentication() {
+        return authentication;
+    }
 
-        JSONObject jsonObject = JSONObject.fromObject(application);
-        System.out.println(jsonObject);
+    public void setAuthentication(UserAuthentication authentication) {
+        this.authentication = authentication;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

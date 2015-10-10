@@ -5,8 +5,8 @@
  *
  * @constructor
  */
-gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'chewanService',
-    'moment', function ($scope, $rootScope, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, chewanService, moment) {
+gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'authenticationService',
+    'moment', function ($scope, $rootScope, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, authenticationService, moment) {
 
         var STATUS_PENDING = '认证中';
         var STATUS_ACCEPTED = '认证通过';
@@ -82,7 +82,7 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
         $scope.searchApplications = function (criteria) {
             //alert(JSON.stringify(criteria));
 
-            $rootScope.loadingPromise = chewanService.getApplicationList(criteria).success(function (result) {
+            $rootScope.loadingPromise = authenticationService.getApplicationList(criteria).success(function (result) {
                 $scope.applications = (result.result === 0 ? result.data : undefined);
             });
         };
@@ -91,7 +91,7 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
          * View processed application
          */
         $scope.viewApplication = function (applicationId) {
-            chewanService.setApplication(applicationId);
+            authenticationService.setApplication(applicationId);
             var modalInstance = $modal.open({
                 templateUrl: 'views/chewan/driver_authentication_info_modal.html',
                 controller: 'authenticateInfoModalController'

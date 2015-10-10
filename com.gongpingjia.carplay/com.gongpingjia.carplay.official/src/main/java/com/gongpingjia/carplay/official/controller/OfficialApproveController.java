@@ -5,7 +5,8 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class OfficialApproveController {
 
-    private static Logger LOG = Logger.getLogger(OfficialApproveController.class);
+    private static Logger LOG = LoggerFactory.getLogger(OfficialApproveController.class);
 
     @Autowired
     private OfficialApproveService officialApproveService;
@@ -70,6 +71,49 @@ public class OfficialApproveController {
             return officialApproveService.getAuthApplicationList(userId, type, status, start, end, ignore, limit);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取用户的认证申请的信息
+     *
+     * @param applicationId 申请Id
+     * @param userId        管理员用户Id
+     * @param token         管理员用户Token
+     * @return
+     */
+    @RequestMapping(value = "/application/{applicationId}/info", method = RequestMethod.GET)
+    public ResponseDo getApplicationInfo(@PathVariable("applicationId") String applicationId,
+                                         @RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.info("Begin query application info, applicationId:{}", applicationId);
+
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+
+            return officialApproveService.getApplicationInfo(applicationId);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 查看认证的Id信息
+     *
+     * @return
+     */
+    @RequestMapping(value = "/authentication/{authenticationId}/info", method = RequestMethod.GET)
+    public ResponseDo getUserAuthenticationInfo(@PathVariable("authenticationId") String authenticationId,
+                                                @RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("Get user authentication infomation, authenticationId:{}", authenticationId);
+
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+
+            return officialApproveService.getUserAuthenticationInfo(authenticationId, userId);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }

@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -53,19 +52,7 @@ public class User {
 
     //用户车辆信息,驾龄
     private Integer drivingYears;
-
-    //驾驶证PhotoUrl
-    private String driverLicense;
-    //行驶证PhotoUrl
-    private String drivingLicense;
     private String licenseAuthStatus;
-    private DrivingLicense license;
-
-    private Car car;
-
-    //用户身份证相关信息
-    private String idCardPhoto;
-    private boolean idCardAuthorized;
 
     /**
      * 用户第三方登录信息
@@ -80,6 +67,8 @@ public class User {
      * 用户只有一个相册，存放多张相片
      */
     private List<Photo> album;
+
+    private Car car;
 
     /**
      * 表示是否处于空闲装态，true表示空闲，false表示忙，默认空闲
@@ -97,6 +86,9 @@ public class User {
     //
     @Transient
     private boolean subscribeFlag;
+    //用户的认证的信息
+    @Transient
+    private UserAuthentication authentication;
 
     /**
      * 刷新user相关的photo的URL地址
@@ -110,12 +102,6 @@ public class User {
         }
         if (!StringUtils.isEmpty(this.photo)) {
             this.photo = localPhotoServer + this.photo;
-        }
-        if (!StringUtils.isEmpty(this.driverLicense)) {
-            this.driverLicense = localPhotoServer + this.driverLicense;
-        }
-        if (!StringUtils.isEmpty(this.drivingLicense)) {
-            this.drivingLicense = localPhotoServer + this.drivingLicense;
         }
 
         if (this.album != null) {
@@ -205,22 +191,6 @@ public class User {
         this.drivingYears = drivingYears;
     }
 
-    public String getDrivingLicense() {
-        return drivingLicense;
-    }
-
-    public void setDrivingLicense(String drivingLicense) {
-        this.drivingLicense = drivingLicense;
-    }
-
-    public String getDriverLicense() {
-        return driverLicense;
-    }
-
-    public void setDriverLicense(String driverLicense) {
-        this.driverLicense = driverLicense;
-    }
-
     public Long getBirthday() {
         return birthday;
     }
@@ -251,30 +221,6 @@ public class User {
 
     public void setInvalid(boolean invalid) {
         this.invalid = invalid;
-    }
-
-    public String getIdCardPhoto() {
-        return idCardPhoto;
-    }
-
-    public void setIdCardPhoto(String idCardPhoto) {
-        this.idCardPhoto = idCardPhoto;
-    }
-
-    public boolean isIdCardAuthorized() {
-        return idCardAuthorized;
-    }
-
-    public void setIdCardAuthorized(boolean idCardAuthorized) {
-        this.idCardAuthorized = idCardAuthorized;
-    }
-
-    public DrivingLicense getLicense() {
-        return license;
-    }
-
-    public void setLicense(DrivingLicense license) {
-        this.license = license;
     }
 
     public Landmark getLandmark() {
@@ -365,6 +311,14 @@ public class User {
         this.token = token;
     }
 
+    public UserAuthentication getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(UserAuthentication authentication) {
+        this.authentication = authentication;
+    }
+
     private int calculateAge(Long birthday) {
         if (null == birthday) {
             return 0;
@@ -392,7 +346,6 @@ public class User {
     public User hideSecretInfo() {
         this.token = null;
         this.password = null;
-        this.license = null;
         return this;
     }
 }

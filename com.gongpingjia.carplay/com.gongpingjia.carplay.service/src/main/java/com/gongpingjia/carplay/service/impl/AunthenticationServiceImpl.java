@@ -8,11 +8,13 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
+import com.gongpingjia.carplay.dao.user.UserAuthenticationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.AuthApplication;
 import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.entity.user.UserAuthentication;
 import com.gongpingjia.carplay.service.AunthenticationService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -50,6 +52,9 @@ public class AunthenticationServiceImpl implements AunthenticationService {
     @Autowired
     private AuthenticationHistoryDao historyDao;
 
+    @Autowired
+    private UserAuthenticationDao userAuthenticationDao;
+
     @Override
     public ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException {
         LOG.debug("Begin apply license authentication");
@@ -73,15 +78,18 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         LOG.debug("record application information");
         Long current = DateUtil.getTime();
 
+        UserAuthentication authentication = new UserAuthentication();
+        authentication.setUserId(userId);
+        authentication.setDriverLicense(driverLicenseKey);
+        authentication.setDrivingLicense(drivingLicenseKey);
+        userAuthenticationDao.save(authentication);
+
         Update update = new Update();
-        update.set("driverLicense", driverLicenseKey);
-        update.set("drivingLicense", drivingLicenseKey);
         update.set("licenseAuthStatus", Constants.AuthStatus.AUTHORIZING);
         Car car = new Car();
         car.setBrand(json.getString("brand"));
         car.setModel(json.getString("model"));
         update.set("car", car);
-
         userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
 
         AuthApplication application = new AuthApplication();

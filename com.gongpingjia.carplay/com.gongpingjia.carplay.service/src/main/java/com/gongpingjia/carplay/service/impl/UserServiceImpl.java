@@ -171,9 +171,6 @@ public class UserServiceImpl implements UserService {
             userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
         }
 
-        //不传输到客户端
-        userData.setLicense(null);
-
         return ResponseDo.buildSuccessResponse(userData);
     }
 

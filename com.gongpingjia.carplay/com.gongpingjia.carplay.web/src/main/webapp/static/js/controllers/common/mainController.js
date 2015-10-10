@@ -10,7 +10,7 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
 
         $rootScope.loadingPromise = $scope.loadingPromise;
 
-        $scope.userRole = authService.getUser().role;
+        $scope.userRole = "ADMIN";//authService.getUser().role
 
         $scope.logout = function () {
             authService.setUser('');

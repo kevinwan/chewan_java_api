@@ -147,9 +147,11 @@ public class Constants {
 
     public interface UserCatalog {
 
-        public static final String COMMON = "普通用户";
+        String COMMON = "普通用户";
 
-        public static final String OFFICIAL = "官方用户";
+        String OFFICIAL = "官方用户";
+
+        String ADMIN = "ADMIN";
     }
 
     public interface Charset {
@@ -157,12 +159,12 @@ public class Constants {
         /**
          * UTF-8编码
          */
-        public static final String UTF8 = "UTF-8";
+        String UTF8 = "UTF-8";
 
         /**
          * GBK编码
          */
-        public static final String GBK = "GBK";
+        String GBK = "GBK";
 
     }
 
@@ -204,7 +206,7 @@ public class Constants {
         String APPLYING = "邀请中";
     }
 
-    public interface Product{
+    public interface Product {
         public static final String DEFAULT_NAME = "android";
     }
 

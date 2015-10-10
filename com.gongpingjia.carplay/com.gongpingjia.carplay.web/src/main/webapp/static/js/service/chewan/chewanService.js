@@ -18,9 +18,7 @@ gpjApp.factory('chewanService', ['restProxyService', 'authService', 'ChewanApiPr
             getApplication: function () {
                 return application;
             },
-            setApplication: function (aApplication) {
-                application = aApplication;
-            },
+
             getFeedback: function () {
                 return feedback;
             },
@@ -38,20 +36,6 @@ gpjApp.factory('chewanService', ['restProxyService', 'authService', 'ChewanApiPr
             },
             setActivity: function (aActivity) {
                 activity = aActivity;
-            },
-            getApplicationList: function (criteria) {
-                var param = "userId=" + authService.getUser().userId;
-                param += "&token=" + authService.getUser().token;
-                param += (criteria.status ? ("&status=" + criteria.status) : "");
-                param += (criteria.type ? ("&type=" + criteria.type) : "");
-                param += (criteria.start ? ("&start=" + criteria.start.getTime()) : 0);
-                param += (criteria.end ? ("&end=" + criteria.end.getTime()) : 0);
-
-                return restProxyService.sendHttpGet(ChewanApiProvider + ChewanApiEndPoint, '/official/authentication/list?' + param);
-            },
-            getApplicationInfo: function () {
-                return restProxyService.sendHttpGet(ChewanApiProvider, ChewanApiEndPoint + '/application/' + application + '/info?access_token='
-                + authService.getUser().token + '&username=' + authService.getUser().name);
             },
             processApplication: function (applicationId, action, license, remarks) {
                 return restProxyService.sendHttpPost(ChewanApiProvider, ChewanApiEndPoint + '/application/' + application + '/process?access_token='

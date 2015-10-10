@@ -48,10 +48,10 @@ gpjApp.run(['$rootScope', '$location', '$window', 'authService', function ($root
     $rootScope.$on('$routeChangeStart', function (event) {
 
         var loginUser = authService.getUser();
-        //if (!loginUser) {
-        //    event.preventDefault();
-        //    $window.location.href = '/login.html';
-        //}
+        if (!loginUser) {
+            event.preventDefault();
+            $window.location.href = '/login.html';
+        }
     });
 }]);
 

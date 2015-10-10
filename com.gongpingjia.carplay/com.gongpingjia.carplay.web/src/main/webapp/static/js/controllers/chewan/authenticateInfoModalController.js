@@ -1,26 +1,14 @@
 'use strict';
 
-gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScope, $modalInstance, chewanService, moment, $window) {
+gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScope, $modalInstance, authenticationService, moment, $window) {
 
     var DEFAULT_REMARKS = '不是有效的行驶证图片';
 
     /**
      * Get feedback info
      */
-    $rootScope.loadingPromise = chewanService.getApplicationInfo().success(function (result) {
+    $rootScope.loadingPromise = authenticationService.getApplicationInfo().success(function (result) {
         if (result && result.result == 0 && result.data) {
-            //alert(JSON.stringify(result.data));
-            $scope.license = {
-                name: result.data.name,
-                plate: result.data.plate,
-                vehicleType: result.data.vehicleType,
-                address: result.data.address,
-                model: result.data.model,
-                vehicleNumber: result.data.vehicleNumber,
-                engineNumber: result.data.engineNumber,
-                registerTime: moment(result.data.registerTime).format('YYYY-MM-DD'),
-                issueTime: moment(result.data.issueTime).format('YYYY-MM-DD')
-            };
             $scope.application = result.data;
         }
     });

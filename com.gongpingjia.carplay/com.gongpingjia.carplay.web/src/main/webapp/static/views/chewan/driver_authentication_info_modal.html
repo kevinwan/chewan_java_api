@@ -2,114 +2,232 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">&times;</button>
-            <h4 class="modal-title">{{application.status === '待处理' ? '处理' : '修改'}}认证申请
-                [{{application.createTime}}]</h4>
+            <h4 class="modal-title">{{application.status === '认证中' ? '处理' : '修改'}}认证申请
+                [{{application.applyTime}}]</h4>
         </div>
-        <div class="modal-body" style="height: 380px;">
-
-            <div class="form-inline">
-                <div class="control-group col-md-5">
-                    <img src="{{application.license}}" ng-click="browsePhoto()" width="350px" height="300px">
-
-                    <p>点击图片查看大图</p>
+        <div class="modal-body" style="height: 900px;">
+            <div class="control-group">
+                <div class="form-inline col-md-12">
+                    <div class="control-group col-md-3">
+                        <div class="bolder ">手机：</div>
+                        <input type="text" style="border: none; color: red; width: 100%;"
+                               ng-model="application.applyUser.phone"
+                               ng-disable="isDeclined" readonly>
+                    </div>
+                    <div class="control-group col-md-2">
+                        <div class="bolder ">驾龄：</div>
+                        <input type="text" style="border: none; color: red;"
+                               ng-model="application.applyUser.drivingYears"
+                               ng-disable="isDeclined" readonly>
+                    </div>
+                    <div class="control-group col-md-7">
+                        <div class="bolder ">车型：</div>
+                        <input type="text" style="border: none; color: red;"
+                               ng-model="application.applyUser.car.model"
+                               ng-disable="isDeclined" readonly>
+                    </div>
                 </div>
 
-                <div class="control-group col-md-7">
-                    <div>
-                        <div class="form-inline">
-                            <div class="control-group col-md-3">
-                                <div class="bolder ">手机：</div>
-                                <input type="text" style="border: none; color: red; width: 100%;"
-                                       ng-model="application.phone"
-                                       ng-disable="isDeclined" readonly>
-                            </div>
-                            <div class="control-group col-md-2">
-                                <div class="bolder ">驾龄：</div>
-                                <input type="text" style="border: none; color: red;"
-                                       ng-model="application.drivingExperience"
-                                       ng-disable="isDeclined" readonly>
-                            </div>
-                            <div class="control-group col-md-7">
-                                <div class="bolder ">车型：</div>
-                                <input type="text" style="border: none; color: red;" ng-model="application.applyModel"
-                                       ng-disable="isDeclined" readonly>
-                            </div>
-                        </div>
+                <div class="form-inline col-md-12" style="margin-top:20px;">
+                    <div class="control-group col-md-5">
+                        <img src="{{application.authentication.drivingLicense}}" ng-click="browsePhoto()" width="350px"
+                             height="300px">
 
-                        <div class="form-inline" style="margin-top: 20px;">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">姓名：</div>
-                                <input type="text" id="name" ng-model="license.name" ng-disable="isDeclined">
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">车牌：</div>
-                                <input type="text" id="plate" ng-model="license.plate" ng-disable="isDeclined">
-                            </div>
+                        <p>点击图片查看大图</p>
+                    </div>
 
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">车辆类型：</div>
-                                <input type="text" id="vehicleType" ng-model="license.vehicleType" ng-disable="isDeclined">
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">品牌型号：</div>
-                                <input type="text" id="model" ng-model="license.model" ng-disable="isDeclined">
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">车辆识别代号：</div>
-                                <input type="text" id="vehicleNumber" ng-model="license.vehicleNumber" ng-disable="isDeclined">
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">发动机号码：</div>
-                                <input type="text" id="engineNumber" ng-model="license.engineNumber" ng-disable="isDeclined">
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder" for="registerTime">注册日期：</div>
-                                <div class="">
-                                    <input type="text" ui-date ui-date-format="yy-mm-dd" id="registerTime"
-                                           ng-model="license.registerTime" placeholder="注册日期" ng-disable="isDeclined">
+                    <div class="control-group col-md-7">
+                        <div>
+                            <div class="form-inline" style="margin-top: 20px;">
+                                <div class="control-group ">
+                                    <div class="bolder ">姓名：</div>
+                                    <input type="text" id="name" ng-model="application.authentication.license.name"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group ">
+                                    <div class="bolder ">车牌：</div>
+                                    <input type="text" id="plate" ng-model="application.authentication.license.plate"
+                                           ng-disable="isDeclined">
                                 </div>
                             </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder" for="issueTime">发证日期：</div>
-                                <div class="">
-                                    <input type="text" ui-date ui-date-format="yy-mm-dd" id="issueTime"
-                                           ng-model="license.issueTime" placeholder="注册日期" ng-disable="isDeclined">
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">车辆类型：</div>
+                                    <input type="text" id="vehicleType"
+                                           ng-model="application.authentication.license.vehicleType"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">品牌型号：</div>
+                                    <input type="text" id="model" ng-model="application.authentication.license.model"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">车辆识别代号：</div>
+                                    <input type="text" id="vehicleNumber"
+                                           ng-model="application.authentication.license.vehicleNumber"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">发动机号码：</div>
+                                    <input type="text" id="engineNumber"
+                                           ng-model="application.authentication.license.engineNumber"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder" for="registerTime">注册日期：</div>
+                                    <div class="">
+                                        <input type="text" ui-date ui-date-format="yy-mm-dd" id="registerTime"
+                                               ng-model="application.authentication.license.registerTime"
+                                               placeholder="注册日期"
+                                               ng-disable="isDeclined">
+                                    </div>
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder" for="issueTime">发证日期：</div>
+                                    <div class="">
+                                        <input type="text" ui-date ui-date-format="yy-mm-dd" id="issueTime"
+                                               ng-model="application.authentication.license.issueTime"
+                                               placeholder="注册日期"
+                                               ng-disable="isDeclined">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-12">
+                                    <div class="bolder ">地址：</div>
+                                    <input type="text" id="address" style="width:95%;"
+                                           ng-model="application.authentication.license..address"
+                                           ng-disable="isDeclined">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-inline">
-                            <div class="control-group col-md-12">
-                                <div class="bolder ">地址：</div>
-                                <input type="text" id="address" style="width:95%;" ng-model="license.address" ng-disable="isDeclined">
-                                <!--<textarea name="address" ng-model="license.address" cols="80" rows="2"></textarea>-->
+                    </div>
+                </div>
+
+                <div class="form-inline col-md-12" style="margin-top:20px;">
+                    <div class="control-group col-md-5">
+                        <img src="{{application.authentication.driverLicense}}" ng-click="browsePhoto()" width="350px"
+                             height="300px">
+
+                        <p>点击图片查看大图</p>
+                    </div>
+
+                    <div class="control-group col-md-7">
+                        <div>
+                            <div class="form-inline" style="margin-top: 20px;">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">姓名：</div>
+                                    <input type="text" id="drivername" ng-model="application.authentication.driver.name"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">驾驶证号：</div>
+                                    <input type="text" id="code" ng-model="application.authentication.driver.code"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">性别：</div>
+                                    <input type="text" id="gender"
+                                           ng-model="application.authentication.driver.gender"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">国籍：</div>
+                                    <input type="text" id="nationality"
+                                           ng-model="application.authentication.driver.nationality"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">准驾车型：</div>
+                                    <input type="text" id="drivingClass"
+                                           ng-model="application.authentication.driver.drivingClass"
+                                           ng-disable="isDeclined">
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">发证交警大队：</div>
+                                    <input type="text" id="police"
+                                           ng-model="application.authentication.driver.police"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder" for="birthday">出生日期：</div>
+                                    <div class="">
+                                        <input type="text" ui-date ui-date-format="yy-mm-dd" id="birthday"
+                                               ng-model="application.authentication.driver.birthday" placeholder="出生日期"
+                                               ng-disable="isDeclined">
+                                    </div>
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder" for="issueDate">初次领证日期：</div>
+                                    <div class="">
+                                        <input type="text" ui-date ui-date-format="yy-mm-dd" id="issueDate"
+                                               ng-model="application.authentication.driver.issueDate"
+                                               placeholder="初次领证日期"
+                                               ng-disable="isDeclined">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-inline">
+                                <div class="control-group col-md-6">
+                                    <div class="bolder" for="validFrom">有效起始日期：</div>
+                                    <div class="">
+                                        <input type="text" ui-date ui-date-format="yy-mm-dd" id="validFrom"
+                                               ng-model="application.authentication.driver.validFrom"
+                                               placeholder="有效起始日期"
+                                               ng-disable="isDeclined">
+                                    </div>
+                                </div>
+                                <div class="control-group col-md-6">
+                                    <div class="bolder ">有效期限(年)：</div>
+                                    <input type="text" id="validFor"
+                                           ng-model="application.authentication.driver.validFor"
+                                           ng-disable="isDeclined">
+                                </div>
+                            </div>
+                            <div class="form-inline">
+                                <div class="control-group col-md-12">
+                                    <div class="bolder ">地址：</div>
+                                    <input type="text" id="driveraddress" style="width:95%;"
+                                           ng-model="application.authentication.driver.address" ng-disable="isDeclined">
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-inline" ng-show="isDeclined">
-                        <div class="control-group col-md-12">
-                            <div class="bolder red">拒绝理由：</div>
-                            <input type="text" id="remarks" ng-model="remarks">
-                        </div>
+                </div>
+
+                <div class="form-inline col-md-12" style="margin-top:20px;" ng-show="isDeclined">
+                    <div class="control-group col-md-12">
+                        <div class="bolder red">拒绝理由：</div>
+                        <input type="text" id="remarks" ng-model="remarks">
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-            <div ng-show="application.status === '待处理'" ng-disable="isDeclined">
+            <div ng-show="application.status === '认证中'" ng-disable="isDeclined">
                 <button class="btn btn-primary" ng-click="accept()">同意</button>
                 <button class="btn btn-warning" ng-click="decline()">拒绝</button>
             </div>
-            <div ng-hide="application.status === '待处理'">
+            <div ng-hide="application.status === '认证中'">
                 <button class="btn btn-primary" ng-click="update()">修改</button>
                 <button class="btn btn-warning" ng-click="close()">取消</button>
             </div>
