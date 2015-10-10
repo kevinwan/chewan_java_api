@@ -42,15 +42,22 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo getAuthApplicationList(String userId, String status, Long start, Long end, int ignore, int limit) {
+    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit) {
         LOG.debug("getAuthApplicationList start");
 
         Criteria criteria = new Criteria();
+        if (StringUtils.isNotEmpty(type)) {
+            criteria.and("type").is(type);
+        }
         if (StringUtils.isNotEmpty(status)) {
             criteria.and("status").is(status);
         }
-        criteria.and("start").gte(start);
-        criteria.and("end").lte(end);
+        if (start != null) {
+            criteria.and("start").gte(start);
+        }
+        if (end != null) {
+            criteria.and("end").lte(end);
+        }
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "applyTime")));

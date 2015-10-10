@@ -98,52 +98,6 @@ public class Constants {
     }
 
     /**
-     * 车主认证申请状态
-     *
-     * @author Administrator
-     */
-    public interface ApplyAuthenticationStatus {
-
-        /**
-         * 待处理状态
-         */
-        public static final String STATUS_PENDING_PROCESSED = "待处理";
-
-        /**
-         * 已同意状态
-         */
-        public static final String STATUS_APPROVED = "已同意";
-
-        /**
-         * 已拒绝状态
-         */
-        public static final String STATUS_DECLINED = "已拒绝";
-
-    }
-
-    public interface ActivityKey {
-        /**
-         * 获取热点活动的Key值
-         */
-        public static final String HOTTEST = "hot";
-
-        /**
-         * 获取附近的活动的Key值
-         */
-        public static final String NEARBY = "nearby";
-
-        /**
-         * 获取最新的活动的Key值
-         */
-        public static final String LATEST = "latest";
-
-        /**
-         * 活动列表Key值集合
-         */
-        public static final List<String> KEY_LIST = Arrays.asList(HOTTEST, LATEST, NEARBY);
-    }
-
-    /**
      * 个人详情（别人/自己）
      *
      * @author Administrator
@@ -189,23 +143,6 @@ public class Constants {
         public static final String COMMON = "普通活动";
 
         public static final String OFFICIAL = "官方活动";
-    }
-
-    public interface ActivityType {
-
-        public static final String DINE = "吃饭";
-
-        public static final String SING = "唱歌";
-
-        public static final String FILM = "电影";
-
-        public static final String TRAVEL = "旅行";
-
-        public static final String SPORT = "运动";
-
-        public static final String CAR_POLL = "拼车";
-
-        public static final String PILOT = "代驾";
     }
 
     public interface UserCatalog {

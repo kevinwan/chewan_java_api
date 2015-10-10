@@ -1,16 +1,16 @@
 'use strict';
 
 /**
- * Driver authentication controller
+ * Driver/Photo/IDCard authentication controller
  *
  * @constructor
  */
 gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'chewanService',
     'moment', function ($scope, $rootScope, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, chewanService, moment) {
 
-        var STATUS_PENDING = '待处理';
-        var STATUS_ACCEPTED = '已同意';
-        var STATUS_DECLINED = '已拒绝';
+        var STATUS_PENDING = '认证中';
+        var STATUS_ACCEPTED = '认证通过';
+        var STATUS_DECLINED = '认证未通过';
 
         /**
          * If radio selection changes, empty the table contents
@@ -53,11 +53,27 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
             }).withOption('order', [0, 'desc']);
 
         /**
+         *
+         * Initial criteria
+         */
+        $scope.criteria = {
+            status: '',
+            startDate: (new Date()).setHours(0, 0, 0, 0),
+            endDate: (new Date()).setHours(23, 59, 59),
+            type: '车主认证'
+        };
+
+        /**
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            var today = '';
-            $scope.criteria = {status: '', startDate: today, endDate: today};
+            var startTime = new Date();
+            startTime.setHours(0, 0, 0, 0);
+
+            var endTime = new Date();
+            endTime.setHours(23, 59, 59);
+
+            $scope.criteria = {status: '', startDate: startTime, endDate: endTime, type: '车主认证'};
         };
 
         /**

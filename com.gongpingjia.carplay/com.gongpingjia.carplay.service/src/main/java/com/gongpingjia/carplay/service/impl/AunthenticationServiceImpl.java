@@ -113,23 +113,18 @@ public class AunthenticationServiceImpl implements AunthenticationService {
     private User checkApplyUserInfo(JSONObject json, String token, String userId) throws ApiException {
         checker.checkUserInfo(userId, token);
 
-        if (!CommonUtil.isUUID(json.getString("drivingLicense")) || !CommonUtil.isUUID(json.getString("driverLicense"))) {
-            LOG.warn("Input parameter drivingLicense or driverLicense is not uuid");
-            throw new ApiException("输入参数有误");
-        }
-
         User user = userDao.findById(userId);
         if (user == null) {
             LOG.warn("User not exist, userId:{}", userId);
             throw new ApiException("用户不存在");
         }
 
-        if (!Constants.AuthStatus.AUTHORIZING.equals(user.getLicenseAuthStatus())) {
+        if (Constants.AuthStatus.AUTHORIZING.equals(user.getLicenseAuthStatus())) {
             LOG.warn("User already authenticated");
             throw new ApiException("用户认证中，请勿重复申请");
         }
 
-        if (!Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {
+        if (Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {
             LOG.warn("User already authenticated");
             throw new ApiException("用户已认证，请勿重复认证");
         }

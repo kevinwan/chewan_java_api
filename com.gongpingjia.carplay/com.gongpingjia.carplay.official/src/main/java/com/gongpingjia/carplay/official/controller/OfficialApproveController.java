@@ -54,17 +54,20 @@ public class OfficialApproveController {
      * @param token  审批人会话Token
      * @return 返回审批结果
      */
-    @RequestMapping(value = "/official/approve/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/official/authentication/list", method = RequestMethod.GET)
     public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token,
                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                   @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+                                  @RequestParam(value = "type", required = false) String type,
                                   @RequestParam(value = "status", required = false) String status,
-                                  @RequestParam("start") Long start, @RequestParam("end") Long end) {
+                                  @RequestParam(value = "start", required = false) Long start,
+                                  @RequestParam(value = "end", required = false) Long end) {
+
         try {
             LOG.info("Begin obtian approve list");
             parameterChecker.checkUserInfo(userId, token);
 
-            return officialApproveService.getAuthApplicationList(userId, status, start, end, ignore, limit);
+            return officialApproveService.getAuthApplicationList(userId, type, status, start, end, ignore, limit);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

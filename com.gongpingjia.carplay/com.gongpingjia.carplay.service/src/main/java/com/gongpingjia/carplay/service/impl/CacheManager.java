@@ -50,7 +50,7 @@ public class CacheManager {
                 UserToken.class);
 
         if (userToken == null) {
-            userToken = tokenDao.findById(userId);
+            userToken = tokenDao.findOne(Query.query(Criteria.where("userId").is(userId)));
             if (userToken != null) {
                 setUserToken(userToken);
             }
