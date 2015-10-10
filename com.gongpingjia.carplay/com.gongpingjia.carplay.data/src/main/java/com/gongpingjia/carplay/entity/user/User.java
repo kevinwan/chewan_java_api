@@ -94,6 +94,10 @@ public class User {
     @Transient
     private String token;
 
+    //
+    @Transient
+    private boolean subscribeFlag;
+
     /**
      * 刷新user相关的photo的URL地址
      *
@@ -374,12 +378,21 @@ public class User {
         return calendar.get(Calendar.YEAR) - userCal.get(Calendar.YEAR);
     }
 
+    public boolean getSubscribeFlag() {
+        return subscribeFlag;
+    }
+
+    public void setSubscribeFlag(boolean subscribeFlag) {
+        this.subscribeFlag = subscribeFlag;
+    }
+
     /**
      * 隐藏用户的隐私信息
      */
-    public void hideSecretInfo() {
+    public User hideSecretInfo() {
         this.token = null;
         this.password = null;
         this.license = null;
+        return this;
     }
 }

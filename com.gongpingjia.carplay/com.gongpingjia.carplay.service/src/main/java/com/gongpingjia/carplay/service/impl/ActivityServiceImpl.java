@@ -9,12 +9,14 @@ import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
+import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.EmchatTokenService;
@@ -61,6 +63,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private AppointmentDao appointmentDao;
+
+    @Autowired
+    private SubscriberDao subscriberDao;
 
     @Override
     public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
@@ -181,8 +186,15 @@ public class ActivityServiceImpl implements ActivityService {
 
         LOG.debug("allActivityList size is:" + allActivityList.size());
 
+        List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        List<String> subscriberIds = new ArrayList<>(subscribers.size());
+
+        for (Subscriber subscriber : subscribers) {
+            subscriberIds.add(subscriber.getToUser());
+        }
+
         //查询出Activity的 组织者，并初始化
-        initOrganizer(allActivityList);
+        initOrganizer(allActivityList, subscriberIds);
 
         /**
          *  对所有的基础条件活动进行权重打分，并且排序
@@ -192,21 +204,24 @@ public class ActivityServiceImpl implements ActivityService {
         List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit);
         LOG.debug("rltList size is:" + rltList.size());
 
-        JSONArray jsonArray = new JSONArray();
+        List<Map<String, Object>> jsonArray = new ArrayList<>();
         for (Activity activity : rltList) {
-            JSONObject jsonItem = new JSONObject();
+            Map<String, Object> jsonItem = new HashMap<>();
             jsonItem.put("type", activity.getType());
             jsonItem.put("activityId", activity.getActivityId());
             jsonItem.put("distance", activity.getDistance());
             jsonItem.put("pay", activity.getPay());
             jsonItem.put("transfer", activity.isTransfer());
 
-            JSONObject itemOrganizer = new JSONObject();
+            Map<String, Object> itemOrganizer = new HashMap<>();
             itemOrganizer.put("userId", activity.getOrganizer().getUserId());
             itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
             itemOrganizer.put("avatar", activity.getOrganizer().getAvatar());
             itemOrganizer.put("gender", activity.getOrganizer().getGender());
             itemOrganizer.put("age", activity.getOrganizer().getAge());
+            itemOrganizer.put("car", activity.getOrganizer().getCar());
+            itemOrganizer.put("photoAuthStatus", activity.getOrganizer().getPhotoAuthStatus());
+            itemOrganizer.put("subscribeFlag", activity.getOrganizer().getSubscribeFlag());
             jsonItem.put("organizer", itemOrganizer);
             jsonArray.add(jsonItem);
         }
@@ -408,7 +423,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @param activityList
      * @throws ApiException
      */
-    private void initOrganizer(List<Activity> activityList) throws ApiException {
+    private void initOrganizer(List<Activity> activityList, List<String> subscribeIds) throws ApiException {
         Set<String> userIdSet = new HashSet<>(activityList.size());
         for (Activity activity : activityList) {
             userIdSet.add(activity.getUserId());
@@ -420,8 +435,10 @@ public class ActivityServiceImpl implements ActivityService {
             if (null == organizer) {
                 throw new ApiException("数据非法 该Activity没有找到对应的Organizer");
             }
-//            organizer.hideSecretInfo();
+            organizer.setSubscribeFlag(subscribeIds.contains(organizer.getUserId()));
             activity.setOrganizer(organizer);
         }
     }
+
+
 }
