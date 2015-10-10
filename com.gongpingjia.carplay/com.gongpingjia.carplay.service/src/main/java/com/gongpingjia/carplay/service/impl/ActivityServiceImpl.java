@@ -198,11 +198,15 @@ public class ActivityServiceImpl implements ActivityService {
             jsonItem.put("type", activity.getType());
             jsonItem.put("activityId", activity.getActivityId());
             jsonItem.put("distance", activity.getDistance());
+            jsonItem.put("pay", activity.getPay());
+            jsonItem.put("transfer", activity.isTransfer());
 
             JSONObject itemOrganizer = new JSONObject();
             itemOrganizer.put("userId", activity.getOrganizer().getUserId());
             itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
             itemOrganizer.put("avatar", activity.getOrganizer().getAvatar());
+            itemOrganizer.put("gender", activity.getOrganizer().getGender());
+            itemOrganizer.put("age", activity.getOrganizer().getAge());
             jsonItem.put("organizer", itemOrganizer);
             jsonArray.add(jsonItem);
         }
