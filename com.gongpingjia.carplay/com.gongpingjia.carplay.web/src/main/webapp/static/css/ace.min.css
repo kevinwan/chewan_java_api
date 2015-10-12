@@ -1252,7 +1252,7 @@ blockquote, blockquote.pull-right {
 	padding-right: 0;
 	min-height: 45px;
 	position: relative;
-	background: #438eb9
+	background: #333333
 }
 
 .navbar>.container {
@@ -1320,7 +1320,7 @@ blockquote, blockquote.pull-right {
 }
 
 .ace-nav>li>a {
-	background-color: #2e6589;
+	background-color: transparent;
 	color: #FFF;
 	display: block;
 	line-height: inherit;
@@ -1689,7 +1689,7 @@ blockquote, blockquote.pull-right {
 	white-space: nowrap;
 	text-align: left;
 	vertical-align: top;
-	line-height: 15px;
+	line-height: 18px;
 	position: relative;
 	top: 6px
 }
@@ -9649,7 +9649,7 @@ th .lbl:only-child, td .lbl:only-child {
 }
 
 .login-layout {
-	background-color: #1d2024
+	background-color: #6fb3e0
 }
 
 .login-layout .main-container:after {

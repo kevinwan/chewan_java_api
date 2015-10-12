@@ -17,51 +17,81 @@ public class OfficialActivity {
     @Id
     private String officialActivityId;
 
+    //创建人 id
     private String userId;
 
+    //活动目的地 经纬度
     private Landmark destPoint;
 
+    //活动目的地
     private Address destination;
 
-    private Landmark estabPoint;
 
-    private Address establish;
-
+    //开始时间
     private Long start;
 
+    //结束时间
     private Long end;
 
+    //成员
     private List<String> members;
 
+    //环信群组ID
     private String emchatGroupId;
 
+    //第三方购票链接
+    private String linkTicketUrl;
 
-    //官方活动--------开始
+
     //官方活动封面图片
-    private List<Photo> covers;
+    private Photo cover;
     //活动相册,普通活动，官方活动都会有
     private List<Photo> photos;
 
     //活动标题
     private String title;
-    //活动描述信息
+
+
+
+    //活动介绍
+    private String instruction;
+
+    //活动内容
     private String description;
 
+    //补充说明
+    private String extraDesc;
+
     //付费单价
-    private Long price;
+    private Double price;
+
+    //补贴价格
+    private Double subsidyPrice;
+
     //价格描述
     private String priceDesc;
 
-    //官方活动流程
-    private List<Flow> flows;
-
-    private String instruction;
-
+    //男性限制
     private Integer maleLimit;
 
+    //当前男性数量
+    private Integer maleNum;
+
+    //女性限制
     private Integer femaleLimit;
 
+    //当前女性数量
+    private Integer femaleNum;
+
+    //创建时间
     private Long createTime;
+
+    //上下架 标志 true 上架 false 下架
+    private Boolean onFlag;
+
+    //删除标志位
+    private Boolean deleteFlag;
+
 
     public String getOfficialActivityId() {
         return officialActivityId;
@@ -93,22 +123,6 @@ public class OfficialActivity {
 
     public void setDestination(Address destination) {
         this.destination = destination;
-    }
-
-    public Landmark getEstabPoint() {
-        return estabPoint;
-    }
-
-    public void setEstabPoint(Landmark estabPoint) {
-        this.estabPoint = estabPoint;
-    }
-
-    public Address getEstablish() {
-        return establish;
-    }
-
-    public void setEstablish(Address establish) {
-        this.establish = establish;
     }
 
     public Long getStart() {
@@ -143,12 +157,20 @@ public class OfficialActivity {
         this.emchatGroupId = emchatGroupId;
     }
 
-    public List<Photo> getCovers() {
-        return covers;
+    public String getLinkTicketUrl() {
+        return linkTicketUrl;
     }
 
-    public void setCovers(List<Photo> covers) {
-        this.covers = covers;
+    public void setLinkTicketUrl(String linkTicketUrl) {
+        this.linkTicketUrl = linkTicketUrl;
+    }
+
+    public Photo getCover() {
+        return cover;
+    }
+
+    public void setCover(Photo cover) {
+        this.cover = cover;
     }
 
     public List<Photo> getPhotos() {
@@ -175,12 +197,36 @@ public class OfficialActivity {
         this.description = description;
     }
 
-    public Long getPrice() {
+    public String getInstruction() {
+        return instruction;
+    }
+
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
+    }
+
+    public String getExtraDesc() {
+        return extraDesc;
+    }
+
+    public void setExtraDesc(String extraDesc) {
+        this.extraDesc = extraDesc;
+    }
+
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Double getSubsidyPrice() {
+        return subsidyPrice;
+    }
+
+    public void setSubsidyPrice(Double subsidyPrice) {
+        this.subsidyPrice = subsidyPrice;
     }
 
     public String getPriceDesc() {
@@ -191,28 +237,20 @@ public class OfficialActivity {
         this.priceDesc = priceDesc;
     }
 
-    public List<Flow> getFlows() {
-        return flows;
-    }
-
-    public void setFlows(List<Flow> flows) {
-        this.flows = flows;
-    }
-
-    public String getInstruction() {
-        return instruction;
-    }
-
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
-    }
-
     public Integer getMaleLimit() {
         return maleLimit;
     }
 
     public void setMaleLimit(Integer maleLimit) {
         this.maleLimit = maleLimit;
+    }
+
+    public Integer getMaleNum() {
+        return maleNum;
+    }
+
+    public void setMaleNum(Integer maleNum) {
+        this.maleNum = maleNum;
     }
 
     public Integer getFemaleLimit() {
@@ -223,11 +261,35 @@ public class OfficialActivity {
         this.femaleLimit = femaleLimit;
     }
 
+    public Integer getFemaleNum() {
+        return femaleNum;
+    }
+
+    public void setFemaleNum(Integer femaleNum) {
+        this.femaleNum = femaleNum;
+    }
+
     public Long getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Long createTime) {
         this.createTime = createTime;
+    }
+
+    public Boolean getOnFlag() {
+        return onFlag;
+    }
+
+    public void setOnFlag(Boolean onFlag) {
+        this.onFlag = onFlag;
+    }
+
+    public Boolean getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(Boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 }

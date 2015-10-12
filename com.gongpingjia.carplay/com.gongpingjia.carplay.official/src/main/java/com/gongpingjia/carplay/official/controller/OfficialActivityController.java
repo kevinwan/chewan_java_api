@@ -24,7 +24,7 @@ public class OfficialActivityController {
     private static final Logger LOG = LoggerFactory.getLogger(OfficialActivityController.class);
 
     @Autowired
-    private OfficialActivityService service;
+    private OfficialActivityService officialActivityService;
 
     @Autowired
     private ParameterChecker checker;
@@ -45,16 +45,29 @@ public class OfficialActivityController {
         try {
             checker.checkUserInfo(userId, token);
 
-            CommonUtil.isEmpty(json, Arrays.asList("destPoint", "destination", "estabPoint", "estabPoint", "start", "transfer", "covers", "title",
-                    "description", "price", "priceDesc", "instruction", "maleLimit", "femaleLimit"));
+//            CommonUtil.isEmpty(json, Arrays.asList("destPoint", "destination", "estabPoint", "estabPoint", "start", "transfer", "covers", "title",
+//                    "description", "price", "priceDesc", "instruction", "maleLimit", "femaleLimit"));
 
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
             activity.setOfficialActivityId(null);
             activity.setUserId(userId);
 
-            return service.registerActivity(activity, json);
+            return officialActivityService.registerActivity(activity, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping(value = "/official/activity/list", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo getActivityList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+        try {
+            checker.checkUserInfo(userId, token);
+            return officialActivityService.getActivityList(userId, json);
+        } catch (ApiException e) {
+            LOG.error(e.getLocalizedMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }

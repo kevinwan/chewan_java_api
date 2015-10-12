@@ -5,17 +5,28 @@
  *
  * @constructor
  */
-gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authService', '$notification',
-    function ($scope, $rootScope, $window, authService, $notification) {
+gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authService', '$notification', 'userService',
+    function ($scope, $rootScope, $window, authService, $notification, userService) {
 
         $rootScope.loadingPromise = $scope.loadingPromise;
 
-        $scope.userRole = "ADMIN";//authService.getUser().role
-
+        if(authService.getUser()){
+            $('#bodyControl').removeClass('hidden');
+            $('#bodyControl').addClass('block');
+        }
+        /**
+         * Log out
+         */
         $scope.logout = function () {
-            authService.setUser('');
-            $window.location.href = '/static/login.html';
+            userService.logOut().success(function (resp) {
+                if (resp.status === "success") {
+                    authService.setUser('');
+                    $window.location.href = '/login.html'
+                } else
+                    alert(resp.msg ? resp.msg : '注销失败');
+            }).error(function (status, data) {
+            });
         };
 
-        //$notification.notify('images/avatars/avatar2.png', '新的上门洗车订单', '车牌号12345');
+        //$notification.notify('images/avatars/avatar.png', 'title', 'content');
     }]);

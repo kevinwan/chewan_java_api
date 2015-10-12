@@ -10,6 +10,7 @@ public class Address {
     private String city;
     private String district;
     private String street;
+    private String detail;
 
     public String getProvince() {
         return province;
@@ -41,6 +42,14 @@ public class Address {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
     @Override

@@ -20,4 +20,7 @@ public interface OfficialActivityService {
      * @throws ApiException
      */
     ResponseDo registerActivity(OfficialActivity activity, JSONObject json) throws ApiException;
+
+
+    ResponseDo getActivityList(String   userId,JSONObject json) throws ApiException;
 }

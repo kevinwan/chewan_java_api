@@ -6,19 +6,21 @@
  * @constructor
  */
 
-gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanApiProvider', 'ChewanApiEndPoint',
-    function (authService, restProxyService, ChewanApiProvider, ChewanApiEndPoint) {
+gpjApp.factory('userService', ['authService', 'restProxyService', 'GpjApiProvider', 'GpjApiEndPoint',
+    function (authService, restProxyService, GpjApiProvider, GpjApiEndPoint) {
 
         return {
-            logIn: function (phone, password) {
-                return restProxyService.sendHttpPost(ChewanApiProvider + ChewanApiEndPoint, '/user/login', {
-                    phone: phone,
+
+            logIn: function (username, password) {
+                return restProxyService.sendHttpPost(GpjApiProvider, GpjApiEndPoint + '/post-login/', {
+                    username: username,
                     password: password
                 });
             },
 
             logOut: function () {
                 authService.setUser(undefined);
+                return restProxyService.sendHttpGet(GpjApiProvider, GpjApiEndPoint + '/get-oss-logout/');
             }
         }
     }]);
