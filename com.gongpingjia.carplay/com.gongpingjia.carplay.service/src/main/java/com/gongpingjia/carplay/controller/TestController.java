@@ -1,7 +1,9 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -49,5 +51,32 @@ public class TestController {
         List<User> userList = new ArrayList<>();
         userList.add(user);
         return ResponseDo.buildSuccessResponse(userList);
+    }
+
+    public static void main(String[] args) {
+        Activity activity = new Activity();
+        activity.setType("看电影");
+        activity.setPay("AA");
+
+        Landmark landmark = new Landmark();
+        landmark.setLatitude(32.23);
+        landmark.setLongitude(180.12);
+        activity.setEstabPoint(landmark);
+        activity.setDestPoint(landmark);
+
+        Address address = new Address();
+        address.setProvince("江苏省");
+        address.setCity("南京市");
+        address.setDistrict("玄武区");
+        address.setStreet("新街口");
+        activity.setEstablish(address);
+        activity.setDestination(address);
+
+        activity.setStart(new Date().getTime());
+        activity.setEnd(new Date().getTime());
+        activity.setTransfer(true);
+
+        JSONObject jsonObject = JSONObject.fromObject(activity);
+        System.out.println(jsonObject);
     }
 }

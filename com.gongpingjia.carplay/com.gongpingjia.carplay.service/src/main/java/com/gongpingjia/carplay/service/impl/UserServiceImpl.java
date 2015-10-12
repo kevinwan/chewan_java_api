@@ -292,17 +292,20 @@ public class UserServiceImpl implements UserService {
             history.setViewUserId(viewUser);
             history.setUserId(beViewedUser);
             historyDao.save(history);
+
+            String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.view", "{0}看过了我的相册"),
+                    user.getNickname());
+            chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.USER_VIEW,
+                    user.getEmchatName(), message);
         }
 
         user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
-
         user.hideSecretInfo();
 
         return ResponseDo.buildSuccessResponse(user);
     }
 
     public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
-
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
