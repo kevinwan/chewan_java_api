@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,8 +100,13 @@ public class ActivityController {
     public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
+            if (StringUtils.isNotEmpty("userId")) {
+                parameterChecker.checkUserInfo(userId,token);
+            }else {
+                userId = "";
+            }
 //            parameterChecker.checkUserInfo(userId,token);
-            return activityService.getNearActivityList(initTransListParam(request), request,userId);
+            return activityService.getNearActivityList(initTransListParam(request), request, userId);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

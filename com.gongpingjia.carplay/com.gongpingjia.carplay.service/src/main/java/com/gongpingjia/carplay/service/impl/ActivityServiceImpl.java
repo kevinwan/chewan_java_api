@@ -175,7 +175,9 @@ public class ActivityServiceImpl implements ActivityService {
         criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
 
         //非用户自己创建的活动
-        criteria.and("userId").ne(userId);
+        if (StringUtils.isNotEmpty(userId)) {
+            criteria.and("userId").ne(userId);
+        }
 
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(Query.query(criteria));
@@ -186,7 +188,13 @@ public class ActivityServiceImpl implements ActivityService {
 
         LOG.debug("allActivityList size is:" + allActivityList.size());
 
-        List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+
+        List<Subscriber> subscribers = null;
+        if (StringUtils.isEmpty(userId)) {
+            subscribers = new ArrayList<>();
+        }else {
+            subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        }
         List<String> subscriberIds = new ArrayList<>(subscribers.size());
 
         for (Subscriber subscriber : subscribers) {
