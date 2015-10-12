@@ -99,7 +99,7 @@ public class ActivityController {
     public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            parameterChecker.checkUserInfo(userId,token);
+//            parameterChecker.checkUserInfo(userId,token);
             return activityService.getNearActivityList(initTransListParam(request), request,userId);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
