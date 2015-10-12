@@ -53,22 +53,12 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
             }).withOption('order', [0, 'desc']);
 
         /**
-         *
-         * Initial criteria
-         */
-        $scope.criteria = {
-            status: '',
-            startDate: (new Date()).setHours(0, 0, 0, 0),
-            endDate: (new Date()).setHours(23, 59, 59),
-            type: '车主认证'
-        };
-
-        /**
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
             var startTime = new Date();
             startTime.setHours(0, 0, 0, 0);
+            startTime.setTime(startTime.getTime() - 1000 * 60 * 60 * 24 * 7);
 
             var endTime = new Date();
             endTime.setHours(23, 59, 59);
