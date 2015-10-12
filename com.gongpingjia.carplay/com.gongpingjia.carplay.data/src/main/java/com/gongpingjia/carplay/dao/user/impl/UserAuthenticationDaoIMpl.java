@@ -6,8 +6,8 @@ import com.gongpingjia.carplay.entity.user.UserAuthentication;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by licheng on 2015/10/10.
+ * Created by Administrator on 2015/10/12 0012.
  */
 @Repository("userAuthenticationDao")
-public class UserAuthenticationDaoImpl extends BaseDaoImpl<UserAuthentication, String> implements UserAuthenticationDao {
+public class UserAuthenticationDaoImpl extends BaseDaoImpl<UserAuthentication,String> implements UserAuthenticationDao {
 }
