@@ -112,10 +112,22 @@ public interface ChatThirdPartyService {
      *
      * @param token       鉴权Token
      * @param adminUser   管理员用户
-     * @param users       接收消息的用户
+     * @param toUsers       接收消息的用户
      * @param textMessage 消息内容
      * @return 返回发送结果
      * @throws ApiException
      */
-    JSONObject sendUserGroupMessage(String token, String adminUser, List<String> users, String textMessage) throws ApiException;
+    JSONObject sendUserGroupMessage(String token, String adminUser, List<String> toUsers, String textMessage, Object ext) throws ApiException;
+
+    /**
+     * 管理员用户向其他的用户发送消息，由adminUser向userEmchatName发送textMessage消息
+     *
+     * @param token          鉴权Token
+     * @param adminUser      管理员用户
+     * @param toUserEmchatName 接收消息的用户
+     * @param textMessage    消息内容
+     * @return 返回发送结果
+     * @throws ApiException
+     */
+    JSONObject sendUserGroupMessage(String token, String adminUser, String toUserEmchatName, String textMessage) throws ApiException;
 }

@@ -285,8 +285,12 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
     }
 
     @Override
-    public JSONObject sendUserGroupMessage(String token, String adminUser, List<String> users, String textMessage) throws ApiException {
+    public JSONObject sendUserGroupMessage(String token, String adminUser, List<String> toUsers, String textMessage, Object ext) throws ApiException {
         LOG.debug("Begin send message by {}", adminUser);
+
+        if (toUsers == null || toUsers.isEmpty()) {
+            return new JSONObject();
+        }
 
         StringBuilder httpUrl = buildRequestUrl();
         httpUrl.append("messages");
@@ -302,13 +306,13 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         param.put("msg", msg);
 
         param.put("from", adminUser);
-        param.put("ext", "");
+        param.put("ext", ext);
 
         final int limit = 20;
         int fromIndex = 0;
-        int toIndex = (users.size() > limit) ? limit : users.size();
+        int toIndex = (toUsers.size() > limit) ? limit : toUsers.size();
         int count = 1;
-        while (users.size() > toIndex) {
+        while (toUsers.size() > toIndex) {
             if (count % 20 == 0) {
                 try {
                     //环信存在每秒钟能够发送消息的限制, 发送次数超过达到20次时，休息一秒钟
@@ -318,25 +322,32 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
                     LOG.warn(e.getMessage());
                 }
             }
-            List<String> subUsers = users.subList(fromIndex, toIndex);
+            List<String> subUsers = toUsers.subList(fromIndex, toIndex);
             param.put("target", subUsers);
             sendEmchatMessage(httpUrl, headers, param);
             //计算下一次截断尺寸
             fromIndex = toIndex;
-            if (users.size() - toIndex > limit) {
+            if (toUsers.size() - toIndex > limit) {
                 toIndex += limit;
             } else {
-                toIndex = users.size();
+                toIndex = toUsers.size();
             }
         }
 
-        List<String> finalUsers = users.subList(fromIndex, toIndex);
+        List<String> finalUsers = toUsers.subList(fromIndex, toIndex);
         param.put("target", finalUsers);
         CloseableHttpResponse response = sendEmchatMessage(httpUrl, headers, param);
         if (HttpClientUtil.isStatusOK(response)) {
             return HttpClientUtil.parseResponseGetJson(response);
         }
         return new JSONObject();
+    }
+
+    @Override
+    public JSONObject sendUserGroupMessage(String token, String adminUser, String toUserEmchatName, String textMessage) throws ApiException {
+        List<String> emchatNames = new ArrayList<>(1);
+        emchatNames.add(toUserEmchatName);
+        return this.sendUserGroupMessage(token, adminUser, emchatNames, textMessage, "");
     }
 
     /**

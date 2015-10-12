@@ -58,7 +58,7 @@ public class ActivityController {
 
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, activity);
-        } catch (Exception e) {
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
@@ -81,7 +81,7 @@ public class ActivityController {
             parameterChecker.checkUserInfo(userId,token);
             ResponseDo responseDo = activityService.getActivityInfo(userId, activityId);
             return responseDo;
-        } catch (Exception e) {
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
@@ -105,9 +105,8 @@ public class ActivityController {
             } else {
                 userId = "";
             }
-//            parameterChecker.checkUserInfo(userId,token);
             return activityService.getNearActivityList(initTransListParam(request), request, userId);
-        } catch (Exception e) {
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
@@ -132,7 +131,7 @@ public class ActivityController {
             parameterChecker.checkUserInfo(userId,token);
             Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
             return activityService.sendAppointment(activityId, userId, appointment);
-        } catch (Exception e) {
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }

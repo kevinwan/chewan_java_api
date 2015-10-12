@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.Subscriber;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -116,11 +118,10 @@ public class SubscribeServiceImpl implements SubscribeService {
         // 关注
         subscriberDao.save(userSubscription);
 
-        List<String> users = new ArrayList<>(1);
-        users.add(userSubscription.getToUser());
-
-        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.SUBSCRIBE, users,
-                user.getNickname() + "关注了你");
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.subscribe", "{0}关注了我"),
+                user.getNickname());
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.SUBSCRIBE,
+                user.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
     }
