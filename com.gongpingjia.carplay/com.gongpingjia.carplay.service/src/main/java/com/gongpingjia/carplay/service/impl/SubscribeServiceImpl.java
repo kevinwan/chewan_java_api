@@ -1,8 +1,10 @@
 package com.gongpingjia.carplay.service.impl;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
@@ -18,10 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by licheng on 2015/9/24.
@@ -39,6 +38,12 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ChatCommonService chatCommonService;
+
+    @Autowired
+    private ChatThirdPartyService chatThirdPartyService;
 
     @Override
     public ResponseDo getUserSubscribeInfo(String userId, String token) throws ApiException {
@@ -110,6 +115,12 @@ public class SubscribeServiceImpl implements SubscribeService {
         userSubscription.setSubscribeTime(DateUtil.getTime());
         // 关注
         subscriberDao.save(userSubscription);
+
+        List<String> users = new ArrayList<>(1);
+        users.add(userSubscription.getToUser());
+
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.SUBSCRIBE, users,
+                user.getNickname() + "关注了你");
 
         return ResponseDo.buildSuccessResponse();
     }

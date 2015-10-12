@@ -284,36 +284,115 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         return new JSONObject();
     }
 
-    // public static void main(String[] args) throws ApiException {
-    // String httpUrl =
-    // "https://a1.easemob.com:443/gongpingjia/carplayapp/messages";
-    //
-    // List<Header> headers = new ArrayList<Header>(2);
-    // headers.add(new BasicHeader("Content-Type", "application/json"));
-    // headers.add(new BasicHeader("Authorization",
-    // MessageFormat.format(AUTH_HEADER_FORMAT,
-    // "YWMterwfoEsOEeWcnQPhxKXuVQAAAVCZQBpQvnlmA3ZdjXXVz6gnv_Czb3Ar1cU")));
-    //
-    // JSONObject json = new JSONObject();
-    // json.put("target_type", "chatgroups");
-    //
-    // JSONArray array = new JSONArray();
-    // array.add("99123551197462944");
-    // json.put("target", array);
-    //
-    // JSONObject msg = new JSONObject();
-    // msg.put("type", "txt");
-    // msg.put("msg", "Test send message");
-    //
-    // json.put("msg", msg);
-    // json.put("from", "4c5dd2e14f07667b244176e782206910");
-    //
-    // CloseableHttpResponse response = HttpClientUtil.post(httpUrl.toString(),
-    // json.toString(), headers,
-    // Constants.Charset.UTF8);
-    //
-    // JSONObject result = HttpClientUtil.parseResponseGetJson(response);
-    //
-    // System.out.println(result);
-    // }
+    @Override
+    public JSONObject sendUserGroupMessage(String token, String adminUser, List<String> users, String textMessage) throws ApiException {
+        LOG.debug("Begin send message by {}", adminUser);
+
+        StringBuilder httpUrl = buildRequestUrl();
+        httpUrl.append("messages");
+
+        List<Header> headers = buildCommonHeaders(token);
+
+        JSONObject param = new JSONObject();
+        param.put("target_type", "users");
+
+        JSONObject msg = new JSONObject();
+        msg.put("type", "txt");
+        msg.put("msg", textMessage);
+        param.put("msg", msg);
+
+        param.put("from", adminUser);
+        param.put("ext", "");
+
+        final int limit = 20;
+        int fromIndex = 0;
+        int toIndex = (users.size() > limit) ? limit : users.size();
+        int count = 1;
+        while (users.size() > toIndex) {
+            if (count % 20 == 0) {
+                try {
+                    //环信存在每秒钟能够发送消息的限制, 发送次数超过达到20次时，休息一秒钟
+                    LOG.debug("Sleep one second for send message limit by emchat");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.warn(e.getMessage());
+                }
+            }
+            List<String> subUsers = users.subList(fromIndex, toIndex);
+            param.put("target", subUsers);
+            sendEmchatMessage(httpUrl, headers, param);
+            //计算下一次截断尺寸
+            fromIndex = toIndex;
+            if (users.size() - toIndex > limit) {
+                toIndex += limit;
+            } else {
+                toIndex = users.size();
+            }
+        }
+
+        List<String> finalUsers = users.subList(fromIndex, toIndex);
+        param.put("target", finalUsers);
+        CloseableHttpResponse response = sendEmchatMessage(httpUrl, headers, param);
+        if (HttpClientUtil.isStatusOK(response)) {
+            return HttpClientUtil.parseResponseGetJson(response);
+        }
+        return new JSONObject();
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param httpUrl URL请求
+     * @param headers
+     * @param param
+     * @return
+     */
+    private CloseableHttpResponse sendEmchatMessage(StringBuilder httpUrl, List<Header> headers, JSONObject param) {
+        CloseableHttpResponse response = null;
+        try {
+            response = HttpClientUtil.post(httpUrl.toString(), param.toString(), headers, Constants.Charset.UTF8);
+            if (!HttpClientUtil.isStatusOK(response)) {
+                LOG.warn("Send emchat message failure, param:{}", param);
+            }
+        } catch (Exception e) {
+            LOG.error("Request for send emchat message falure", e);
+        } finally {
+            HttpClientUtil.close(response);
+        }
+        return response;
+    }
+
+//    public static void main(String[] args) throws ApiException {
+//        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/messages";
+//
+//        List<Header> headers = new ArrayList<Header>(2);
+//        headers.add(new BasicHeader("Content-Type", "application/json"));
+//        headers.add(new BasicHeader("Authorization",
+//                MessageFormat.format(AUTH_HEADER_FORMAT,
+//                        "YWMtfmMeZmWJEeWVab12jYnrsAAAAVFGywz5i7xlS_xlLlV9qeTzT8RLiUn7XkU")));
+//
+//        List<String> users = new ArrayList<>(2);
+//        users.add("eb1e9dbc37d51624d2a42fcb2355ab71");
+//        users.add("59baae3ea738202c35749112b1f869c4");
+//
+//        JSONObject param = new JSONObject();
+//        param.put("target_type", "users");
+//        param.put("target", users);
+//
+//        JSONObject msg = new JSONObject();
+//        msg.put("type", "txt");
+//        msg.put("msg", "Test for send message");
+//        param.put("msg", msg);
+//
+//        param.put("from", "SubscribeAdmin");
+//        param.put("ext", "");
+//
+//        CloseableHttpResponse response = HttpClientUtil.post(httpUrl.toString(),
+//                param.toString(), headers,
+//                Constants.Charset.UTF8);
+//
+//        JSONObject result = HttpClientUtil.parseResponseGetJson(response);
+//
+//        System.out.println(result);
+//    }
 }
