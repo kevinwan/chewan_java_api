@@ -207,7 +207,36 @@ public class Constants {
     }
 
     public interface Product {
-        public static final String DEFAULT_NAME = "android";
+        String DEFAULT_NAME = "android";
     }
 
+    /**
+     * 动态部分的服务端环信用户
+     */
+    public interface EmchatAdmin {
+        /**
+         * 感兴趣的人
+         */
+        String INTEREST = "InterestAdmin";
+
+        /**
+         * 活动动态
+         */
+        String ACTIVITY_STATE = "ActivityStateAdmin";
+
+        /**
+         * 谁看过我
+         */
+        String USER_VIEW = "UserViewAdmin";
+
+        /**
+         * 我关注的人
+         */
+        String SUBSCRIBE = "SubscribeAdmin";
+
+        /**
+         * 车玩官方
+         */
+        String OFFICIAL = "OfficialAdmin";
+    }
 }

@@ -14,7 +14,7 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
 
         $scope.logout = function () {
             authService.setUser('');
-            $window.location.href = '/login.html';
+            $window.location.href = '/static/login.html';
         };
 
         //$notification.notify('images/avatars/avatar2.png', '新的上门洗车订单', '车牌号12345');
