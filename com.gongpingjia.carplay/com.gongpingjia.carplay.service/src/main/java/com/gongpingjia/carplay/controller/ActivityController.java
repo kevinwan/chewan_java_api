@@ -92,17 +92,17 @@ public class ActivityController {
      * 获取附近的活动
      *
      * @param request
-     * @param userId
-     * @param token
      * @return
      */
     @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
-    public ResponseDo getNearByActivityList(HttpServletRequest request, @RequestParam("userId") String userId, @RequestParam("token") String token) {
+    public ResponseDo getNearByActivityList(HttpServletRequest request) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            if (StringUtils.isNotEmpty("userId")) {
-                parameterChecker.checkUserInfo(userId,token);
-            }else {
+            String userId = request.getParameter("userId");
+            String token = request.getParameter("token");
+            if (StringUtils.isNotEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            } else {
                 userId = "";
             }
 //            parameterChecker.checkUserInfo(userId,token);
