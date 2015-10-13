@@ -31,15 +31,25 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     + authService.getUser().token + '&userId=' + authService.getUser().userId);
                 },
 
-                processApplication: function (action, remarks, application) {
-                    return restProxyService.sendHttpPost(ChewanApiProvider + ChewanApiEndPoint, '/official/approve?token='
-                    + authService.getUser().token + '&userId=' + authService.getUser().userId, JSON.stringify({
-                        applicationId: application.applicationId,
-                        status: action,
-                        content: remarks,
+                processApplication: function (accept, remarks, application) {
+                    return restProxyService.sendHttpPost(ChewanApiProvider + ChewanApiEndPoint, '/official/approve/driving?token='
+                        + authService.getUser().token + '&userId=' + authService.getUser().userId,
+                        JSON.stringify({
+                            applicationId: application.applicationId,
+                            accept: accept,
+                            content: remarks,
+                            license: application.authentication.license,
+                            driver: application.authentication.driver
+                        }));
+                },
+
+                updateUserLicense: function (userId, authentication) {
+                    return restProxyService.sendHttpPost(ChewanApiProvider + ChewanApiEndPoint, '/authentication/' + userId + '/update?userId='
+                    + authService.getUser().userId + '&token=' + authService.getUser().token,
+                    JSON.stringify({
                         license: application.authentication.license,
                         driver: application.authentication.driver
-                    }));
+                    }))
                 }
             }
         }]

@@ -4,13 +4,13 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.UserAuthenticationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.entity.user.AuthApplication;
-import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.entity.user.UserAuthentication;
+import com.gongpingjia.carplay.entity.user.*;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +44,54 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     private OfficialParameterChecker parameterChecker;
 
     @Override
-    public ResponseDo saveAuthApplication(String applicationId, String status) {
-        LOG.debug("saveAuthApplication start");
+    public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException {
+        LOG.debug("approveUserAuthentication start");
 
-        authApplicationDao.update(applicationId, Update.update("status", status));
+        String applicationId = json.getString("applicationId");
+        AuthApplication application = authApplicationDao.findById(applicationId);
+        if (application == null) {
+            LOG.warn("Approved auth application is not exist, applicationId:{}", applicationId);
+            throw new ApiException("输入参数错误");
+        }
+
+        boolean accept = json.getBoolean("accept");
+        String status = Constants.AuthStatus.REJECT;
+        if (accept) {
+            status = Constants.AuthStatus.ACCEPT;
+        }
+
+        updateUserAuthenticationInfo(json, application.getApplyUserId());
+
+        authApplicationDao.update(applicationId, Update.update("status", status)
+                .set("authUserId", userId).set("authTime", DateUtil.getTime()));
+
         return ResponseDo.buildSuccessResponse();
+    }
+
+    /**
+     * 根据JSON对象更新userId 对应的证件信息
+     *
+     * @param json
+     * @param userId
+     */
+    private void updateUserAuthenticationInfo(JSONObject json, String userId) {
+        UserAuthentication userAuthentication = userAuthenticationDao.findById(userId);
+        if (userAuthentication == null) {
+            LOG.warn("User authentication is not exist with userId:{}", userId);
+            return;
+        }
+
+        if (!StringUtils.isEmpty(json.getString("driver"))) {
+            DriverLicense driver = (DriverLicense) JSONObject.toBean(json.getJSONObject("driver"), DriverLicense.class);
+            userAuthentication.setDriver(driver);
+        }
+
+        if (!StringUtils.isEmpty(json.getString("license"))) {
+            DrivingLicense license = (DrivingLicense) JSONObject.toBean(json.getJSONObject("license"), DrivingLicense.class);
+            userAuthentication.setLicense(license);
+        }
+
+        userAuthenticationDao.update(userAuthentication.getUserId(), userAuthentication);
     }
 
     @Override
@@ -130,8 +173,6 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             throw new ApiException("输入参数有误");
         }
 
-        parameterChecker.checkUserAdministrator(userId);
-
         UserAuthentication userAuthentication = userAuthenticationDao.findById(authenticationId);
         userAuth.setAuthentication(userAuthentication);
 
@@ -141,18 +182,11 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo modifyUserAuthenticationInfo(UserAuthentication authentication, String userId) throws ApiException {
+    public ResponseDo modifyUserAuthenticationInfo(String userId, JSONObject json) throws ApiException {
         LOG.debug("Begin modify user authentication info");
 
-        User userAuth = userDao.findById(authentication.getUserId());
-        if (userAuth == null) {
-            LOG.warn("Input parameter authentication with no exist user");
-            throw new ApiException("输入参数有误");
-        }
+        updateUserAuthenticationInfo(json, userId);
 
-        parameterChecker.checkUserAdministrator(userId);
-
-        userAuthenticationDao.update(authentication.getUserId(), authentication);
         return ResponseDo.buildSuccessResponse();
     }
 }

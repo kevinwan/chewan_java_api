@@ -2,8 +2,10 @@ package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.entity.activity.Activity;
+import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -54,6 +56,7 @@ public class TestController {
     }
 
     public static void main(String[] args) {
+        /*
         Activity activity = new Activity();
         activity.setType("看电影");
         activity.setPay("AA");
@@ -77,6 +80,47 @@ public class TestController {
         activity.setTransfer(true);
 
         JSONObject jsonObject = JSONObject.fromObject(activity);
+        System.out.println(jsonObject);
+        */
+
+        OfficialActivity oa = new OfficialActivity();
+        oa.setUserId("561ba2d60cf2429fb48e86bd");
+        oa.setCreateTime(new Date().getTime());
+        oa.setEnd(new Date().getTime() + 10000000L);
+        oa.setDescription("测试官方活动Description");
+
+        Photo photo = new Photo();
+        photo.setId("315aa636-bc9c-4548-9f83-69d720738d90");
+        photo.setKey("asset/activity/cover/315aa636-bc9c-4548-9f83-69d720738d90/cover.jpg");
+        List<Photo> photos = new ArrayList<>(1);
+        photos.add(photo);
+        oa.setCovers(photos);
+
+        Address destination = new Address();
+        destination.setProvince("江苏省");
+        destination.setCity("南京市");
+        destination.setDistrict("玄武区");
+        destination.setStreet("玄武大道");
+        oa.setDestination(destination);
+
+        Landmark landmark = new Landmark();
+        landmark.setLongitude(0D);
+        landmark.setLongitude(0D);
+        oa.setDestPoint(landmark);
+
+        oa.setEstablish(destination);
+        oa.setEstabPoint(landmark);
+
+        oa.setFemaleLimit(20);
+        oa.setMaleLimit(20);
+        oa.setInstruction("测试官方活动Instruction");
+        oa.setPrice(200L);
+        oa.setTitle("测试官方活动Title");
+        oa.setPriceDesc("测试PriceDescription");
+
+        oa.setStart(new Date().getTime());
+
+        JSONObject jsonObject = JSONObject.fromObject(oa);
         System.out.println(jsonObject);
     }
 }

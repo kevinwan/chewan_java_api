@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.official.service;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.user.UserAuthentication;
+import net.sf.json.JSONObject;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -10,7 +11,13 @@ import com.gongpingjia.carplay.entity.user.UserAuthentication;
  */
 public interface OfficialApproveService {
 
-    public ResponseDo saveAuthApplication(String applicationId, String status);
+    /**
+     * 审批用户的车主认证信息
+     * @param userId
+     * @param json
+     * @return
+     */
+    public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException;
 
     public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit);
 
@@ -34,10 +41,9 @@ public interface OfficialApproveService {
 
     /**
      * 修改用户的认证信息
-     * @param authentication  认证信息
      * @param userId 用户Id
      * @return 返回
      * @throws ApiException
      */
-    ResponseDo modifyUserAuthenticationInfo(UserAuthentication authentication, String userId) throws ApiException;
+    ResponseDo modifyUserAuthenticationInfo(String userId, JSONObject json) throws ApiException;
 }

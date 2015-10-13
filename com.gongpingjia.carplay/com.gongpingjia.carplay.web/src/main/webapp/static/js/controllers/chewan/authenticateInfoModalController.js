@@ -18,8 +18,15 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      */
     var passMandatoryCheck = function () {
         //alert(JSON.stringify($scope.license));
-        return ($scope.license && $scope.license.name && $scope.license.plate && $scope.license.vehicleType && $scope.license.model
-        && $scope.license.vehicleNumber && $scope.license.engineNumber && $scope.license.registerTime && $scope.license.issueTime);
+        var license = $scope.application.authentication.license;
+        var licenseCheck = license.name && license.plate && license.vehicleType && license.model
+            && license.vehicleNumber && license.engineNumber && license.registerTime && license.issueTime;
+
+        var driver = $scope.application.authentication.driver;
+        var driverCheck = driver.name && driver.code && driver.gender && driver.nationality && driver.drivingClass &&
+            driver.police && driver.birthday && driver.issueDate && driver.validFrom && driver.validFor && driver.address;
+
+        return licenseCheck && driverCheck;
     };
 
 
@@ -27,13 +34,10 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      * Accept authentication application
      */
     $scope.accept = function () {
-        //alert('accept');
         if (!passMandatoryCheck())
-            alert('请将行驶证的信息录入系统后再次点击同意按钮');
+            alert('请将行驶证和驾驶证信息录入系统后再次点击同意按钮');
         else {
-            $scope.license.registerTime = moment($scope.license.registerTime).valueOf();
-            $scope.license.issueTime = moment($scope.license.issueTime).valueOf();
-            $rootScope.loadingPromise = chewanService.processApplication($scope.application.id, 1, $scope.license, '').success(function (result) {
+            $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('成功完成车主认证');
                     $modalInstance.close('refresh');
@@ -54,7 +58,7 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
             alert('请在底部填写拒绝理由');
         else {
             var remarks = $scope.remarks ? $scope.remarks : DEFAULT_REMARKS;
-            $rootScope.loadingPromise = chewanService.processApplication($scope.application.id, 0, undefined, remarks).success(function (result) {
+            $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('已拒绝审核');
                     $modalInstance.close('refresh');
@@ -69,8 +73,18 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      * Update license info
      */
     $scope.update = function () {
-        alert('该功能未开发完成');
-        $modalInstance.dismiss('close');
+        if (!passMandatoryCheck())
+            alert('请将行驶证和驾驶证信息录入系统后再次点击更新按钮');
+        else {
+            $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
+                if (result && result.result == 0) {
+                    alert('成功完成车主认证');
+                    $modalInstance.close('refresh');
+                } else {
+                    alert(result.errmsg);
+                }
+            });
+        }
     };
 
     /**
@@ -78,8 +92,8 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      *
      * @param photo
      */
-    $scope.browsePhoto = function(){
-        $window.open($scope.application.license,'_blank');
+    $scope.browsePhoto = function () {
+        $window.open($scope.application.license, '_blank');
     };
 
     /**

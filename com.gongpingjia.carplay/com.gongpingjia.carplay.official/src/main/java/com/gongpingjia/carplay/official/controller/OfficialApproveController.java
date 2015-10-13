@@ -2,13 +2,16 @@ package com.gongpingjia.carplay.official.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
-import com.gongpingjia.carplay.service.impl.ParameterChecker;
+import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -23,25 +26,29 @@ public class OfficialApproveController {
     private OfficialApproveService officialApproveService;
 
     @Autowired
-    private ParameterChecker parameterChecker;
+    private OfficialParameterChecker parameterChecker;
 
     /**
-     * 官方认证审批
+     * 官方审批车主认证
      *
      * @param userId 审批人用户Id
      * @param token  审批人会话Token
      * @param json   请求的JSON实体对象
      * @return 返回审批结果
      */
-    @RequestMapping(value = "/official/approve", method = RequestMethod.POST,
+    @RequestMapping(value = "/official/approve/driving", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo approveUserApply(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo approveUserDrivingApply(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                              @RequestBody JSONObject json) {
         try {
             LOG.info("Begin approve user apply");
-            parameterChecker.checkUserInfo(userId, token);
-            String applicationId = json.getString("applicationId");
-            String status = json.getString("status");
-            return officialApproveService.saveAuthApplication(applicationId, status);
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            if (CommonUtil.isEmpty(json, Arrays.asList("applicationId", "accept", "license", "driver"))) {
+                throw new ApiException("输入参数错误");
+            }
+
+            return officialApproveService.approveUserDrivingAuthentication(userId, json);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -59,14 +66,14 @@ public class OfficialApproveController {
     public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token,
                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                   @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
-                                  @RequestParam(value = "type", required = false) String type,
+                                  @RequestParam(value = "type") String type,
                                   @RequestParam(value = "status", required = false) String status,
                                   @RequestParam(value = "start", required = false) Long start,
                                   @RequestParam(value = "end", required = false) Long end) {
 
         try {
             LOG.info("Begin obtian approve list");
-            parameterChecker.checkUserInfo(userId, token);
+            parameterChecker.checkAdminUserInfo(userId, token);
 
             return officialApproveService.getAuthApplicationList(userId, type, status, start, end, ignore, limit);
         } catch (ApiException e) {
@@ -89,7 +96,7 @@ public class OfficialApproveController {
         LOG.info("Begin query application info, applicationId:{}", applicationId);
 
         try {
-            parameterChecker.checkUserInfo(userId, token);
+            parameterChecker.checkAdminUserInfo(userId, token);
 
             return officialApproveService.getApplicationInfo(applicationId);
         } catch (ApiException e) {
@@ -109,9 +116,33 @@ public class OfficialApproveController {
         LOG.debug("Get user authentication infomation, authenticationId:{}", authenticationId);
 
         try {
-            parameterChecker.checkUserInfo(userId, token);
+            parameterChecker.checkAdminUserInfo(userId, token);
 
             return officialApproveService.getUserAuthenticationInfo(authenticationId, userId);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新用户的认证信息
+     * @param authenticationId
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/authentication/{authenticationId}/update")
+    public ResponseDo updateUserAuthenticationInfo(@PathVariable("authenticationId") String authenticationId,
+                                                   @RequestParam("userId") String userId, @RequestParam("token") String token,
+                                                   @RequestBody JSONObject json) {
+        LOG.debug("Update user authentication infomation, authenticationId:{}", authenticationId);
+
+        try {
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            return officialApproveService.modifyUserAuthenticationInfo(authenticationId, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
