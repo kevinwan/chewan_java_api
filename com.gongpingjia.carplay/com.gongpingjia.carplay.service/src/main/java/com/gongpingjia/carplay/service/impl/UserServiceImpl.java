@@ -25,6 +25,7 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.ListUtils;
 import org.apache.http.Header;
@@ -171,9 +172,54 @@ public class UserServiceImpl implements UserService {
             userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
         }
 
+        userData.setCompletion(computeCompletion(userData));
+
         return ResponseDo.buildSuccessResponse(userData);
     }
 
+    /**
+     * 计算用户的信息的完善程度
+     *
+     * @param user
+     * @return
+     */
+    private Integer computeCompletion(User user) {
+        int completion = 0;
+        if (Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {
+            completion += 20;
+        }
+        if (Constants.AuthStatus.ACCEPT.equals(user.getPhotoAuthStatus())) {
+            completion += 20;
+        }
+
+        final int total = 6;  //总共需要填写6项
+        int has = 0;
+        if (!StringUtils.isEmpty(user.getNickname())) {
+            has++;
+        }
+        if (user.getBirthday() != null) {
+            has++;
+        }
+        if (!StringUtils.isEmpty(user.getGender())) {
+            has++;
+        }
+        if (!StringUtils.isEmpty(user.getAvatar())) {
+            has++;
+        }
+        if (!StringUtils.isEmpty(user.getPhone())) {
+            has++;
+        }
+        if (user.getAlbum() != null && user.getAlbum().size() > 0) {
+            has++;
+        }
+
+        if (has == total) {
+            completion += 60;
+        } else {
+            completion += (has * 60) / total;
+        }
+        return completion;
+    }
 
     @Override
     public void checkRegisterParameters(User user, JSONObject json) throws ApiException {

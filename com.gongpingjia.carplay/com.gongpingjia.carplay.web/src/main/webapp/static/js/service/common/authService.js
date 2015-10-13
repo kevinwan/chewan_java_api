@@ -6,21 +6,17 @@
  * @constructor
  */
 
-gpjApp.factory('authService', ['$window', 'commonService', function ($window, commonService) {
+gpjApp.factory('authService', ['$window', function ($window) {
 
     var user;
-
     return {
         getUser: function () {
-            var retVal = undefined;
-            if (user) {
-                retVal = user;
-            } else if (commonService.isDefined($window.localStorage.user)) {
-                retVal = JSON.parse($window.localStorage.user);
-            } else if (commonService.isDefined($window.sessionStorage.user)) {
-                retVal = JSON.parse($window.sessionStorage.user);
+            if (!user && !$window.localStorage.user && !$window.sessionStorage.user) {
+                return undefined;
             }
-            return retVal;
+
+            return user ? user : (($window.localStorage.user && $window.localStorage.user !== 'undefined') ?
+                JSON.parse($window.localStorage.user) : JSON.parse($window.sessionStorage.user));
         },
         setUser: function (aUser) {
             user = aUser;
@@ -35,6 +31,4 @@ gpjApp.factory('authService', ['$window', 'commonService', function ($window, co
             }
         }
     }
-}
-])
-;
+}]);

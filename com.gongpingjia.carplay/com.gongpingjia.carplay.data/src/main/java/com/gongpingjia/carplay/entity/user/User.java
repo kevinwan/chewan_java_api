@@ -75,6 +75,10 @@ public class User {
      */
     private Boolean idle;
 
+    //用户信息完善程度，运行时计算
+    @Transient
+    private Integer completion;
+
     //仅用于计算距离，不存储到DB
     @Transient
     private Double distance;
@@ -86,6 +90,7 @@ public class User {
     //
     @Transient
     private boolean subscribeFlag;
+
     //用户的认证的信息
     @Transient
     private UserAuthentication authentication;
@@ -317,6 +322,18 @@ public class User {
 
     public void setAuthentication(UserAuthentication authentication) {
         this.authentication = authentication;
+    }
+
+    public Integer getCompletion() {
+        return completion;
+    }
+
+    public void setCompletion(Integer completion) {
+        this.completion = completion;
+    }
+
+    public boolean isSubscribeFlag() {
+        return subscribeFlag;
     }
 
     private int calculateAge(Long birthday) {
