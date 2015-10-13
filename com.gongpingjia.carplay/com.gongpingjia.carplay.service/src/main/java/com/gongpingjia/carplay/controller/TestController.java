@@ -94,7 +94,7 @@ public class TestController {
         photo.setKey("asset/activity/cover/315aa636-bc9c-4548-9f83-69d720738d90/cover.jpg");
         List<Photo> photos = new ArrayList<>(1);
         photos.add(photo);
-        oa.setCovers(photos);
+//        oa.setCovers(photos);
 
         Address destination = new Address();
         destination.setProvince("江苏省");
@@ -108,13 +108,13 @@ public class TestController {
         landmark.setLongitude(0D);
         oa.setDestPoint(landmark);
 
-        oa.setEstablish(destination);
-        oa.setEstabPoint(landmark);
+//        oa.setEstablish(destination);
+//        oa.setEstabPoint(landmark);
 
         oa.setFemaleLimit(20);
         oa.setMaleLimit(20);
         oa.setInstruction("测试官方活动Instruction");
-        oa.setPrice(200L);
+//        oa.setPrice(200L);
         oa.setTitle("测试官方活动Title");
         oa.setPriceDesc("测试PriceDescription");
 
