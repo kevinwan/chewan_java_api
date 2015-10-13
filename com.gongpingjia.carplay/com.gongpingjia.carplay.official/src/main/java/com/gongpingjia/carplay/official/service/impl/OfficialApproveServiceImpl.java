@@ -5,9 +5,11 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.UserAuthenticationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.*;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
 import net.sf.json.JSONObject;
@@ -21,7 +23,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -41,7 +46,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     private UserAuthenticationDao userAuthenticationDao;
 
     @Autowired
-    private OfficialParameterChecker parameterChecker;
+    private AuthenticationHistoryDao historyDao;
 
     @Override
     public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException {
@@ -54,17 +59,38 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             throw new ApiException("输入参数错误");
         }
 
+        Long current = DateUtil.getTime();
+        Update update = Update.update("authUserId", userId).set("authTime", current);
         boolean accept = json.getBoolean("accept");
-        String status = Constants.AuthStatus.REJECT;
-        if (accept) {
-            status = Constants.AuthStatus.ACCEPT;
+        String status = Constants.AuthStatus.ACCEPT;
+        if (!accept) {
+            status = Constants.AuthStatus.REJECT;
+            if (!CommonUtil.isEmpty(json, "remarks")) {
+                update.set("remarks", json.getString("remarks"));
+            }
         }
+
+        update.set("status", status);
 
         updateUserAuthenticationInfo(json, application.getApplyUserId());
 
-        authApplicationDao.update(applicationId, Update.update("status", status)
-                .set("authUserId", userId).set("authTime", DateUtil.getTime()));
+        authApplicationDao.update(applicationId, update);
 
+        userDao.update(application.getApplyUserId(), Update.update("licenseAuthStatus", status));
+
+        AuthenticationHistory history = new AuthenticationHistory();
+        history.setAuthTime(current);
+        history.setApplicationId(applicationId);
+        history.setAuthId(userId);
+        history.setApplyUserId(application.getApplyUserId());
+        history.setType(application.getType());
+        history.setStatus(status);
+        if (!CommonUtil.isEmpty(json, "remarks")) {
+            history.setRemark(json.getString("remarks"));
+        }
+        historyDao.save(history);
+
+        LOG.debug("Finished approved user apply");
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -105,11 +131,12 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         if (StringUtils.isNotEmpty(status)) {
             criteria.and("status").is(status);
         }
-        if (start != null) {
-            criteria.and("start").gte(start);
-        }
-        if (end != null) {
-            criteria.and("end").lte(end);
+        if (start != null && end != null) {
+            criteria.and("applyTime").gte(start).lt(end);
+        } else if (end != null) {
+            criteria.and("applyTime").lt(end);
+        } else if (start != null) {
+            criteria.and("applyTime").gte(start);
         }
 
         Query query = Query.query(criteria);
@@ -120,9 +147,15 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         }
         List<AuthApplication> authApplicationList = authApplicationDao.find(query);
 
+        Map<String, User> userMap = buildUserMap(authApplicationList);
+
         LOG.debug("Query apply user information");
         for (AuthApplication application : authApplicationList) {
-            User applyUser = userDao.findById(application.getApplyUserId());
+            User applyUser = userMap.get(application.getApplyUserId());
+            if (applyUser == null) {
+                continue;
+            }
+
             applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
             if (applyUser.getCar() != null) {
                 applyUser.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
@@ -134,6 +167,26 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         }
 
         return ResponseDo.buildSuccessResponse(authApplicationList);
+    }
+
+    /**
+     * 根据申请信息构造用户信息Map
+     *
+     * @param authApplicationList
+     * @return
+     */
+    private Map<String, User> buildUserMap(List<AuthApplication> authApplicationList) {
+        List<String> userIds = new ArrayList<>(authApplicationList.size());
+        for (AuthApplication application : authApplicationList) {
+            userIds.add(application.getApplyUserId());
+        }
+
+        Map<String, User> userMap = new HashMap<>(authApplicationList.size());
+        List<User> users = userDao.findByIds(userIds);
+        for (User user : users) {
+            userMap.put(user.getUserId(), user);
+        }
+        return userMap;
     }
 
     @Override

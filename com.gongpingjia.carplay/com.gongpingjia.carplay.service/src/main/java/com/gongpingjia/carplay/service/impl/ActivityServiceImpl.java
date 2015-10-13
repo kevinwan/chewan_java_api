@@ -91,7 +91,8 @@ public class ActivityServiceImpl implements ActivityService {
         //向关注我的人发送感兴趣的信息
         Map<String, Object> ext = new HashMap<>(1);
         ext.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}发布了活动"), user.getNickname());
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"),
+                user.getNickname(), activity.getType());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,
                 buildUserSubscribers(userId), message, ext);
 
@@ -219,7 +220,7 @@ public class ActivityServiceImpl implements ActivityService {
         List<Subscriber> subscribers = null;
         if (StringUtils.isEmpty(userId)) {
             subscribers = new ArrayList<>();
-        }else {
+        } else {
             subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
         }
         List<String> subscriberIds = new ArrayList<>(subscribers.size());

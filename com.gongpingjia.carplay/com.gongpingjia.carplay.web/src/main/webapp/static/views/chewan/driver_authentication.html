@@ -10,8 +10,7 @@
             <label class="control-label bolder blue" for="phone">手机</label>
 
             <div class="controls">
-                <input type="text" id="phone" ng-model="criteria.phone"
-                       placeholder="根据手机号查询">
+                <input type="text" id="phone" ng-model="criteria.phone" placeholder="根据手机号查询">
             </div>
         </div>
 
@@ -87,7 +86,7 @@
                         <i class="fa fa-edit">审核</i>
                     </button>
                     <button type="button" ng-click="viewApplication(application.applicationId)"
-                            ng-show="{{application.status !== '认证中'}}"
+                            ng-show="{{application.status != '认证中'}}"
                             class="btn btn-warning">
                         <i class="fa fa-edit">查看</i>
                     </button>
@@ -97,15 +96,15 @@
             </tbody>
         </table>
     </div>
-    <table class="pull-right">
-        <thead>
-        <tr>
-            <th>
-                <div><span>总计{{applications.length ? applications.length : 0}}条</span></div>
-            </th>
-        </tr>
-        </thead>
-    </table>
+    <!--<table class="pull-right">-->
+    <!--<thead>-->
+    <!--<tr>-->
+    <!--<th>-->
+    <!--<div><span>总计{{applications.length ? applications.length : 0}}条</span></div>-->
+    <!--</th>-->
+    <!--</tr>-->
+    <!--</thead>-->
+    <!--</table>-->
 </form>
 
 

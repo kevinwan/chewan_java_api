@@ -10,6 +10,7 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
     $rootScope.loadingPromise = authenticationService.getApplicationInfo().success(function (result) {
         if (result && result.result == 0 && result.data) {
             $scope.application = result.data;
+            authenticationService.initialApplication($scope.application.authentication);
         }
     });
 
@@ -37,6 +38,7 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
         if (!passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击同意按钮');
         else {
+            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('成功完成车主认证');
@@ -52,12 +54,11 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      * Decline authentication application
      */
     $scope.decline = function () {
-        $scope.isDeclined = true;
-
         if (!($scope.remarks))
             alert('请在底部填写拒绝理由');
         else {
             var remarks = $scope.remarks ? $scope.remarks : DEFAULT_REMARKS;
+            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('已拒绝审核');
@@ -73,9 +74,10 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      * Update license info
      */
     $scope.update = function () {
-        if (!passMandatoryCheck())
+        if ($scope.application.status == "认证通过" && !passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击更新按钮');
         else {
+            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.updateUserLicense($scope.application.applyUserId, $scope.application.authentication)
                 .success(function (result) {
                     if (result && result.result == 0) {
