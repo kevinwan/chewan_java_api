@@ -22,6 +22,8 @@ var GPJ_API_PORT = '80';
 //var GPJ_API_HOST = 'http://192.168.1.81';
 //var GPJ_API_PORT = '8001';
 
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
+
 gpjApp.constant('AuthApiPrefix', API_BASE + '/auth');
 gpjApp.constant('ChewanApiProvider', CHEWAN_API_HOST ? (CHEWAN_API_HOST + ':' + CHEWAN_API_PORT) : '');
 gpjApp.constant('ChewanApiEndPoint', API_BASE + '/chewan');
@@ -143,10 +145,10 @@ gpjApp.run(['$rootScope', '$location', '$window', 'authService', function ($root
      */
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
         var loginUser = authService.getUser();
-        //if (!loginUser) {
-        //    event.preventDefault();
-        //    $window.location.href = '/login.html';
-        //}
+        if (!loginUser) {
+            event.preventDefault();
+            $window.location.href = '/static/login.html';
+        }
     });
 }]);
 

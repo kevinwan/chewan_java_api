@@ -2,7 +2,7 @@
 
 gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScope, $modalInstance, authenticationService, moment, $window) {
 
-    var DEFAULT_REMARKS = '不是有效的行驶证图片';
+    var DEFAULT_REMARKS = '不是有效的行驶证和驾驶证图片';
 
     /**
      * Get feedback info
@@ -76,14 +76,15 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
         if (!passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击更新按钮');
         else {
-            $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
-                if (result && result.result == 0) {
-                    alert('成功完成车主认证');
-                    $modalInstance.close('refresh');
-                } else {
-                    alert(result.errmsg);
-                }
-            });
+            $rootScope.loadingPromise = authenticationService.updateUserLicense($scope.application.applyUserId, $scope.application.authentication)
+                .success(function (result) {
+                    if (result && result.result == 0) {
+                        alert('信息更新成功');
+                        $modalInstance.close('refresh');
+                    } else {
+                        alert(result.errmsg);
+                    }
+                });
         }
     };
 

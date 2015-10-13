@@ -10,6 +10,8 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
 
         $rootScope.loadingPromise = $scope.loadingPromise;
 
+        $scope.userRole = "ADMIN";//authService.getUser().role
+
         if(authService.getUser()){
             $('#bodyControl').removeClass('hidden');
             $('#bodyControl').addClass('block');
@@ -21,7 +23,7 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
             userService.logOut().success(function (resp) {
                 if (resp.status === "success") {
                     authService.setUser('');
-                    $window.location.href = '/login.html'
+                    $window.location.href = '/static/login.html';
                 } else
                     alert(resp.msg ? resp.msg : '注销失败');
             }).error(function (status, data) {

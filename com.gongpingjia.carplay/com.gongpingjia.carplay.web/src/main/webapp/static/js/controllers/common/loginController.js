@@ -8,13 +8,13 @@
 gpjApp.controller('loginController', ['$scope', '$window', 'userService', 'authService', 'md5', function ($scope, $window, userService, authService, md5) {
 
     $scope.login = function (user) {
-        if (user && user.username && user.password) {
-            userService.logIn(user.username, md5.createHash(user.password)).success(function (resp) {
-                if (resp.status === "success") {
-                    authService.setUser({username: 'gpj_admin', remember: user.remember});
-                    $window.location.href = '/'
+        if (user && user.phone && user.password) {
+            userService.logIn(user.phone, md5.createHash(user.password)).success(function (resp) {
+                if (resp.result === 0) {
+                    authService.setUser(resp.data);
+                    $window.location.href = '/static/index.html'
                 } else
-                    alert(resp.msg ? resp.msg : '登录失败');
+                    alert('用户名或密码错误');
             }).error(function (status, data) {
                 alert('网络错误');
             });
