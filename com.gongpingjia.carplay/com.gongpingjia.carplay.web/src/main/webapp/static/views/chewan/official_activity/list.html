@@ -59,7 +59,6 @@
                 <th><span>全选</span><input type="checkbox" name="checkItem" id="checkItemAll"/></th>
                 <th>活动标题</th>
                 <th>参与人数(男女)</th>
-                <th>参与人数</th>
                 <th>目的地</th>
                 <th>价格</th>
                 <th>补贴</th>
@@ -74,10 +73,10 @@
                 <td>
                     <!--&&  -->
                     <!--下架-->
-                    <input ng-show="item.onFlag == true &&item.end != undefined && item.end != null&& item.end < new Date().getTime() "
+                    <input ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2"
                            type="checkbox" name="checkItem"/>
                     <!--未上架-->
-                    <input ng-show="item.onFlag = false" type="checkbox" name="checkItem"/>
+                    <input ng-show="item.onFlag == false" type="checkbox" name="checkItem"/>
                 </td>
                 <td>
                     <!--未上架   修改-->
@@ -86,17 +85,25 @@
                     <a ng-show="item.onFlag == true" ng-click="viewOfficialActivity(item.officialActivityId)">{{item.title}}</a>
 
                 </td>
-                <td>{{item.title}}</td>
+                <td>男{{item.maleNum}}/{{item.maleLimit}}  女{{item.femaleNum}}/{{item.femaleLimit}}</td>
                 <td>{{item.destination.detail}}</td>
                 <td>{{item.price}}元</td>
-                <td>{{item.subsidyPrice}}</td>
+                <td>{{item.subsidyPrice}}元</td>
                 <td>{{item.start | date:"yyyy-MM-dd hh:mm"}}</td>
-                <td>{{item.end | date:"yyyy-MM-dd hh:mm"}}</td>
+                <td>
+                    <span ng-show="item.end == undefined || item.end == null || item.end == '' ">待定</span>
+                    <span ng-show="item.end != undefined && item.end != null">{{item.end | date:"yyyy-MM-dd hh:mm"}}</span>
+                </td>
                 <td>
                     <div ng-show="item.onFlag == false">未上架
                         <button ng-click="sendOnFlag(item.officialActivityId)" style="margin-left:5px;">上架</button>
                     </div>
-                    <div ng-show="item.onFlag == true">已上架</div>
+                    <div ng-show="checkOnItemStatus(item.onFlag,item.end)  == 1">
+                        上架中
+                    </div>
+                    <div ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2">
+                        已下架
+                    </div>
                 </td>
                 <td style="display: none">{{item.officialActivityId}}</td>
             </tr>

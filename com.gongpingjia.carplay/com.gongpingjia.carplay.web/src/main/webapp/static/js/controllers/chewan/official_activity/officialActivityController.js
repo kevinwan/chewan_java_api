@@ -64,6 +64,9 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         $scope.searchOfficialActivities = function (criteria) {
             if (criteria.startTime != '') {
                 //TODO
+            }else{
+                criteria.startTime == new Date(0);
+
             }
 
             $rootScope.loadingPromise = officialActivityService.getOfficialActivityList(criteria).success(function (result) {
@@ -75,14 +78,15 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             $rootScope.loadingPromise = officialActivityService.sendOnFlag(officialActivityId).success(function (result) {
                 if(result.result === 0) {
                     for (var index in $scope.officialActivities) {
-                        if ($scope.officialActivities[index].officialActivityId === index) {
+                        if ($scope.officialActivities[index].officialActivityId === officialActivityId) {
                             $scope.officialActivities[index].onFlag = false;
-                            break;
                             $window.alert("上架成功");
+                            break;
                         }
                     }
+                    $scope.$apply();
                 }else{
-                    $window.alert(result.message);
+                    $window.alert(result.errmsg);
                 }
 
             });
@@ -96,6 +100,27 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         $scope.updateOfficialActivity = function(officialActivityId) {
             officialActivityService.setOfficialActivityId(officialActivityId);
             $location.path("/officialActivity/update");
+        };
+
+        $scope.checkOnItemStatus = function(onFlag,end){
+            if(onFlag == false) {
+                //未上架
+                return 0;
+            }else{
+                //上架中
+                if(end == undefined || end == null || end == "") {
+                    return 1;
+                }else{
+                    var nowTime = new Date().getTime();
+                    //当前时间大于 活动 截止时间 活动处于下架状态
+                    if(nowTime > end) {
+                        return 2;
+                    }else{
+                        //活动没有到截止时间 处于 上架中
+                        return 1;
+                    }
+                }
+            }
         };
 
         $scope.resetCriteria();

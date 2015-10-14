@@ -1,7 +1,7 @@
 'use strict';
 
 var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'datatables', 'angularMoment',
-    'ui.bootstrap', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
+    'ui.bootstrap','mgcrea.ngStrap.datepicker', 'mgcrea.ngStrap.timepicker', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
     'ui.date']);
 
 gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8080');
@@ -45,7 +45,18 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/chewan/official_activity/view.html',
         controller: 'officialActivityEditController'
     });
-}]);
+}]).config(function($datepickerProvider) {
+        angular.extend($datepickerProvider.defaults, {
+            dateFormat: 'yyyy-MM-dd',
+            startWeek: 1
+        });
+
+    }).config(function($timepickerProvider) {
+    angular.extend($timepickerProvider.defaults, {
+        timeFormat: 'HH:mm',
+        length: 7
+    });
+});
 
 gpjApp.value('cgBusyDefaults', {
     message: '页面加载中，请稍候...',

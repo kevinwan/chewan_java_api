@@ -133,7 +133,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 criteria.and(detailAddress).regex(detailAddressReg);
             }
             if (StringUtils.isNotEmpty(title)) {
-                String titleReg = "/." + title + "/.";
+                String titleReg = "/" + title + "/";
                 criteria.and("destination.detail").regex(titleReg);
             }
             List<OfficialActivity> officialActivities = activityDao.find(Query.query(criteria));
@@ -165,13 +165,15 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
     @Override
     public ResponseDo updateActivity(String officialActivityId, JSONObject json) throws ApiException {
+        json.remove("members");
+        json.remove("photos");
+        OfficialActivity source = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
 
-        OfficialActivity toUpdate = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
         OfficialActivity officialActivity = activityDao.findById(officialActivityId);
         if (null == officialActivity) {
             throw new ApiException("改数据不存在");
         }
-        activityDao.update(officialActivityId, toUpdate);
+        activityDao.update(officialActivityId, source);
         return ResponseDo.buildSuccessResponse();
     }
 

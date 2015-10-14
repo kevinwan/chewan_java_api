@@ -110,11 +110,16 @@ public class OfficialServiceImpl implements OfficialService {
             }
         }
 
+
+
         User applyUser = userDao.findById(userId);
         if (null == applyUser) {
             LOG.warn("user not exist");
             throw new ApiException("用户不存在");
         }
+
+        //判断是否超过人数设定值
+        //TODO
 
         //加入到环信群组中
         try {

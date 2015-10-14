@@ -2,11 +2,11 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">&times;</button>
-            <h4 class="modal-title">官方活动</h4>
+            <h4 class="modal-title">官方活动详情</h4>
         </div>
         <div class="form-horizontal" role="form">
             <div class="form-inline col-md-12">
-                <h1 style="color:#0044cc">更新官方活动</h1>
+                <h1 style="color:#0044cc">修改</h1>
             </div>
 
             <div class="form-inline col-md-12">
@@ -26,6 +26,33 @@
                 <div class="col-md-8" style="text-align:left">
                     <input type="text" id="instruction" ng-model="activity.instruction"
                            placeholder="活动介绍"/>
+                </div>
+            </div>
+            <div class="form-inline col-md-12">
+                <div>
+                    <div class="col-md-4">
+                        <label style="color:red"></label>目的地
+                    </div>
+                </div>
+            </div>
+            <div class="form-inline col-md-12">
+                <div>
+                    <div class="col-md-4">
+                        <label style="color:red">*</label>省份
+                    </div>
+                    <div class="col-md-8" style="text-align:left">
+                        <input type="text" id="province" ng-model="activity.destination.province"
+                                />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-inline col-md-12">
+                <div class="col-md-4">
+                    <label style="color:red">*</label>市
+                </div>
+                <div class="col-md-8" style="text-align:left">
+                    <input type="text" id="city" ng-model="activity.destination.city"/>
                 </div>
             </div>
 
@@ -55,24 +82,82 @@
             </div>
 
             <div class="form-inline col-md-12">
-                <div class="col-md-4">
-                    <label style="color:red">*</label>男性参与人数
+                <!--0 不限制 1 不限男女 2男女人数分别限制-->
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-1"
+                           onchange="angular.element(this).scope().changeLimitType(this)" value="1"/>总设置数
                 </div>
-                <div class="col-md-8" style="text-align:left">
-                    <input type="text" id="maleLimit" ng-model="activity.maleLimit"
-                           placeholder="男性参与人数"/>
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-2"
+                           onchange="angular.element(this).scope().changeLimitType(this)" value="2"/>男女人数分别限制
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-0"
+                           onchange="angular.element(this).scope().changeLimitType(this)" checked value="0"/>不限
                 </div>
             </div>
 
-            <div class="form-inline col-md-12">
-                <div class="col-md-4">
-                    <label style="color:red">*</label>女性参与人数
+            <div ng-show="activity.limitType === 1" class="form-inline col-md-12">
+                <div class="col-md-12">
+                    <input type="text" placeholder="参与人数总数" ng-model="activity.totalLimit"/>
                 </div>
-                <div class="col-md-8" style="text-align:left">
-                    <input type="text" id="femaleLimit" ng-model="activity.femaleLimit"
-                           placeholder="女性参与人数"/>
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        已参与0人
+                    </div>
                 </div>
             </div>
+
+            <div ng-show="activity.limitType === 2" class="form-inline col-md-12">
+                <div class="form-inline col-md-6">
+                    <div>
+                        <input type="text" placeholder="男性参与人数" ng-model="activity.maleLimit"/>
+                    </div>
+                    <div>
+                        已参与0人
+                    </div>
+                </div>
+                <div class="form-inline col-md-6">
+                    <div>
+                        <input type="text" placeholder="女性参与人数" ng-model="activity.femaleLimit"/>
+                    </div>
+                    <div>
+                        已参与0人
+                    </div>
+                </div>
+            </div>
+
+            <div ng-show="activity.limitType === 0" class="form-inline col-md-12">
+                <div class="col-md-12">
+                    <input type="text" readonly="true" placeholder="参与人数总数"/>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        不限制
+                    </div>
+                </div>
+            </div>
+
+
+            <!--<div class="form-inline col-md-12">-->
+            <!--<div class="col-md-4">-->
+            <!--<label style="color:red">*</label>男性参与人数-->
+            <!--</div>-->
+            <!--<div class="col-md-8" style="text-align:left">-->
+            <!--<input type="text" id="maleLimit" ng-model="activity.maleLimit"-->
+            <!--placeholder="男性参与人数"/>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <!--<div class="form-inline col-md-12">-->
+            <!--<div class="col-md-4">-->
+            <!--<label style="color:red">*</label>女性参与人数-->
+            <!--</div>-->
+            <!--<div class="col-md-8" style="text-align:left">-->
+            <!--<input type="text" id="femaleLimit" ng-model="activity.femaleLimit"-->
+            <!--placeholder="女性参与人数"/>-->
+            <!--</div>-->
+            <!--</div>-->
 
             <div class="form-inline col-md-12">
                 <div class="col-md-4">
@@ -99,8 +184,14 @@
                     <label style="color:red">*</label>开始时间
                 </div>
                 <div class="col-md-8" style="text-align:left">
-                    <input type="text" ui-date ui-date-format="yy-mm-dd HH;mm" ng-model="activity.start"
-                           placeholder="开始时间">
+                    <div class="col-md-6">
+                        <input type="text" size="10" class="pickDate" ng-model="startTime.date" data-autoclose="1"
+                               placeholder="请输入日期" id="startDate" bs-datepicker>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" size="4" class="pickTime" ng-model="startTime.time" id="startTime"
+                               data-time-type="number" data-autoclose="1" placeholder="请输入时间" bs-timepicker>
+                    </div>
                 </div>
             </div>
 
@@ -109,8 +200,14 @@
                     <label style="color:red">*</label>结束时间
                 </div>
                 <div class="col-md-8" style="text-align:left">
-                    <input type="text" ui-date ui-date-format="yy-mm-dd HH;mm" ng-model="activity.end"
-                           placeholder="结束时间">
+                    <div class="col-md-6">
+                        <input type="text" size="10" class="pickDate" ng-model="endTime.date" data-autoclose="1"
+                               placeholder="请输入日期" id="endDate" bs-datepicker>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" size="4" class="pickTime" ng-model="endTime.time" id="endTime"
+                               data-time-type="number" data-autoclose="1" placeholder="请输入时间" bs-timepicker>
+                    </div>
                 </div>
             </div>
 
@@ -144,25 +241,25 @@
                 </div>
             </div>
 
-            <!--<div class="form-inline col-md-12">-->
-                <!--<div class="col-md-4">-->
-                    <!--<label style="color:red">*</label>是否上架-->
-                <!--</div>-->
-                <!--<div class="col-md-8" style="text-align:left">-->
-                    <!--<select id="onFlag" ng-init="activity.onFlag"-->
-                            <!--data-ng-model="activity.onFlag">-->
-                        <!--<option value="true">未上架</option>-->
-                        <!--<option value="false">下架</option>-->
-                    <!--</select>-->
-                <!--</div>-->
-            <!--</div>-->
-
             <div class="form-inline col-md-12">
                 <div class="col-md-4">
-                    <label style="color:red">*</label>上架状态
+                    <label style="color:red">*</label>是否上架
                 </div>
                 <div class="col-md-8" style="text-align:left">
-                    <span>未上架</span>
+                    <select id="onFlag" ng-init="activity.onFlag = false"
+                            data-ng-model="activity.onFlag">
+                        <option value="true">上架</option>
+                        <option value="false">下架</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-inline col-md-12">
+                <div class="col-md-6">
+                    <button ng-click="close()">取消</button>
+                </div>
+                <div class="col-md-6">
+                    <button ng-click="updateOfficialActivity()">修改</button>
                 </div>
             </div>
 

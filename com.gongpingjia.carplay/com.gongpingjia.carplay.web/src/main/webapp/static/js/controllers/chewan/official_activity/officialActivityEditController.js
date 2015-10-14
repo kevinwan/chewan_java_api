@@ -24,14 +24,53 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     //    $scope.photoUrl = $scope.activity.cover.photoUrl;
                     //}
                     if (result.result === 0) {
+                        //初始化时间
                         $scope.activity = result.data;
                         $scope.photoUrl = $scope.activity.cover.url;
+                        //$scope.activity.start
+
                     }
                 });
             }
         };
 
+        function checkTime() {
+            var startDate = document.getElementById("startDate").value;
+            var startTime = document.getElementById("startTime").value;
+            var endDate = document.getElementById("endDate").value;
+            var endTime = document.getElementById("endTime").value;
+            if (startDate == undefined || startDate == null) {
+                $window.alert("请选择开始时间");
+                return;
+            }
+            if (startTime == undefined || startTime == null) {
+                $window.alert("请选择结束时间");
+                return;
+            }
+            if (endDate != undefined && endDate != null) {
+                if (endTime == undefined || endTime == null) {
+                    $window.alert("请选择结束时间");
+                    return;
+                }
+            }
+            var startStr = startDate + " " + startTime;
+            var endStr = endDate + " " + endTime;
+
+            var start = new Date(startStr);
+            var end = new Date(endStr);
+            $scope.activity.start = start.getTime();
+
+            if (endStr !== " ") {
+                $scope.activity.end = end.getTime();
+            } else {
+                $scope.activity.end = null;
+            }
+        }
+
         $scope.updateOfficialActivity = function () {
+            //
+            checkTime();
+
             $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity).success(function (result) {
                 if (result.result == 0) {
                     $window.alert("更新成功");
@@ -45,8 +84,8 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          * register
          */
         $scope.register = function () {
-            var startTime = $scope.activity.start;
-            var endTime = $scope.activity.end;
+
+            checkTime();
 
             officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
                 if (data.result == 0) {
@@ -78,6 +117,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             $scope.activity.limitType = parseInt(data.value);
             $scope.$apply();
         };
+
 
         $scope.initData();
     }
