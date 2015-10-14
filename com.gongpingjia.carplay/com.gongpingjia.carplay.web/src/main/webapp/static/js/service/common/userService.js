@@ -6,8 +6,8 @@
  * @constructor
  */
 
-gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficialApiEndPoint',
-    function (authService, restProxyService, ChewanOfficialApiEndPoint) {
+gpjApp.factory('userService', ['$window', 'authService', 'restProxyService', 'ChewanOfficialApiEndPoint',
+    function ($window, authService, restProxyService, ChewanOfficialApiEndPoint) {
 
         return {
             logIn: function (phone, password) {
@@ -19,6 +19,7 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
 
             logOut: function () {
                 authService.setUser(undefined);
+                $window.location.href = '/static/login.html';
             }
         }
     }]);
