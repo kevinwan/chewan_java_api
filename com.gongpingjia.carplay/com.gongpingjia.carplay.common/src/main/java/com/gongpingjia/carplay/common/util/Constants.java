@@ -245,4 +245,9 @@ public class Constants {
         int TOTAL_LIMIT = 1;
         int GENDER_LIMIT = 2;
     }
+
+    public interface USER_GENDER {
+        String MALE = "男";
+        String FEMALE = "女";
+    }
 }

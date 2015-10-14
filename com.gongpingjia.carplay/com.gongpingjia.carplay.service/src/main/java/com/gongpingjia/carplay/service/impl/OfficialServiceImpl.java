@@ -125,9 +125,16 @@ public class OfficialServiceImpl implements OfficialService {
             throw e;
         }
 
+
         //加入到 members中;
         Update update = new Update();
         update.addToSet("members", userId);
+        if (StringUtils.equals(applyUser.getGender(), Constants.USER_GENDER.MALE)) {
+            update.inc("maleNum", 1);
+        } else {
+            update.inc("femaleNum", 1);
+        }
+        update.inc("nowJoinNum", 1);
         officialActivityDao.update(activityId, update);
 
         return ResponseDo.buildSuccessResponse();
