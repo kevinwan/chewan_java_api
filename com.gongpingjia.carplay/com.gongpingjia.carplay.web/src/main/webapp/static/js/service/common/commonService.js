@@ -13,7 +13,7 @@ gpjApp.factory('commonService', [function () {
 
     return {
         transferLongToDateString: function (longTime) {
-            if (longTime == undefined || longTime == 0) {
+            if (longTime == undefined || longTime <= 1) {
                 return "";
             }
 
@@ -27,11 +27,11 @@ gpjApp.factory('commonService', [function () {
             if (dateTime == undefined) {
                 return 0;
             }
-            var regexp = new RegExp("[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}", "g");
-            if (regexp.test(dateTime)) {
-                return Date.parse(dateTime.replace(/-/g, "/"));
-            }
-            return 1;
+            //var regexp = new RegExp("[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}", "g");
+            //if (regexp.test(dateTime)) {
+            return Date.parse(dateTime.replace(/-/g, "/"));
+            //}
+            //return 1;
         }
     }
 }]);
