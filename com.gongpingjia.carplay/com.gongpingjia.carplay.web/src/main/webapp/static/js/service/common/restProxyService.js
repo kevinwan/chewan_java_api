@@ -22,6 +22,11 @@ gpjApp.factory('restProxyService', ['$http', function ($http) {
         sendHttpPost: function (apiPrefix, path, data) {
             $http.headers = {"Accept": "application/json; charset=UTF-8", "Content-Type": "application/json"};
             return $http.post(apiPrefix + path, data);
+        },
+
+        sendFormData: function(apiPrefix,path,data) {
+            $http.headers = {"Content-Type": "multipart/form-data"};
+            return $http.post(apiPrefix + path, data);
         }
     }
 }]);

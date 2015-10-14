@@ -23,4 +23,10 @@ public interface OfficialActivityService {
 
 
     ResponseDo getActivityList(String   userId,JSONObject json) throws ApiException;
+
+    ResponseDo changeActivityOnFlag(String officialActivityId)throws ApiException;
+
+    ResponseDo updateActivity(String officialActivityId, JSONObject json)throws ApiException;
+
+    ResponseDo getActivity(String officialActivityId) throws ApiException;
 }

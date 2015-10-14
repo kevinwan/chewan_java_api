@@ -45,12 +45,12 @@ public class OfficialActivity {
 
     //官方活动封面图片
     private Photo cover;
+
     //活动相册,普通活动，官方活动都会有
     private List<Photo> photos;
 
     //活动标题
     private String title;
-
 
 
     //活动介绍
@@ -71,6 +71,19 @@ public class OfficialActivity {
     //价格描述
     private String priceDesc;
 
+
+    //限制类型；
+    // 0:无限制 1：限制总人数 2：限制男女人数
+    //Constant.OFFICIAL_ACTIVITY_LIMIT_TYPE 中的类型参数;
+    private Integer limitType;
+
+
+    //总限制人数
+    private Integer totalLimit;
+
+    //当前总人数
+    private Integer nowJoinNum;
+
     //男性限制
     private Integer maleLimit;
 
@@ -86,7 +99,11 @@ public class OfficialActivity {
     //创建时间
     private Long createTime;
 
-    //上下架 标志 true 上架 false 下架
+    //上下架 标志 true 上架 false 下架   注意三种状态：
+    //onFlag == false 未上架
+    //onFlag == true && end > nowTime    上架中
+    //noFlag == true && end < nowTime    已下架
+    //使用 onFlag 跟 end 联合判断文档中的状态
     private Boolean onFlag;
 
     //删除标志位

@@ -4,15 +4,19 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.bootstrap', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
     'ui.date']);
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8000');
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8080');
+gpjApp.constant("ChewanApiProvider","http://127.0.0.1:8080");
+gpjApp.constant("ChewanApiEndPoint","");
+
+
 
 /**
  * Router configuration
  */
 gpjApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
-        templateUrl: 'views/chewan/officialActivity_main.html',
-        controller: 'officialActivityController'
+        templateUrl: 'views/chewan/user.html',
+        controller:'userController'
     }).when('/driverAuthentication/list', {
         templateUrl: 'views/chewan/driver_authentication.html',
         controller: 'driverAuthenticateController'
@@ -29,8 +33,17 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/chewan/activity.html',
         controller: 'activityController'
     }).when('/officialActivity/list', {
-        templateUrl: 'views/chewan/officialActivity_main.html',
+        templateUrl: 'views/chewan/official_activity/list.html',
         controller: 'officialActivityController'
+    }).when('/officialActivity/add',{
+        templateUrl: 'views/chewan/official_activity/add.html',
+        controller: 'officialActivityEditController'
+    }).when('/officialActivity/update',{
+        templateUrl: 'views/chewan/official_activity/update.html',
+        controller: 'officialActivityEditController'
+    }).when('/officialActivity/view',{
+        templateUrl: 'views/chewan/official_activity/view.html',
+        controller: 'officialActivityEditController'
     });
 }]);
 

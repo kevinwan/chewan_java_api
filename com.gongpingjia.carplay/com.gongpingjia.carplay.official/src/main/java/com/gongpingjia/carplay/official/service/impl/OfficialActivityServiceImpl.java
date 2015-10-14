@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     @Autowired
     @Qualifier("thirdPhotoManager")
     private PhotoService photoService;
+
 
     @Override
     public ResponseDo registerActivity(OfficialActivity activity, JSONObject json) throws ApiException {
@@ -113,27 +115,84 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     @Override
     public ResponseDo getActivityList(String userId, JSONObject json) throws ApiException {
         try {
-            Integer draw = json.getInt("draw");
-            Integer length = json.getInt("length");
-            Integer start = json.getInt("start");
-            String city = json.getString("city");
-            Criteria criteria = new Criteria();
-
-            if (StringUtils.isNotEmpty(city)) {
-                criteria.and("destination.city").is(city);
-            }
             String title = json.getString("title");
+            String detailAddress = json.getString("detailAddress");
+            String startTimeStr = json.getString("startTime");
+            String onFlagStr = json.getString("onFlag");
+            Criteria criteria = new Criteria();
+            if (StringUtils.isNotEmpty(startTimeStr)) {
+                Long startTime = Long.parseLong(startTimeStr);
+                criteria.and("start").lt(startTime);
+            }
+            if (StringUtils.isNotEmpty(onFlagStr)) {
+                Boolean onFlag = json.getBoolean("onFlag");
+                criteria.and("onFlag").is(onFlag);
+            }
+            if (StringUtils.isNotEmpty(detailAddress)) {
+                String detailAddressReg = "/" + detailAddress + "/";
+                criteria.and(detailAddress).regex(detailAddressReg);
+            }
             if (StringUtils.isNotEmpty(title)) {
-                criteria.and("title").is(title);
+                String titleReg = "/." + title + "/.";
+                criteria.and("destination.detail").regex(titleReg);
             }
             List<OfficialActivity> officialActivities = activityDao.find(Query.query(criteria));
-
-            //TODO
-//            Map<String, Object> resultMap = new HashMap<>();
-//            resultMap.put()
             return ResponseDo.buildSuccessResponse(officialActivities);
         } catch (Exception e) {
             throw new ApiException(e.getMessage());
         }
+    }
+
+    @Override
+    public ResponseDo changeActivityOnFlag(String officialActivityId) throws ApiException {
+        try {
+            Criteria criteria = Criteria.where("officialActivityId").is(officialActivityId).and("deleteFlag").is(false);
+            OfficialActivity officialActivity = activityDao.findOne(Query.query(criteria));
+            if (null == officialActivity) {
+                throw new ApiException("改官方活动不存在");
+            }
+            //该活动已经上架
+            if (officialActivity.getOnFlag()) {
+                throw new ApiException("该活动已经上架 不能修改");
+            }
+            Update update = Update.update("onFlag", true);
+            activityDao.update(Query.query(criteria), update);
+            return ResponseDo.buildSuccessResponse();
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseDo updateActivity(String officialActivityId, JSONObject json) throws ApiException {
+
+        OfficialActivity toUpdate = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+        OfficialActivity officialActivity = activityDao.findById(officialActivityId);
+        if (null == officialActivity) {
+            throw new ApiException("改数据不存在");
+        }
+        activityDao.update(officialActivityId, toUpdate);
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    private OfficialActivity initOfficialActivity(JSONObject jsonObject) throws ApiException {
+        OfficialActivity officialActivity = new OfficialActivity();
+        String title = jsonObject.getString("title");
+        String instruction = jsonObject.getString("instruction");
+//        String description
+
+        return officialActivity;
+    }
+
+    @Override
+    public ResponseDo getActivity(String officialActivityId) throws ApiException {
+        OfficialActivity officialActivity = activityDao.findById(officialActivityId);
+        if (null == officialActivity) {
+            throw new ApiException("can not find this data");
+        }
+        if (null != officialActivity.getCover() && StringUtils.isNotEmpty(officialActivity.getCover().getKey())) {
+            officialActivity.getCover().setUrl(CommonUtil.getThirdPhotoServer() + officialActivity.getCover().getKey());
+        }
+        return ResponseDo.buildSuccessResponse(officialActivity);
     }
 }

@@ -239,4 +239,10 @@ public class Constants {
          */
         String OFFICIAL = "OfficialAdmin";
     }
+
+    public interface OFFICIAL_ACTIVITY_LIMIT_TYPE {
+        int NO_LIMIT = 0;
+        int TOTAL_LIMIT = 1;
+        int GENDER_LIMIT = 2;
+    }
 }

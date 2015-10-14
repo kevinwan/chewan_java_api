@@ -51,6 +51,7 @@ public class OfficialActivityController {
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
             activity.setOfficialActivityId(null);
             activity.setUserId(userId);
+            activity.setDeleteFlag(false);
 
             return officialActivityService.registerActivity(activity, json);
         } catch (ApiException e) {
@@ -66,6 +67,41 @@ public class OfficialActivityController {
         try {
             checker.checkUserInfo(userId, token);
             return officialActivityService.getActivityList(userId, json);
+        } catch (ApiException e) {
+            LOG.error(e.getLocalizedMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "official/activity/onFlag", method = RequestMethod.GET)
+    public ResponseDo changeOnFlag(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
+        try {
+            checker.checkUserInfo(userId, token);
+            return officialActivityService.changeActivityOnFlag(officialActivityId);
+        } catch (ApiException e) {
+            LOG.error(e.getLocalizedMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    //TODO
+    @RequestMapping(value = "/official/activity/update", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId, @RequestBody JSONObject json) {
+        try {
+            checker.checkUserInfo(userId, token);
+            return officialActivityService.updateActivity(officialActivityId, json);
+        } catch (ApiException e) {
+            LOG.error(e.getLocalizedMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "official/activity/info", method = RequestMethod.GET)
+    public ResponseDo getInfo(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
+        try {
+            checker.checkUserInfo(userId, token);
+            return officialActivityService.getActivity(officialActivityId);
         } catch (ApiException e) {
             LOG.error(e.getLocalizedMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

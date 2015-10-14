@@ -100,6 +100,7 @@ public class UploadServiceImpl implements UploadService {
         if (Constants.Result.SUCCESS.equalsIgnoreCase(result.get("result"))) {
             Map<String, String> dataMap = new HashMap<String, String>();
             dataMap.put("photoUrl", CommonUtil.getThirdPhotoServer() + result.get("key"));
+            dataMap.put("photoKey", result.get("key"));
             dataMap.put("photoId", photoId);
             return ResponseDo.buildSuccessResponse(dataMap);
         } else {
