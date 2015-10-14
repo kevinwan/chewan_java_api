@@ -11,26 +11,27 @@
                     <div class="control-group col-md-3">
                         <div class="bolder ">手机：</div>
                         <input type="text" style="border: none; color: red; width: 100%;"
-                               ng-model="application.applyUser.phone"  readonly>
+                               ng-model="application.applyUser.phone" readonly>
                     </div>
                     <div class="control-group col-md-2">
                         <div class="bolder ">驾龄：</div>
                         <input type="text" style="border: none; color: red;"
-                               ng-model="application.applyUser.drivingYears"  readonly>
+                               ng-model="application.applyUser.drivingYears" readonly>
                     </div>
                     <div class="control-group col-md-7">
                         <div class="bolder ">车型：</div>
                         <input type="text" style="border: none; color: red;"
-                               ng-model="application.applyUser.car.model"  readonly>
+                               ng-model="application.applyUser.car.model" readonly>
                     </div>
                 </div>
 
                 <div class="form-inline col-md-12" style="margin-top:20px;">
                     <div class="control-group col-md-5">
-                        <img ng-src="{{application.authentication.drivingLicense}}" ng-click="browsePhoto(application.authentication.drivingLicense)" width="350px"
+                        <img ng-src="{{application.authentication.drivingLicense}}"
+                             ng-click="browsePhoto(application.authentication.drivingLicense)" width="350px"
                              height="300px">
 
-                        <p>[行驶证]点击图片查看大图</p>
+                        <p>[行驶证] 点击图片查看大图</p>
                     </div>
 
                     <div class="control-group col-md-7">
@@ -38,13 +39,11 @@
                             <div class="form-inline" style="margin-top: 20px;">
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">姓名：</div>
-                                    <input type="text" id="name" ng-model="application.authentication.license.name"
-                                           ng-disable="isDeclined">
+                                    <input type="text" id="name" ng-model="application.authentication.license.name">
                                 </div>
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">车牌：</div>
-                                    <input type="text" id="plate" ng-model="application.authentication.license.plate"
-                                           ng-disable="isDeclined">
+                                    <input type="text" id="plate" ng-model="application.authentication.license.plate">
                                 </div>
                             </div>
 
@@ -52,11 +51,11 @@
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">车辆类型：</div>
                                     <input type="text" id="vehicleType"
-                                           ng-model="application.authentication.license.vehicleType" >
+                                           ng-model="application.authentication.license.vehicleType">
                                 </div>
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">品牌型号：</div>
-                                    <input type="text" id="model" ng-model="application.authentication.license.model" >
+                                    <input type="text" id="model" ng-model="application.authentication.license.model">
                                 </div>
                             </div>
 
@@ -64,12 +63,12 @@
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">车辆识别代号：</div>
                                     <input type="text" id="vehicleNumber"
-                                           ng-model="application.authentication.license.vehicleNumber" >
+                                           ng-model="application.authentication.license.vehicleNumber">
                                 </div>
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">发动机号码：</div>
                                     <input type="text" id="engineNumber"
-                                           ng-model="application.authentication.license.engineNumber" >
+                                           ng-model="application.authentication.license.engineNumber">
                                 </div>
                             </div>
 
@@ -106,7 +105,8 @@
 
                 <div class="form-inline col-md-12" style="margin-top:20px;">
                     <div class="control-group col-md-5">
-                        <img ng-src="{{application.authentication.driverLicense}}" ng-click="browsePhoto(application.authentication.driverLicense)" width="350px"
+                        <img ng-src="{{application.authentication.driverLicense}}"
+                             ng-click="browsePhoto(application.authentication.driverLicense)" width="350px"
                              height="300px">
 
                         <p>[驾驶证]点击图片查看大图</p>
@@ -117,7 +117,8 @@
                             <div class="form-inline">
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">姓名：</div>
-                                    <input type="text" id="driverName" ng-model="application.authentication.driver.name">
+                                    <input type="text" id="driverName"
+                                           ng-model="application.authentication.driver.name">
                                 </div>
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">驾驶证号：</div>
@@ -128,8 +129,11 @@
                             <div class="form-inline">
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">性别：</div>
-                                    <input type="text" id="gender"
-                                           ng-model="application.authentication.driver.gender">
+                                    <select id="gender" ng-init="application.authentication.driver.gender='男'"
+                                            ng-model="application.authentication.driver.gender" style="width:90%;">
+                                        <option value="女">女</option>
+                                        <option value="男">男</option>
+                                    </select>
                                 </div>
                                 <div class="control-group col-md-6">
                                     <div class="bolder ">国籍：</div>
@@ -194,7 +198,7 @@
                     </div>
                 </div>
 
-                <div class="form-inline col-md-12" style="margin-top:20px;" ng-hide="{{application.status == '认证通过'}}">
+                <div class="form-inline col-md-12" style="margin-top:20px;" ng-show="application.status != '认证通过'">
                     <div class="control-group col-md-12">
                         <div class="bolder red">拒绝理由：</div>
                         <input type="text" id="remarks" ng-model="application.remarks">
@@ -203,7 +207,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <div ng-show="application.status === '认证中'" ng-disable="isDeclined">
+            <div ng-show="application.status === '认证中'">
                 <button class="btn btn-primary" ng-click="accept()">同意</button>
                 <button class="btn btn-warning" ng-click="decline()">拒绝</button>
             </div>

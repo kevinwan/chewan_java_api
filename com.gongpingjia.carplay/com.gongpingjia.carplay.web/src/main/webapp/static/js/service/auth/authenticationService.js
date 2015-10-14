@@ -43,6 +43,36 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     license.issueTime = commonService.transferLongToDateString(license.issueTime);
                 },
 
+                buildLicense: function (authentication) {
+                    var license = new Object();
+                    license.address = authentication.license.address;
+                    license.engineNumber = authentication.license.engineNumber;
+                    license.issueTime = commonService.transferDateStringToLong(authentication.license.issueTime);
+                    license.model = authentication.license.model;
+                    license.name = authentication.license.name;
+                    license.plate = authentication.license.plate;
+                    license.registerTime = commonService.transferDateStringToLong(authentication.license.registerTime);
+                    license.vehicleNumber = authentication.license.vehicleNumber;
+                    license.vehicleType = authentication.license.vehicleType;
+                    return license;
+                },
+
+                buildDriver: function (authentication) {
+                    var driver = new Object();
+                    driver.address = authentication.driver.address;
+                    driver.birthday = commonService.transferDateStringToLong(authentication.driver.birthday);
+                    driver.code = authentication.driver.code;
+                    driver.drivingClass = authentication.driver.drivingClass;
+                    driver.gender = authentication.driver.gender;
+                    driver.issueDate = commonService.transferDateStringToLong(authentication.driver.issueDate);
+                    driver.name = authentication.driver.name;
+                    driver.nationality = authentication.driver.nationality;
+                    driver.police = authentication.driver.police;
+                    driver.validFor = authentication.driver.validFor;
+                    driver.validFrom = commonService.transferDateStringToLong(authentication.driver.validFrom);
+                    return driver;
+                },
+
                 refreshApplication: function (authentication) {
                     var driver = authentication.driver;
                     driver.birthday = commonService.transferDateStringToLong(driver.birthday);
@@ -61,8 +91,8 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                             applicationId: application.applicationId,
                             accept: accept,
                             remarks: remarks,
-                            license: application.authentication.license,
-                            driver: application.authentication.driver
+                            license: this.buildLicense(application.authentication),
+                            driver: this.buildDriver(application.authentication)
                         }));
                 },
 
@@ -70,8 +100,8 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/authentication/' + authenticationId + '/update?userId='
                         + authService.getUser().userId + '&token=' + authService.getUser().token,
                         JSON.stringify({
-                            license: authentication.license,
-                            driver: authentication.driver
+                            license: this.buildLicense(authentication),
+                            driver: this.buildDriver(authentication)
                         }))
                 },
 

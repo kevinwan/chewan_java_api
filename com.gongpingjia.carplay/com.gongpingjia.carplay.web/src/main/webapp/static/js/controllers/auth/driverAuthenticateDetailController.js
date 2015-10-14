@@ -18,7 +18,6 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
      * Check if mandatory fields are filled in
      */
     var passMandatoryCheck = function () {
-        //alert(JSON.stringify($scope.license));
         var license = $scope.application.authentication.license;
         var licenseCheck = license.name && license.plate && license.vehicleType && license.model
             && license.vehicleNumber && license.engineNumber && license.registerTime && license.issueTime;
@@ -38,7 +37,6 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
         if (!passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击同意按钮');
         else {
-            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('成功完成车主认证');
@@ -58,7 +56,6 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
             alert('请在底部填写拒绝理由');
         else {
             var remarks = $scope.remarks ? $scope.remarks : DEFAULT_REMARKS;
-            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('已拒绝审核');
@@ -77,7 +74,6 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
         if ($scope.application.status == "认证通过" && !passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击更新按钮');
         else {
-            authenticationService.refreshApplication($scope.application.authentication);
             $rootScope.loadingPromise = authenticationService.updateUserLicense($scope.application.applyUserId, $scope.application.authentication)
                 .success(function (result) {
                     if (result && result.result == 0) {
