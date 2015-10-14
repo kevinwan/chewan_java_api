@@ -13,16 +13,14 @@ gpjApp.factory('commonService', [function () {
 
     return {
         transferLongToDateString: function (longTime) {
-            if (longTime == undefined) {
+            if (longTime == undefined || longTime == 0) {
                 return "";
             }
-            if (longTime != 0) {
-                var birthdayDate = new Date();
-                birthdayDate.setTime(longTime);
-                //format  YYYY-MM-DD
-                return birthdayDate.getFullYear() + "-" + (birthdayDate.getMonth() + 1) + "-" + birthdayDate.getDate();
-            }
-            return "";
+
+            var birthdayDate = new Date();
+            birthdayDate.setTime(longTime);
+            //format  YYYY-MM-DD
+            return birthdayDate.getFullYear() + "-" + (birthdayDate.getMonth() + 1) + "-" + birthdayDate.getDate();
         },
 
         transferDateStringToLong: function (dateTime) {
@@ -33,7 +31,7 @@ gpjApp.factory('commonService', [function () {
             if (regexp.test(dateTime)) {
                 return Date.parse(dateTime.replace(/-/g, "/"));
             }
-            return 0;
+            return 1;
         }
     }
 }]);

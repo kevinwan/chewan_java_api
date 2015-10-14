@@ -277,7 +277,6 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
-
         } finally {
             HttpClientUtil.close(response);
         }
@@ -336,10 +335,9 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
         List<String> finalUsers = toUsers.subList(fromIndex, toIndex);
         param.put("target", finalUsers);
-        CloseableHttpResponse response = sendEmchatMessage(httpUrl, headers, param);
-        if (HttpClientUtil.isStatusOK(response)) {
-            return HttpClientUtil.parseResponseGetJson(response);
-        }
+
+        sendEmchatMessage(httpUrl, headers, param);
+
         return new JSONObject();
     }
 
@@ -364,6 +362,8 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
             response = HttpClientUtil.post(httpUrl.toString(), param.toString(), headers, Constants.Charset.UTF8);
             if (!HttpClientUtil.isStatusOK(response)) {
                 LOG.warn("Send emchat message failure, param:{}", param);
+            } else {
+                LOG.info("Send emchat message success, param:{}", param);
             }
         } catch (Exception e) {
             LOG.error("Request for send emchat message falure", e);

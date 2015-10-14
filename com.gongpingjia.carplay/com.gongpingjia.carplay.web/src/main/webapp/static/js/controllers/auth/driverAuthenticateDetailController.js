@@ -1,6 +1,6 @@
 'use strict';
 
-gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScope, $modalInstance, authenticationService, moment, $window) {
+gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootScope, $modalInstance, authenticationService, moment, $window) {
 
     var DEFAULT_REMARKS = '不是有效的行驶证和驾驶证图片';
 
@@ -95,8 +95,8 @@ gpjApp.controller('authenticateInfoModalController', function ($scope, $rootScop
      *
      * @param photo
      */
-    $scope.browsePhoto = function () {
-        $window.open($scope.application.license, '_blank');
+    $scope.browsePhoto = function (photoUrl) {
+        $window.open(photoUrl, '_blank');
     };
 
     /**

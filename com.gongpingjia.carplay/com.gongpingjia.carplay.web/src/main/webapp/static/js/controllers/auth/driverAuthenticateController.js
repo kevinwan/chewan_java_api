@@ -83,8 +83,8 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
         $scope.viewApplication = function (applicationId) {
             authenticationService.setApplication(applicationId);
             var modalInstance = $modal.open({
-                templateUrl: 'views/chewan/driver_authentication_info_modal.html',
-                controller: 'authenticateInfoModalController'
+                templateUrl: 'views/auth/driver_authentication_detail.html',
+                controller: 'driverAuthenticateDetailController'
             });
 
             return modalInstance.result.then(function (reply) {

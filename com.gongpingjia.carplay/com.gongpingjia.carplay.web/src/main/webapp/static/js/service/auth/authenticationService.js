@@ -73,8 +73,17 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                             license: authentication.license,
                             driver: authentication.driver
                         }))
-                }
+                },
 
+                processUserPhotoApplication: function (accept, remarks, applicationId) {
+                    return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/official/approve/userPhoto?userId="
+                        + authService.getUser().userId + '&token=' + authService.getUser().token,
+                        JSON.stringify({
+                            applicationId: applicationId,
+                            accept: accept,
+                            remarks: remarks
+                        }))
+                }
             }
         }]
 )

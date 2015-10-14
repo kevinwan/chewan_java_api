@@ -13,6 +13,7 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.AuthApplication;
+import com.gongpingjia.carplay.entity.user.DrivingLicense;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserAuthentication;
 import com.gongpingjia.carplay.service.AunthenticationService;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -82,6 +84,9 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         authentication.setUserId(userId);
         authentication.setDriverLicense(driverLicenseKey);
         authentication.setDrivingLicense(drivingLicenseKey);
+        DrivingLicense drivingLicense = new DrivingLicense();
+        drivingLicense.setModel(json.getString("model"));
+        authentication.setLicense(drivingLicense);
         userAuthenticationDao.save(authentication);
 
         Update update = new Update();
@@ -92,17 +97,28 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         update.set("car", car);
         userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
 
-        AuthApplication application = new AuthApplication();
+        AuthApplication application = authApplicationDao.findOne(Query.query(
+                Criteria.where("applyUserId").is(userId).and("type").is(Constants.AuthType.LICENSE_AUTH)));
+        if (application == null) {
+            application = new AuthApplication();
+        }
         application.setApplyTime(current);
         application.setStatus(Constants.AuthStatus.AUTHORIZING);
         application.setType(Constants.AuthType.LICENSE_AUTH);
         application.setApplyUserId(userId);
-        authApplicationDao.save(application);
+        application.setAuthUserId("");
+        application.setAuthTime(0L);
+        if (StringUtils.isEmpty(application.getApplicationId())) {
+            authApplicationDao.save(application);
+        } else {
+            authApplicationDao.update(application.getApplicationId(), application);
+        }
 
         AuthenticationHistory history = new AuthenticationHistory();
         history.setApplicationId(application.getApplicationId());
         history.setStatus(application.getStatus());
         history.setAuthTime(current);
+        history.setType(Constants.AuthType.LICENSE_AUTH);
         history.setRemark("车主认证申请");
         historyDao.save(history);
 
@@ -155,12 +171,22 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         update.set("photoAuthStatus", Constants.AuthStatus.AUTHORIZING);
         userDao.update(Query.query(Criteria.where("userId").is(userId)), update);
 
-        AuthApplication application = new AuthApplication();
+        AuthApplication application = authApplicationDao.findOne(Query.query(
+                Criteria.where("applyUserId").is(userId).and("type").is(Constants.AuthType.PHOTO_AUTH)));
+        if (application == null) {
+            application = new AuthApplication();
+        }
         application.setApplyTime(current);
         application.setStatus(Constants.AuthStatus.AUTHORIZING);
         application.setType(Constants.AuthType.PHOTO_AUTH);
         application.setApplyUserId(userId);
-        authApplicationDao.save(application);
+        application.setAuthUserId("");
+        application.setAuthTime(0L);
+        if (StringUtils.isEmpty(application.getApplicationId())) {
+            authApplicationDao.save(application);
+        } else {
+            authApplicationDao.update(application.getApplicationId(), application);
+        }
 
         AuthenticationHistory history = new AuthenticationHistory();
         history.setApplicationId(application.getApplicationId());
