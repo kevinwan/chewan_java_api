@@ -4,7 +4,7 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.bootstrap', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
     'ui.date']);
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8080');
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8000');
 gpjApp.constant("ChewanApiProvider","http://127.0.0.1:8080");
 gpjApp.constant("ChewanApiEndPoint","");
 

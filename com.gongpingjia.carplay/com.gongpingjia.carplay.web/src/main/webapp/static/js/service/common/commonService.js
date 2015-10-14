@@ -23,15 +23,40 @@ gpjApp.factory('commonService', [function () {
             return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
         },
 
+        transferLongToDateTimeString: function (longTime) {
+            if (longTime == undefined || longTime <= 1) {
+                return "";
+            }
+
+            var date = new Date();
+            date.setTime(longTime);
+            //format  YYYY-MM-DD HH24:MM
+            return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " "
+                + date.getHours() + ":" + date.getMinutes();
+        },
+
         transferDateStringToLong: function (dateTime) {
             if (dateTime == undefined) {
                 return 0;
             }
-            //var regexp = new RegExp("[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}", "g");
-            //if (regexp.test(dateTime)) {
             return Date.parse(dateTime.replace(/-/g, "/"));
-            //}
-            //return 1;
+        },
+
+        transferDateTimeStringToLong: function (dateTime) {
+            if (dateTime == undefined) {
+                return 0;
+            }
+
+            var data = dateTime.split(" ");
+            var hour = data[1].substring(0, data[1].indexOf(":"));
+            var minute = data[1].substring(hour.length + 1);
+
+            var milliseconds = this.transferDateStringToLong(data[0]);
+            milliseconds += parseInt(hour) * (60 * 60 * 1000);
+            milliseconds += parseInt(minute) * (60 * 1000);
+
+            return milliseconds;
         }
+
     }
 }]);
