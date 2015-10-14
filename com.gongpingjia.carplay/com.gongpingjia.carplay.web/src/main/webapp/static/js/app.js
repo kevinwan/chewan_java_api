@@ -5,9 +5,8 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.date']);
 
 gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8000');
-gpjApp.constant("ChewanApiProvider","http://127.0.0.1:8080");
-gpjApp.constant("ChewanApiEndPoint","");
-
+gpjApp.constant("ChewanApiProvider", "http://127.0.0.1:8080");
+gpjApp.constant("ChewanApiEndPoint", "");
 
 
 /**
@@ -16,10 +15,13 @@ gpjApp.constant("ChewanApiEndPoint","");
 gpjApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'views/chewan/user.html',
-        controller:'userController'
+        controller: 'userController'
     }).when('/driverAuthentication/list', {
         templateUrl: 'views/auth/driver_authentication.html',
         controller: 'driverAuthenticateController'
+    }).when('/driverAuthentication/detail', {
+        templateUrl: 'views/auth/driver_authentication_detail.html',
+        controller: 'driverAuthenticateDetailController'
     }).when('/photoAuthentication/list', {
         templateUrl: 'views/auth/user_photo_authentication.html',
         controller: 'userPhotoAuthenticationController'
@@ -35,13 +37,13 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/officialActivity/list', {
         templateUrl: 'views/chewan/official_activity/list.html',
         controller: 'officialActivityController'
-    }).when('/officialActivity/add',{
+    }).when('/officialActivity/add', {
         templateUrl: 'views/chewan/official_activity/add.html',
         controller: 'officialActivityEditController'
-    }).when('/officialActivity/update',{
+    }).when('/officialActivity/update', {
         templateUrl: 'views/chewan/official_activity/update.html',
         controller: 'officialActivityEditController'
-    }).when('/officialActivity/view',{
+    }).when('/officialActivity/view', {
         templateUrl: 'views/chewan/official_activity/view.html',
         controller: 'officialActivityEditController'
     });

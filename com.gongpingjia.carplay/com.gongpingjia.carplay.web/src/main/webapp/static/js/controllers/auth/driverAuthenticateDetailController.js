@@ -1,6 +1,6 @@
 'use strict';
 
-gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootScope, $modalInstance, authenticationService, moment, $window) {
+gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootScope, authenticationService, moment, $window, $location) {
 
     var DEFAULT_REMARKS = '不是有效的行驶证和驾驶证图片';
 
@@ -40,7 +40,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
             $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('成功完成车主认证');
-                    $modalInstance.close('refresh');
+                    $location.path('/driverAuthentication/list');
                 } else {
                     alert(result.errmsg);
                 }
@@ -59,7 +59,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
             $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.remarks, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('已拒绝审核');
-                    $modalInstance.close('refresh');
+                    $location.path('/driverAuthentication/list');
                 } else {
                     alert(result.errmsg);
                 }
@@ -78,7 +78,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
                 .success(function (result) {
                     if (result && result.result == 0) {
                         alert('信息更新成功');
-                        $modalInstance.close('refresh');
+                        $location.path('/driverAuthentication/list');
                     } else {
                         alert(result.errmsg);
                     }
@@ -99,6 +99,6 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
      * Cancel button click handler
      */
     $scope.close = function () {
-        $modalInstance.dismiss('close');
+        $location.path('/driverAuthentication/list');
     };
 });
