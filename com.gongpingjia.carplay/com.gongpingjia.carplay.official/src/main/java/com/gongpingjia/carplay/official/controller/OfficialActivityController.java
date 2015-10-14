@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.official.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
@@ -45,14 +46,15 @@ public class OfficialActivityController {
         try {
             checker.checkUserInfo(userId, token);
 
-//            CommonUtil.isEmpty(json, Arrays.asList("destPoint", "destination", "estabPoint", "estabPoint", "start", "transfer", "covers", "title",
-//                    "description", "price", "priceDesc", "instruction", "maleLimit", "femaleLimit"));
+            CommonUtil.isEmpty(json, Arrays.asList("title", "destination", "cover", "instruction", "description", "price", "subsidyPrice", "priceDesc", "limitType"));
 
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
             activity.setOfficialActivityId(null);
             activity.setUserId(userId);
             activity.setDeleteFlag(false);
-
+            activity.setNowJoinNum(0);
+            activity.setMaleNum(0);
+            activity.setFemaleNum(0);
             return officialActivityService.registerActivity(activity, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);

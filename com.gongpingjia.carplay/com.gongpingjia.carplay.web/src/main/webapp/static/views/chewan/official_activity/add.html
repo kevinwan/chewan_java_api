@@ -28,23 +28,32 @@
                            placeholder="活动介绍"/>
                 </div>
             </div>
+            <div class="form-inline col-md-12">
+                <div>
+                    <div class="col-md-4">
+                        <label style="color:red"></label>目的地
+                    </div>
+                </div>
+            </div>
+            <div class="form-inline col-md-12">
+                <div>
+                    <div class="col-md-4">
+                        <label style="color:red">*</label>省份
+                    </div>
+                    <div class="col-md-8" style="text-align:left">
+                        <input type="text" id="province" ng-model="activity.destination.province"
+                                />
+                    </div>
+                </div>
+            </div>
 
-            <div>
+            <div class="form-inline col-md-12">
                 <div class="col-md-4">
-                    <label style="color:red">*</label>目的地
+                    <label style="color:red">*</label>市
                 </div>
                 <div class="col-md-8" style="text-align:left">
-                    <input type="text" id="province" ng-model="activity.destination.province"
-                           placeholder="目的地"/>
+                    <input type="text" id="city" ng-model="activity.destination.city"/>
                 </div>
-            </div>
-
-            <div class="col-md-4">
-                <label style="color:red">*</label>目的地
-            </div>
-            <div class="col-md-8" style="text-align:left">
-                <input type="text" id="city" ng-model="activity.destination.city"
-                       placeholder="目的地"/>
             </div>
 
             <div class="form-inline col-md-12">
@@ -73,24 +82,81 @@
             </div>
 
             <div class="form-inline col-md-12">
-                <div class="col-md-4">
-                    <label style="color:red">*</label>男性参与人数
+                <!--0 不限制 1 不限男女 2男女人数分别限制-->
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-1" onchange="angular.element(this).scope().changeLimitType(this)" value="1"/>总设置数
                 </div>
-                <div class="col-md-8" style="text-align:left">
-                    <input type="text" id="maleLimit" ng-model="activity.maleLimit"
-                           placeholder="男性参与人数"/>
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-2" onchange="angular.element(this).scope().changeLimitType(this)" value="2"/>男女人数分别限制
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="limitType" id="limitType-0" onchange="angular.element(this).scope().changeLimitType(this)" checked value="0" />不限
                 </div>
             </div>
 
-            <div class="form-inline col-md-12">
-                <div class="col-md-4">
-                    <label style="color:red">*</label>女性参与人数
+            <div ng-show="activity.limitType === 1"  class="form-inline col-md-12">
+                <div class="col-md-12">
+                    <input type="text"  placeholder="参与人数总数" ng-model="activity.totalLimit" />
                 </div>
-                <div class="col-md-8" style="text-align:left">
-                    <input type="text" id="femaleLimit" ng-model="activity.femaleLimit"
-                           placeholder="女性参与人数"/>
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        已参与0人
+                    </div>
                 </div>
             </div>
+
+            <div ng-show="activity.limitType === 2"  class="form-inline col-md-12">
+                <div class="form-inline col-md-6">
+                    <div>
+                        <input type="text"  placeholder="男性参与人数" ng-model="activity.maleLimit" />
+                    </div>
+                    <div>
+                        已参与0人
+                    </div>
+                </div>
+                <div class="form-inline col-md-6">
+                    <div>
+                        <input type="text"  placeholder="女性参与人数" ng-model="activity.femaleLimit" />
+                    </div>
+                    <div>
+                        已参与0人
+                    </div>
+                </div>
+            </div>
+
+            <div ng-show="activity.limitType === 0"  class="form-inline col-md-12">
+                <div class="col-md-12">
+                    <input type="text"  readonly="true"  placeholder="参与人数总数" />
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-4">
+                        不限制
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!--<div class="form-inline col-md-12">-->
+            <!--<div class="col-md-4">-->
+            <!--<label style="color:red">*</label>男性参与人数-->
+            <!--</div>-->
+            <!--<div class="col-md-8" style="text-align:left">-->
+            <!--<input type="text" id="maleLimit" ng-model="activity.maleLimit"-->
+            <!--placeholder="男性参与人数"/>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <!--<div class="form-inline col-md-12">-->
+            <!--<div class="col-md-4">-->
+            <!--<label style="color:red">*</label>女性参与人数-->
+            <!--</div>-->
+            <!--<div class="col-md-8" style="text-align:left">-->
+            <!--<input type="text" id="femaleLimit" ng-model="activity.femaleLimit"-->
+            <!--placeholder="女性参与人数"/>-->
+            <!--</div>-->
+            <!--</div>-->
 
             <div class="form-inline col-md-12">
                 <div class="col-md-4">

@@ -309,4 +309,28 @@ public class OfficialActivity {
     public void setDeleteFlag(Boolean deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
+
+    public Integer getLimitType() {
+        return limitType;
+    }
+
+    public void setLimitType(Integer limitType) {
+        this.limitType = limitType;
+    }
+
+    public Integer getTotalLimit() {
+        return totalLimit;
+    }
+
+    public void setTotalLimit(Integer totalLimit) {
+        this.totalLimit = totalLimit;
+    }
+
+    public Integer getNowJoinNum() {
+        return nowJoinNum;
+    }
+
+    public void setNowJoinNum(Integer nowJoinNum) {
+        this.nowJoinNum = nowJoinNum;
+    }
 }

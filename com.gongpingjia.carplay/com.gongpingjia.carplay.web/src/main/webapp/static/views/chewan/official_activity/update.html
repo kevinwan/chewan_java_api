@@ -144,25 +144,25 @@
                 </div>
             </div>
 
-            <div class="form-inline col-md-12">
-                <div class="col-md-4">
-                    <label style="color:red">*</label>是否上架
-                </div>
-                <div class="col-md-8" style="text-align:left">
-                    <select id="onFlag" ng-init="activity.onFlag"
-                            data-ng-model="activity.onFlag">
-                        <option value="true">上架</option>
-                        <option value="false">下架</option>
-                    </select>
-                </div>
-            </div>
+            <!--<div class="form-inline col-md-12">-->
+                <!--<div class="col-md-4">-->
+                    <!--<label style="color:red">*</label>是否上架-->
+                <!--</div>-->
+                <!--<div class="col-md-8" style="text-align:left">-->
+                    <!--<select id="onFlag" ng-init="activity.onFlag"-->
+                            <!--data-ng-model="activity.onFlag">-->
+                        <!--<option value="true">未上架</option>-->
+                        <!--<option value="false">下架</option>-->
+                    <!--</select>-->
+                <!--</div>-->
+            <!--</div>-->
 
             <div class="form-inline col-md-12">
-                <div class="col-md-6">
-                    <button ng-click="close()">取消</button>
+                <div class="col-md-4">
+                    <label style="color:red">*</label>上架状态
                 </div>
-                <div class="col-md-6">
-                    <button ng-click="updateOfficialActivity()">更新</button>
+                <div class="col-md-8" style="text-align:left">
+                    <span>未上架</span>
                 </div>
             </div>
 

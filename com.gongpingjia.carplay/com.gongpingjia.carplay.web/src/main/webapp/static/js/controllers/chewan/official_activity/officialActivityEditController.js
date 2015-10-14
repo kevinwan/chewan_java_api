@@ -13,6 +13,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         $scope.initData = function () {
             var officialActivityId = officialActivityService.getOfficialActivityId();
             if (officialActivityId === '') {
+                //增加
+                $scope.activity = {};
+                $scope.activity.limitType = 0;
                 return;
             } else {
                 $rootScope.loadingPromise = officialActivityService.getOfficialActivity(officialActivityId).success(function (result) {
@@ -20,8 +23,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     //if($scope.activity.cover != undefined && $scope.activity.cover != null) {
                     //    $scope.photoUrl = $scope.activity.cover.photoUrl;
                     //}
-                    if(result.result === 0) {
-
+                    if (result.result === 0) {
+                        $scope.activity = result.data;
+                        $scope.photoUrl = $scope.activity.cover.url;
                     }
                 });
             }
@@ -53,7 +57,6 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         }
 
 
-
         $scope.uploadFile = function (data) {
             var formData = new FormData();
             formData.append('attach', data.files[0]);
@@ -68,6 +71,12 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     $scope.photoUrl = cover.photoUrl;
                 }
             });
+        };
+
+
+        $scope.changeLimitType = function (data) {
+            $scope.activity.limitType = parseInt(data.value);
+            $scope.$apply();
         };
 
         $scope.initData();
