@@ -17,10 +17,10 @@ gpjApp.factory('commonService', [function () {
                 return "";
             }
 
-            var birthdayDate = new Date();
-            birthdayDate.setTime(longTime);
+            var date = new Date();
+            date.setTime(longTime);
             //format  YYYY-MM-DD
-            return birthdayDate.getFullYear() + "-" + (birthdayDate.getMonth() + 1) + "-" + birthdayDate.getDate();
+            return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
         },
 
         transferDateStringToLong: function (dateTime) {
