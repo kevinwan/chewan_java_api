@@ -30,7 +30,7 @@ public class AuthApplication {
 
     private Long authTime;
 
-    private String remark;
+    private String remarks;
 
     @Transient
     private User applyUser;
@@ -110,11 +110,11 @@ public class AuthApplication {
         this.authentication = authentication;
     }
 
-    public String getRemark() {
-        return remark;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

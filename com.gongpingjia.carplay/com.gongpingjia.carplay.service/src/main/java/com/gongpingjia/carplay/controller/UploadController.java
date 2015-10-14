@@ -63,7 +63,7 @@ public class UploadController {
     }
 
     /**
-     * 行驶证上传
+     * 驾驶证上传
      *
      * @param userId 用户ID
      * @param token  用户会话Token
