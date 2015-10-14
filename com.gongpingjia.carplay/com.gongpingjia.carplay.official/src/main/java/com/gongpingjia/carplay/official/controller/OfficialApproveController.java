@@ -127,6 +127,7 @@ public class OfficialApproveController {
 
     /**
      * 更新用户的认证信息
+     *
      * @param authenticationId
      * @param userId
      * @param token
@@ -143,6 +144,30 @@ public class OfficialApproveController {
             parameterChecker.checkAdminUserInfo(userId, token);
 
             return officialApproveService.modifyUserAuthenticationInfo(authenticationId, json);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 用户图像认证审批
+     *
+     * @return
+     */
+    @RequestMapping(value = "/official/approve/userPhoto", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo approveUserPhotoAuthApply(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                                @RequestBody JSONObject json) {
+        LOG.debug("Approved user photo authentication apply");
+
+        try {
+            if (CommonUtil.isEmpty(json, Arrays.asList("applicationId", "accept"))) {
+                throw new ApiException("输入参数有误");
+            }
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            return officialApproveService.approveUserPhotoAuthentication(userId, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());

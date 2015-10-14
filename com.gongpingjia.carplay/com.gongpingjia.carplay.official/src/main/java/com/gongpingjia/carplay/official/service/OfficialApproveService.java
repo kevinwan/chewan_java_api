@@ -13,6 +13,7 @@ public interface OfficialApproveService {
 
     /**
      * 审批用户的车主认证信息
+     *
      * @param userId
      * @param json
      * @return
@@ -41,9 +42,19 @@ public interface OfficialApproveService {
 
     /**
      * 修改用户的认证信息
+     *
      * @param userId 用户Id
      * @return 返回
      * @throws ApiException
      */
     ResponseDo modifyUserAuthenticationInfo(String userId, JSONObject json) throws ApiException;
+
+    /**
+     * 用户图像认证
+     *
+     * @param userId 审批用户Id
+     * @param json   审批结果信息
+     * @return 返回审批结果
+     */
+    ResponseDo approveUserPhotoAuthentication(String userId, JSONObject json) throws ApiException;
 }

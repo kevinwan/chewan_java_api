@@ -18,11 +18,11 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/chewan/user.html',
         controller:'userController'
     }).when('/driverAuthentication/list', {
-        templateUrl: 'views/chewan/driver_authentication.html',
+        templateUrl: 'views/auth/driver_authentication.html',
         controller: 'driverAuthenticateController'
     }).when('/photoAuthentication/list', {
-        templateUrl: 'views/chewan/photo_authentication.html',
-        controller: 'photoAuthenticationController'
+        templateUrl: 'views/auth/user_photo_authentication.html',
+        controller: 'userPhotoAuthenticationController'
     }).when('/feedback/list', {
         templateUrl: 'views/chewan/feedback_main.html',
         controller: 'feedbackController'
