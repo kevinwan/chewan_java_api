@@ -37,7 +37,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
         if (!passMandatoryCheck())
             alert('请将行驶证和驾驶证信息录入系统后再次点击同意按钮');
         else {
-            $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.remarks, $scope.application).success(function (result) {
+            $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('成功完成车主认证');
                     $location.path('/driverAuthentication/list');
@@ -52,11 +52,10 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
      * Decline authentication application
      */
     $scope.decline = function () {
-        if (!($scope.remarks))
+        if (!($scope.application.remarks))
             alert('请在底部填写拒绝理由');
         else {
-            var remarks = $scope.remarks ? $scope.remarks : DEFAULT_REMARKS;
-            $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.remarks, $scope.application).success(function (result) {
+            $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
                     alert('已拒绝审核');
                     $location.path('/driverAuthentication/list');
