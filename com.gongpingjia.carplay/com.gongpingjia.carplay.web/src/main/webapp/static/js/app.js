@@ -179,7 +179,7 @@ gpjApp.run(['$rootScope', '$location', '$window', 'authService', function ($root
         var loginUser = authService.getUser();
         if (!loginUser) {
             event.preventDefault();
-            $window.location.href = '/login.html';
+            $window.location.href = 'v2/login.html';
         }
     });
 }]);

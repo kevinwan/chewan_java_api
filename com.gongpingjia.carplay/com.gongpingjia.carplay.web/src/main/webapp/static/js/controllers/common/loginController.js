@@ -12,7 +12,7 @@ gpjApp.controller('loginController', ['$scope', '$window', 'userService', 'authS
             userService.logIn(user.phone, md5.createHash(user.password)).success(function (resp) {
                 if (resp.result === 0) {
                     authService.setUser(resp.data);
-                    $window.location.href = '/'
+                    $window.location.href = 'v2/'
                 } else
                     alert(resp.msg ? resp.msg : '登录失败');
             }).error(function (status, data) {

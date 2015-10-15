@@ -137,7 +137,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 Long toTime = Long.parseLong(toTimeStr);
                 toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
 //TODO bug fix
-                criteria.and("start").gte(fromTime);
+//                criteria.and("start").gte(fromTime);
             }else if (StringUtils.isNotEmpty(fromTimeStr) && StringUtils.isEmpty(toTimeStr)) {
                 Long fromTime = Long.parseLong(fromTimeStr);
                 criteria.and("start").gte(fromTime);
