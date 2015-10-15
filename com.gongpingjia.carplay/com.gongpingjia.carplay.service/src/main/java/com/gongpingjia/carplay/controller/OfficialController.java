@@ -85,12 +85,12 @@ public class OfficialController {
      * @return 返回查询结果
      */
     @RequestMapping(value = "/official/activity/list", method = RequestMethod.GET)
-    public ResponseDo listActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,
-                                     @RequestParam("province") String province, @RequestParam("city") String city,
+    public ResponseDo listActivities(@RequestParam(value = "userId", required = false) String userId, @RequestParam(value = "token", required = false) String token,
+                                     @RequestParam(value = "province", required = false) String province, @RequestParam(value = "city", required = false) String city,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         try {
-            parameterChecker.checkUserInfo(userId, token);
+//            parameterChecker.checkUserInfo(userId, token);
 
             Address address = new Address();
             address.setCity(city);
