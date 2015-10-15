@@ -31,8 +31,8 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
 //
 //var ERROR_MSG_NOLOGIN = '不是职员';
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://192.168.1.145:8080');
-gpjApp.constant("ChewanApiProvider", "http://192.168.1.145:8080");
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+gpjApp.constant("ChewanApiProvider", "http://cwapi.gongpingjia.com:8080");
 gpjApp.constant("ChewanApiEndPoint", "/v2");
 
 /**
