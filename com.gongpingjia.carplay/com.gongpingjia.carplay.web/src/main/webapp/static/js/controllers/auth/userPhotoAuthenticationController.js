@@ -102,10 +102,22 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
                 return {'color': 'brown', 'font-weight': 'bold'};
         };
 
+        /**
+         * Reload data on load
+         */
+        $rootScope.loadingPromise = function () {
+            return authenticationService.getApplicationList($scope.criteria).success(function (result) {
+                $scope.applications = (result.result === 0 ? result.data : undefined);
+            })
+        };
 
         /**
          * Initialize component status
          */
         $scope.resetCriteria();
 
+        /**
+         * load data
+         */
+        $rootScope.loadingPromise();
     }])

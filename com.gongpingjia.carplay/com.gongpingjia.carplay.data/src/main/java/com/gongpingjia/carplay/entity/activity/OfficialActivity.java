@@ -1,12 +1,13 @@
 package com.gongpingjia.carplay.entity.activity;
 
 import com.gongpingjia.carplay.entity.common.Address;
-import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2015/9/29.
@@ -19,9 +20,6 @@ public class OfficialActivity {
 
     //创建人 id
     private String userId;
-
-    //活动目的地 经纬度
-    private Landmark destPoint;
 
     //活动目的地
     private Address destination;
@@ -109,6 +107,17 @@ public class OfficialActivity {
     //删除标志位
     private Boolean deleteFlag;
 
+    /**
+     * 组织成员信息
+     */
+    @Transient
+    private Map<String, Object> organizer;
+
+    /**
+     * 封面信息
+     */
+    @Transient
+    private String[] covers;
 
     public String getOfficialActivityId() {
         return officialActivityId;
@@ -124,14 +133,6 @@ public class OfficialActivity {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public Landmark getDestPoint() {
-        return destPoint;
-    }
-
-    public void setDestPoint(Landmark destPoint) {
-        this.destPoint = destPoint;
     }
 
     public Address getDestination() {
@@ -332,5 +333,21 @@ public class OfficialActivity {
 
     public void setNowJoinNum(Integer nowJoinNum) {
         this.nowJoinNum = nowJoinNum;
+    }
+
+    public Map<String, Object> getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(Map<String, Object> organizer) {
+        this.organizer = organizer;
+    }
+
+    public String[] getCovers() {
+        return covers;
+    }
+
+    public void setCovers(String[] covers) {
+        this.covers = covers;
     }
 }

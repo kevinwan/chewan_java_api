@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
@@ -14,8 +15,12 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.EmchatTokenService;
 import com.gongpingjia.carplay.service.OfficialService;
+import com.gongpingjia.carplay.service.util.ActivityUtil;
+import com.gongpingjia.carplay.service.util.DistanceUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -23,7 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2015/9/29.
@@ -31,7 +36,7 @@ import java.util.List;
 @Service
 public class OfficialServiceImpl implements OfficialService {
 
-    private static Logger LOG = Logger.getLogger(OfficialServiceImpl.class);
+    private static Logger LOG = LoggerFactory.getLogger(OfficialServiceImpl.class);
 
     @Autowired
     private OfficialActivityDao officialActivityDao;
@@ -49,14 +54,59 @@ public class OfficialServiceImpl implements OfficialService {
     private AppointmentDao appointmentDao;
 
     @Override
-    public ResponseDo getActivityInfo(String activityId) {
+    public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-        OfficialActivity officialActivity = officialActivityDao.findById(activityId);
+        OfficialActivity officialActivity = officialActivityDao.findById(officialActivityId);
         if (null == officialActivity) {
-
+            LOG.warn("Input officialActivityId:{} is not exist in the database", officialActivityId);
+            throw new ApiException("输入参数有误");
         }
-        return ResponseDo.buildSuccessResponse(officialActivity);
+
+        String localServer = CommonUtil.getLocalPhotoServer();
+        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
+
+        //构造组织者的信息
+        User organizer = userDao.findById(officialActivity.getUserId());
+        officialActivity.setOrganizer(new HashMap<String, Object>(2));
+        officialActivity.getOrganizer().put("nickname", organizer.getNickname());
+        officialActivity.getOrganizer().put("avatar", localServer + organizer.getAvatar());
+        officialActivity.setCovers(new String[]{CommonUtil.getThirdPhotoServer() + officialActivity.getCover().getKey()});
+
+        //构造返回的JSON对象
+        JSONObject jsonObject = JSONObject.fromObject(officialActivity);
+        if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty()) {
+            jsonObject.put("isMember", false);
+            jsonObject.put("members", new ArrayList<>(0));
+        } else {
+            jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
+            //获取当前用户和成员信息
+            User queryUser = userDao.findById(userId);
+            LOG.debug("Build members and organizer");
+            List<User> users = userDao.findByIds(officialActivity.getMembers());
+            List<Map<String, Object>> members = new ArrayList<>(users.size());
+            for (User user : users) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("userId", user.getUserId());
+                map.put("nickname", user.getNickname());
+                map.put("avatar", localServer + user.getAvatar());
+                map.put("gender", user.getGender());
+                map.put("licenseAuthStatus", user.getLicenseAuthStatus());
+                map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
+                        user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+                if (user.getCar() != null) {
+                    user.getCar().setLogo(gpjServer + user.getCar().getLogo());
+                    map.put("car", user.getCar());
+                } else {
+                    map.put("car", "");
+                }
+                members.add(map);
+            }
+            jsonObject.put("members", members);
+        }
+
+        LOG.debug("Finished build data");
+        return ResponseDo.buildSuccessResponse(jsonObject);
     }
 
     /**
@@ -75,13 +125,35 @@ public class OfficialServiceImpl implements OfficialService {
         if (StringUtils.isNotEmpty(address.getCity())) {
             criteria.and("destination.city").is(address.getCity());
         }
-        if (StringUtils.isNotEmpty(address.getDistrict())) {
-            criteria.and("destination.district").is(address.getDistrict());
-        }
+
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
         query.limit(limit).skip(ignore);
         List<OfficialActivity> activityList = officialActivityDao.find(query);
+
+        LOG.debug("Begin query organizer info");
+        Map<String, User> map = new HashMap<>(activityList.size());
+        for (OfficialActivity activity : activityList) {
+            map.put(activity.getUserId(), null);
+        }
+        List<User> users = userDao.findByIds(map.keySet());
+        for (User user : users) {
+            map.put(user.getUserId(), user);
+        }
+
+        String localServer = CommonUtil.getLocalPhotoServer();
+        String thirdServer = CommonUtil.getThirdPhotoServer();
+        for (OfficialActivity activity : activityList) {
+            Map<String, Object> organizer = new HashMap<String, Object>(2);
+            User user = map.get(activity.getUserId());
+            organizer.put("nickname", user.getNickname());
+            organizer.put("avatar", localServer + user.getAvatar());
+            activity.setOrganizer(organizer);
+            activity.setCovers(new String[]{thirdServer + activity.getCover().getKey()});
+        }
+
+
+        LOG.debug("Finished build data");
         return ResponseDo.buildSuccessResponse(activityList);
     }
 
@@ -93,8 +165,7 @@ public class OfficialServiceImpl implements OfficialService {
      */
     @Override
     public ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException {
-
-        LOG.debug("applyJoinActivity starts");
+        LOG.debug("applyJoinActivity starts check input paramters");
 
         OfficialActivity officialActivity = officialActivityDao.findById(activityId);
         if (null == officialActivity) {
@@ -103,14 +174,10 @@ public class OfficialServiceImpl implements OfficialService {
         }
 
         List<String> members = officialActivity.getMembers();
-        for (String member : members) {
-            if (member.equals(userId)) {
-                LOG.warn("Already be a member");
-                throw new ApiException("已是成员，不能重复申请加入活动");
-            }
+        if (members != null && members.contains(userId)) {
+            LOG.warn("Already be a member");
+            throw new ApiException("已是成员，不能重复申请加入活动");
         }
-
-
 
         User applyUser = userDao.findById(userId);
         if (null == applyUser) {
@@ -118,23 +185,20 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("用户不存在");
         }
 
-        //判断是否超过人数设定值
-        //TODO
+        checkUserOverflowed(officialActivity, applyUser);
 
         //加入到环信群组中
         try {
             chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
         } catch (ApiException e) {
-            LOG.error(e.getMessage(), e);
-            //添加环信用户失败；
-            throw e;
+            LOG.warn(e.getMessage(), e);
+            throw new ApiException("加入到聊天群组失败");
         }
-
 
         //加入到 members中;
         Update update = new Update();
         update.addToSet("members", userId);
-        if (StringUtils.equals(applyUser.getGender(), Constants.USER_GENDER.MALE)) {
+        if (StringUtils.equals(applyUser.getGender(), Constants.UserGender.MALE)) {
             update.inc("maleNum", 1);
         } else {
             update.inc("femaleNum", 1);
@@ -143,6 +207,32 @@ public class OfficialServiceImpl implements OfficialService {
         officialActivityDao.update(activityId, update);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private void checkUserOverflowed(OfficialActivity officialActivity, User applyUser) throws ApiException {
+        LOG.debug("Check user is already overflowed or not");
+        if (Constants.OfficialActivityLimitType.TOTAL_LIMIT == officialActivity.getLimitType()) {
+            //总人数限制
+            if (officialActivity.getMembers() != null && officialActivity.getMembers().size() >= officialActivity.getTotalLimit()) {
+                LOG.warn("Official activity is already overflow");
+                throw new ApiException("活动人数已满");
+            }
+        } else if (Constants.OfficialActivityLimitType.GENDER_LIMIT == officialActivity.getLimitType()) {
+            //性别人数限制
+            if (StringUtils.equals(applyUser.getGender(), Constants.UserGender.MALE)) {
+                //检查男性用户
+                if (officialActivity.getMaleNum() >= officialActivity.getMaleLimit()) {
+                    LOG.warn("Official activity male limit is already overflow");
+                    throw new ApiException("活动人数已满");
+                }
+            } else {
+                //检查女性用户
+                if (officialActivity.getFemaleNum() >= officialActivity.getFemaleLimit()) {
+                    LOG.warn("Official activity male limit is already overflow");
+                    throw new ApiException("活动人数已满");
+                }
+            }
+        }
     }
 
     @Override

@@ -5,8 +5,8 @@
  *
  * @constructor
  */
-gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'authenticationService',
-    'moment', function ($scope, $rootScope, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, authenticationService, moment) {
+gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$location', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'authenticationService',
+    'moment', function ($scope, $rootScope, $location, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, authenticationService, moment) {
 
         var STATUS_PENDING = '认证中';
         var STATUS_ACCEPTED = '认证通过';
@@ -70,8 +70,6 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
          * Search authentication applications based on criteria
          */
         $scope.searchApplications = function (criteria) {
-            //alert(JSON.stringify(criteria));
-
             $rootScope.loadingPromise = authenticationService.getApplicationList(criteria).success(function (result) {
                 $scope.applications = (result.result === 0 ? result.data : undefined);
             });
@@ -82,14 +80,7 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
          */
         $scope.viewApplication = function (applicationId) {
             authenticationService.setApplication(applicationId);
-            var modalInstance = $modal.open({
-                templateUrl: 'views/auth/driver_authentication_detail.html',
-                controller: 'driverAuthenticateDetailController'
-            });
-
-            return modalInstance.result.then(function (reply) {
-                $scope.searchApplications($scope.criteria);
-            });
+            $location.path('/driverAuthentication/detail');
         };
 
         /**
@@ -105,7 +96,22 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$htt
         };
 
         /**
+         * Reload data on load
+         */
+        $rootScope.loadingPromise = function () {
+            return authenticationService.getApplicationList($scope.criteria).success(function (result) {
+                $scope.applications = (result.result === 0 ? result.data : undefined);
+            })
+        };
+
+        /**
          * Initialize component status
          */
         $scope.resetCriteria();
-    }]);
+
+        /**
+         * Query data once on load
+         */
+        $scope.loadingPromise()
+    }
+]);

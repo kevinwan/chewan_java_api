@@ -240,13 +240,28 @@ public class Constants {
         String OFFICIAL = "OfficialAdmin";
     }
 
-    public interface OFFICIAL_ACTIVITY_LIMIT_TYPE {
+    /**
+     * 官方活动人数限制类型
+     */
+    public interface OfficialActivityLimitType {
+        /**
+         * 官方活动不设置人数限制
+         */
         int NO_LIMIT = 0;
+        /**
+         * 官方活动设置总人数限制
+         */
         int TOTAL_LIMIT = 1;
+        /**
+         * 官方活动设置不同性别人数限制
+         */
         int GENDER_LIMIT = 2;
     }
 
-    public interface USER_GENDER {
+    /**
+     * 用户性别常量
+     */
+    public interface UserGender {
         String MALE = "男";
         String FEMALE = "女";
     }

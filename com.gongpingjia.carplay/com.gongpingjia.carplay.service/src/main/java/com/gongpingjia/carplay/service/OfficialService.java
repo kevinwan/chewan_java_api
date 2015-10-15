@@ -7,7 +7,13 @@ import com.gongpingjia.carplay.entity.common.Address;
 public interface OfficialService {
 
 
-    public ResponseDo getActivityInfo(String activityId);
+    /**
+     * 获取活动详情
+     *
+     * @param officialActivityId
+     * @return
+     */
+    public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException;
 
 
     /**
@@ -15,11 +21,10 @@ public interface OfficialService {
      *
      * @return 返回活动信息
      */
-    public ResponseDo getActivityList(Address address,int limit,int ignore);
+    public ResponseDo getActivityList(Address address, int limit, int ignore);
 
 
     /**
-     *
      * @param activityId
      * @param userId
      * @return
@@ -27,5 +32,5 @@ public interface OfficialService {
     public ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
 
 
-    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId,boolean transfer) throws ApiException;
+    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException;
 }
