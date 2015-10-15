@@ -5,6 +5,8 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import net.sf.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by licheng on 2015/9/28.
  * 官方活动接口
@@ -29,4 +31,6 @@ public interface OfficialActivityService {
     ResponseDo updateActivity(String officialActivityId, JSONObject json)throws ApiException;
 
     ResponseDo getActivity(String officialActivityId) throws ApiException;
+
+    ResponseDo deleteActivities(List<String> officialActivityIds) throws ApiException;
 }

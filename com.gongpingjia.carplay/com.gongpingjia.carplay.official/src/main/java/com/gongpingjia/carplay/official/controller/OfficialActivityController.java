@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.official.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
@@ -13,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -46,7 +50,9 @@ public class OfficialActivityController {
         try {
             checker.checkUserInfo(userId, token);
 
-            CommonUtil.isEmpty(json, Arrays.asList("title", "destination", "cover", "instruction", "description", "price", "subsidyPrice", "priceDesc", "limitType"));
+            if (CommonUtil.isEmpty(json, Arrays.asList("title", "destination", "cover", "instruction", "description", "price", "subsidyPrice", "limitType"))) {
+                throw new ApiException("参数输入不全 请检查参数");
+            }
 
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
             activity.setOfficialActivityId(null);
@@ -86,7 +92,6 @@ public class OfficialActivityController {
         }
     }
 
-    //TODO
     @RequestMapping(value = "/official/activity/update", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId, @RequestBody JSONObject json) {
@@ -106,6 +111,26 @@ public class OfficialActivityController {
             return officialActivityService.getActivity(officialActivityId);
         } catch (ApiException e) {
             LOG.error(e.getLocalizedMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/official/activity/deleteIds", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,@RequestBody JSONArray json) {
+        try {
+            checker.checkUserInfo(userId,token);
+            if (json == null || json.size() == 0) {
+                return ResponseDo.buildFailureResponse("请选择需要删除的项");
+            }
+            List<String> ids = new ArrayList<>(json.size());
+            Iterator<Object> iterator = json.iterator();
+            while (iterator.hasNext()) {
+                ids.add((String)iterator.next());
+            }
+            return officialActivityService.deleteActivities(ids);
+        } catch (ApiException e) {
+            LOG.error(e.getLocalizedMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }

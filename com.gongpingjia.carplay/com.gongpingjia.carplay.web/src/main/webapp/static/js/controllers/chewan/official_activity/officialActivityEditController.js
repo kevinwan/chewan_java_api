@@ -1,7 +1,8 @@
 'use strict';
 
-gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window',
-    function ($scope, $rootScope, $location, officialActivityService, moment, $window) {
+
+gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService',
+    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService) {
 
         /**
          * Cancel button click handler
@@ -9,6 +10,8 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         $scope.close = function () {
             $location.path('/officialActivity/list');
         };
+
+
 
         $scope.initData = function () {
             var officialActivityId = officialActivityService.getOfficialActivityId();
@@ -26,31 +29,45 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     if (result.result === 0) {
                         //初始化时间
                         $scope.activity = result.data;
+                        $scope.activity.onFlag = $scope.activity.onFlag ? 'true' : 'false';
+
                         $scope.photoUrl = $scope.activity.cover.url;
                         //$scope.activity.start
-
+                        document.getElementById("startDate").value = commonService.transferLongToDateString($scope.activity.start);
+                        document.getElementById("startTime").value = commonService.transferLongToTimeString($scope.activity.start);
+                        if ($scope.activity.end != undefined && $scope.activity.end != null && $scope.activity.end !== "") {
+                            document.getElementById("endDate").value = commonService.transferLongToDateString($scope.activity.end);
+                            document.getElementById("endTime").value = commonService.transferLongToTimeString($scope.activity.end);
+                        }
                     }
                 });
             }
         };
+
 
         function checkTime() {
             var startDate = document.getElementById("startDate").value;
             var startTime = document.getElementById("startTime").value;
             var endDate = document.getElementById("endDate").value;
             var endTime = document.getElementById("endTime").value;
-            if (startDate == undefined || startDate == null) {
+            if (startDate == undefined || startDate == null || startDate == "") {
                 $window.alert("请选择开始时间");
-                return;
+                return false;
             }
-            if (startTime == undefined || startTime == null) {
-                $window.alert("请选择结束时间");
-                return;
+            if (startTime == undefined || startTime == null || startTime == "") {
+                $window.alert("请选择开始时间");
+                return false;
             }
-            if (endDate != undefined && endDate != null) {
-                if (endTime == undefined || endTime == null) {
+            if (endDate != undefined && endDate != null && endDate != "") {
+                if (endTime == undefined || endTime == null || endTime == "") {
                     $window.alert("请选择结束时间");
-                    return;
+                    return false;
+                }
+            }
+            if (endTime != undefined && endTime != null && endTime != "") {
+                if (endDate == undefined || endDate == null || endDate == "") {
+                    $window.alert("请选择结束时间");
+                    return false;
                 }
             }
             var startStr = startDate + " " + startTime;
@@ -65,19 +82,21 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             } else {
                 $scope.activity.end = null;
             }
+            return true;
         }
+
 
         $scope.updateOfficialActivity = function () {
             //
-            checkTime();
-
-            $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity).success(function (result) {
-                if (result.result == 0) {
-                    $window.alert("更新成功");
-                } else {
-                    $window.alert("更新失败");
-                }
-            });
+            if (checkTime()) {
+                $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
+                    if (result.result == 0) {
+                        $window.alert("更新成功");
+                    } else {
+                        $window.alert("更新失败");
+                    }
+                });
+            }
         }
 
         /**
@@ -85,14 +104,16 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          */
         $scope.register = function () {
 
-            checkTime();
-
-            officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
-                if (data.result == 0) {
-                    $window.alert("创建成功");
-                    $location.path('/officialActivity/list');
-                }
-            });
+            if (checkTime()) {
+                officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
+                    if (data.result == 0) {
+                        $window.alert("创建成功");
+                        $location.path('/officialActivity/list');
+                    } else {
+                        $window.alert("创建失败 请检查参数");
+                    }
+                });
+            }
         }
 
 
@@ -118,7 +139,30 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             $scope.$apply();
         };
 
+        $scope.checkOnItemStatus = function (onFlag, end) {
+            if (onFlag == false) {
+                //未上架
+                return 0;
+            } else {
+                //上架中
+                if (end == undefined || end == null || end == "") {
+                    return 1;
+                } else {
+                    var nowTime = new Date().getTime();
+                    //当前时间大于 活动 截止时间 活动处于下架状态
+                    if (nowTime > end) {
+                        return 2;
+                    } else {
+                        //活动没有到截止时间 处于 上架中
+                        return 1;
+                    }
+                }
+            }
+        };
 
+        function validateAll(){
+
+        };
         $scope.initData();
     }
 ]);

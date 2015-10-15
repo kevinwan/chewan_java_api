@@ -35,6 +35,26 @@ gpjApp.factory('commonService', [function () {
                 + date.getHours() + ":" + date.getMinutes();
         },
 
+        transferLongToTimeString: function (longTime) {
+            if (longTime == undefined || longTime <= 1) {
+                return "";
+            }
+
+            var date = new Date();
+            date.setTime(longTime);
+            //format  YYYY-MM-DD HH24:MM
+            var hourStr = date.getHours();
+            if(hourStr < 10) {
+                hourStr = "0"+hourStr;
+            }
+            var minuteStr = date.getMinutes();
+            if(minuteStr < 10) {
+                minuteStr = "0" + minuteStr;
+            }
+            return hourStr + ":" + minuteStr;
+        },
+
+
         transferDateStringToLong: function (dateTime) {
             if (dateTime == undefined) {
                 return 0;

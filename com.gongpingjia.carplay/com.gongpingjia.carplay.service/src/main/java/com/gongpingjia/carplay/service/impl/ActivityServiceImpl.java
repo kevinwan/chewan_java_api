@@ -238,6 +238,10 @@ public class ActivityServiceImpl implements ActivityService {
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
         List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit);
+
+        if (null == rltList || rltList.size() == 0) {
+            return ResponseDo.buildSuccessResponse("[]");
+        }
         LOG.debug("rltList size is:" + rltList.size());
 
         List<Map<String, Object>> jsonArray = new ArrayList<>();

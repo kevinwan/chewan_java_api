@@ -117,24 +117,39 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         try {
             String title = json.getString("title");
             String detailAddress = json.getString("detailAddress");
-            String startTimeStr = json.getString("startTime");
-            String onFlagStr = json.getString("onFlag");
+            //查询 活动开始时间大于 startTimeStr 和 小于 endTimeStr 的 活动；
+            String fromTimeStr = json.getString("fromTime");
+            String toTimeStr = json.getString("toTime");
+            String statusStr = json.getString("status");
             Criteria criteria = new Criteria();
-            if (StringUtils.isNotEmpty(startTimeStr)) {
-                Long startTime = Long.parseLong(startTimeStr);
-                criteria.and("start").lt(startTime);
+            criteria.and("deleteFlag").is(false);
+            if (StringUtils.isNotEmpty(statusStr)) {
+                int status = Integer.parseInt(statusStr);
+                if (status == 0) {
+                    criteria.and("onFlag").is(false);
+
+                } else if (status == 1) {
+                    criteria.and("onFlag").is(true);
+                } else if (status == 2) {
+                    criteria.and("onFlag").is(true);
+                }
             }
-            if (StringUtils.isNotEmpty(onFlagStr)) {
-                Boolean onFlag = json.getBoolean("onFlag");
-                criteria.and("onFlag").is(onFlag);
+            // start 大于 fromTime 小于 toTime
+            if (StringUtils.isNotEmpty(fromTimeStr)) {
+                Long fromTime = Long.parseLong(fromTimeStr);
+                criteria.and("start").gte(fromTime);
+            }
+            if (StringUtils.isNotEmpty(toTimeStr)) {
+                Long toTime = Long.parseLong(toTimeStr);
+                criteria.and("start").lte(toTime);
             }
             if (StringUtils.isNotEmpty(detailAddress)) {
-                String detailAddressReg = "/" + detailAddress + "/";
-                criteria.and(detailAddress).regex(detailAddressReg);
+                String detailAddressReg = ".*" + detailAddress + ".*";
+                criteria.and("destination.detail").regex(detailAddressReg);
             }
             if (StringUtils.isNotEmpty(title)) {
-                String titleReg = "/" + title + "/";
-                criteria.and("destination.detail").regex(titleReg);
+                String titleReg = ".*" + title + ".*";
+                criteria.and("title").regex(titleReg);
             }
             List<OfficialActivity> officialActivities = activityDao.find(Query.query(criteria));
             return ResponseDo.buildSuccessResponse(officialActivities);
@@ -196,5 +211,19 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
             officialActivity.getCover().setUrl(CommonUtil.getThirdPhotoServer() + officialActivity.getCover().getKey());
         }
         return ResponseDo.buildSuccessResponse(officialActivity);
+    }
+
+    @Override
+    public ResponseDo deleteActivities(List<String> officialActivityIds) throws ApiException {
+        if (null == officialActivityIds || officialActivityIds.size() == 0) {
+            throw new ApiException("没有选中删除数据");
+        }
+        List<OfficialActivity> officialActivityList = activityDao.findByIds(officialActivityIds);
+        if (officialActivityIds.size() != officialActivityList.size()) {
+            throw new ApiException("存在数据库中不存在的数据");
+        }
+        Update update = Update.update("deleteFlag", true);
+        activityDao.updateAll(Query.query(Criteria.where("officialActivityId").in(officialActivityIds)), update);
+        return ResponseDo.buildSuccessResponse();
     }
 }

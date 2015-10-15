@@ -24,14 +24,17 @@ gpjApp.factory('officialActivityService', ['$http','restProxyService', 'authServ
             saveOfficialActivity: function (data) {
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/activity/register?token=' + USER_TOKEN + "&userId=" + USER_ID, data);
             },
+            deleteOfficialActivities: function(ids) {
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint,'/official/activity/deleteIds?token=' + USER_TOKEN + "&userId=" + USER_ID, ids);
+            },
             getOfficialActivity: function (officialActivityId) {
                 return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/official/activity/info?token=' + USER_TOKEN + "&userId=" + USER_ID + "&officialActivityId=" + officialActivityId);
             },
             sendOnFlag: function (officialActivityId) {
                 return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/official/activity/onFlag?token=' + USER_TOKEN + "&userId=" + USER_ID + "&officialActivityId=" + officialActivityId);
             },
-            updateOfficialActivity: function (data) {
-                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/activity/update?token=' + USER_TOKEN + "&userId=" + USER_ID + "&officialActivityId=" + officialActivityId, data);
+            updateOfficialActivity: function (id,data) {
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/activity/update?token=' + USER_TOKEN + "&userId=" + USER_ID + "&officialActivityId=" + id, data);
             },
             uploadFile: function(data) {
                 return $http({

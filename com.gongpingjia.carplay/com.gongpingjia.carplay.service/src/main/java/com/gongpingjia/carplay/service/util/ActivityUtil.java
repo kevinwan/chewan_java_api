@@ -19,6 +19,9 @@ public class ActivityUtil {
     public static List<Activity> getSortResult(List<Activity> activities, Date currentTime, Landmark nowLandmark,
                                                double maxDistance, long maxPubTime, int skip, int limit) {
         List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime), skip, limit);
+        if (null == activityWeights) {
+            return null;
+        }
         ArrayList<Activity> rltList = new ArrayList<>(activityWeights.size());
         for (ActivityWeight activityWeight : activityWeights) {
             rltList.add(activityWeight.getActivity());
