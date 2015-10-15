@@ -1,0 +1,140 @@
+<div class="page-header">
+    <h1>未被商家选中的车</h1>
+</div>
+<!-- /.page-header -->
+<form class="form-horizontal" role="form">
+
+    <div class="form-inline col-md-12">
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="phone">用户手机</label>
+
+            <div class="controls">
+                <input type="text" id="phone" ng-model="criteria.phone"
+                       placeholder="根据手机号查询">
+            </div>
+        </div>
+
+        <div class="col-md-1">
+            <label class="control-label bolder blue" for="province">用户省份</label>
+
+            <div class="controls">
+                <select id="province" data-ng-model="provinceIndex"
+                        ng-change="changeProvince(provinceOptions[provinceIndex])" style="width:100%;">
+                    <option value="">全部</option>
+                    <option ng-repeat="provinceOption in provinceOptions" ng-value="$index">
+                        {{provinceOption.province}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="city">用户城市</label>
+
+            <div class="controls">
+                <select id="city" data-ng-model="criteria.city"
+                        ng-change="changeCity()" style="width:100%;">
+                    <option value="">全部</option>
+                    <option ng-repeat="cityOption in cityOptions" ng-value="cityOption">
+                        {{cityOption}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-1">
+            <label class="control-label bolder blue" for="process_status">客服状态</label>
+
+            <div class="controls">
+                <select id="process_status" data-ng-model="criteria.process_status" style="width:100%;">
+                    <option value="">全部</option>
+                    <option value="pending">待处理</option>
+                    <option value="processing">处理中</option>
+                    <option value="done">已完成</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-1">
+            <label class="control-label bolder blue" for="source">来源</label>
+
+            <div class="controls">
+                <select id="source" data-ng-model="criteria.source" style="width:100%;">
+                    <option value="">全部</option>
+                    <option value="android">安卓</option>
+                    <option value="ios">苹果</option>
+                    <option value="web_pc">网站</option>
+                    <option value="web_responsive">H5</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="startDate">开始时间</label>
+
+            <div class="">
+                <input type="text" class="form-control" ng-model="criteria.startDate" id="startDate" placeholder="开始时间"
+                       ui-date-format="yy-mm-dd" ui-date="dateOptions">
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="endDate">结束时间</label>
+
+            <div class="">
+                <input type="text" class="form-control" ng-model="criteria.endDate" id="endDate" placeholder="结束时间"
+                       ui-date-format="yy-mm-dd" ui-date="dateOptions">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-inline col-md-12">
+        <div class="clearfix visible‐xs‐block"></div>
+        <div class="control-group pull-right">
+            <button type="button" class="btn btn-info" ng-disabled="" ng-hide=""
+                    ng-click="searchRequirements(criteria)">查询
+            </button>
+            <button type="button" class="btn" ng-click="resetCriteria()">清除</button>
+        </div>
+    </div>
+
+    <div class="control-group col-md-12">
+        <table datatable="ng" dt-options="dtOptions" dt-instance="dtInstance" dt-columns="dtColumns"
+               dt-column-defs="dtColumnDefs" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>发布时间</th>
+                <th>姓名</th>
+                <th>手机</th>
+                <th>品牌</th>
+                <th>型号</th>
+                <th>里程</th>
+                <th>上牌时间</th>
+                <th>估值</th>
+                <th>城市</th>
+                <th>推送商家数</th>
+                <th>来源</th>
+                <th>客服状态</th>
+                <th>操作</th>
+                <th style="display: none"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in items">
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <table class="pull-right">
+        <thead>
+        <tr>
+            <th>
+                <div><span>总计{{total ? total : 0}}条</span></div>
+            </th>
+        </tr>
+        </thead>
+    </table>
+</form>
+
+
+

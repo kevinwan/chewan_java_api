@@ -1,0 +1,40 @@
+<div class="page-header">
+    <h1>运营数据</h1>
+</div>
+
+<style type="text/css">
+    [ac-chart] {
+        float: left;
+        width: 100%;
+        height: 400px;
+        margin: 0 1%;
+    }
+
+    .ac-tooltip {
+        color: black;
+        border: 2px solid rgba(200, 200, 0, 0.8);
+        background-color: rgba(200, 200, 0, 0.5);
+        z-index: 1600;
+    }
+</style>
+<!-- /.page-header -->
+<div bs-tabs>
+    <div title="新增用户" style="height:500px;" bs-pane ng-controller="userStatisticsController">
+        <select ng-init="type='1'" data-ng-model="type" style="margin-left: 10px;"
+                ng-change="getUserAmountStatistics(type)">
+            <option value="">按月统计</option>
+            <option value="1">按日统计</option>
+        </select>
+        <select data-ng-model="userAmountChartType" style="margin-top:40px; margin-left: 10px;">
+            <option value="bar">柱状图</option>
+            <option value="line">曲线图</option>
+        </select>
+
+        <div ac-chart="userAmountChartType" ac-data="newUserData" ac-config="newUserConfig"
+             style="margin-top:5px;"></div>
+    </div>
+    <div title="用户分布" style="height:500px;" bs-pane ng-controller="userStatisticsController">
+        <div ac-chart="userLocateChartType" ac-data="userLocateData" ac-config="userLocateConfig"
+             style="margin-left: 10px;"></div>
+    </div>
+</div>

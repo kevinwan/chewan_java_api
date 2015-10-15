@@ -1,0 +1,93 @@
+<div class="">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">&times;</button>
+            <h4 class="modal-title">未被商家选中的车</h4>
+        </div>
+        <div class="modal-body" style="height: 250px">
+
+            <!-- Row 1 -->
+            <div class="form-inline col-md-12">
+                <div class="control-group col-md-4">
+                    <div class="bolder ">姓名：</div>
+                    <input type="text" id="contact"
+                           ng-model="noDealerTrade.contact" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">手机：</div>
+                    <input type="text" id="phone"
+                           ng-model="noDealerTrade.phone" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">品牌：</div>
+                    <input type="text" id="brand"
+                           ng-model="noDealerTrade.brand" ng-disabled="isDisabled">
+                </div>
+            </div>
+
+            <div class="form-inline col-md-12">
+                <div class="control-group col-md-4">
+                    <div class="bolder ">型号：</div>
+                    <input type="text" id="model"
+                           ng-model="noDealerTrade.model" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">里程：</div>
+                    <input type="text" id="mile"
+                           ng-model="noDealerTrade.mile" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">上牌时间：</div>
+                    <input type="text" id="year"
+                           ng-model="noDealerTrade.year" ng-disabled="isDisabled">
+                </div>
+            </div>
+
+            <div class="form-inline col-md-12">
+                <div class="control-group col-md-4">
+                    <div class="bolder ">估值：</div>
+                    <input type="text" id="eval_price"
+                           ng-model="noDealerTrade.eval_price" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">城市：</div>
+                    <input type="text" id="city"
+                           ng-model="noDealerTrade.city" ng-disabled="isDisabled">
+                </div>
+                <div class="control-group col-md-4">
+                    <div class="bolder ">推送商家数：</div>
+                    <input type="text" id="notify_count"
+                           ng-model="noDealerTrade.notify_count" ng-disabled="isDisabled">
+                </div>
+            </div>
+
+            <div class="form-inline col-md-12">
+                <div class="control-group col-md-4">
+                    <div class="bolder red">客服处理状态：</div>
+                    <select id="process_status" data-ng-model="noDealerTrade.process_status"
+                            style="width:90%;">
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="done">已完成</option>
+                    </select>
+                </div>
+                <div class="control-group col-md-8">
+                    <div class="bolder red">备注内容：</div>
+                    <input type="text" id="process_remarks" placeholder="请输入备注内容"
+                           ng-model="noDealerTrade.process_remarks" style="width: 95%;">
+                </div>
+            </div>
+
+            <div class="hidden">
+                <div class="bolder ">id：</div>
+                <input type="text" id="id"
+                       ng-model="noDealerTrade.open_sell_id" ng-disabled="isDisabled">
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="updateRemarks(noDealerTrade)">备注</button>
+            <button class="btn btn-default" ng-click="close()">取消</button>
+        </div>
+    </div>
+</div>

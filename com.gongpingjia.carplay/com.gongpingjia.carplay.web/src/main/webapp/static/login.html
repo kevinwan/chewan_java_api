@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="gpjApp">
+<head>
+    <meta charset="utf-8"/>
+    <title>车玩App运营系统-登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    
+    <!-- basic styles -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/font-awesome.min.css"/>
+
+    <!--[if IE 7]>
+    <link rel="stylesheet" href="css/font-awesome-ie7.min.css"/>
+    <![endif]-->
+
+    <!-- page specific plugin styles -->
+
+    <link rel="stylesheet" href="css/jquery-ui-1.10.3.full.min.css"/>
+
+    <!-- ace styles -->
+
+    <link rel="stylesheet" href="css/ace.min.css"/>
+    <link rel="stylesheet" href="css/ace-rtl.min.css"/>
+
+    <!-- angular -->
+    <link rel="stylesheet" href="css/angular-busy.min.css"/>
+    <link rel="stylesheet" href="css/notification.min.css"/>
+
+    <!-- gpj -->
+    <link rel="stylesheet" href="css/gpj.css"/>
+
+    <!-- gpj -->
+    <link rel="stylesheet" href="css/style.css"/>
+
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="css/ace-ie.min.css"/>
+    <![endif]-->
+
+    <!-- inline styles related to this page -->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+
+    <!--[if lt IE 9]>
+    <script src="js/lib/ace/html5shiv.js"></script>
+    <script src="js/lib/ace/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="login-layout" onkeydown="keyProcess();">
+
+<!-- jQuery -->
+<script src="js/lib/ace/jquery-2.0.3.min.js"></script>
+<script src="js/lib/ace/jquery.dataTables.min.js"></script>
+<script src="js/lib/ace/jquery-ui-1.10.3.custom.min.js"></script>
+
+<!-- AngularJS -->
+<script src="js/lib/angular/angular.min.js"></script>
+<script src="js/lib/angular/angular-resource.min.js"></script>
+<script src="js/lib/angular/angular-route.min.js"></script>
+<script src="js/lib/angular/angular-sanitize.min.js"></script>
+<script src="js/lib/angular/angular-animate.min.js"></script>
+<script src="js/lib/angular/angular-busy.min.js"></script>
+<script src="js/lib/angular/angular-datatables.min.js"></script>
+<script src="js/lib/angular/angular-datatables.bootstrap.min.js"></script>
+<script src="js/lib/angular/ui-bootstrap-tpls-0.12.0.min.js"></script>
+<script src="js/lib/angular/angular-strap.min.js"></script>
+<script src="js/lib/angular/angular-strap.tpl.min.js"></script>
+<script src="js/lib/angular/angular-md5.min.js"></script>
+<script src="js/lib/angular/moment.min.js"></script>
+<script src="js/lib/angular/angular-moment.min.js"></script>
+<script src="js/lib/angular/angular-charts.min.js"></script>
+<script src="js/lib/angular/notification.js"></script>
+
+<!-- D3 -->
+<script src="js/lib/d3/d3.min.js"></script>
+
+<!-- date.js -->
+<script src="js/lib/ace/date.js"></script>
+
+<!-- Common -->
+<script src="js/app.js"></script>
+<script src="js/directives/ngEnter.js"></script>
+<script src="js/service/common/restProxyService.js"></script>
+<script src="js/service/common/commonService.js"></script>
+<script src="js/service/common/authService.js"></script>
+<script src="js/service/common/userService.js"></script>
+<script src="js/controllers/common/loginController.js"></script>
+
+<div class="main-container">
+    <div class="main-content">
+        <div class="login_box">
+            <div class="login_head">
+                <img id="logo" src="images/gpj.png"/>
+            </div>
+            <div class="login_body">
+                <div class="login_form" ng-controller="loginController">
+                    <h1>车玩App运营系统</h1>
+                    <!--<h2>用户登录</h2>-->
+                    <ul>
+                        <li><input type="text" class="user_txt" ng-model="user.phone" placeholder="手机号"/></li>
+                        <li><input type="password" class="password_txt" ng-model="user.password" placeholder="密码"/></li>
+                        <li><input type="checkbox" class="remember" ng-model="user.remember" id="rememberMe"/><label
+                                for="rememberMe">记住密码</label></li>
+                        <li><input type="submit" id="loginButton" class="login_btn" ng-click="login(user)"
+                                   ng-enter="login(user)" value="登 录"/></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function keyProcess() {
+        if (event.keyCode == 13) {
+            event.cancelBubble = true;
+            event.returnValue = false;
+            document.getElementById('loginButton').click();
+        }
+    }
+
+    $(function () {
+        if("ActiveXObject" in window)
+            alert('IE11 以下的浏览器可能会有兼容问题，请选择 Chrome/火狐/搜狗/360 浏览器');
+    });
+</script>
+</body>
+</html>

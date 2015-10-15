@@ -1,0 +1,37 @@
+<div class="">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">&times;</button>
+            <h4 class="modal-title">客户预约&nbsp;&nbsp;（{{appointments.length ? appointments.length : 0}}人）</h4>
+        </div>
+        <div class="modal-body" style="margin-bottom: 10px">
+            <table datatable="ng" dt-options="dtOptions"
+                   dt-columns="dtColumnDefs" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>手机端操作时间</th>
+                    <th>姓名</th>
+                    <th>电话</th>
+                    <th>预约看车时间</th>
+                    <th>车商已联系</th>
+                    <th>客服状态</th>
+                    <th></th>
+                    <th class="hidden">预约id</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="appointment in appointments">
+                    <td>{{ appointment.process_time }}</td>
+                    <td>{{ appointment.contact }}</td>
+                    <td>{{ appointment.phone }}</td>
+                    <td>{{ appointment.book_time }}</td>
+                    <td>{{ appointment.dial ? '是' : '否' }}</td>
+                    <td>{{ appointment.process_status }}</td>
+                    <td><a href="" ng-click="viewRemarks(appointment)">客服备注</a></td>
+                    <td class="hidden">{{ appointment.book_id }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

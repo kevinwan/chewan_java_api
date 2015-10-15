@@ -1,0 +1,79 @@
+<div class="page-header">
+    <h1>{{criteria.type === 'scan' ? '扫描' : '下载'}}排名</h1>
+</div>
+
+<style type="text/css">
+    [ac-chart] {
+        float: left;
+        width: 100%;
+        height: 400px;
+        margin: 0 1%;
+    }
+
+    .ac-tooltip {
+        color: black;
+        border: 2px solid rgba(200, 200, 0, 0.8);
+        background-color: rgba(200, 200, 0, 0.5);
+        z-index: 1600;
+    }
+</style>
+<!-- /.page-header -->
+
+<div class="form-inline col-md-12">
+    <div class="col-md-1">
+        <label class="control-label bolder blue" for="type">类型</label>
+
+        <div class="controls">
+            <select id="type" data-ng-model="criteria.type"
+                    ng-change="getRankStatistics()">
+                <option value="scan">扫描</option>
+                <option value="download">下载</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-1">
+        <label class="control-label bolder blue" for="city">城市</label>
+
+        <div class="controls">
+            <select id="city" data-ng-model="criteria.city"
+                    ng-change="getRankStatistics()">
+                <option value="北京">北京</option>
+                <option value="成都">成都</option>
+                <option value="南京">南京</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <label class="control-label bolder blue" for="startDate">开始时间</label>
+
+        <div class="">
+            <input type="text" class="form-control" ng-model="criteria.startDate" id="startDate" placeholder="开始时间"
+                   ui-date-format="yy-mm-dd" ui-date="dateOptions" ng-change="getRankStatistics()">
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <label class="control-label bolder blue" for="endDate">结束时间</label>
+
+        <div class="">
+            <input type="text" class="form-control" ng-model="criteria.endDate" id="endDate" placeholder="结束时间"
+                   ui-date-format="yy-mm-dd" ui-date="dateOptions" ng-change="getRankStatistics()">
+        </div>
+    </div>
+
+    <div class="col-md-1">
+        <label class="control-label bolder blue" for="type">图表类型</label>
+
+        <div class="controls">
+            <select id="rankChartType" data-ng-model="rankChartType"
+                    ng-init="rankChartType='bar'">
+                <option value="bar">柱状图</option>
+                <option value="pie">饼状图</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div ac-chart="rankChartType" ac-data="rankData" ac-config="rankConfig" style="margin-top:5px;"></div>

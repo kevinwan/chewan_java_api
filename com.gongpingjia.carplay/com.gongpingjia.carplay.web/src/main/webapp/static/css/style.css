@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Microsoft Yahei';
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6em;
+    background: #eee
+}
+
+ul li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    outline: none
+}
+
+img {
+    border: 0 none;
+}
+
+.clear {
+    clear: both;
+}
+
+input {
+    font-family: 'Microsoft Yahei';
+    cursor: pointer;
+}
+
+/*login*/
+body#login_bg {
+    background: #6fb3e0
+}
+
+div.login_box {
+    position: absolute;
+    width: 615px;
+    left: 50%;
+    margin-left: -210px;
+    top:10%;
+}
+
+div.login_head {
+    width: 434px;
+    text-align: center
+}
+
+div.login_head img {
+    vertical-align: bottom;
+}
+
+div.login_body {
+    width: 615px;
+    height: 588px;
+    margin-top: -70px;
+    background: url('../images/login_bg.png') no-repeat
+}
+
+div.login_form {
+    width: 434px;
+    padding-top: 80px;
+}
+
+div.login_form h1 {
+    text-align: center;
+    font-size: 26px;
+    font-weight: normal
+}
+
+div.login_form h2 {
+    text-align: center;
+    font-size: 20px;
+    font-weight: normal;
+    margin-top: 5px;
+}
+
+div.login_form ul {
+    width: 344px;
+    margin: auto;
+    margin-top: 18px;
+}
+
+div.login_form ul li {
+    height: 40px;
+    margin-top: 10px;
+}
+
+div.login_form ul li input {
+    font-family: 'Microsoft Yahei';
+    height: 40px;
+    border: 0px;
+    font-size: 14px;
+    color: #666
+}
+
+div.login_form ul li input.user_txt, div.login_form ul li input.password_txt {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    text-indent: 20px;
+}
+
+div.login_form ul li input.login_btn {
+    width: 100%;
+    font-size: 16px;
+    background: #ffb752;
+    border-radius: 10px;
+    color: #fff;
+}
+
+div.login_form ul li input.remember {
+    float: left;
+    margin-left: 130px;
+}
+
+div.login_form ul li label {
+    float: left;
+    line-height: 37px;
+    padding-left: 5px;
+}
