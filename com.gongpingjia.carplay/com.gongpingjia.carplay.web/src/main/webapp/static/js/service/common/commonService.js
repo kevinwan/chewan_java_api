@@ -9,7 +9,7 @@
  * @constructor
  */
 
-gpjApp.factory('commonService', [function () {
+gpjApp.factory('commonService', ['restProxyService', function (restProxyService) {
 
     return {
         transferLongToDateString: function (longTime) {
@@ -76,6 +76,10 @@ gpjApp.factory('commonService', [function () {
             milliseconds += parseInt(minute) * (60 * 1000);
 
             return milliseconds;
+        },
+
+        getCities: function () {
+            return restProxyService.sendHttpGet('resource/cities.json', '');
         }
 
     }

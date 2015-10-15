@@ -28,10 +28,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -135,14 +132,23 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 }
             }
             // start 大于 fromTime 小于 toTime
-            if (StringUtils.isNotEmpty(fromTimeStr)) {
+            if (StringUtils.isNotEmpty(fromTimeStr) && StringUtils.isNotEmpty(toTimeStr)) {
+                Long fromTime = Long.parseLong(fromTimeStr);
+                Long toTime = Long.parseLong(toTimeStr);
+                toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
+                criteria.and("start").gte(fromTime).lte(toTime);
+            }else if (StringUtils.isNotEmpty(fromTimeStr) && StringUtils.isEmpty(toTimeStr)) {
                 Long fromTime = Long.parseLong(fromTimeStr);
                 criteria.and("start").gte(fromTime);
-            }
-            if (StringUtils.isNotEmpty(toTimeStr)) {
+            }else if (StringUtils.isEmpty(fromTimeStr) && StringUtils.isNotEmpty(toTimeStr)) {
                 Long toTime = Long.parseLong(toTimeStr);
+                toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
                 criteria.and("start").lte(toTime);
             }
+//            if (StringUtils.isNotEmpty(toTimeStr)) {
+//                Long toTime = Long.parseLong(toTimeStr);
+//                criteria.and("start").lte(toTime);
+//            }
             if (StringUtils.isNotEmpty(detailAddress)) {
                 String detailAddressReg = ".*" + detailAddress + ".*";
                 criteria.and("destination.detail").regex(detailAddressReg);

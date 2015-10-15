@@ -52,9 +52,9 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            $scope.criteria = {title: '', detailAddress: '', onFlag: '-1', status: '-1'};
-            document.getElementById("startDate").value = "";
-            document.getElementById("endDate").value = "";
+            $scope.criteria = {title: '', detailAddress: '', status: '-1', fromDate:moment().format('YYYY-MM-DD'), toDate: moment().format('YYYY-MM-DD')};
+            //document.getElementById("startDate").value = "";
+            //document.getElementById("endDate").value = "";
         };
 
         /**
@@ -62,8 +62,8 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
          */
         $scope.searchOfficialActivities = function (criteria) {
 
-            var startDate = document.getElementById("startDate").value;
-            var endDate = document.getElementById("endDate").value;
+            var startDate = $scope.criteria.fromDate; //document.getElementById("startDate").value;
+            var endDate = $scope.criteria.toDate; //document.getElementById("endDate").value;
             if (startDate !== "") {
                 criteria.fromTime = new Date(startDate).getTime();
             } else {

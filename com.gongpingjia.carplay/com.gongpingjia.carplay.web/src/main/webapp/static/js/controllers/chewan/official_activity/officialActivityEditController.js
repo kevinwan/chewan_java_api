@@ -11,13 +11,35 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             $location.path('/officialActivity/list');
         };
 
+        /**
+         * Get province and city info
+         */
+        commonService.getCities().success(function (data) {
+            $scope.provinceOptions = data;
+        });
 
+        /**
+         * Trigger by province change
+         */
+        $scope.changeProvince = function (provinceOption) {
+            $scope.activity.destination.city = '';
+            $scope.cityOptions = [];
+            if (provinceOption && provinceOption.cities)
+                $scope.cityOptions = provinceOption.cities;
+        };
+
+        /**
+         * Trigger by city change
+         */
+        $scope.changeCity = function () {
+            //alert($scope.criteria.dealer_city);
+        };
 
         $scope.initData = function () {
             var officialActivityId = officialActivityService.getOfficialActivityId();
             if (officialActivityId === '') {
                 //增加
-                $scope.activity = {};
+                $scope.activity = {destination:{}};
                 $scope.activity.limitType = 0;
                 return;
             } else {
@@ -30,6 +52,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         //初始化时间
                         $scope.activity = result.data;
                         $scope.activity.onFlag = $scope.activity.onFlag ? 'true' : 'false';
+
+                        //初始化 显示 类型checkbox
+                        var limitType = $scope.activity.limitType;
+                        document.getElementById("limitType-" + limitType).checked = true;
 
                         $scope.photoUrl = $scope.activity.cover.url;
                         //$scope.activity.start
