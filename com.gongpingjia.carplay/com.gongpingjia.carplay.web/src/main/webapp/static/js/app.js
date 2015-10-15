@@ -14,8 +14,8 @@ gpjApp.constant("ChewanApiEndPoint", "/v2");
  */
 gpjApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
-        templateUrl: 'views/chewan/user.html',
-        controller: 'userController'
+        templateUrl: 'views/chewan/official_activity/list.html',
+        controller: 'officialActivityController'
     }).when('/driverAuthentication/list', {
         templateUrl: 'views/auth/driver_authentication.html',
         controller: 'driverAuthenticateController'
