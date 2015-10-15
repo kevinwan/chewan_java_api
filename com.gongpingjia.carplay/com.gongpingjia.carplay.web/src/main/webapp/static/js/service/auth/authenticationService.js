@@ -88,13 +88,13 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     license.issueTime = commonService.transferDateStringToLong(license.issueTime);
                 },
 
-                processApplication: function (accept, remarks, application) {
+                processApplication: function (accept, application) {
                     return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/approve/driving?token='
                         + authService.getUser().token + '&userId=' + authService.getUser().userId,
                         JSON.stringify({
                             applicationId: application.applicationId,
                             accept: accept,
-                            remarks: remarks,
+                            remarks: application.remarks,
                             license: this.buildLicense(application.authentication),
                             driver: this.buildDriver(application.authentication)
                         }));
