@@ -37,7 +37,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         /**
          * Define data table options
          */
-        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('rowCallback',
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withBootstrap().withOption('rowCallback',
             function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                 $('td', nRow).unbind('click');
                 $('td', nRow).bind('click', function () {
