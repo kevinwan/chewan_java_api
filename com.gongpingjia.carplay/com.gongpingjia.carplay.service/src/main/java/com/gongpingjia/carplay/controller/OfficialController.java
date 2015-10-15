@@ -41,6 +41,7 @@ public class OfficialController {
                                    @RequestParam("userId") String userId, @RequestParam String token) {
         try {
             parameterChecker.checkUserInfo(userId, token);
+
             return officialService.applyJoinActivity(activityId, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -52,18 +53,19 @@ public class OfficialController {
     /**
      * 获取官方活动详细信息
      *
-     * @param activityId 活动Id
-     * @param userId     用户Id
-     * @param token      用户会话Token
+     * @param officialActivityId 活动Id
+     * @param userId             用户Id
+     * @param token              用户会话Token
      * @return 返回结果信息
      */
-    @RequestMapping(value = "/official/activity/{activityId}/info", method = RequestMethod.GET)
-    public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
+    @RequestMapping(value = "/official/activity/{officialActivityId}/info", method = RequestMethod.GET)
+    public ResponseDo getActivityInfo(@PathVariable("officialActivityId") String officialActivityId,
                                       @RequestParam("userId") String userId, @RequestParam("token") String token) {
 
         try {
             parameterChecker.checkUserInfo(userId, token);
-            return officialService.getActivityInfo(activityId);
+
+            return officialService.getActivityInfo(officialActivityId, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -78,22 +80,22 @@ public class OfficialController {
      * @param token    用户会话Token
      * @param province 省份
      * @param city     市
-     * @param district 区
      * @param limit    查询条数
      * @param ignore   忽略条数
      * @return 返回查询结果
      */
     @RequestMapping(value = "/official/activity/list", method = RequestMethod.GET)
     public ResponseDo listActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,
-                                     @RequestParam("province") String province, @RequestParam("city") String city, @RequestParam("district") String district,
+                                     @RequestParam("province") String province, @RequestParam("city") String city,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         try {
             parameterChecker.checkUserInfo(userId, token);
+
             Address address = new Address();
             address.setCity(city);
             address.setProvince(province);
-            address.setDistrict(district);
+
             return officialService.getActivityList(address, limit, ignore);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

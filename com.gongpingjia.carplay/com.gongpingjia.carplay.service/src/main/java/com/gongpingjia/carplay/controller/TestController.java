@@ -103,11 +103,6 @@ public class TestController {
         destination.setStreet("玄武大道");
         oa.setDestination(destination);
 
-        Landmark landmark = new Landmark();
-        landmark.setLongitude(0D);
-        landmark.setLongitude(0D);
-        oa.setDestPoint(landmark);
-
 //        oa.setEstablish(destination);
 //        oa.setEstabPoint(landmark);
 

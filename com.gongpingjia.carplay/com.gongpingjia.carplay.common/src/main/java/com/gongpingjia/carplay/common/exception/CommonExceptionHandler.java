@@ -118,11 +118,11 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(new Exception(ex), response, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
-//    @ExceptionHandler(RuntimeException.class)
-//    public final ResponseEntity<?> handleRuntimeException(RuntimeException ex, WebRequest request) {
-//        LOG.warn("Handle RuntimeException, it is runtime error");
-//        LOG.error(ex.getMessage(), ex);
-//        ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
-//        return handleExceptionInternal(new Exception(ex), response, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-//    }
+    @ExceptionHandler(NullPointerException.class)
+    public final ResponseEntity<?> handleNullPointerException(NullPointerException ex, WebRequest request) {
+        LOG.warn("Handle NullPointerException, it is runtime error");
+        LOG.error(ex.getMessage(), ex);
+        ResponseDo response = ResponseDo.buildFailureResponse("系统错误");
+        return handleExceptionInternal(new Exception(ex), response, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
 }
