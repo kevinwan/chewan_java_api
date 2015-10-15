@@ -75,7 +75,7 @@
                dt-columns="dtColumnDefs" class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>全选 <input type="checkbox" name="checkItem" id="checkItemAll" ng-click="selectAll(this)"/></th>
+                <th>全选 <input type="checkbox"  id="checkItemAll" ng-model="allSelected" ng-change="selectAll(allSelected)"/></th>
                 <th>活动标题</th>
                 <th>参与人数(男女)</th>
                 <th>目的地</th>
@@ -92,13 +92,11 @@
                 <td>
                     <!--&&  -->
                     <!--下架-->
-                    <input ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2"
-                           type="checkbox" name="checkItem" onchange="angular.element(this).scope().checkItem(this)"
-                           id="checkItem{{item.officialActivityId}}"/>
-                    <!--未上架-->
-                    <input ng-show="item.onFlag == false" type="checkbox" name="checkItem"
-                           onchange="angular.element(this).scope().checkItem(this)"
-                           id="checkItem{{item.officialActivityId}}"/>
+                    <!--<input ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2 || checkOnItemStatus(item.onFlag,item.end) == 0"-->
+                           <!--type="checkbox" name="checkItem" onchange="angular.element(this).scope().checkItem(this)"-->
+                           <!--id="checkItem{{item.officialActivityId}}"/>-->
+                    <input ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2 || checkOnItemStatus(item.onFlag,item.end) == 0"
+                           type="checkbox" name="checkItem" ng-model="item.checked" ng-change="checkItem(item)"/>
                 </td>
                 <td>
                     <!--未上架   修改-->

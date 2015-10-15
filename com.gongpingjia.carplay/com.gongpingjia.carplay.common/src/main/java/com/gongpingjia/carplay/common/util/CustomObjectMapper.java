@@ -8,9 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2015/9/28.
@@ -35,9 +33,9 @@ public class CustomObjectMapper extends ObjectMapper {
             @Override
             public void serialize(Object value, JsonGenerator jgen, SerializerProvider sp) throws IOException, JsonProcessingException {
                 if (value instanceof Collection) {
-                    jgen.writeString("[]");
+                    jgen.writeObject(new ArrayList<>(0));
                 } else if (value instanceof Map) {
-                    jgen.writeString("{}");
+                    jgen.writeObject(new HashMap<>(0));
                 } else {
                     jgen.writeString("");
                 }

@@ -40,8 +40,7 @@
                             <label style="color:red">*</label>省份
                         </div>
                         <div class="col-md-8" style="text-align:left">
-                            <input type="text" id="province" ng-model="activity.destination.province" required
-                                    />
+                            <input type="text" id="province" ng-model="activity.destination.province" required />
                         </div>
                     </div>
                 </div>
@@ -80,7 +79,7 @@
                     </div>
                     <div class="col-md-8" style="text-align:left">
                         <div class="upload">
-                            <div id="thumbnails"><img src="{{photoUrl}}"></div>
+                            <div id="thumbnails"><img src="{{photoUrl}}" width="350px" height="300px"></div>
                             <input type="file" class="upload_file" multiple ng-model-instant id="uploadFile"
                                    onchange="angular.element(this).scope().uploadFile(this)" required>
                         </div>

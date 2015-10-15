@@ -182,6 +182,8 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     public ResponseDo updateActivity(String officialActivityId, JSONObject json) throws ApiException {
         json.remove("members");
         json.remove("photos");
+        json.remove("organizer");
+        json.remove("covers");
         OfficialActivity source = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
 
         OfficialActivity officialActivity = activityDao.findById(officialActivityId);

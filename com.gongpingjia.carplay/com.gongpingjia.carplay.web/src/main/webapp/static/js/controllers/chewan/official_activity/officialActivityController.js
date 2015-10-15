@@ -52,7 +52,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            $scope.criteria = {title: '', detailAddress: '', onFlag: '-1',status:'-1'};
+            $scope.criteria = {title: '', detailAddress: '', onFlag: '-1', status: '-1'};
             document.getElementById("startDate").value = "";
             document.getElementById("endDate").value = "";
         };
@@ -64,14 +64,14 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
 
             var startDate = document.getElementById("startDate").value;
             var endDate = document.getElementById("endDate").value;
-            if(startDate !== ""){
+            if (startDate !== "") {
                 criteria.fromTime = new Date(startDate).getTime();
-            }else{
+            } else {
                 criteria.fromTime = "";
             }
-            if(endDate !== ""){
+            if (endDate !== "") {
                 criteria.toTime = new Date(startDate).getTime();
-            }else{
+            } else {
                 criteria.toTime = "";
             }
             $rootScope.loadingPromise = officialActivityService.getOfficialActivityList(criteria).success(function (result) {
@@ -128,54 +128,76 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             }
         };
 
-        $scope.checkItem = function(itemCheckbox){
-            var id = itemCheckbox.id.substring(9,itemCheckbox.id.length);
-            if(itemCheckbox.checked){
-                //如果被选中
-                //已经存在
-                for(var index in $scope.deleteIds) {
-                    if($scope.deleteIds[index] === id) {
-                        return;
-                    }
-                }
-                $scope.deleteIds.push(id);
-            }else{
-                //不选中
-                for(var index in $scope.deleteIds) {
-                    if($scope.deleteIds[index] === id) {
-                       $scope.deleteIds.splice(index,1)
-                    }
-                }
+        $scope.checkItem = function (item) {
+            //var id = itemCheckbox.id.substring(9,itemCheckbox.id.length);
+            //if(itemCheckbox.checked){
+            //    //如果被选中
+            //    //已经存在
+            //    for(var index in $scope.deleteIds) {
+            //        if($scope.deleteIds[index] === id) {
+            //            return;
+            //        }
+            //    }
+            //    $scope.deleteIds.push(id);
+            //}else{
+            //    //不选中
+            //    for(var index in $scope.deleteIds) {
+            //        if($scope.deleteIds[index] === id) {
+            //           $scope.deleteIds.splice(index,1)
+            //        }
+            //    }
+            //}
+            if (item.checked) {
+                $scope.deleteIdsSet[item.officialActivityId] = 1;
+            } else {
+                delete $scope.deleteIdsSet[item.getOfficialActivityId];
             }
         };
 
-        $scope.deleteOfficialActivities = function(){
-            if($window.confirm("确定删除")){
-                $rootScope.loadingPromise =   officialActivityService.deleteOfficialActivities($scope.deleteIds).success(function(result){
-                    if(result.result == 0) {
+        $scope.deleteOfficialActivities = function () {
+            if ($window.confirm("确定删除")) {
+                var deleteIds = [];
+                for(var item in $scope.deleteIdsSet) {
+                    deleteIds.push(item);
+                }
+                $rootScope.loadingPromise = officialActivityService.deleteOfficialActivities(deleteIds).success(function (result) {
+                    if (result.result == 0) {
                         $window.alert("删除成功");
-                     $scope.searchOfficialActivities($scope.criteria);
-                    }else{
+                        $scope.searchOfficialActivities($scope.criteria);
+                    } else {
                         $window.alert(result.errmsg);
                     }
                 });
             }
         };
 
-        $scope.selectAll = function(){
-            var allItem = document.getElementById("checkItemAll");
-            if(allItem.checked) {
-                //
-                var items =   document.getElementsByName("checkItem");
-                for(var index in items) {
-                    items[index].checked = true;
+        $scope.selectAll = function (allChecked) {
+            //var allItem = document.getElementById("checkItemAll");
+            //if(allItem.checked) {
+            //    //
+            //    var items =   document.getElementsByName("checkItem");
+            //    for(var index in items) {
+            //        items[index].checked = true;
+            //    }
+            //}
+            if (allChecked) {
+                for (var index in $scope.officialActivities) {
+                    var item = $scope.officialActivities[index];
+                    //不在上架状态中
+                    if ($scope.checkOnItemStatus(item.onFlag, item.end) != 1) {
+                        if (allChecked) {
+                            $scope.deleteIdsSet[item.officialActivityId] = 1;
+                            item.checked = allChecked;
+                        }
+                    }
                 }
             }
-            var name = '123';
         };
 
 
         $scope.resetCriteria();
-        $scope.deleteIds = [];
+
+        $scope.deleteIdsSet = {};
+
         $scope.searchOfficialActivities($scope.criteria);
     }]);
