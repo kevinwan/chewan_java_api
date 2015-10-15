@@ -94,6 +94,7 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         Car car = new Car();
         car.setBrand(json.getString("brand"));
         car.setModel(json.getString("model"));
+        car.setLogo(json.getString("logo"));
         update.set("car", car);
         userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
 

@@ -37,7 +37,7 @@ public class AuthenticationController {
                                                  @RequestParam(value = "token") String token, @RequestBody JSONObject json) {
         LOG.debug("licenseAuthenticationApply is called, request parameter produce:{}", json);
 
-        if (CommonUtil.isEmpty(json, Arrays.asList("brand", "model", "driverLicense", "drivingLicense"))) {
+        if (CommonUtil.isEmpty(json, Arrays.asList("brand", "model", "logo", "driverLicense", "drivingLicense"))) {
             return ResponseDo.buildFailureResponse("输入参数有误");
         }
 

@@ -63,6 +63,11 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("输入参数有误");
         }
 
+        if (officialActivity.getDeleteFlag()) {
+            LOG.warn("Official activity already deleted, _id:{}", officialActivityId);
+            throw new ApiException("活动信息不存在");
+        }
+
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
 
@@ -125,6 +130,7 @@ public class OfficialServiceImpl implements OfficialService {
         if (StringUtils.isNotEmpty(address.getCity())) {
             criteria.and("destination.city").is(address.getCity());
         }
+        criteria.and("deleteFlag").is(false);//过滤已经删除了的官方活动
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
