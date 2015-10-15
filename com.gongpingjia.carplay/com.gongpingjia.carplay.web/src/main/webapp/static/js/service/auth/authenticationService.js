@@ -34,13 +34,17 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                 initialApplication: function (authentication) {
                     var driver = authentication.driver;
 
-                    driver.birthday = commonService.transferLongToDateString(driver.birthday);
-                    driver.issueDate = commonService.transferLongToDateString(driver.issueDate);
-                    driver.validFrom = commonService.transferLongToDateString(driver.validFrom);
+                    if (driver) {
+                        driver.birthday = commonService.transferLongToDateString(driver.birthday);
+                        driver.issueDate = commonService.transferLongToDateString(driver.issueDate);
+                        driver.validFrom = commonService.transferLongToDateString(driver.validFrom);
+                    }
 
                     var license = authentication.license;
-                    license.registerTime = commonService.transferLongToDateString(license.registerTime);
-                    license.issueTime = commonService.transferLongToDateString(license.issueTime);
+                    if (license) {
+                        license.registerTime = commonService.transferLongToDateString(license.registerTime);
+                        license.issueTime = commonService.transferLongToDateString(license.issueTime);
+                    }
                 },
 
                 buildLicense: function (authentication) {

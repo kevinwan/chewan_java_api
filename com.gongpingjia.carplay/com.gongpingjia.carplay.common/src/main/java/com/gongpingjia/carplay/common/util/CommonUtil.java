@@ -12,232 +12,225 @@ import org.springframework.util.StringUtils;
 
 /**
  * 公共类公共方法
- * 
- * @author licheng
  *
+ * @author licheng
  */
 public class CommonUtil {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CommonUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommonUtil.class);
 
-	/**
-	 * 手机号正则匹配模式
-	 */
-	private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{11}$");
+    /**
+     * 手机号正则匹配模式
+     */
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{11}$");
 
-	/**
-	 * UUID的正则表达式匹配
-	 */
-	private static final Pattern UUID_PATTERN = Pattern
-			.compile("^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
+    /**
+     * UUID的正则表达式匹配
+     */
+    private static final Pattern UUID_PATTERN = Pattern
+            .compile("^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$", Pattern.CASE_INSENSITIVE);
 
-	/**
-	 * 检查电话号码是否正确
-	 * 
-	 * @param phone
-	 *            电话号码
-	 * @return 如果是电话号码返回true， 否则返回false
-	 */
-	public static boolean isPhoneNumber(String phone) {
-		LOG.debug("Check phone number: {}", phone);
-		if (StringUtils.isEmpty(phone)) {
-			LOG.warn("phone number is empty");
-			return false;
-		}
+    /**
+     * 检查电话号码是否正确
+     *
+     * @param phone 电话号码
+     * @return 如果是电话号码返回true， 否则返回false
+     */
+    public static boolean isPhoneNumber(String phone) {
+        LOG.debug("Check phone number: {}", phone);
+        if (StringUtils.isEmpty(phone)) {
+            LOG.warn("phone number is empty");
+            return false;
+        }
 
-		// 手机号必须为长度为11的数字字符串
-		if (!PHONE_PATTERN.matcher(phone).matches()) {
-			LOG.warn("phone number is not a number sequence which length is 11");
-			return false;
-		}
+        // 手机号必须为长度为11的数字字符串
+        if (!PHONE_PATTERN.matcher(phone).matches()) {
+            LOG.warn("phone number is not a number sequence which length is 11");
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * 检查字符串是否为UUID生成字符串
-	 * 
-	 * @param uuid
-	 *            UUID字符串
-	 * @return 是UUID字符串返回true，否则返回false
-	 */
-	public static boolean isUUID(String uuid) {
-		if (StringUtils.isEmpty(uuid)) {
-			return false;
-		}
-		return UUID_PATTERN.matcher(uuid).matches();
-	}
+    /**
+     * 检查字符串是否为UUID生成字符串
+     *
+     * @param uuid UUID字符串
+     * @return 是UUID字符串返回true，否则返回false
+     */
+    public static boolean isUUID(String uuid) {
+        if (StringUtils.isEmpty(uuid)) {
+            return false;
+        }
+        return UUID_PATTERN.matcher(uuid).matches();
+    }
 
-	/**
-	 * 获取第三方图片资源服务器
-	 * 
-	 * @return 图片资源服务器URL
-	 */
-	public static String getThirdPhotoServer() {
-		return PropertiesUtil.getProperty("qiniu.server.url", "http://7xknzo.com1.z0.glb.clouddn.com/");
-	}
+    /**
+     * 获取第三方图片资源服务器
+     *
+     * @return 图片资源服务器URL
+     */
+    public static String getThirdPhotoServer() {
+        return PropertiesUtil.getProperty("qiniu.server.url", "http://7xknzo.com1.z0.glb.clouddn.com/");
+    }
 
-	/**
-	 * 获取本地图片资源服务器
-	 * 
-	 * @return 图片资源服务器URL
-	 */
-	public static String getLocalPhotoServer() {
-		return PropertiesUtil.getProperty("carplay.server.photo.url", "http://localhost:8080/com.gongpingjia.carplay.web/photos/");
-	}
-	
-	/**
-	 * 获取公平价图标前缀
-	 * 
-	 * @return 返回gpjImagePrefix
-	 */
-	public static String getGPJBrandLogoPrefix() {
-		return PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "http://img.gongpingjia.com/img/logo/");
-	}
+    /**
+     * 获取本地图片资源服务器
+     *
+     * @return 图片资源服务器URL
+     */
+    public static String getLocalPhotoServer() {
+        return PropertiesUtil.getProperty("carplay.server.photo.url", "http://localhost:8080/com.gongpingjia.carplay.web/photos/");
+    }
 
-	/**
-	 * 获取查找七牛服务器的后缀
-	 * 
-	 * @return 返回后缀配置信息
-	 */
-	public static String getActivityPhotoPostfix() {
-		return PropertiesUtil.getProperty("activity.photo.postfix", "?imageView2/1/w/200");
-	}
+    /**
+     * 获取公平价图标前缀
+     *
+     * @return 返回gpjImagePrefix
+     */
+    public static String getGPJBrandLogoPrefix() {
+        return PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "http://img.gongpingjia.com/img/logo/");
+    }
 
-	/**
-	 * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
-	 * 
-	 * @param objectValue
-	 *            目标值
-	 * @param defaultValue
-	 *            默认值
-	 * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
-	 */
-	public static Object ifNull(Object objectValue, Object defaultValue) {
-		if (objectValue == null) {
-			return defaultValue;
-		}
-		return objectValue;
-	}
+    /**
+     * 获取查找七牛服务器的后缀
+     *
+     * @return 返回后缀配置信息
+     */
+    public static String getActivityPhotoPostfix() {
+        return PropertiesUtil.getProperty("activity.photo.postfix", "?imageView2/1/w/200");
+    }
 
-	/**
-	 * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
-	 * 
-	 * @param objectValue
-	 *            目标值
-	 * @param defaultValue
-	 *            默认值
-	 * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
-	 */
-	public static Object ifEmtyReturnNull(Object objectValue) {
-		if (objectValue == null) {
-			return null;
-		}
+    /**
+     * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+     *
+     * @param objectValue  目标值
+     * @param defaultValue 默认值
+     * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+     */
+    public static Object ifNull(Object objectValue, Object defaultValue) {
+        if (objectValue == null) {
+            return defaultValue;
+        }
+        return objectValue;
+    }
 
-		if (objectValue instanceof String) {
-			if (StringUtils.isEmpty(objectValue.toString().trim())) {
-				return null;
-			}
-		}
+    /**
+     * 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+     *
+     * @param objectValue  目标值
+     * @param defaultValue 默认值
+     * @return 获取当前ObjectValue，如果为Null的话，取默认值DefaultValue
+     */
+    public static Object ifEmtyReturnNull(Object objectValue) {
+        if (objectValue == null) {
+            return null;
+        }
 
-		return objectValue;
-	}
+        if (objectValue instanceof String) {
+            if (StringUtils.isEmpty(objectValue.toString().trim())) {
+                return null;
+            }
+        }
 
-	/**
-	 * 检查JSON对象中对应的Key值是否为空，如果为空返回true， 否则返回false
-	 * 
-	 * @param json
-	 * @param key
-	 * @return
-	 */
-	public static boolean isEmpty(JSONObject json, String key) {
-		if (json == null) {
-			return true;
-		}
+        return objectValue;
+    }
 
-		if (!json.containsKey(key)) {
-			return true;
-		}
+    /**
+     * 检查JSON对象中对应的Key值是否为空，如果为空返回true， 否则返回false
+     *
+     * @param json
+     * @param key
+     * @return
+     */
+    public static boolean isEmpty(JSONObject json, String key) {
+        if (json == null) {
+            return true;
+        }
 
-		if (StringUtils.isEmpty(json.getString(key))) {
-			return true;
-		}
-		return false;
-	}
+        if (!json.containsKey(key)) {
+            return true;
+        }
 
-	/**
-	 * 检查Key对应的参数为数组类型是否为空
-	 * 
-	 * @param json
-	 * @param key
-	 * @return
-	 */
-	public static boolean isArrayEmpty(JSONObject json, String key) {
-		if (json == null) {
-			return true;
-		}
+        if (StringUtils.isEmpty(json.getString(key))) {
+            return true;
+        }
+        return false;
+    }
 
-		if (!json.containsKey(key)) {
-			return true;
-		}
-		try {
-			if (json.getJSONArray(key).isEmpty()) {
-				return true;
-			}
-		} catch (Exception e) {
-			LOG.warn("{} is not a JSONArray", key);
-			return true;
-		}
-		return false;
-	}
+    /**
+     * 检查Key对应的参数为数组类型是否为空
+     *
+     * @param json
+     * @param key
+     * @return
+     */
+    public static boolean isArrayEmpty(JSONObject json, String key) {
+        if (json == null) {
+            return true;
+        }
 
-	/**
-	 * 根据JSONArray返回String数组
-	 */
-	public static String[] getStringArray(JSONArray jsonArray) {
-		String[] strings;
-		int length = jsonArray.size();
-		if (length == 0) {
-			return null;
-		} else {
-			strings = new String[length];
-			for (int i = 0; i < length; i++) {
-				strings[i] = jsonArray.getString(i);
-			}
-			return strings;
-		}
-	}
+        if (!json.containsKey(key)) {
+            return true;
+        }
+        try {
+            if (json.getJSONArray(key).isEmpty()) {
+                return true;
+            }
+        } catch (Exception e) {
+            LOG.warn("{} is not a JSONArray", key);
+            return true;
+        }
+        return false;
+    }
 
-	/**
-	 * 获取json对象中key的value值，如果key不存在就返回defaultValue
-	 *
-	 * @param json
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public static String getString(JSONObject json, String key, String defaultValue) {
-		if (isEmpty(json, key)) {
-			return defaultValue;
-		}
-		return json.getString(key);
-	}
+    /**
+     * 根据JSONArray返回String数组
+     */
+    public static String[] getStringArray(JSONArray jsonArray) {
+        String[] strings;
+        int length = jsonArray.size();
+        if (length == 0) {
+            return null;
+        } else {
+            strings = new String[length];
+            for (int i = 0; i < length; i++) {
+                strings[i] = jsonArray.getString(i);
+            }
+            return strings;
+        }
+    }
 
-	/**
-	 * 批量检查Key值为空的参数,如果存在一个为空的就返回true
-	 *
-	 * @param json
-	 * @param keys
-	 * @return
-	 */
-	public static boolean isEmpty(JSONObject json, List<String> keys) {
-		for (String key : keys) {
-			if (isEmpty(json, key)) {
-				LOG.warn("Parameter {} is empty", key);
-				return true;
-			}
-		}
+    /**
+     * 获取json对象中key的value值，如果key不存在就返回defaultValue
+     *
+     * @param json
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static String getString(JSONObject json, String key, String defaultValue) {
+        if (isEmpty(json, key)) {
+            return defaultValue;
+        }
+        return json.getString(key);
+    }
 
-		return false;
-	}
+    /**
+     * 批量检查Key值为空的参数,如果存在一个为空的就返回true
+     *
+     * @param json
+     * @param keys
+     * @return
+     */
+    public static boolean isEmpty(JSONObject json, List<String> keys) {
+        for (String key : keys) {
+            if (isEmpty(json, key)) {
+                LOG.warn("Parameter {} is empty", key);
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
