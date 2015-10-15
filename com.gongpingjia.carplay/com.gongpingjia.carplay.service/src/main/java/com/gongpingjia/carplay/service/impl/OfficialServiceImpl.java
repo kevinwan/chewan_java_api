@@ -165,8 +165,7 @@ public class OfficialServiceImpl implements OfficialService {
      */
     @Override
     public ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException {
-
-        LOG.debug("applyJoinActivity starts");
+        LOG.debug("applyJoinActivity starts check input paramters");
 
         OfficialActivity officialActivity = officialActivityDao.findById(activityId);
         if (null == officialActivity) {
@@ -175,11 +174,9 @@ public class OfficialServiceImpl implements OfficialService {
         }
 
         List<String> members = officialActivity.getMembers();
-        for (String member : members) {
-            if (member.equals(userId)) {
-                LOG.warn("Already be a member");
-                throw new ApiException("已是成员，不能重复申请加入活动");
-            }
+        if (members != null && members.contains(userId)) {
+            LOG.warn("Already be a member");
+            throw new ApiException("已是成员，不能重复申请加入活动");
         }
 
         User applyUser = userDao.findById(userId);
@@ -188,20 +185,20 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("用户不存在");
         }
 
+        checkUserOverflowed(officialActivity, applyUser);
+
         //加入到环信群组中
         try {
             chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
         } catch (ApiException e) {
-            LOG.error(e.getMessage(), e);
-            //添加环信用户失败；
-            throw e;
+            LOG.warn(e.getMessage(), e);
+            throw new ApiException("加入到聊天群组失败");
         }
-
 
         //加入到 members中;
         Update update = new Update();
         update.addToSet("members", userId);
-        if (StringUtils.equals(applyUser.getGender(), Constants.USER_GENDER.MALE)) {
+        if (StringUtils.equals(applyUser.getGender(), Constants.UserGender.MALE)) {
             update.inc("maleNum", 1);
         } else {
             update.inc("femaleNum", 1);
@@ -210,6 +207,32 @@ public class OfficialServiceImpl implements OfficialService {
         officialActivityDao.update(activityId, update);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private void checkUserOverflowed(OfficialActivity officialActivity, User applyUser) throws ApiException {
+        LOG.debug("Check user is already overflowed or not");
+        if (Constants.OfficialActivityLimitType.TOTAL_LIMIT == officialActivity.getLimitType()) {
+            //总人数限制
+            if (officialActivity.getMembers() != null && officialActivity.getMembers().size() >= officialActivity.getTotalLimit()) {
+                LOG.warn("Official activity is already overflow");
+                throw new ApiException("活动人数已满");
+            }
+        } else if (Constants.OfficialActivityLimitType.GENDER_LIMIT == officialActivity.getLimitType()) {
+            //性别人数限制
+            if (StringUtils.equals(applyUser.getGender(), Constants.UserGender.MALE)) {
+                //检查男性用户
+                if (officialActivity.getMaleNum() >= officialActivity.getMaleLimit()) {
+                    LOG.warn("Official activity male limit is already overflow");
+                    throw new ApiException("活动人数已满");
+                }
+            } else {
+                //检查女性用户
+                if (officialActivity.getFemaleNum() >= officialActivity.getFemaleLimit()) {
+                    LOG.warn("Official activity male limit is already overflow");
+                    throw new ApiException("活动人数已满");
+                }
+            }
+        }
     }
 
     @Override
