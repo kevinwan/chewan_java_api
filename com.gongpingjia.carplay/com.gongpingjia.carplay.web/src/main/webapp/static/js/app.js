@@ -1,12 +1,12 @@
 'use strict';
 
 var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'datatables', 'angularMoment',
-    'ui.bootstrap','mgcrea.ngStrap.datepicker', 'mgcrea.ngStrap.timepicker', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
-    'ui.date']);
+    'ui.bootstrap', 'mgcrea.ngStrap.datepicker', 'mgcrea.ngStrap.timepicker', 'mgcrea.ngStrap.tab', 'cgBusy', 'ngAnimate',
+    'angular-md5', 'angularCharts', 'notifications', 'ui.date']);
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://127.0.0.1:8000');
-gpjApp.constant("ChewanApiProvider", "http://127.0.0.1:8080");
-gpjApp.constant("ChewanApiEndPoint", "");
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+gpjApp.constant("ChewanApiProvider", "http://cwapi.gongpingjia.com:8080");
+gpjApp.constant("ChewanApiEndPoint", "/v2");
 
 
 /**
@@ -47,13 +47,13 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/chewan/official_activity/view.html',
         controller: 'officialActivityEditController'
     });
-}]).config(function($datepickerProvider) {
-        angular.extend($datepickerProvider.defaults, {
-            dateFormat: 'yyyy-MM-dd',
-            startWeek: 1
-        });
+}]).config(function ($datepickerProvider) {
+    angular.extend($datepickerProvider.defaults, {
+        dateFormat: 'yyyy-MM-dd',
+        startWeek: 1
+    });
 
-    }).config(function($timepickerProvider) {
+}).config(function ($timepickerProvider) {
     angular.extend($timepickerProvider.defaults, {
         timeFormat: 'HH:mm',
         length: 7
@@ -75,7 +75,7 @@ gpjApp.run(['$rootScope', '$location', '$window', 'authService', function ($root
         var loginUser = authService.getUser();
         if (!loginUser) {
             event.preventDefault();
-            $window.location.href = '/static/login.html';
+            $window.location.href = '/v2/login.html';
         }
     });
 }]);

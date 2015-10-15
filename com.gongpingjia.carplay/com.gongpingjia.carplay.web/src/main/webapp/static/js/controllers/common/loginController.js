@@ -12,7 +12,8 @@ gpjApp.controller('loginController', ['$scope', '$window', 'userService', 'authS
             userService.logIn(user.phone, md5.createHash(user.password)).success(function (resp) {
                 if (resp.result === 0) {
                     authService.setUser(resp.data);
-                    $window.location.href = '/static/index.html'
+                    $window.absUrl =
+                    $window.location.href = '/v2/index.html'
                 } else
                     alert('用户名或密码错误');
             }).error(function (status, data) {

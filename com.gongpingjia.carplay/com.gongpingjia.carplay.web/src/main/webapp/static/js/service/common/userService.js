@@ -19,7 +19,7 @@ gpjApp.factory('userService', ['$window', 'authService', 'restProxyService', 'Ch
 
             logOut: function () {
                 authService.setUser(undefined);
-                $window.location.href = '/static/login.html';
+                $window.location.href = '/v2/login.html';
             }
         }
     }]);

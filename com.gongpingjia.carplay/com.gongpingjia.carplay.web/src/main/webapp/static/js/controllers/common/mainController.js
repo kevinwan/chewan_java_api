@@ -23,7 +23,7 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
             userService.logOut().success(function (resp) {
                 if (resp.status === "success") {
                     authService.setUser('');
-                    $window.location.href = '/static/login.html';
+                    $window.location.href = '/v2/login.html';
                 } else
                     alert(resp.msg ? resp.msg : '注销失败');
             }).error(function (status, data) {

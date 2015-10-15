@@ -48,7 +48,7 @@ public class ParameterChecker {
         }
 
         if (!userToken.getToken().equals(token)) {
-            LOG.error("User token response to userId in the system, token:{}", token);
+            LOG.error("User token is not response to userId in the system, token:{}", token);
             throw new ApiException("输入参数有误");
         }
 
