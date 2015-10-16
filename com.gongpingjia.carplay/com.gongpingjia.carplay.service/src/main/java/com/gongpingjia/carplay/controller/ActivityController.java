@@ -51,8 +51,8 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            parameterChecker.checkUserInfo(userId,token);
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination","destPoint", "estabPoint", "establish", "transfer"))) {
+            parameterChecker.checkUserInfo(userId, token);
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "destination", "destPoint", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
@@ -78,7 +78,7 @@ public class ActivityController {
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            parameterChecker.checkUserInfo(userId,token);
+            parameterChecker.checkUserInfo(userId, token);
             ResponseDo responseDo = activityService.getActivityInfo(userId, activityId);
             return responseDo;
         } catch (ApiException e) {
@@ -121,14 +121,14 @@ public class ActivityController {
      * @param json
      * @return
      */
-        @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST,
+    @RequestMapping(value = "/activity/{activityId}/join", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("activity/ {} /join begin", activityId);
         try {
             //TODO validator
-            parameterChecker.checkUserInfo(userId,token);
+            parameterChecker.checkUserInfo(userId, token);
             Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
             return activityService.sendAppointment(activityId, userId, appointment);
         } catch (ApiException e) {
