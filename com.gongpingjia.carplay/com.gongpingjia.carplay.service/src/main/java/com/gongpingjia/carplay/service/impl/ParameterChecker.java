@@ -2,8 +2,10 @@ package com.gongpingjia.carplay.service.impl;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
+import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
 import com.gongpingjia.carplay.entity.user.User;
@@ -49,7 +51,7 @@ public class ParameterChecker {
 
         if (!userToken.getToken().equals(token)) {
             LOG.error("User token is not response to userId in the system, token:{}", token);
-            throw new ApiException("输入参数有误");
+            throw new ApiException("权限不够");
         }
 
         if (userToken.getExpire() < DateUtil.getTime()) {

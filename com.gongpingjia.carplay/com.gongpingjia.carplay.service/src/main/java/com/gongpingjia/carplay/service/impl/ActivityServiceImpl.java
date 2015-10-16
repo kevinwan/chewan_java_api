@@ -256,7 +256,8 @@ public class ActivityServiceImpl implements ActivityService {
             Map<String, Object> itemOrganizer = new HashMap<>();
             itemOrganizer.put("userId", activity.getOrganizer().getUserId());
             itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
-            itemOrganizer.put("avatar", activity.getOrganizer().getAvatar());
+            //TODO
+            itemOrganizer.put("avatar",CommonUtil.getLocalPhotoServer() + activity.getOrganizer().getAvatar());
             itemOrganizer.put("gender", activity.getOrganizer().getGender());
             itemOrganizer.put("age", activity.getOrganizer().getAge());
             itemOrganizer.put("car", activity.getOrganizer().getCar());

@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
+import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +36,9 @@ public class OfficialActivityController {
     @Autowired
     private ParameterChecker checker;
 
+    @Autowired
+    private OfficialParameterChecker officialParameterChecker;
+
     /**
      * 创建官方活动
      *
@@ -49,28 +53,9 @@ public class OfficialActivityController {
         LOG.debug("begin registerActivity by official operation, userId:{}", userId);
 
         try {
-            checker.checkUserInfo(userId, token);
+            officialParameterChecker.checkAdminUserInfo(userId, token);
 
-            if (CommonUtil.isEmpty(json, Arrays.asList("title", "destination", "cover", "instruction", "description", "price", "subsidyPrice", "limitType"))) {
-                throw new ApiException("参数输入不全 请检查参数");
-            }
-
-            OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
-
-            if (null == activity.getDestination()) {
-                throw new ApiException("地址不能为空 ");
-            }
-            if (StringUtils.isEmpty(activity.getDestination().getCity()) || StringUtils.isEmpty(activity.getDestination().getDetail())) {
-                throw new ApiException("地址 城市 跟具体地址不能为空");
-            }
-
-            activity.setOfficialActivityId(null);
-            activity.setUserId(userId);
-            activity.setDeleteFlag(false);
-            activity.setNowJoinNum(0);
-            activity.setMaleNum(0);
-            activity.setFemaleNum(0);
-            return officialActivityService.registerActivity(activity, json);
+            return officialActivityService.registerActivity(json, userId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -82,10 +67,11 @@ public class OfficialActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo getActivityList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         try {
-            checker.checkUserInfo(userId, token);
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+
             return officialActivityService.getActivityList(userId, json);
         } catch (ApiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
@@ -93,10 +79,11 @@ public class OfficialActivityController {
     @RequestMapping(value = "official/activity/onFlag", method = RequestMethod.GET)
     public ResponseDo changeOnFlag(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
         try {
-            checker.checkUserInfo(userId, token);
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+
             return officialActivityService.changeActivityOnFlag(officialActivityId);
         } catch (ApiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
@@ -105,10 +92,11 @@ public class OfficialActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId, @RequestBody JSONObject json) {
         try {
-            checker.checkUserInfo(userId, token);
-            return officialActivityService.updateActivity(officialActivityId, json);
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+
+            return officialActivityService.updateActivity(officialActivityId, json, userId);
         } catch (ApiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
@@ -116,10 +104,11 @@ public class OfficialActivityController {
     @RequestMapping(value = "official/activity/info", method = RequestMethod.GET)
     public ResponseDo getInfo(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
         try {
-            checker.checkUserInfo(userId, token);
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+
             return officialActivityService.getActivity(officialActivityId);
         } catch (ApiException e) {
-            LOG.error(e.getLocalizedMessage(), e);
+            LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
@@ -128,7 +117,9 @@ public class OfficialActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONArray json) {
         try {
-            checker.checkUserInfo(userId, token);
+
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+
             if (json == null || json.size() == 0) {
                 return ResponseDo.buildFailureResponse("请选择需要删除的项");
             }
@@ -139,9 +130,8 @@ public class OfficialActivityController {
             }
             return officialActivityService.deleteActivities(ids);
         } catch (ApiException e) {
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
-
 }

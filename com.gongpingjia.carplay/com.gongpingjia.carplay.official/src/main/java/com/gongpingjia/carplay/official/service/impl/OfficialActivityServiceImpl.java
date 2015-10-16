@@ -10,6 +10,7 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
@@ -56,10 +57,11 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
 
     @Override
-    public ResponseDo registerActivity(OfficialActivity activity, JSONObject json) throws ApiException {
+    public ResponseDo registerActivity(JSONObject json,String userId) throws ApiException {
         LOG.debug("Begin register activity and save data");
 
-//        JSONArray coverArray = json.getJSONArray("covers");
+        //检查参数是否非法        初始化一些信息；
+        OfficialActivity activity = checkAndInitSaveEntity(userId, json);
 
         Long current = DateUtil.getTime();
         activity.setCreateTime(current);
@@ -149,14 +151,12 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
                 criteria.and("start").lte(toTime);
             }
-//            if (StringUtils.isNotEmpty(toTimeStr)) {
-//                Long toTime = Long.parseLong(toTimeStr);
-//                criteria.and("start").lte(toTime);
-//            }
+
             if (StringUtils.isNotEmpty(detailAddress)) {
                 String detailAddressReg = ".*" + detailAddress + ".*";
                 criteria.and("destination.detail").regex(detailAddressReg);
             }
+
             if (StringUtils.isNotEmpty(title)) {
                 String titleReg = ".*" + title + ".*";
                 criteria.and("title").regex(titleReg);
@@ -189,11 +189,14 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     }
 
     @Override
-    public ResponseDo updateActivity(String officialActivityId, JSONObject json) throws ApiException {
+    public ResponseDo updateActivity(String officialActivityId, JSONObject json,String userId) throws ApiException {
         json.remove("members");
         json.remove("photos");
         json.remove("organizer");
         json.remove("covers");
+
+        checkParam(json);
+
         OfficialActivity source = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
 
         OfficialActivity officialActivity = activityDao.findById(officialActivityId);
@@ -202,15 +205,6 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         }
         activityDao.update(officialActivityId, source);
         return ResponseDo.buildSuccessResponse();
-    }
-
-    private OfficialActivity initOfficialActivity(JSONObject jsonObject) throws ApiException {
-        OfficialActivity officialActivity = new OfficialActivity();
-        String title = jsonObject.getString("title");
-        String instruction = jsonObject.getString("instruction");
-//        String description
-
-        return officialActivity;
     }
 
     @Override
@@ -238,4 +232,99 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         activityDao.updateAll(Query.query(Criteria.where("officialActivityId").in(officialActivityIds)), update);
         return ResponseDo.buildSuccessResponse();
     }
+
+
+    private OfficialActivity checkAndInitSaveEntity(String userId, JSONObject json) throws ApiException {
+        //必填项目
+        if (CommonUtil.isEmpty(json, Arrays.asList("title", "instruction", "destination", "cover", "limitType", "price", "start", "onFlag"))) {
+            throw new ApiException("参数输入不全 请检查参数");
+        }
+
+
+        OfficialActivity activity = null;
+        try {
+            activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+        } catch (Exception e) {
+            LOG.debug(e.getMessage(),e);
+
+            throw new ApiException("输入参数有误");
+        }
+
+        if (null == activity.getDestination()) {
+            throw new ApiException("地址不能为空 ");
+        }
+        if (StringUtils.isEmpty(activity.getDestination().getCity()) || StringUtils.isEmpty(activity.getDestination().getDetail())) {
+            throw new ApiException("地址 城市 跟具体地址不能为空");
+        }
+
+        if (activity.getLimitType() == Constants.OfficialActivityLimitType.TOTAL_LIMIT) {
+            //限制总人数
+            if (null == activity.getTotalLimit() || activity.getTotalLimit() <= 0) {
+                throw new ApiException("总限制人数必须大于0");
+            }
+            activity.setMaleLimit(-1);
+            activity.setFemaleLimit(-1);
+        }else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+            //分别限制男女人数
+            if (null == activity.getMaleLimit() || activity.getMaleLimit() < 0) {
+                throw new ApiException("男性数量必须大于等于0");
+            }
+            if (null == activity.getFemaleLimit() || activity.getFemaleLimit() < 0) {
+                throw new ApiException("女性数量必须大于等于0");
+            }
+            //不能同时为0
+            if (null != activity.getMaleLimit() && activity.getMaleLimit() == 0 && null != activity.getFemaleLimit() && activity.getFemaleLimit() == 0) {
+                throw new ApiException("男女人数不能同时为0");
+            }
+            activity.setTotalLimit(activity.getMaleLimit() + activity.getFemaleLimit());
+        }else {
+            //不限制人数
+            activity.setTotalLimit(-1);
+            activity.setMaleLimit(-1);
+            activity.setFemaleLimit(-1);
+        }
+        activity.setOfficialActivityId(null);
+        activity.setUserId(userId);
+        activity.setDeleteFlag(false);
+        activity.setNowJoinNum(0);
+        activity.setMaleNum(0);
+        activity.setFemaleNum(0);
+        return activity;
+    }
+
+    private void checkParam(JSONObject json) throws ApiException{
+        //必填项目
+        if (CommonUtil.isEmpty(json, Arrays.asList("title", "instruction", "destination", "cover", "limitType", "price", "start", "onFlag"))) {
+            throw new ApiException("参数输入不全 请检查参数");
+        }
+
+        OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+
+        if (null == activity.getDestination()) {
+            throw new ApiException("地址不能为空 ");
+        }
+        if (StringUtils.isEmpty(activity.getDestination().getCity()) || StringUtils.isEmpty(activity.getDestination().getDetail())) {
+            throw new ApiException("地址 城市 跟具体地址不能为空");
+        }
+
+        if (activity.getLimitType() == Constants.OfficialActivityLimitType.TOTAL_LIMIT) {
+            //限制总人数
+            if (null == activity.getTotalLimit() || activity.getTotalLimit() <= 0) {
+                throw new ApiException("总限制人数必须大于0");
+            }
+        }else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+            //分别限制男女人数
+            if (null == activity.getMaleLimit() || activity.getMaleLimit() < 0) {
+                throw new ApiException("男性数量必须大于等于0");
+            }
+            if (null == activity.getFemaleLimit() || activity.getFemaleLimit() < 0) {
+                throw new ApiException("女性数量必须大于等于0");
+            }
+            //不能同时为0
+            if (null != activity.getMaleLimit() && activity.getMaleLimit() == 0 && null != activity.getFemaleLimit() && activity.getFemaleLimit() == 0) {
+                throw new ApiException("男女人数不能同时为0");
+            }
+        }
+    }
+
 }

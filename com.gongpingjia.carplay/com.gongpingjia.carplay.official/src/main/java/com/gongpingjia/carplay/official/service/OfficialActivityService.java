@@ -21,14 +21,14 @@ public interface OfficialActivityService {
      * @return 返回创建结果信息
      * @throws ApiException
      */
-    ResponseDo registerActivity(OfficialActivity activity, JSONObject json) throws ApiException;
+    ResponseDo registerActivity( JSONObject json,String userId) throws ApiException;
 
 
     ResponseDo getActivityList(String   userId,JSONObject json) throws ApiException;
 
     ResponseDo changeActivityOnFlag(String officialActivityId)throws ApiException;
 
-    ResponseDo updateActivity(String officialActivityId, JSONObject json)throws ApiException;
+    ResponseDo updateActivity(String officialActivityId, JSONObject json,String userId)throws ApiException;
 
     ResponseDo getActivity(String officialActivityId) throws ApiException;
 
