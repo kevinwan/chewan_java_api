@@ -126,9 +126,13 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                     criteria.and("onFlag").is(false);
 
                 } else if (status == 1) {
+                    //上架中
                     criteria.and("onFlag").is(true);
+                    criteria.and("end").exists(false).orOperator(Criteria.where("end").gte(new Date()));
                 } else if (status == 2) {
+                    //已经下架
                     criteria.and("onFlag").is(true);
+                    criteria.and("end").lte(new Date().getTime());
                 }
             }
             // start 大于 fromTime 小于 toTime

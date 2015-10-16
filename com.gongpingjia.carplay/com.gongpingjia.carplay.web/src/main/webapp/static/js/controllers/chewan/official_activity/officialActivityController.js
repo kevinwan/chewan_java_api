@@ -70,7 +70,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
                 criteria.fromTime = "";
             }
             if (endDate !== "") {
-                criteria.toTime = new Date(startDate).getTime();
+                criteria.toTime = new Date(endDate).getTime();
             } else {
                 criteria.toTime = "";
             }
