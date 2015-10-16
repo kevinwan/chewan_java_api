@@ -32,6 +32,22 @@
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>
 
+    <!--&lt;!&ndash; by default look for a Mongo object named 'mongo' &ndash;&gt;-->
+    <!--<mongo:jmx mongo-ref="mongo"/>-->
+
+    <!--<bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">-->
+        <!--<property name="port" value="1099"></property>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; Expose JMX over RMI &ndash;&gt;-->
+    <!--<bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean" depends-on="registry">-->
+        <!--<property name="objectName" value="connector:name=rmi"/>-->
+        <!--<property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:1099/myconnector"/>-->
+        <!--&lt;!&ndash;<property name="serviceUrl" value="service:jmx:jmxmp://localhost:9875" />&ndash;&gt;-->
+        <!--<property name="threaded" value="true"/>-->
+        <!--<property name="daemon" value="true"/>-->
+    <!--</bean>-->
+
     <mongo:repositories base-package="com.gongpingjia.carplay.entity"/>
 
     <context:component-scan base-package="com.gongpingjia.carplay.dao"/>

@@ -27,7 +27,7 @@
 		<param name="encoding" value="UTF-8" />
 		<param name="target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="[%d{yyy-MM-dd HH:mm:ss,SSS}] %-5p %c{2} - %m%n" />
+			<param name="ConversionPattern" value="[%d{yyy-MM-dd HH:mm:ss,SSS}] %-5p %c(%l) - %m%n" />
 		</layout>
 	</appender>
 
@@ -37,7 +37,7 @@
 		<param name="encoding" value="UTF-8" />
 		<param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{yyy-MM-dd HH:mm:ss,SSS} %p %c(%l) -- %m%n" />
+			<param name="ConversionPattern" value="[%d{yyy-MM-dd HH:mm:ss,SSS}] %-5p %c(%l) -- %m%n" />
 		</layout>
 	</appender>
 
@@ -49,6 +49,12 @@
 	</category>
 
 	<category name="org.springframework">
+		<priority value="WARN" />
+		<appender-ref ref="logFile" />
+		<appender-ref ref="console" />
+	</category>
+
+	<category name="com.mongodb">
 		<priority value="WARN" />
 		<appender-ref ref="logFile" />
 		<appender-ref ref="console" />
