@@ -5,23 +5,18 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import net.sf.json.JSONObject;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by heyongyu on 2015/9/21.
@@ -123,7 +118,7 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     @Override
     public void update(K id, Update update) {
         Query idQuery = Query.query(Criteria.where("_id").is(id));
-        mongoTemplate.updateFirst(idQuery, update,getCls());
+        mongoTemplate.updateFirst(idQuery, update, getCls());
     }
 
     @Override

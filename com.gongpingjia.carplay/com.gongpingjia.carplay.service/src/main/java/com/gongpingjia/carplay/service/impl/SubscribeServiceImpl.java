@@ -100,11 +100,13 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         checker.checkUserInfo(userSubscription.getFromUser(), token);
 
-        User user = userDao.findById(userSubscription.getToUser());
-        if (user == null) {
-            LOG.warn("User not exist");
+        User toUser = userDao.findById(userSubscription.getToUser());
+        if (toUser == null) {
+            LOG.warn("toUser not exist");
             throw new ApiException("关注用户不存在");
         }
+
+        User fromUser = userDao.findById(userSubscription.getFromUser());
 
         // 是否已关注
         Subscriber userSub = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(userSubscription.getFromUser())
@@ -119,9 +121,9 @@ public class SubscribeServiceImpl implements SubscribeService {
         subscriberDao.save(userSubscription);
 
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.subscribe", "{0}关注了我"),
-                user.getNickname());
+                fromUser.getNickname());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.SUBSCRIBE,
-                user.getEmchatName(), message);
+                fromUser.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
     }

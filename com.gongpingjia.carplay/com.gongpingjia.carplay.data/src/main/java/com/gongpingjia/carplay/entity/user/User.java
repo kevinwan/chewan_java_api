@@ -34,7 +34,7 @@ public class User {
     private String role;
     private boolean invalid;
 
-    @Indexed(unique = true)
+    @Indexed
     private String phone;
     @Transient
     private Integer age;
