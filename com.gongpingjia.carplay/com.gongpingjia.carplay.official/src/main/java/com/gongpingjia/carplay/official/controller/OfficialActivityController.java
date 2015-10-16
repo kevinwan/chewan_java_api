@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,14 @@ public class OfficialActivityController {
             }
 
             OfficialActivity activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+
+            if (null == activity.getDestination()) {
+                throw new ApiException("地址不能为空 ");
+            }
+            if (StringUtils.isEmpty(activity.getDestination().getCity()) || StringUtils.isEmpty(activity.getDestination().getDetail())) {
+                throw new ApiException("地址 城市 跟具体地址不能为空");
+            }
+
             activity.setOfficialActivityId(null);
             activity.setUserId(userId);
             activity.setDeleteFlag(false);
@@ -117,16 +126,16 @@ public class OfficialActivityController {
 
     @RequestMapping(value = "/official/activity/deleteIds", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,@RequestBody JSONArray json) {
+    public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONArray json) {
         try {
-            checker.checkUserInfo(userId,token);
+            checker.checkUserInfo(userId, token);
             if (json == null || json.size() == 0) {
                 return ResponseDo.buildFailureResponse("请选择需要删除的项");
             }
             List<String> ids = new ArrayList<>(json.size());
             Iterator<Object> iterator = json.iterator();
             while (iterator.hasNext()) {
-                ids.add((String)iterator.next());
+                ids.add((String) iterator.next());
             }
             return officialActivityService.deleteActivities(ids);
         } catch (ApiException e) {

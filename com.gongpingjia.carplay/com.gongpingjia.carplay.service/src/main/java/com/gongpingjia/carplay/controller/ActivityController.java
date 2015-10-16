@@ -52,7 +52,7 @@ public class ActivityController {
         LOG.debug("activity/register begin");
         try {
             parameterChecker.checkUserInfo(userId,token);
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "destination","destPoint", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
