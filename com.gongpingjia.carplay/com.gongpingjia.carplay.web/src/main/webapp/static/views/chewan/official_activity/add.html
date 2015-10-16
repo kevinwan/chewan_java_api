@@ -20,7 +20,7 @@
             <label class="col-md-1 control-label"><span style="color:red">*</span>活动介绍</label>
 
             <div class="col-md-9 no-padding-left">
-                <input type="text" id="instruction" ng-model="activity.instruction"
+                <textarea rows="6" type="text" id="instruction" ng-model="activity.instruction"
                        placeholder="活动介绍"/>
             </div>
         </div>
@@ -30,12 +30,17 @@
             <label class="col-md-1 control-label" for="province"> <span style="color:red">*</span>省</label>
 
             <div class="col-md-3 no-padding-left">
-                <select id="province" data-ng-model="provinceIndex"
-                        ng-change="changeProvince(provinceOptions[provinceIndex])" style="width:100%;">
+                <!--<select id="province" data-ng-model="provinceIndex"-->
+                        <!--ng-change="changeProvince(provinceOptions[provinceIndex])" style="width:100%;">-->
+                    <!--<option value="">全部</option>-->
+                    <!--<option ng-repeat="provinceOption in provinceOptions" ng-value="$index">-->
+                        <!--{{provinceOption.province}}-->
+                    <!--</option>-->
+                <!--</select>-->
+                <select id="province" ng-model="activity.destination.province"
+                        ng-options=" item.province as item.province for item in provinceOptions"
+                        ng-change="changeProvince(activity.destination.province)">
                     <option value="">全部</option>
-                    <option ng-repeat="provinceOption in provinceOptions" ng-value="$index">
-                        {{provinceOption.province}}
-                    </option>
                 </select>
             </div>
         </div>
@@ -44,12 +49,16 @@
             <label class="col-md-1 control-label" for="city"> <span style="color:red">*</span>市</label>
 
             <div class="col-md-3 no-padding-left">
-                <select id="city" data-ng-model="activity.destination.city"
-                        ng-change="changeCity()" style="width:100%;">
+                <!--<select id="city" data-ng-model="activity.destination.city"-->
+                        <!--ng-change="changeCity()" style="width:100%;">-->
+                    <!--<option value="">全部</option>-->
+                    <!--<option ng-repeat="cityOption in cityOptions" ng-value="cityOption">-->
+                        <!--{{cityOption}}-->
+                    <!--</option>-->
+                <!--</select>-->
+                <select id="city" ng-model="activity.destination.city"
+                        ng-options=" item as item for item in cityOptions">
                     <option value="">全部</option>
-                    <option ng-repeat="cityOption in cityOptions" ng-value="cityOption">
-                        {{cityOption}}
-                    </option>
                 </select>
             </div>
         </div>
@@ -61,7 +70,7 @@
                 <!--<input type="text" id="destination" ng-model="activity.destination.detail"-->
                        <!--placeholder="目的地"/>-->
                 <div class="autoclass">
-                    <input type="text" id="keyword" name="keyword" value="" class="autoSearch">
+                    <input type="text" id="keyword" name="keyword" ng-model="activity.destination.detail" class="autoSearch">
 
                     <div id="result1" class="autobox" name="result1"></div>
                     <div id="address" style="display: none"></div>
@@ -157,7 +166,7 @@
         </div>
         <!-- input 10 -->
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label"><span style="color:red">*</span>官方补贴</label>
+            <label class="col-md-1 control-label">官方补贴</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <input type="text" id="subsidyPrice" ng-model="activity.subsidyPrice"
@@ -186,7 +195,7 @@
         </div>
         <!-- input 12 -->
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label"><span style="color:red">*</span>结束时间</label>
+            <label class="col-md-1 control-label">结束时间</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <!--<div class="col-md-2 no-padding-left">-->
@@ -195,17 +204,17 @@
                 <!--</div>-->
                 <div class="col-md-2 no-padding-left">
                     <input type="text" id="endDate" ui-date ui-date-format="yy-mm-dd" ng-model="endTime.date"
-                           placeholder="结束日期">
+                           placeholder="不限制">
                 </div>
                 <div class="col-md-2 no-padding-left">
                     <input type="text" size="4" class="pickTime" ng-model="endTime.time" id="endTime"
-                           data-time-type="number" data-autoclose="1" placeholder="结束时间" bs-timepicker>
+                           data-time-type="number" data-autoclose="1" placeholder="不限制" bs-timepicker>
                 </div>
             </div>
         </div>
         <!-- input 13 -->
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label"><span style="color:red">*</span>活动内容</label>
+            <label class="col-md-1 control-label">活动内容</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <input type="text" id="description" ng-model="activity.description"
@@ -214,7 +223,7 @@
         </div>
         <!-- input 14 -->
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label"><span style="color:red">*</span>活动补充说明</label>
+            <label class="col-md-1 control-label">活动补充说明</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <input type="text" id="extraDesc" ng-model="activity.extraDesc"
@@ -223,7 +232,7 @@
         </div>
         <!-- input 15 -->
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label"><span style="color:red">*</span>第三方购票平台链接</label>
+            <label class="col-md-1 control-label">第三方购票平台链接</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <input type="text" id="linkTicketUrl" ng-model="activity.linkTicketUrl"
@@ -237,8 +246,8 @@
             <div class="col-md-9 no-padding-left" style="text-align:left">
                 <select id="onFlag" ng-init="activity.onFlag = 'false'"
                         data-ng-model="activity.onFlag" style="width:200px">
-                    <option value="true">是</option>
-                    <option value="false">否</option>
+                    <option value="true">是                      将在app上展示</option>
+                    <option value="false">否                    不会再app上展示</option>
                 </select>
                 <!--<div style="position: absolute;left:90px;top: 4px">将在app上展示</div>-->
             </div>

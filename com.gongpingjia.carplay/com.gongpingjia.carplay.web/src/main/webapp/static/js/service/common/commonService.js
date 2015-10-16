@@ -83,6 +83,12 @@ gpjApp.factory('commonService', ['restProxyService', function (restProxyService)
         },
         isDefined: function (str) {
             return (str && (str !== 'undefined'));
+        },
+        isNull:function(source) {
+            return (source === undefined || source === null);
+        },
+        isStrEmpty:function(str) {
+            return (str === undefined || str === null || str === "");
         }
     }
 }]);

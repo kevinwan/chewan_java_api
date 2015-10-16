@@ -1,8 +1,17 @@
 'use strict';
 
 
-gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService',
-    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService) {
+gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', '$timeout',
+    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, $timeout) {
+
+        //$scope.items = [
+        //    { id: 1, name: 'foo' },
+        //    { id: 2, name: 'bar' },
+        //    { id: 3, name: 'blah' }
+        //];
+        //
+        //$scope.selectedItem = 2;
+
 
         /**
          * Cancel button click handler
@@ -21,46 +30,92 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         /**
          * Trigger by province change
          */
-        $scope.changeProvince = function (provinceOption) {
+        $scope.changeProvince = function (province) {
             $scope.activity.destination.city = '';
             $scope.cityOptions = [];
-            if (provinceOption && provinceOption.cities)
-                $scope.cityOptions = provinceOption.cities;
-        };
 
-        /**
-         * Trigger by city change
-         */
-        $scope.changeCity = function () {
-            //alert($scope.criteria.dealer_city);
+            //找出 province 对应的 cityOptions
+            for (var index in $scope.provinceOptions) {
+                if ($scope.provinceOptions[index].province === province) {
+                    $scope.cityOptions = $scope.provinceOptions[index].cities;
+                    //$scope.$apply();
+                    break;
+                }
+            }
         };
 
         $scope.initData = function () {
             var officialActivityId = officialActivityService.getOfficialActivityId();
+            //var officialActivityId = $location.search()['id'];
             if (officialActivityId === '') {
                 //增加
-                $scope.activity = {destination:{}};
+                $scope.activity = {destination: {}};
                 $scope.activity.limitType = 0;
                 return;
             } else {
                 $rootScope.loadingPromise = officialActivityService.getOfficialActivity(officialActivityId).success(function (result) {
-                    //$scope.activity = (result.result === 0 ? result.data : undefined);
-                    //if($scope.activity.cover != undefined && $scope.activity.cover != null) {
-                    //    $scope.photoUrl = $scope.activity.cover.photoUrl;
-                    //}
+                    //获取数据成功
                     if (result.result === 0) {
                         //初始化时间
                         $scope.activity = result.data;
                         $scope.activity.onFlag = $scope.activity.onFlag ? 'true' : 'false';
 
-                        //初始化 显示 类型checkbox
+                        //初始化 人数限制类型
                         var limitType = $scope.activity.limitType;
                         document.getElementById("limitType-" + limitType).checked = true;
 
+                        //初始化省市 信息；
+                        $scope.cityOptions = [];
+                        for (var index in $scope.provinceOptions) {
+                            if ($scope.provinceOptions[index].province === $scope.activity.destination.province) {
+                                $scope.cityOptions = $scope.provinceOptions[index].cities;
+                                break;
+                            }
+                        }
+
+
+                        //var findFlag = false;
+                        //var provinceIndex = -1;
+                        //var cityIndex = -1;
+                        //for (var pIndex in $scope.provinceOptions) {
+                        //
+                        //    for (var cIndex in $scope.provinceOptions[pIndex].cities) {
+                        //        if ($scope.provinceOptions[pIndex].cities[cIndex] === $scope.activity.destination.city) {
+                        //            $scope.provinceIndex = pIndex;
+                        //            findFlag = true;
+                        //            provinceIndex = pIndex;
+                        //            cityIndex = cIndex;
+                        //            break;
+                        //        }
+                        //    }
+                        //    if (findFlag) {
+                        //        break;
+                        //    }
+                        //}
+                        //var provinceIndex = 2;
+                        //$scope.provinceIndex = parseInt(provinceIndex);
+                        //$scope.cityOptions = [];
+                        //$scope.cityOptions = $scope.provinceOptions[$scope.provinceIndex].cities;
+                        //
+                        //$scope.activity.destination = {};
+                        //$scope.activity.destination.city = '天津';
+
+
+                        //document.getElementById("province").options[parseInt(provinceIndex) + 1].selected = true;
+                        //$scope.cityOptions = [];
+                        //$scope.cityOptions = $scope.provinceOptions[parseInt(provinceIndex)].cities;
+                        //var cityDom = new Option($scope.activity.destination.city, "0");
+                        //var cityParentDom = document.getElementById("city");
+                        //cityParentDom.add(cityDom);
+                        //document.getElementById("city").options[1].selected = true;
+
+                        //初始化封面信息；
                         $scope.photoUrl = $scope.activity.cover.url;
-                        //$scope.activity.start
+
+                        //初始化 开始 结束 时间信息；
                         document.getElementById("startDate").value = commonService.transferLongToDateString($scope.activity.start);
                         document.getElementById("startTime").value = commonService.transferLongToTimeString($scope.activity.start);
+                        //结束时间可能不存在
                         if ($scope.activity.end != undefined && $scope.activity.end != null && $scope.activity.end !== "") {
                             document.getElementById("endDate").value = commonService.transferLongToDateString($scope.activity.end);
                             document.getElementById("endTime").value = commonService.transferLongToTimeString($scope.activity.end);
@@ -70,7 +125,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             }
         };
 
-
+        /**
+         * 检查时间 并且初始化时间
+         * @returns {boolean}
+         */
         function checkTime() {
             var startDate = document.getElementById("startDate").value;
             var startTime = document.getElementById("startTime").value;
@@ -109,28 +167,36 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $scope.activity.end = null;
             }
             return true;
-        }
+        };
 
 
+        /**
+         * 更新官方活动
+         */
         $scope.updateOfficialActivity = function () {
-            //
-            if (checkTime()) {
+            //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
+            if (checkTime() && validateAll()) {
                 $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
                     if (result.result == 0) {
                         $window.alert("更新成功");
+                        $location.path('/officialActivity/list');
                     } else {
                         $window.alert("更新失败");
+                        $location.path('/officialActivity/list');
                     }
                 });
             }
-        }
+        };
 
         /**
          * register
+         * 注册 官方活动;
          */
         $scope.register = function () {
 
-            if (checkTime()) {
+            if (checkTime() && validateAll()) {
+                //初始化 省份信息 angular上绑定的 provinceIndex 信息；
+                //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
                 officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
                     if (data.result == 0) {
                         $window.alert("创建成功");
@@ -140,9 +206,13 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     }
                 });
             }
-        }
+        };
 
 
+        /**
+         * 上传图片 并返回一个 cover 对象；
+         * @param data
+         */
         $scope.uploadFile = function (data) {
             var formData = new FormData();
             formData.append('attach', data.files[0]);
@@ -160,11 +230,21 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         };
 
 
+        /**
+         * 修改 人数限制类型 并且对应着不同的 样式 表单
+         * @param data
+         */
         $scope.changeLimitType = function (data) {
             $scope.activity.limitType = parseInt(data.value);
             $scope.$apply();
         };
 
+        /**
+         * 判断 上架 上架中 下架状态
+         * @param onFlag
+         * @param end
+         * @returns {number}
+         */
         $scope.checkOnItemStatus = function (onFlag, end) {
             if (onFlag == false) {
                 //未上架
@@ -186,9 +266,91 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             }
         };
 
-        function validateAll(){
 
+        /**
+         * 校验表单 参数
+         * @returns {boolean}
+         */
+        function validateAll() {
+            if (commonService.isStrEmpty($scope.activity.title)) {
+                $window.alert("活动标题不能为空");
+                return false;
+            }
+            if (commonService.isStrEmpty($scope.activity.instruction)) {
+                $window.alert("活动标题不能为空");
+                return false;
+            }
+            if (commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.city)) {
+                $window.alert("城市不能为空");
+                return false;
+            }
+            if (commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.detail)) {
+                $window.alert("目的地不能为空");
+                return false;
+            }
+            if (commonService.isNull($scope.activity.cover)) {
+                $window.alert("封面不能为空");
+                return false;
+            }
+            var intRegex = /^[0-9]*$/;
+            if ($scope.activity.limitType == 1) {
+                //限制总人数
+                //if($scope.activity.totalLimit === undefined || $scope.activity.totalLimit === ''){
+                //    $window.alert("总设置人数不能为空");
+                //}
+                if (!intRegex.test($scope.activity.totalLimit)) {
+                    $window.alert("请输入合法的总人数");
+                    return false;
+                }
+
+                var totalLimit = parseInt($scope.activity.totalLimit)
+                if (isNaN(totalLimit) || totalLimit <= 0) {
+                    $window.alert("总人数必须大于0");
+                    return false;
+                }
+            }
+            if ($scope.activity.limitType == 2) {
+                //分别检查男女参数
+                if (!intRegex.test($scope.activity.maleLimit)) {
+                    $window.alert("请输入合法的男性数目");
+                    return false;
+                }
+                if (!intRegex.test($scope.activity.femaleLimit)) {
+                    $window.alert("请输入合法的女性数目");
+                    return false;
+                }
+                var maleLimit = parseInt($scope.activity.maleLimit)
+                if (isNaN(maleLimit) || maleLimit < 0) {
+                    $window.alert("男性数目必须大于大于0");
+                    return false;
+                }
+                var femaleLimit = parseInt($scope.activity.femaleLimit)
+                if (isNaN(femaleLimit) || femaleLimit < 0) {
+                    $window.alert("女性数目必须大于大于0");
+                    return false;
+                }
+                if (femaleLimit == 0 && maleLimit == 0) {
+                    $window.alert("男女人数不能同时为0");
+                    return false;
+                }
+            }
+            var priceReg = /^[0-9]+\.{0,1}[0-9]{0,2}$/;
+            if (!priceReg.test($scope.activity.price)) {
+                $window.alert("请输入合法的价格");
+                return false;
+            }
+
+            if (!commonService.isStrEmpty($scope.activity.subsidyPrice)) {
+                if (!priceReg.test($scope.activity.subsidyPrice)) {
+                    $window.alert("请输入合法的补贴价格");
+                    return false;
+                }
+            }
+            //参数合法
+            return true;
         };
+
+        //初始化相关参数；
         $scope.initData();
     }
 ]);

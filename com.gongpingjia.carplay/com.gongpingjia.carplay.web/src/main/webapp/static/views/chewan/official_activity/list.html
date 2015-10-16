@@ -7,7 +7,7 @@
     <div class="form-inline col-md-12">
 
         <div class="col-md-2">
-            <label class="control-label bolder blue" for="title">昵称</label>
+            <label class="control-label bolder blue" for="title">活动名称</label>
 
             <div class="controls">
                 <input type="text" id="title" ng-model="criteria.title"
@@ -54,60 +54,7 @@
                        placeholder="结束时间">
             </div>
         </div>
-
     </div>
-    <!--<div class="form-inline col-md-12">-->
-    <!--<div class="col-md-1">-->
-    <!--<div class="controls">-->
-    <!--<input type="text" id="title" ng-model="criteria.title"-->
-    <!--placeholder="活动标题">-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <!--<div class="col-md-2">-->
-    <!--<div class="controls">-->
-    <!--<input type="text" id="detailAddress" ng-model="criteria.detailAddress"-->
-    <!--placeholder="输入目的地">-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <!--<div class="col-md-1">-->
-    <!--<div class="controls">-->
-    <!--<span>开始时间</span>-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <!--<div class="col-md-3">-->
-
-    <!--<input type="text" size="10" class="pickDate" data-autoclose="1" ng-model="fromDate"-->
-    <!--placeholder="日期" id="startDate" bs-datepicker>-->
-    <!--</div>-->
-
-    <!--<div class="col-md-1">-->
-    <!--<div class="controls">-->
-    <!--<span>~</span>-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <!--<div class="col-md-3">-->
-
-    <!--<input type="text" size="10" class="pickDate" data-autoclose="1" ng-model="toDate"-->
-    <!--placeholder="日期" id="endDate" bs-datepicker>-->
-
-    <!--</div>-->
-
-    <!--<div class="col-md-1">-->
-    <!--<div class="controls">-->
-    <!--<select id="status" ng-init="criteria.status= '-1'"-->
-    <!--ng-model="criteria.status" style="width:100%;">-->
-    <!--<option value="-1">上下架不限</option>-->
-    <!--<option value="0">未上架</option>-->
-    <!--<option value="1">上架中</option>-->
-    <!--<option value="2">已下架</option>-->
-    <!--</select>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
 
     <div class="form-inline col-md-12">
         <div class="clearfix visible‐xs‐block"></div>
@@ -158,10 +105,20 @@
                     <a ng-show="item.onFlag == true" ng-click="viewOfficialActivity(item.officialActivityId)">{{item.title}}</a>
 
                 </td>
-                <td>男{{item.maleNum}}/{{item.maleLimit}} 女{{item.femaleNum}}/{{item.femaleLimit}}</td>
+                <td>
+                    <span ng-show="item.limitType == 0">不限总人数 {{item.nowJoinNum}} / 不限制</span>
+                    <span ng-show="item.limitType == 1">总人数 {{item.nowJoinNum}} / {{item.totalLimit}} </span>
+                    <span ng-show="item.limitType == 2">男 {{item.maleNum}}/{{item.maleLimit}} 女 {{item.femaleNum}}/{{item.femaleLimit}}</span>
+
+
+
+                </td>
                 <td>{{item.destination.detail}}</td>
                 <td>{{item.price}}元</td>
-                <td>{{item.subsidyPrice}}元</td>
+                <td>
+                    <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice == 0">无</span>
+                    <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice != 0">{{item.subsidyPrice}}元</span>
+                </td>
                 <td>{{item.start | date:"yyyy-MM-dd hh:mm"}}</td>
                 <td>
                     <span ng-show="item.end == undefined || item.end == null || item.end === '' ">待定</span>
