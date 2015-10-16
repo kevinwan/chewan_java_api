@@ -19,7 +19,7 @@ gpjApp.controller('mainController', ['$scope', '$rootScope', '$window', 'authSer
          */
         $scope.logout = function () {
             userService.logOut();
-            $window.location.href = 'v2/login.html'
+            $window.location.href = 'login.html'
         };
 
         //$notification.notify('images/avatars/avatar.png', 'title', 'content');
