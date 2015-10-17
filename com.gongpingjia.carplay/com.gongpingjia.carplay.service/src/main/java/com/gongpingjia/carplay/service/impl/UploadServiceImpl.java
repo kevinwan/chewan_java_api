@@ -241,7 +241,7 @@ public class UploadServiceImpl implements UploadService {
         LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
         String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, userId);
-        return uploadThirdServer(data, userId, key, true);
+        return uploadLocalServer(userId, data, key);
     }
 
     @Override

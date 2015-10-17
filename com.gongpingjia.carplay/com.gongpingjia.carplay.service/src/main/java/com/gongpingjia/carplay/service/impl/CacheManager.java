@@ -2,7 +2,10 @@ package com.gongpingjia.carplay.service.impl;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.dao.user.EmchatTokenDao;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.entity.user.EmchatToken;
+import org.springframework.util.StringUtils;
 
 /**
  * 对业务缓存的统一处理
@@ -146,5 +150,43 @@ public class CacheManager {
      */
     public String setEmchatToken(EmchatToken emchatToken) {
         return cacheService.set(CacheUtil.CacheName.EMCHAT_TOKEN, emchatToken);
+    }
+
+    /**
+     * 根据ID获取区域的列表
+     *
+     * @param parentId 父ID
+     * @return
+     */
+    public JSONArray getAreaList(Integer parentId) {
+        String jsonString = cacheService.get(parentId.toString());
+        if (StringUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        return JSONArray.fromObject(jsonString);
+    }
+
+    /**
+     * 设置区域信息
+     *
+     * @param parentId
+     * @param areas
+     * @return
+     */
+    public String setAreaList(Integer parentId, List<Map<String, Object>> areas) {
+        JSONArray jsonArray = JSONArray.fromObject(areas);
+
+        return cacheService.set(CacheUtil.getAreaKey(parentId), jsonArray.toString());
+    }
+
+    /**
+     * 清除缓存数据
+     *
+     * @param parentId
+     * @return
+     */
+    public Long delAreaList(Integer parentId) {
+        return cacheService.del(parentId.toString());
     }
 }

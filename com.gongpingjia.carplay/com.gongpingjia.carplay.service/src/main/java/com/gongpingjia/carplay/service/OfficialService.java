@@ -13,7 +13,7 @@ public interface OfficialService {
      * @param officialActivityId
      * @return
      */
-    public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException;
+    ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException;
 
 
     /**
@@ -21,7 +21,7 @@ public interface OfficialService {
      *
      * @return 返回活动信息
      */
-    public ResponseDo getActivityList(Address address, int limit, int ignore);
+    ResponseDo getActivityList(Address address, int limit, int ignore);
 
 
     /**
@@ -29,8 +29,16 @@ public interface OfficialService {
      * @param userId
      * @return
      */
-    public ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
+    ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
 
 
-    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException;
+    ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException;
+
+    /**
+     * 获取区域信息
+     *
+     * @param parentId
+     * @return
+     */
+    ResponseDo getAreaList(Integer parentId);
 }
