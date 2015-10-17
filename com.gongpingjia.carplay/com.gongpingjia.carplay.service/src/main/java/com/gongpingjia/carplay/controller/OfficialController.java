@@ -1,13 +1,12 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
-import org.apache.log4j.Logger;
-import org.omg.CORBA.PRIVATE_MEMBER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class OfficialController {
 
-    private static Logger LOG = Logger.getLogger(OfficialController.class);
+    private static Logger LOG = LoggerFactory.getLogger(OfficialController.class);
 
     @Autowired
     private OfficialService officialService;
@@ -128,5 +127,19 @@ public class OfficialController {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
+    }
+
+
+    /**
+     * 获取省市区信息接口
+     *
+     * @param parentId 父信息的Id， 如果获取省份信息，传0
+     * @return 返回父ID对应的所有子区域的信息
+     */
+    @RequestMapping(value = "/area/list", method = RequestMethod.GET)
+    public ResponseDo getAreaInfos(@RequestParam Integer parentId) {
+        LOG.info("Query area list information, parentId:{}", parentId);
+
+        return officialService.getAreaList(parentId);
     }
 }

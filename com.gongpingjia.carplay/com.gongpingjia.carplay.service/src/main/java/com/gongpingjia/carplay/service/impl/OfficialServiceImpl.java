@@ -8,17 +8,21 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
+import com.gongpingjia.carplay.dao.common.AreaDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.EmchatTokenService;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.omg.CORBA.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.lang.Object;
 import java.util.*;
 
 /**
@@ -52,6 +57,12 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Autowired
     private AppointmentDao appointmentDao;
+
+    @Autowired
+    private AreaDao areaDao;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Override
     public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException {
@@ -263,5 +274,43 @@ public class OfficialServiceImpl implements OfficialService {
         appointmentDao.save(appointment);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo getAreaList(Integer parentId) {
+        LOG.debug("Load area data from cache first");
+        JSONArray jsonArray = cacheManager.getAreaList(parentId);
+        if (jsonArray != null) {
+            //直接从缓存中获取
+            return ResponseDo.buildSuccessResponse(jsonArray);
+        }
+
+        LOG.debug("No data exist in the cache, query database");
+        List<Map<String, Object>> data = getValidAreasFromDb(parentId);
+        cacheManager.setAreaList(parentId, data);
+
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
+    /**
+     * 从数据库中获取该ParentId 对应的数据的信息
+     *
+     * @param parentId 父Id
+     * @return 该父Id下面所有的区域信息
+     */
+    private List<Map<String, Object>> getValidAreasFromDb(Integer parentId) {
+        Query query = Query.query(Criteria.where("parentId").is(parentId));
+        query.with(new Sort(new Sort.Order(Sort.Direction.ASC, "name")));
+        List<Area> areas = areaDao.find(query);
+        List<Map<String, Object>> validAreas = new ArrayList<>(areas.size());
+        for (Area area : areas) {
+            if (area.getValiad()) {
+                Map<String, Object> areaMap = new HashMap<>(2);
+                areaMap.put("code", area.getCode());
+                areaMap.put("name", area.getName());
+                validAreas.add(areaMap);
+            }
+        }
+        return validAreas;
     }
 }
