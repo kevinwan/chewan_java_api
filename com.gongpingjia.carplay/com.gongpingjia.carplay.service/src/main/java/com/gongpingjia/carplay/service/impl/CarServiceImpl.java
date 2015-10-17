@@ -106,7 +106,12 @@ public class CarServiceImpl implements CarService {
             String data = HttpClientUtil.parseResponse(response);
             json = JSONObject.fromObject(data);
 
-            dataJson = json.getJSONArray("model_list");
+//            dataJson = json.getJSONArray("model_list");
+            if (json.getJSONObject("model_list").isArray()) {
+                dataJson = json.getJSONArray("model_list");
+            } else {
+                dataJson = new JSONArray();
+            }
 
             LOG.debug("Refresh data in the cache server");
 

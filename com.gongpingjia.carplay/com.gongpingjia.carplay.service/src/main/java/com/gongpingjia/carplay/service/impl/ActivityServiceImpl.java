@@ -3,10 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.common.util.DateUtil;
-import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
@@ -162,26 +159,27 @@ public class ActivityServiceImpl implements ActivityService {
 
         double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
 
+
         String limitStr = request.getParameter("limit");
         String ignoreStr = request.getParameter("ignore");
         if (StringUtils.isNotEmpty(limitStr)) {
-            limit = Integer.parseInt(limitStr);
+            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
         }
         if (StringUtils.isNotEmpty(ignoreStr)) {
-            ignore = Integer.parseInt(ignoreStr);
+            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
         }
         String longitude = request.getParameter("longitude");
         String latitude = request.getParameter("latitude");
         if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
             LOG.error("longitude or latitude has not init");
-            throw new ApiException("param not match");
+            throw new ApiException("经纬度信息没有提供");
         }
         LOG.debug("longitude is:" + longitude);
         LOG.debug("latitude is:" + latitude);
         String maxDistanceStr = request.getParameter("maxDistance");
         LOG.debug("maxDistanceStr is:" + maxDistanceStr);
         if (StringUtils.isNotEmpty(maxDistanceStr)) {
-            maxDistance = Double.parseDouble(maxDistanceStr);
+            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
         }
         Landmark landmark = new Landmark();
         landmark.setLatitude(Double.parseDouble(latitude));
@@ -256,8 +254,8 @@ public class ActivityServiceImpl implements ActivityService {
             Map<String, Object> itemOrganizer = new HashMap<>();
             itemOrganizer.put("userId", activity.getOrganizer().getUserId());
             itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
-            //TODO
-            itemOrganizer.put("avatar",CommonUtil.getLocalPhotoServer() + activity.getOrganizer().getAvatar());
+            // 对 avatar 信息添加了 服务器主机信息
+            itemOrganizer.put("avatar", CommonUtil.getLocalPhotoServer() + activity.getOrganizer().getAvatar());
             itemOrganizer.put("gender", activity.getOrganizer().getGender());
             itemOrganizer.put("age", activity.getOrganizer().getAge());
             itemOrganizer.put("car", activity.getOrganizer().getCar());
