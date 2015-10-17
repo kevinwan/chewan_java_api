@@ -18,12 +18,6 @@ import java.util.List;
 @Document
 public class Activity extends ActivityIntention {
 
-    public static final String PAY_TYPE_TREAT = "请客";
-
-    public static final String PAY_TYPE_INVITED = "请我";
-
-    public static final String PAY_TYPE_AA = "AA";
-
 
     @Id
     private String activityId;
@@ -57,6 +51,7 @@ public class Activity extends ActivityIntention {
 
     @Transient
     private Double distance;
+
 
 
 
@@ -155,6 +150,8 @@ public class Activity extends ActivityIntention {
     public void setDistance(Double distance) {
         this.distance = distance;
     }
+
+
 
 
 }

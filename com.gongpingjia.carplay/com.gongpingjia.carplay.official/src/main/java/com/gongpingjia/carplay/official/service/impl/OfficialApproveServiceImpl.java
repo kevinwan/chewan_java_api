@@ -189,7 +189,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             if (applyUser == null) {
                 continue;
             }
-            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
             if (applyUser.getCar() != null) {
                 applyUser.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
             }
@@ -272,7 +272,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             throw new ApiException("输入参数有误");
         }
         applyUser.hideSecretInfo();
-        applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+        applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
         application.setApplyUser(applyUser);
 
         UserAuthentication userAuthentication = userAuthenticationDao.findById(application.getApplyUserId());

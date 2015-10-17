@@ -86,4 +86,13 @@ public class TypeConverUtil {
 		}
 		return 0;
 	}
+
+	public static Boolean convertToBoolean(String paramName,String param,boolean throwException)throws ApiException {
+		try {
+			return Boolean.parseBoolean(param);
+		} catch (Exception e) {
+			LOG.warn("Parameter {} is not Integer type, which value is {}", paramName, param);
+			throw new ApiException("参数错误");
+		}
+	}
 }

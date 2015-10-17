@@ -105,7 +105,7 @@ public class ActivityController {
             } else {
                 userId = "";
             }
-            return activityService.getNearActivityList(initTransListParam(request), request, userId);
+            return activityService.getNearActivityList( request, userId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -163,20 +163,6 @@ public class ActivityController {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
-    }
-
-    /**
-     * type=$type&pay=$pay&province=$province&city=$city&district=$district&street=$street&transfer=$transfer&ignore=$ignore&limit=$limit&longitude=$longitude&latitude=$latitude &maxDistance=$maxDistance
-     */
-    private Map<String, String> initTransListParam(HttpServletRequest request) {
-        Map<String, String> keyTranMap = new HashMap<>();
-        keyTranMap.put("pay", "pay");
-        keyTranMap.put("type", "type");
-        keyTranMap.put("province", "establish.province");
-        keyTranMap.put("city", "establish.city");
-        keyTranMap.put("district", "establish.district");
-        keyTranMap.put("street", "establish.street");
-        return keyTranMap;
     }
 
 

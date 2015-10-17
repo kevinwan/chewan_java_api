@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
         //刷新用户Token
         userData.setToken(refreshUserToken(userData.getUserId()));
 
-        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         // 查询用户车辆信息
         if (userData.getCar() != null) {
             userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
@@ -345,7 +345,7 @@ public class UserServiceImpl implements UserService {
                     user.getEmchatName(), message);
         }
 
-        user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+        user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         user.setCompletion(computeCompletion(user));
         user.hideSecretInfo();
 
@@ -435,7 +435,7 @@ public class UserServiceImpl implements UserService {
             for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
                 Activity activity = activitiesData.get(actIndex);
                 if (organizer.getUserId().equals(activity.getUserId())) {
-                    organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+                    organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
                     organizer.hideSecretInfo();
                     activity.setOrganizer(organizer);
                     break;
@@ -520,7 +520,7 @@ public class UserServiceImpl implements UserService {
         List<User> data = new ArrayList<>();
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
             User user = findById(authUsers, authenticationHistory.getAuthId());
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer());
+            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             user.hideSecretInfo();
             data.add(user);
         }

@@ -101,7 +101,7 @@ public class User {
      * @param localPhotoServer  本地服务器
      * @param remotePhotoServer 远程服务器
      */
-    public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer) {
+    public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer,String gpjLogoServer) {
         if (!StringUtils.isEmpty(this.avatar)) {
             this.avatar = localPhotoServer + this.avatar;
         }
@@ -112,6 +112,12 @@ public class User {
         if (this.album != null) {
             for (Photo photo : album) {
                 photo.setUrl(remotePhotoServer + photo.getKey());
+            }
+        }
+
+        if (this.car != null) {
+            if (this.car.getLogo() != null) {
+                this.car.refreshPhotoInfo(gpjLogoServer);
             }
         }
     }

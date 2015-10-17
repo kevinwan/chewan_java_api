@@ -265,4 +265,41 @@ public class Constants {
         String MALE = "男";
         String FEMALE = "女";
     }
+
+    /**
+     * 用户活动类型
+     */
+    public interface ActivityType {
+        String EAT = "吃饭";
+
+        String SING = "唱歌";
+
+        String SHOPPING = "购物";
+
+        String NIGHT_CLUB = "夜店";
+
+        String FILM = "看电影";
+
+        String WALK_DOG = "遛狗";
+
+        String COFFEE = "咖啡";
+
+        String SPORT = "运动";
+
+        String DINK = "喝酒";
+
+        String MIDNIGHT_SNACK = "夜宵";
+    }
+
+    /**
+     * 请客类型
+     */
+    public interface ActivityPayType {
+
+        String AA = "AA";
+
+        String TREAT_ME = "请我吧";
+
+        String MY_TREAT = "我请客";
+    }
 }

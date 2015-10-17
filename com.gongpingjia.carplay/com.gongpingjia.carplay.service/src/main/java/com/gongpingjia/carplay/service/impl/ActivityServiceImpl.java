@@ -10,6 +10,7 @@ import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
@@ -139,56 +140,70 @@ public class ActivityServiceImpl implements ActivityService {
     /**
      * 基础参数转换规则；例如 province 需要转换成 destAddress.province 进行查询
      *
-     * @param transParams
-     * @param request     request中需要其他的信息 ；limit ignore 分页信息；longitude latitude 当前的经纬度；maxDistance 最大搜索距离 不是必须的；
-     *                    step 1: 将基础转换参数 转换成查询参数；
-     *                    step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
-     *                    step 3： 查询出基础Activity List
-     *                    step 4：对技术list 中的activity进行 权重计算 以及排序；
-     *                    step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
+     * @param request request中需要其他的信息 ；limit ignore 分页信息；longitude latitude 当前的经纬度；maxDistance 最大搜索距离 不是必须的；
+     *                step 1: 将基础转换参数 转换成查询参数；
+     *                step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
+     *                step 3： 查询出基础Activity List
+     *                step 4：对技术list 中的activity进行 权重计算 以及排序；
+     *                step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
      */
     @Override
-    public ResponseDo getNearActivityList(Map<String, String> transParams, HttpServletRequest request, String userId) throws ApiException {
+    public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException {
         LOG.debug("getNearActivityList");
-        //从request读取初始化信息；
-        //limit 是分页参数
+
+        //必填项
+        String longitude = request.getParameter("longitude");
+        String latitude = request.getParameter("latitude");
+
+        if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
+            LOG.error("longitude or latitude has not init");
+            throw new ApiException("经纬度信息没有提供");
+        }
+
+        //选填项目
+        String maxDistanceStr = request.getParameter("maxDistance");
+        LOG.debug("maxDistanceStr is:" + maxDistanceStr);
+
+
+        String type = request.getParameter("type");
+
+        String pay = request.getParameter("payStr");
+
+        String genderTypeStr = request.getParameter("genderType");
+
+        String transferStr = request.getParameter("transfer");
+
+        //分页信息  可以不填
+        String limitStr = request.getParameter("limit");
+        String ignoreStr = request.getParameter("ignore");
+
+        Landmark landmark = new Landmark();
+        landmark.setLatitude(TypeConverUtil.convertToDouble("latitude", latitude, true));
+        landmark.setLongitude(TypeConverUtil.convertToDouble("longitude", longitude, true));
+
+
+        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
+        if (StringUtils.isNotEmpty(maxDistanceStr)) {
+            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
+        }
+
+
+        //
         int limit = 10;
         //ignore是跳过的参数
         int ignore = 0;
         //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
-
-        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-
-
-        String limitStr = request.getParameter("limit");
-        String ignoreStr = request.getParameter("ignore");
         if (StringUtils.isNotEmpty(limitStr)) {
             limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
         }
         if (StringUtils.isNotEmpty(ignoreStr)) {
             ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
         }
-        String longitude = request.getParameter("longitude");
-        String latitude = request.getParameter("latitude");
-        if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
-            LOG.error("longitude or latitude has not init");
-            throw new ApiException("经纬度信息没有提供");
-        }
-        LOG.debug("longitude is:" + longitude);
-        LOG.debug("latitude is:" + latitude);
-        String maxDistanceStr = request.getParameter("maxDistance");
-        LOG.debug("maxDistanceStr is:" + maxDistanceStr);
-        if (StringUtils.isNotEmpty(maxDistanceStr)) {
-            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
-        }
-        Landmark landmark = new Landmark();
-        landmark.setLatitude(Double.parseDouble(latitude));
-        landmark.setLongitude(Double.parseDouble(longitude));
+
 
         LOG.debug("init Query");
         //从request读取基础查询参数；
-        Criteria criteria = initQuery(request, transParams);
-
+        Criteria criteria = new Criteria();
 
         // 添加 距离  时间 查询参数；
         long maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
@@ -204,6 +219,21 @@ public class ActivityServiceImpl implements ActivityService {
         if (StringUtils.isNotEmpty(userId)) {
             criteria.and("userId").ne(userId);
         }
+
+        if (StringUtils.isNotEmpty(type)) {
+            criteria.and("type").is(type);
+        }
+        if (StringUtils.isNotEmpty(pay)) {
+            criteria.and("pay").is(pay);
+        }
+        if (StringUtils.isNotEmpty(transferStr)) {
+            boolean transfer = TypeConverUtil.convertToBoolean("transfer", transferStr, true);
+            //如果包接送
+            if (transfer) {
+                criteria.and("transfer").is(true);
+            }
+        }
+
 
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(Query.query(criteria));
@@ -235,13 +265,51 @@ public class ActivityServiceImpl implements ActivityService {
          * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
-        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit);
+
+        int genderType = -1;
+
+        if (StringUtils.isEmpty(genderTypeStr)) {
+            genderType = -1;
+        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.MALE)) {
+            genderType = 0;
+        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.FEMALE)) {
+            genderType = 1;
+        } else {
+            throw new ApiException("用户性别设置不正确");
+        }
+
+        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType);
 
         if (null == rltList || rltList.size() == 0) {
             return ResponseDo.buildSuccessResponse("[]");
         }
+
         LOG.debug("rltList size is:" + rltList.size());
 
+        //初始化返回数据
+        JSONObject rltMap = initResultMap(userId, rltList);
+
+
+        return ResponseDo.buildSuccessResponse(rltMap);
+    }
+
+    private JSONObject initResultMap(String userId, List<Activity> rltList) {
+        //返回的数据类型
+        JSONObject rltMap = new JSONObject();
+
+        //判断当前用户是否有图片 没有图片不能看到 其他用户的头像信息；
+        if (StringUtils.isEmpty(userId)) {
+            rltMap.put("hasAlbum", false);
+        } else {
+            User user = userDao.findById(userId);
+            if (user != null && user.getAlbum() != null && !user.getAlbum().isEmpty()) {
+                rltMap.put("hasAlbum", true);
+            } else {
+                rltMap.put("hasAlbum", false);
+            }
+        }
+
+        //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
         List<Map<String, Object>> jsonArray = new ArrayList<>();
         for (Activity activity : rltList) {
             Map<String, Object> jsonItem = new HashMap<>();
@@ -250,45 +318,39 @@ public class ActivityServiceImpl implements ActivityService {
             jsonItem.put("distance", activity.getDistance());
             jsonItem.put("pay", activity.getPay());
             jsonItem.put("transfer", activity.isTransfer());
+            jsonItem.put("destination", activity.getDestination());
 
             Map<String, Object> itemOrganizer = new HashMap<>();
             itemOrganizer.put("userId", activity.getOrganizer().getUserId());
             itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
+
             // 对 avatar 信息添加了 服务器主机信息
             itemOrganizer.put("avatar", CommonUtil.getLocalPhotoServer() + activity.getOrganizer().getAvatar());
             itemOrganizer.put("gender", activity.getOrganizer().getGender());
             itemOrganizer.put("age", activity.getOrganizer().getAge());
-            itemOrganizer.put("car", activity.getOrganizer().getCar());
+
+            //初始化 活动的组织者的 car 信息 Car 的 brand 品牌 和  logo 是一个 url
+            JSONObject carJson = new JSONObject();
+            Car car = activity.getOrganizer().getCar();
+            if (null != car) {
+                if (StringUtils.isNotEmpty(car.getBrand())) {
+                    carJson.put("brand", car.getBrand());
+                }
+                //car 的 logo 需要添加 公平价的 服务器地址前缀
+                if (StringUtils.isNotEmpty(car.getLogo())) {
+                    carJson.put("logo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+                }
+            }
+            itemOrganizer.put("car", carJson);
+
             itemOrganizer.put("photoAuthStatus", activity.getOrganizer().getPhotoAuthStatus());
             itemOrganizer.put("subscribeFlag", activity.getOrganizer().getSubscribeFlag());
             jsonItem.put("organizer", itemOrganizer);
             jsonArray.add(jsonItem);
         }
-        return ResponseDo.buildSuccessResponse(jsonArray);
-    }
 
-    @Override
-    public Criteria initQuery(HttpServletRequest request, Map<String, String> transMap) {
-        //初始化query信息
-        Criteria criteria = new Criteria();
-        for (Map.Entry<String, String> transItem : transMap.entrySet()) {
-            String requestVal = request.getParameter(transItem.getKey());
-            if (StringUtils.isNotEmpty(requestVal)) {
-                //付款类型转换 请我变成 请客  请客变成 请我 AA不变；
-                if (transItem.getKey().equals("pay")) {
-                    if (requestVal.equals(Activity.PAY_TYPE_INVITED)) {
-                        criteria.and(transItem.getValue()).is(Activity.PAY_TYPE_TREAT);
-                    } else if (requestVal.equals(Activity.PAY_TYPE_TREAT)) {
-                        criteria.and(transItem.getKey()).is(Activity.PAY_TYPE_INVITED);
-                    } else {
-                        criteria.and(transItem.getKey()).is(Activity.PAY_TYPE_AA);
-                    }
-                } else {
-                    criteria.and(transItem.getValue()).is(requestVal);
-                }
-            }
-        }
-        return criteria;
+        rltMap.put("activityList", jsonArray);
+        return rltMap;
     }
 
     @Override

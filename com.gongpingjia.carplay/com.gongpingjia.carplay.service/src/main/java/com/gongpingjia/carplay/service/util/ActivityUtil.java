@@ -17,8 +17,11 @@ import java.util.*;
 public class ActivityUtil {
 
     public static List<Activity> getSortResult(List<Activity> activities, Date currentTime, Landmark nowLandmark,
-                                               double maxDistance, long maxPubTime, int skip, int limit) {
-        List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime), skip, limit);
+                                               double maxDistance, long maxPubTime, int skip, int limit,int genderType) {
+
+        //genderType 为 -1 不限制 genderType 为0 搜索男性发布的活动 genderType 为1 搜索女性发布的活动；
+
+        List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime,genderType), skip, limit);
         if (null == activityWeights) {
             return null;
         }
@@ -30,11 +33,23 @@ public class ActivityUtil {
     }
 
 
-    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime) {
+    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime,int genderType) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
         for (Activity activity : activities) {
-            ActivityWeight aw = new ActivityWeight(activity);
             User user = activity.getOrganizer();
+
+            //过滤男女
+            if (genderType == 0) {
+                if (!StringUtils.equals(user.getGender(), Constants.UserGender.MALE)) {
+                    continue;
+                }
+            }else if (genderType == 1){
+                if (!StringUtils.equals(user.getGender(), Constants.UserGender.FEMALE)) {
+                    continue;
+                }
+            }
+
+            ActivityWeight aw = new ActivityWeight(activity);
             //  车主认证；
             if (StringUtils.equals(user.getLicenseAuthStatus(), Constants.AuthStatus.ACCEPT)) {
                 aw.setCarOwnerFlag(true);
