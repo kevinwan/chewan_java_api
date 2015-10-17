@@ -32,7 +32,7 @@ public class User {
     private Long birthday;
     private Long registerTime;
     private String role;
-    private boolean invalid;
+    private boolean deleteFlag;
 
     @Indexed
     private String phone;
@@ -87,7 +87,7 @@ public class User {
     @Transient
     private String token;
 
-    //
+    //关注标识，是否已经被我关注了
     @Transient
     private boolean subscribeFlag;
 
@@ -220,12 +220,12 @@ public class User {
         this.role = role;
     }
 
-    public boolean isInvalid() {
-        return invalid;
+    public boolean isDeleteFlag() {
+        return deleteFlag;
     }
 
-    public void setInvalid(boolean invalid) {
-        this.invalid = invalid;
+    public void setDeleteFlag(boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 
     public Landmark getLandmark() {
