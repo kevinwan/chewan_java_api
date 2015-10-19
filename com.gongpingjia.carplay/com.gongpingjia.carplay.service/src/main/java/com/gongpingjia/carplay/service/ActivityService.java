@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -58,4 +59,11 @@ public interface ActivityService {
      * @return
      */
     public ResponseDo getUserActivityList(HttpServletRequest request)throws ApiException;
+
+
+    public ResponseDo updateUserActivity(JSONObject json,String activityId)throws ApiException;
+
+    public ResponseDo viewUserActivity(String activityId) throws ApiException;
+
+    public ResponseDo deleteUserActivities(Collection ids)throws ApiException;
 }

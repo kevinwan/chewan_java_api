@@ -77,6 +77,7 @@ public class ActivityServiceImpl implements ActivityService {
         memberIds.add(userId);
         activity.setMembers(memberIds);
         activity.setCreateTime(new Date().getTime());
+        activity.setDeleteFlag(false);
 
         activityDao.save(activity);
 //        try {
@@ -125,7 +126,12 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo getActivityInfo(String userId, String activityId) throws ApiException {
         LOG.debug("getActivityInfo");
-        Activity activity = activityDao.findById(activityId);
+
+
+        //
+        Criteria criteria = Criteria.where("activityId").is(activityId);
+        criteria.and("deleteFlag").is(false);
+        Activity activity = activityDao.findOne(Query.query(criteria));
         if (null == activity) {
             LOG.warn("activity not exist");
             throw new ApiException("活动id 找不到对应的活动");
@@ -221,6 +227,16 @@ public class ActivityServiceImpl implements ActivityService {
         //非用户自己创建的活动
         if (StringUtils.isNotEmpty(userId)) {
             criteria.and("userId").ne(userId);
+        }
+
+        //deleteFlag 为 false 的活动；
+        criteria.and("deleteFlag").is(false);
+
+        //剔除掉用户已经申请过该活动
+        if (StringUtils.isNotEmpty(userId)) {
+            Criteria inCriteria = new Criteria();
+            inCriteria.ne(userId);
+            criteria.and("applyIds").elemMatch(inCriteria);
         }
 
         if (StringUtils.isNotEmpty(type)) {
@@ -623,44 +639,101 @@ public class ActivityServiceImpl implements ActivityService {
             criteria.and("estabPoint.city").is(city);
         }
 
-        String nickname = request.getParameter("phone");
-        if (StringUtils.isNotEmpty(nickname)) {
-            User user = userDao.findOne(Query.query(Criteria.where("phone").is(nickname)));
+        String phone = request.getParameter("phone");
+        if (StringUtils.isNotEmpty(phone)) {
+            User user = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
             if (null == user || StringUtils.isEmpty(user.getUserId())) {
                 throw new ApiException("未找到该号码发布的活动");
             }
             criteria.and("userId").is(user.getUserId());
         }
 
-        String startDateStr = request.getParameter("startDateStr");
-        String endDateStr = request.getParameter("endDateStr");
-        if (StringUtils.isNotEmpty(startDateStr) && StringUtils.isNotEmpty(endDateStr)) {
-            long start = TypeConverUtil.convertToLong("startDate", startDateStr, true);
-            long end = TypeConverUtil.convertToLong("endDate", endDateStr, true) + 24 * 60 * 60 * 1000;
-            criteria.and("createTime").gte(start).lte(end);
-        }
+//        String startTimeStr = request.getParameter("startTime");
+//        String endTimeStr = request.getParameter("endTime");
+//        if (StringUtils.isNotEmpty(startTimeStr) && StringUtils.isNotEmpty(endTimeStr)) {
+//            long start = TypeConverUtil.convertToLong("startDate", startTimeStr, true);
+//            long end = TypeConverUtil.convertToLong("endDate", endTimeStr, true) + 24 * 60 * 60 * 1000;
+//            criteria.and("createTime").gte(start).lte(end);
+//        }
 
         String pay = request.getParameter("pay");
-        if (!StringUtils.equals(pay, "-1")) {
+        if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
             criteria.and("pay").is(pay);
         }
 
         String type = request.getParameter("type");
-        if (!StringUtils.equals(type, "-1")) {
+        if (StringUtils.isNotEmpty(type) && !StringUtils.equals(type, "-1")) {
             criteria.and("type").is(type);
         }
 
         String transferStr = request.getParameter("transfer");
-        if (!StringUtils.equals(transferStr, "-1")) {
+        if (StringUtils.isNotEmpty(transferStr) && !StringUtils.equals(transferStr, "-1")) {
             criteria.and("transfer").is(TypeConverUtil.convertToBoolean("transfer", transferStr, true));
         }
 
         List<Activity> activityList = activityDao.find(Query.query(criteria));
+        if (null == activityList || activityList.isEmpty()) {
+            return ResponseDo.buildSuccessResponse("[]");
+        }
 
-        if (null == activityList) {
-            activityList = new ArrayList<>();
+        HashSet<String> userIdSet = new HashSet<>(activityList.size());
+        for (Activity activity : activityList) {
+            userIdSet.add(activity.getUserId());
+        }
+        List<User> userList = userDao.findByIds(userIdSet);
+        for (Activity activity : activityList) {
+            activity.setOrganizer(FetchUtil.getUserFromList(userList, activity.getUserId()));
         }
 
         return ResponseDo.buildSuccessResponse(activityList);
+    }
+
+
+    @Override
+    public ResponseDo updateUserActivity(JSONObject json, String activityId) throws ApiException {
+        Activity activity = null;
+        try {
+            activity = (Activity) JSONObject.toBean(json, Activity.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            throw new ApiException("活动转换时出错");
+        }
+        Activity toFind = activityDao.findById(activityId);
+        if (null == toFind) {
+            throw new ApiException("该id对应的活动不存在");
+        }
+        activityDao.update(activityId, activity);
+        return ResponseDo.buildSuccessResponse();
+
+    }
+
+    @Override
+    public ResponseDo viewUserActivity(String activityId) throws ApiException {
+        Activity activity = activityDao.findById(activityId);
+        if (null == activity) {
+            throw new ApiException("该活动不存在");
+        }
+        User organizer = userDao.findById(activity.getUserId());
+        if (null == organizer || StringUtils.isEmpty(organizer.getUserId())) {
+            throw new ApiException("该活动没有组织者");
+        }
+        activity.setOrganizer(organizer);
+        return ResponseDo.buildSuccessResponse(activity);
+    }
+
+    @Override
+    public ResponseDo deleteUserActivities(Collection ids) throws ApiException {
+        if (null == ids || ids.isEmpty()) {
+            throw new ApiException("未传入具体值");
+        }
+        List<Activity> byIds = activityDao.findByIds(ids);
+        if (null == byIds || ids.isEmpty()) {
+            throw new ApiException("id中含有不存在的值");
+        }
+        if (byIds.size() != ids.size()) {
+            throw new ApiException("id中含有不存在的值");
+        }
+        activityDao.deleteByIds(ids);
+        return null;
     }
 }

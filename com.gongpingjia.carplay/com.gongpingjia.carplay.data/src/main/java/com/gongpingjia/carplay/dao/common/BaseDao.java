@@ -37,7 +37,7 @@ public interface BaseDao<T,K> {
 
     public void deleteById(K id);
 
-    public void deleteByIds(K[] ids);
+    public void deleteByIds(Collection<K> ids);
 
     public void delete(Query query);
 

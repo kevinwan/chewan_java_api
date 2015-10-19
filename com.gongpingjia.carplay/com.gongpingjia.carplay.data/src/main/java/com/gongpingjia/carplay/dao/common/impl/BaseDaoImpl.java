@@ -83,7 +83,7 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     }
 
     @Override
-    public void deleteByIds(K[] ids) {
+    public void deleteByIds(Collection<K> ids) {
         mongoTemplate.remove(Query.query(Criteria.where("_id").in(ids)), getCls());
     }
 

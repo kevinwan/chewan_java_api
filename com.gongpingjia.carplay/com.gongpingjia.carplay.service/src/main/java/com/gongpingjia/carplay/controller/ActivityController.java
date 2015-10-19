@@ -55,7 +55,6 @@ public class ActivityController {
             if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "destination", "destPoint", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
-
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, activity);
         } catch (ApiException e) {

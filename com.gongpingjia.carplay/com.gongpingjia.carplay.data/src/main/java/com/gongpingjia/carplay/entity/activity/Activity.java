@@ -49,8 +49,13 @@ public class Activity extends ActivityIntention {
     //活动创建时间
     private Long createTime;
 
+
+    private Boolean deleteFlag;
+
     @Transient
     private Double distance;
+
+    private List<String> applyIds;
 
 
 
@@ -143,6 +148,14 @@ public class Activity extends ActivityIntention {
         this.createTime = createTime;
     }
 
+    public Boolean getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(Boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
+    }
+
     public Double getDistance() {
         return distance;
     }
@@ -151,7 +164,11 @@ public class Activity extends ActivityIntention {
         this.distance = distance;
     }
 
+    public List<String> getApplyIds() {
+        return applyIds;
+    }
 
-
-
+    public void setApplyIds(List<String> applyIds) {
+        this.applyIds = applyIds;
+    }
 }
