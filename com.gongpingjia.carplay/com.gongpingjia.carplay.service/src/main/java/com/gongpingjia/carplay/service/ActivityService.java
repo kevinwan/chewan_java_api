@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import net.sf.json.JSONObject;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -49,4 +50,12 @@ public interface ActivityService {
      * @throws ApiException
      */
     public ResponseDo processAppointment(String appointmentId, String userId, boolean acceptFlag) throws ApiException;
+
+
+    /**
+     * 管理后台 查询  用户创建的活动
+     * @param request
+     * @return
+     */
+    public ResponseDo getUserActivityList(HttpServletRequest request)throws ApiException;
 }

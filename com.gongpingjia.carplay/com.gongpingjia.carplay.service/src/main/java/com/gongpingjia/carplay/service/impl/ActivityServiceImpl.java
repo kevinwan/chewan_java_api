@@ -12,6 +12,7 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -19,6 +20,7 @@ import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.ActivityWeight;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import com.gongpingjia.carplay.service.util.FetchUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -288,30 +290,30 @@ public class ActivityServiceImpl implements ActivityService {
         LOG.debug("rltList size is:" + rltList.size());
 
         //初始化返回数据
-        JSONObject rltMap = initResultMap(userId, rltList);
+        JSONArray rltArr = initResultMap(userId, rltList);
 
 
-        return ResponseDo.buildSuccessResponse(rltMap);
+        return ResponseDo.buildSuccessResponse(rltArr);
     }
 
-    private JSONObject initResultMap(String userId, List<Activity> rltList) {
-        //返回的数据类型
-        JSONObject rltMap = new JSONObject();
+    private JSONArray initResultMap(String userId, List<Activity> rltList) throws ApiException {
+//        //返回的数据类型
+//        JSONObject rltMap = new JSONObject();
 
-        //判断当前用户是否有图片 没有图片不能看到 其他用户的头像信息；
-        if (StringUtils.isEmpty(userId)) {
-            rltMap.put("hasAlbum", false);
-        } else {
-            User user = userDao.findById(userId);
-            if (user != null && user.getAlbum() != null && !user.getAlbum().isEmpty()) {
-                rltMap.put("hasAlbum", true);
-            } else {
-                rltMap.put("hasAlbum", false);
-            }
-        }
+//        //判断当前用户是否有图片 没有图片不能看到 其他用户的头像信息；
+//        if (StringUtils.isEmpty(userId)) {
+//            rltMap.put("hasAlbum", false);
+//        } else {
+//            User user = userDao.findById(userId);
+//            if (user != null && user.getAlbum() != null && !user.getAlbum().isEmpty()) {
+//                rltMap.put("hasAlbum", true);
+//            } else {
+//                rltMap.put("hasAlbum", false);
+//            }
+//        }
 
         //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
-        List<Map<String, Object>> jsonArray = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
         for (Activity activity : rltList) {
             Map<String, Object> jsonItem = new HashMap<>();
             jsonItem.put("type", activity.getType());
@@ -322,27 +324,23 @@ public class ActivityServiceImpl implements ActivityService {
             jsonItem.put("destination", activity.getDestination());
 
             Map<String, Object> itemOrganizer = new HashMap<>();
-            itemOrganizer.put("userId", activity.getOrganizer().getUserId());
-            itemOrganizer.put("nickname", activity.getOrganizer().getNickname());
+            User organizer = activity.getOrganizer();
+            if (null == organizer) {
+                throw new ApiException("该活动没有组织者");
+            }
+            itemOrganizer.put("userId", organizer.getUserId());
+            itemOrganizer.put("nickname", organizer.getNickname());
 
             // 对 avatar 信息添加了 服务器主机信息
-            itemOrganizer.put("avatar", CommonUtil.getLocalPhotoServer() + activity.getOrganizer().getAvatar());
-            itemOrganizer.put("gender", activity.getOrganizer().getGender());
-            itemOrganizer.put("age", activity.getOrganizer().getAge());
+            itemOrganizer.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
+            itemOrganizer.put("gender", organizer.getGender());
+            itemOrganizer.put("age", organizer.getAge());
+
+            //初始化用户相册信息
+            initUserAlbumInfo(itemOrganizer, organizer);
 
             //初始化 活动的组织者的 car 信息 Car 的 brand 品牌 和  logo 是一个 url
-            JSONObject carJson = new JSONObject();
-            Car car = activity.getOrganizer().getCar();
-            if (null != car) {
-                if (StringUtils.isNotEmpty(car.getBrand())) {
-                    carJson.put("brand", car.getBrand());
-                }
-                //car 的 logo 需要添加 公平价的 服务器地址前缀
-                if (StringUtils.isNotEmpty(car.getLogo())) {
-                    carJson.put("logo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
-                }
-            }
-            itemOrganizer.put("car", carJson);
+            initUserCarInfo(activity, itemOrganizer);
 
             itemOrganizer.put("photoAuthStatus", activity.getOrganizer().getPhotoAuthStatus());
             itemOrganizer.put("subscribeFlag", activity.getOrganizer().getSubscribeFlag());
@@ -350,8 +348,45 @@ public class ActivityServiceImpl implements ActivityService {
             jsonArray.add(jsonItem);
         }
 
-        rltMap.put("activityList", jsonArray);
-        return rltMap;
+//        rltMap.put("activityList", jsonArray);
+        return jsonArray;
+    }
+
+    private void initUserCarInfo(Activity activity, Map<String, Object> itemOrganizer) {
+        JSONObject carJson = new JSONObject();
+        Car car = activity.getOrganizer().getCar();
+        if (null != car) {
+            if (StringUtils.isNotEmpty(car.getBrand())) {
+                carJson.put("brand", car.getBrand());
+            }
+            //car 的 logo 需要添加 公平价的 服务器地址前缀
+            if (StringUtils.isNotEmpty(car.getLogo())) {
+                carJson.put("logo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+            }
+        }
+        itemOrganizer.put("car", carJson);
+    }
+
+    private void initUserAlbumInfo(Map<String, Object> itemOrganizer, User organizer) {
+        if (null == organizer.getAlbum() || organizer.getAlbum().size() == 0) {
+            itemOrganizer.put("album", "[]");
+        } else {
+            //获取时间最近的一张;
+            long maxTime = 0L;
+            Photo tempPhoto = null;
+            Iterator<Photo> iterator = organizer.getAlbum().iterator();
+            while (iterator.hasNext()) {
+                Photo temp = iterator.next();
+                if (maxTime < temp.getUploadTime()) {
+                    maxTime = temp.getUploadTime();
+                    tempPhoto = temp;
+                }
+            }
+            tempPhoto.setUrl(CommonUtil.getThirdPhotoServer() + tempPhoto.getKey());
+            List<Photo> onePhoneAlbum = new ArrayList<>(1);
+            onePhoneAlbum.add(tempPhoto);
+            itemOrganizer.put("album", onePhoneAlbum);
+        }
     }
 
     @Override
@@ -555,4 +590,77 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
 
+    /**
+     *
+     * 管理后台功能
+     *
+     *
+     */
+
+
+    /**
+     * 管理后台用户 查找 用户活动 列表
+     * <p/>
+     * criteria:
+     * city   对应 estabPoint.city
+     * phone 根据 phone 查出对应的user  根据 userId 查出 对应的 activity
+     * fromDate  toDate          对应 createTime
+     * pay  -1 对应不限制              我请客 请我吧 AA制
+     * type -1 全部           type值 对应着 type
+     * transfer  -1 全部      true  false
+     *
+     * @param request
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    public ResponseDo getUserActivityList(HttpServletRequest request) throws ApiException {
+        Criteria criteria = new Criteria();
+
+        //
+        String city = request.getParameter("city");
+        if (StringUtils.isNotEmpty(city)) {
+            criteria.and("estabPoint.city").is(city);
+        }
+
+        String nickname = request.getParameter("phone");
+        if (StringUtils.isNotEmpty(nickname)) {
+            User user = userDao.findOne(Query.query(Criteria.where("phone").is(nickname)));
+            if (null == user || StringUtils.isEmpty(user.getUserId())) {
+                throw new ApiException("未找到该号码发布的活动");
+            }
+            criteria.and("userId").is(user.getUserId());
+        }
+
+        String startDateStr = request.getParameter("startDateStr");
+        String endDateStr = request.getParameter("endDateStr");
+        if (StringUtils.isNotEmpty(startDateStr) && StringUtils.isNotEmpty(endDateStr)) {
+            long start = TypeConverUtil.convertToLong("startDate", startDateStr, true);
+            long end = TypeConverUtil.convertToLong("endDate", endDateStr, true) + 24 * 60 * 60 * 1000;
+            criteria.and("createTime").gte(start).lte(end);
+        }
+
+        String pay = request.getParameter("pay");
+        if (!StringUtils.equals(pay, "-1")) {
+            criteria.and("pay").is(pay);
+        }
+
+        String type = request.getParameter("type");
+        if (!StringUtils.equals(type, "-1")) {
+            criteria.and("type").is(type);
+        }
+
+        String transferStr = request.getParameter("transfer");
+        if (!StringUtils.equals(transferStr, "-1")) {
+            criteria.and("transfer").is(TypeConverUtil.convertToBoolean("transfer", transferStr, true));
+        }
+
+        List<Activity> activityList = activityDao.find(Query.query(criteria));
+
+        if (null == activityList) {
+            activityList = new ArrayList<>();
+        }
+
+        return ResponseDo.buildSuccessResponse(activityList);
+    }
 }
