@@ -308,12 +308,13 @@ public class UserServiceImpl implements UserService {
             data.put("avatar", user.getAvatar());
             return ResponseDo.buildSuccessResponse(data);
         } else {
-            // 用户已经存在于系统中
-            LOG.debug("User is exist in the system, return login infor");
-            if (userData.getCar() == null) {
-                userData.setCar(new Car());
+            if (userData.isDeleteFlag()) {
+                LOG.warn("User is already deleted by administrator, cannot login again");
+                throw new ApiException("用户不存在");
             }
 
+            // 用户已经存在于系统中
+            LOG.debug("User is exist in the system, return login information");
             //刷新用户会话Token
             userData.setToken(refreshUserToken(userData.getUserId()));
             return ResponseDo.buildSuccessResponse(userData);
