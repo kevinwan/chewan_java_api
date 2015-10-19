@@ -35,18 +35,23 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
                     }));
             },
 
-            getUserInfo: function () {
-                return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/user/" + user + "/detail?userId="
+            getUserInfo: function (userId) {
+                return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/user/" + userId + "/detail?userId="
                 + authService.getUser().userId + "&token=" + authService.getUser().token);
             },
 
             updateUserInfo: function (user) {
+                var photoIds = new Array();
+                for(var photo in user.album){
+                    photoIds.add(photo.id);
+                }
+
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/user/" + user + "/update?userId="
                     + authService.getUser().userId + "&token=" + authService.getUser().token,
                     JSON.stringify({
                         role: user.role,
                         deleteFlag: user.deleteFlag,
-                        photos: user.photos
+                        photoIds: photoIds
                     }));
             }
         }

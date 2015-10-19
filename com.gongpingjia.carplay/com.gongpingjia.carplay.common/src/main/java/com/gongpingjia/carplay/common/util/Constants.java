@@ -139,10 +139,9 @@ public class Constants {
     }
 
     public interface ActivityCatalog {
+        String COMMON = "普通活动";
 
-        public static final String COMMON = "普通活动";
-
-        public static final String OFFICIAL = "官方活动";
+        String OFFICIAL = "官方活动";
     }
 
     public interface UserCatalog {
@@ -152,6 +151,8 @@ public class Constants {
         String OFFICIAL = "官方用户";
 
         String ADMIN = "ADMIN";
+
+        List<String> ROLES = Arrays.asList(COMMON, OFFICIAL, ADMIN);
     }
 
     public interface Charset {

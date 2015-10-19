@@ -8,25 +8,6 @@ gpjApp.controller('userInfoModalController', function ($scope, $rootScope, $loca
     $rootScope.loadingPromise = userService.getUserInfo().success(function (result) {
         if (result && result.result == 0 && result.data) {
             $scope.user = result.data;
-            //
-            //var photos = $scope.user.photos;
-            //if (photos != undefined) {
-            //    //<li class="span3">
-            //    //    <a href="#" class="thumbnail">
-            //    //    <img src="http://placehold.it/260x180" alt="">
-            //    //    </a>
-            //    //    </li>
-            //    for(var photo in photos){
-            //        var li = document.createElement("li");
-            //        li.addClass("span3");
-            //        var a = document.createElement("a");
-            //
-            //        var img = document.createElement("img");
-            //        img.setAttribute("src", photo);
-            //
-            //    }
-            //
-            //}
         }
     });
 
