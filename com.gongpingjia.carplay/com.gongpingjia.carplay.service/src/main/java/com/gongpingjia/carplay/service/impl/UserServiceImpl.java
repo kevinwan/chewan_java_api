@@ -353,13 +353,13 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(user);
     }
 
-    public ResponseDo getAppointment(String userId, String token, String status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getAppointment(String userId, String token, String[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
         Criteria criteria = Criteria.where("invitedUserId").is(userId);
-        if (!StringUtils.isEmpty(status)) {
-            criteria.and("status").is(status);
+        if (status != null && status.length > 0) {
+            criteria.and("status").in(status);
         }
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));

@@ -52,22 +52,23 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
             start.setTime(start.getTime() - 1000 * 60 * 60 * 24 * 7);
 
             var end = new Date();
-            end.setHours(23, 59, 59);
+            end.setHours(0, 0, 0, 0);
+
             $scope.criteria = {
                 phone: '',
                 nickname: '',
                 licenseAuthStatus: '',
                 photoAuthStatus: '',
-                start: start,
-                end: end
+                start: start.getFullYear() + "-" + (start.getMonth() + 1) + "-" + start.getDate(),
+                end: end.getFullYear() + "-" + (end.getMonth() + 1) + "-" + end.getDate()
             };
         };
 
         /**
          * Search users based on criteria
          */
-        $scope.searchUsers = function (criteria) {
-            $rootScope.loadingPromise = userService.listUsers(criteria).success(function (result) {
+        $scope.searchUsers = function () {
+            $rootScope.loadingPromise = userService.listUsers($scope.criteria).success(function (result) {
                 $scope.users = (result.result === 0 ? result.data : undefined);
             });
         };
@@ -76,7 +77,7 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
          * View user info
          */
         $scope.viewUser = function (userId) {
-            chewanService.setUser(userId);
+            userService.setUser(userId);
             $location.path("/user/detail");
         };
 
