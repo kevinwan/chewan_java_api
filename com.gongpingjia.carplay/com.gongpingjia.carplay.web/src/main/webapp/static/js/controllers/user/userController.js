@@ -5,8 +5,8 @@
  *
  * @constructor
  */
-gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'chewanService',
-    'moment', function ($scope, $rootScope, $http, $modal, DTOptionsBuilder, DTColumnDefBuilder, chewanService, moment) {
+gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'userService',
+    function ($scope, $rootScope, $http, $location, DTOptionsBuilder, DTColumnDefBuilder, userService) {
 
         /**
          * Define data table columns
@@ -32,7 +32,7 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$modal', 
         /**
          * Define data table options
          */
-        $scope.dtOptions = DTOptionsBuilder.newOptions().withBootstrap().withOption('rowCallback',
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('rowCallback',
             function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                 $('td', nRow).unbind('click');
                 $('td', nRow).bind('click', function () {
@@ -47,16 +47,27 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$modal', 
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            $scope.criteria = {phone: '', nickname: '', isAuthenticated: ''};
+            var start = new Date();
+            start.setHours(0, 0, 0, 0);
+            start.setTime(start.getTime() - 1000 * 60 * 60 * 24 * 7);
+
+            var end = new Date();
+            end.setHours(23, 59, 59);
+            $scope.criteria = {
+                phone: '',
+                nickname: '',
+                licenseAuthStatus: '',
+                photoAuthStatus: '',
+                start: start,
+                end: end
+            };
         };
 
         /**
          * Search users based on criteria
          */
         $scope.searchUsers = function (criteria) {
-            //alert(JSON.stringify(criteria));
-
-            $rootScope.loadingPromise = chewanService.getUserList(criteria).success(function (result) {
+            $rootScope.loadingPromise = userService.listUsers(criteria).success(function (result) {
                 $scope.users = (result.result === 0 ? result.data : undefined);
             });
         };
@@ -66,30 +77,16 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$modal', 
          */
         $scope.viewUser = function (userId) {
             chewanService.setUser(userId);
-            var modalInstance = $modal.open({
-                templateUrl: 'views/chewan/user_info_modal.html',
-                controller: 'userInfoModalController'
-            });
-
-            return modalInstance.result.then(function (reply) {
-                $scope.searchUsers($scope.criteria);
-            });
+            $location.path("/user/detail");
         };
-
-        /**
-         * Get status color
-         */
-        //$scope.getStatusColor = function (status) {
-        //    if (status === STATUS_DECLINED)
-        //        return {'color': 'red', 'font-weight': 'bold'};
-        //    else if (status === STATUS_ACCEPTED)
-        //        return {'color': 'green', 'font-weight': 'bold'};
-        //    else
-        //        return {'color': 'brown', 'font-weight': 'bold'};
-        //};
 
         /**
          * Initialize component status
          */
         $scope.resetCriteria();
+
+        /**
+         * 进入页面执行一次查询操作
+         */
+        $scope.searchUsers(this.criteria);
     }]);

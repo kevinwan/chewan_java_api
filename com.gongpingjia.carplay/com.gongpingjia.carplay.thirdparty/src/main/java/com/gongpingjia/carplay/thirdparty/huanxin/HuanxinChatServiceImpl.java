@@ -373,37 +373,40 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         return response;
     }
 
-//    public static void main(String[] args) throws ApiException {
-//        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/messages";
-//
-//        List<Header> headers = new ArrayList<Header>(2);
-//        headers.add(new BasicHeader("Content-Type", "application/json"));
-//        headers.add(new BasicHeader("Authorization",
-//                MessageFormat.format(AUTH_HEADER_FORMAT,
-//                        "YWMtfmMeZmWJEeWVab12jYnrsAAAAVFGywz5i7xlS_xlLlV9qeTzT8RLiUn7XkU")));
-//
-//        List<String> users = new ArrayList<>(2);
-//        users.add("eb1e9dbc37d51624d2a42fcb2355ab71");
-//        users.add("59baae3ea738202c35749112b1f869c4");
-//
-//        JSONObject param = new JSONObject();
-//        param.put("target_type", "users");
-//        param.put("target", users);
-//
-//        JSONObject msg = new JSONObject();
-//        msg.put("type", "txt");
-//        msg.put("msg", "Test for send message");
-//        param.put("msg", msg);
-//
-//        param.put("from", "SubscribeAdmin");
-//        param.put("ext", "");
-//
-//        CloseableHttpResponse response = HttpClientUtil.post(httpUrl.toString(),
-//                param.toString(), headers,
-//                Constants.Charset.UTF8);
-//
-//        JSONObject result = HttpClientUtil.parseResponseGetJson(response);
-//
-//        System.out.println(result);
-//    }
+    public static void main(String[] args) throws ApiException {
+        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/messages";
+
+        List<Header> headers = new ArrayList<Header>(2);
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        headers.add(new BasicHeader("Authorization",
+                MessageFormat.format(AUTH_HEADER_FORMAT,
+                        "YWMtsxGcunDDEeWm6k8ZZ_uVGwAAAVGQX3Ib5a1W7kr5MTSKQkN1BAAgP53U2tE")));
+
+        List<String> users = new ArrayList<>(2);
+        users.add("2575a950e18f4a003e1ab082861f572c");
+
+        JSONObject param = new JSONObject();
+        param.put("target_type", "users");
+        param.put("target", users);
+
+        JSONObject msg = new JSONObject();
+        msg.put("type", "txt");
+        msg.put("msg", "Test for send message");
+        param.put("msg", msg);
+
+        param.put("from", "InterestAdmin");
+
+        Map<String, Object> ext = new HashMap<>(1);
+        ext.put("avatar", "李程测试ext属性avatar");
+        param.put("ext", ext);
+
+        System.out.println(param.toString());
+        CloseableHttpResponse response = HttpClientUtil.post(httpUrl.toString(),
+                param.toString(), headers,
+                Constants.Charset.UTF8);
+
+        JSONObject result = HttpClientUtil.parseResponseGetJson(response);
+
+        System.out.println(result);
+    }
 }

@@ -89,7 +89,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         //向关注我的人发送感兴趣的信息
         Map<String, Object> ext = new HashMap<>(1);
-        ext.put("attr1", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+        ext.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"),
                 user.getNickname(), activity.getType());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,

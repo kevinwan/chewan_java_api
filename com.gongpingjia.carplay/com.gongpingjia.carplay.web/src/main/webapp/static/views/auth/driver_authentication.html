@@ -28,17 +28,17 @@
         </div>
 
         <div class="col-md-2">
-            <label class="control-label bolder blue" for="plate">开始时间</label>
+            <label class="control-label bolder blue" for="start">开始时间</label>
 
             <div class="">
-                <input type="text" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.startDate" placeholder="开始时间">
+                <input id="start" type="text" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.startDate" placeholder="开始时间">
             </div>
         </div>
         <div class="col-md-2">
-            <label class="control-label bolder blue" for="plate">结束时间</label>
+            <label class="control-label bolder blue" for="end">结束时间</label>
 
             <div class="">
-                <input type="text" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.endDate" placeholder="结束时间">
+                <input id="end" type="text" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.endDate" placeholder="结束时间">
             </div>
         </div>
     </div>
