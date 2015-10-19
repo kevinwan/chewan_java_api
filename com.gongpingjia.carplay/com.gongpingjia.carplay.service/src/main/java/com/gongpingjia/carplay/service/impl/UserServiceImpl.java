@@ -361,15 +361,25 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(status)) {
             criteria.and("status").is(status);
         }
-        List<Appointment> appointments = appointmentDao.find(Query.query(Criteria.where("invitedUserId").is(userId))
+        List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
+
+        User user = userDao.findById(userId);
+        HashMap<String, User> users = buildUsers(userId, appointments);
 
         List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 
+        String localServer = CommonUtil.getLocalPhotoServer();
+        String remoteServer = CommonUtil.getThirdPhotoServer();
+        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
+
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
-            User applicantUser = userDao.findById(appointment.getApplyUserId());
+            User applicantUser = users.get(appointment.getApplyUserId()); //userDao.findById(appointment.getApplyUserId());
             applicantUser.hideSecretInfo();
+            applicantUser.refreshPhotoInfo(localServer, remoteServer, gpjServer);
+            applicantUser.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    applicantUser.getLandmark().getLongitude(), applicantUser.getLandmark().getLatitude()));
 
             JSONObject jsonObject = JSONObject.fromObject(appointment);
             jsonObject.put("applicant", applicantUser);
@@ -378,6 +388,22 @@ public class UserServiceImpl implements UserService {
         }
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    private HashMap<String, User> buildUsers(String userId, List<Appointment> appointments) {
+        HashMap<String, User> users = new HashMap<>(appointments.size());
+        for (Appointment appointment : appointments) {
+            users.put(appointment.getApplyUserId(), null);
+            users.put(appointment.getInvitedUserId(), null);
+        }
+        users.remove(userId);
+
+        List<User> userList = userDao.findByIds(users.keySet());
+        for (User item : userList) {
+            users.put(item.getUserId(), item);
+        }
+
+        return users;
     }
 
     @Override
