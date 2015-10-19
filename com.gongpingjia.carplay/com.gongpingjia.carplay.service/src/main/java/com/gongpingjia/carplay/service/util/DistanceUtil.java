@@ -5,7 +5,7 @@ package com.gongpingjia.carplay.service.util;
  */
 public class DistanceUtil {
 
-    private static final  double EARTH_RADIUS = 6378137;//赤道半径(单位m)
+    public static final  double EARTH_RADIUS = 6378137;//赤道半径(单位m)
 
     public static double calculateDistance(double lon1, double lat1,double lon2, double lat2) {
         double radLat1 = rad(lat1);

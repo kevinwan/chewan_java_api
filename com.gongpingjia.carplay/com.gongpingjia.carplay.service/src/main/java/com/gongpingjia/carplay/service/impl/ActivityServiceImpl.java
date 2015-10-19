@@ -17,6 +17,7 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.ActivityWeight;
+import com.gongpingjia.carplay.service.util.DistanceUtil;
 import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -212,8 +213,8 @@ public class ActivityServiceImpl implements ActivityService {
         long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
         criteria.and("createTime").gte(gtTime);
 
-        //查询在最大距离内的 活动；
-        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance);
+        //查询在最大距离内的 活动；      此处的maxDistance 需要换算成 对应的 弧度
+        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance * 180 / DistanceUtil.EARTH_RADIUS);
 
         //非用户自己创建的活动
         if (StringUtils.isNotEmpty(userId)) {

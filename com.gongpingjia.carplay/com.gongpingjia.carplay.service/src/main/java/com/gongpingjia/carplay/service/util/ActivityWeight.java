@@ -34,7 +34,6 @@ public class ActivityWeight implements Comparable<ActivityWeight> {
     }
 
 
-
     public Activity getActivity() {
         return activity;
     }
@@ -83,14 +82,16 @@ public class ActivityWeight implements Comparable<ActivityWeight> {
         this.identityFlag = identityFlag;
     }
 
+
+    //排序规则是 从大到小  weight 越大 越靠前
     @Override
     public int compareTo(ActivityWeight compare) {
         if (this.getWeight() > compare.getWeight()) {
-            return 1;
+            return -1;
         } else if (this.getWeight() == compare.getWeight()) {
             return 0;
         } else {
-            return -1;
+            return 1;
         }
     }
 }
