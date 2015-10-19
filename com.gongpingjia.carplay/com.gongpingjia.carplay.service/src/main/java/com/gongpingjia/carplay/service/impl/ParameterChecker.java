@@ -51,7 +51,7 @@ public class ParameterChecker {
 
         if (!userToken.getToken().equals(token)) {
             LOG.error("User token is not response to userId in the system, token:{}", token);
-            throw new ApiException("输入参数错误");
+            throw new ApiException("回话失效");
         }
 
         if (userToken.getExpire() < DateUtil.getTime()) {
