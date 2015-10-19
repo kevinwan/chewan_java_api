@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.activity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -31,6 +32,9 @@ public class Appointment extends ActivityIntention {
     private String remark;
 
     private Long modifyTime;
+
+    @Transient
+    private Object applicant;
 
     public String getAppointmentId() {
         return appointmentId;
@@ -102,5 +106,13 @@ public class Appointment extends ActivityIntention {
 
     public void setModifyTime(Long modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public Object getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(Object applicant) {
+        this.applicant = applicant;
     }
 }

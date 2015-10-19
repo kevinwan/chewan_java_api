@@ -437,6 +437,11 @@ public class ActivityServiceImpl implements ActivityService {
         appointment.setActivityCategory(Constants.ActivityCatalog.COMMON);
         appointmentDao.save(appointment);
 
+        //将当前用户ID加入到申请人列表中
+        Update update = new Update();
+        update.addToSet("applyIds", userId);
+        activityDao.update(activityId, update);
+
         //发送环信推送消息
         User organizer = userDao.findById(activity.getUserId());
         User applier = userDao.findById(userId);

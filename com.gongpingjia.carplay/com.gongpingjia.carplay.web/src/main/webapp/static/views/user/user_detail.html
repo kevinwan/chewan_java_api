@@ -88,12 +88,12 @@
 
             <div class="form-inline">
                 <div><span>用户相册</span></div>
-                <div>
-                    <ul id="albums" class="thumbnails">
+                <div class="col-md-12">
+                    <ul id="albums" class="thumbnails" ng-repeat="photo in album">
                         <!--Add dynamic-->
-                        <li class="span3">
+                        <li class="col-md-3">
                             <a href="#" class="thumbnail">
-                                <img src="http://placehold.it/260x180" alt="">
+                                <img src="photo.url" alt="">
                             </a>
                         </li>
                     </ul>
