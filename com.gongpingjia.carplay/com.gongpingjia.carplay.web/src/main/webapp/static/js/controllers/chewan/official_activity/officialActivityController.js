@@ -52,7 +52,13 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            $scope.criteria = {title: '', detailAddress: '', status: '-1', fromDate:moment().format('YYYY-MM-DD'), toDate: moment().format('YYYY-MM-DD')};
+            $scope.criteria = {
+                title: '',
+                detailAddress: '',
+                status: '-1',
+                fromDate: moment().format('YYYY-MM-DD'),
+                toDate: moment().format('YYYY-MM-DD')
+            };
             //document.getElementById("startDate").value = "";
             //document.getElementById("endDate").value = "";
         };
@@ -98,11 +104,13 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
 
         $scope.viewOfficialActivity = function (officialActivityId) {
             officialActivityService.setOfficialActivityId(officialActivityId);
+            $location.path("/officialActivity/view");
             //$location.path(encodeURI("/officialActivity/view?id="+officialActivityId));
         };
 
         $scope.updateOfficialActivity = function (officialActivityId) {
             officialActivityService.setOfficialActivityId(officialActivityId);
+            $location.path(("/officialActivity/update"));
             //$location.path(encodeURI("/officialActivity/update?id="+officialActivityId));
         };
 
@@ -157,7 +165,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         $scope.deleteOfficialActivities = function () {
             if ($window.confirm("确定删除")) {
                 var deleteIds = [];
-                for(var item in $scope.deleteIdsSet) {
+                for (var item in $scope.deleteIdsSet) {
                     deleteIds.push(item);
                 }
                 $rootScope.loadingPromise = officialActivityService.deleteOfficialActivities(deleteIds).success(function (result) {
