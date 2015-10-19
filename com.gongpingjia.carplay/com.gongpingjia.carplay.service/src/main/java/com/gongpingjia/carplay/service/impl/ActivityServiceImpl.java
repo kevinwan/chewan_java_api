@@ -234,9 +234,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         //剔除掉用户已经申请过该活动
         if (StringUtils.isNotEmpty(userId)) {
-            Criteria inCriteria = new Criteria();
-            inCriteria.ne(userId);
-            criteria.and("applyIds").elemMatch(inCriteria);
+            criteria.and("applyIds").nin(userId);
         }
 
         if (StringUtils.isNotEmpty(type)) {
