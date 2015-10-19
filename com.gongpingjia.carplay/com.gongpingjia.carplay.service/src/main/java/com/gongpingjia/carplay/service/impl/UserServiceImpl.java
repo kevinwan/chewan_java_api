@@ -367,8 +367,6 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findById(userId);
         HashMap<String, User> users = buildUsers(userId, appointments);
 
-        List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
-
         String localServer = CommonUtil.getLocalPhotoServer();
         String remoteServer = CommonUtil.getThirdPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -381,13 +379,10 @@ public class UserServiceImpl implements UserService {
             applicantUser.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
                     applicantUser.getLandmark().getLongitude(), applicantUser.getLandmark().getLatitude()));
 
-            JSONObject jsonObject = JSONObject.fromObject(appointment);
-            jsonObject.put("applicant", applicantUser);
-
-            data.add(jsonObject);
+            appointment.setApplicant(applicantUser);
         }
 
-        return ResponseDo.buildSuccessResponse(data);
+        return ResponseDo.buildSuccessResponse(appointments);
     }
 
     private HashMap<String, User> buildUsers(String userId, List<Appointment> appointments) {
