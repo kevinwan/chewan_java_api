@@ -10,6 +10,9 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,7 +57,11 @@ public class ChatCommonService {
         if (token == null) {
             emchatTokenDao.save(refresh);
         } else {
-            emchatTokenDao.update(refresh.getApplication(), refresh);
+            Update update = new Update();
+            update.set("expire", refresh.getExpire());
+            update.set("token", refresh.getToken());
+
+            emchatTokenDao.update(Query.query(Criteria.where("application").is(refresh.getApplication())), update);
         }
 
         LOG.debug("Update token in the database");

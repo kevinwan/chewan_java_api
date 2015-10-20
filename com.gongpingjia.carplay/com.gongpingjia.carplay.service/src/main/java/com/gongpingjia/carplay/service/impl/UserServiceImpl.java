@@ -738,21 +738,28 @@ public class UserServiceImpl implements UserService {
      */
     private String refreshUserToken(String userId) throws ApiException {
         UserToken userToken = cacheManager.getUserToken(userId);
+        String token = CodeGenerator.generatorId();
         if (null == userToken) {
             LOG.warn("Fail to get token and expire info from userToken, new a token");
             userToken = new UserToken();
             userToken.setUserId(userId);
+            userToken.setToken(token);
+            userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
+                    PropertiesUtil.getProperty("carplay.token.over.date", 7)));
+            userTokenDao.save(userToken);
+        } else {
+            userToken.setToken(token);
+            userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
+                    PropertiesUtil.getProperty("carplay.token.over.date", 7)));
+
+            Update update = new Update();
+            update.set("token", userToken.getToken());
+            update.set("expire", userToken.getExpire());
+            userTokenDao.update(userToken.getId(), update);
         }
-
-        String uuid = CodeGenerator.generatorId();
-        userToken.setToken(uuid);
-        userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
-                PropertiesUtil.getProperty("carplay.token.over.date", 7)));
-        userTokenDao.update(userToken.getId(), userToken);
-
         cacheManager.setUserToken(userToken);
 
-        return uuid;
+        return token;
     }
 
     @Override
