@@ -506,7 +506,7 @@ public class ActivityServiceImpl implements ActivityService {
      */
     @Override
     public ResponseDo processAppointment(String appointmentId, String userId, boolean acceptFlag) throws ApiException {
-        LOG.debug("applyJoinActivity");
+        LOG.debug("applyJoinActivity, appointmentId:{}, accept:{}", appointmentId, acceptFlag);
         Appointment appointment = checkAppointment(appointmentId, userId);
 
 //        Activity activity = checkAppointmentActivity(appointment);
@@ -522,7 +522,7 @@ public class ActivityServiceImpl implements ActivityService {
             //不同意
             status = Constants.AppointmentStatus.REJECT;
         }
-        appointmentDao.update(appointment.getAppointmentId(), Update.update("status", status));
+        appointmentDao.update(appointmentId, Update.update("status", status));
 
 //        //同意
 //        //添加到环信群组中；
@@ -598,8 +598,8 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         if (!Constants.AppointmentStatus.APPLYING.equals(appointment.getStatus())) {
-            LOG.warn("appoint has done");
-            throw new ApiException("该邀请已经处理过了");
+            LOG.warn("appoint is applying");
+            throw new ApiException("活动邀请处理中");
         }
 
         return appointment;

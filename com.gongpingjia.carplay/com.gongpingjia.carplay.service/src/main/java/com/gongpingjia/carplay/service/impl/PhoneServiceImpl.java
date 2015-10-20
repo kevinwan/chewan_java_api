@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -93,16 +94,21 @@ public class PhoneServiceImpl implements PhoneService {
         Calendar calCurrent = Calendar.getInstance();
         calCurrent.setTime(DateUtil.getDate());
 
+        Update update = new Update();
         if (calModify.get(Calendar.DAY_OF_YEAR) == calCurrent.get(Calendar.DAY_OF_YEAR)
                 && calModify.get(Calendar.YEAR) == calCurrent.get(Calendar.YEAR)) {
             // 表示是同一天
-            phoneVerification.setSendTimes(phoneVerification.getSendTimes() + 1);
+            update.set("sendTimes", phoneVerification.getSendTimes() + 1);
+//            phoneVerification.setSendTimes(phoneVerification.getSendTimes() + 1);
         } else {
             // 不是同一天
-            phoneVerification.setSendTimes(1);
+            update.set("sendTimes", 1);
+//            phoneVerification.setSendTimes(1);
         }
-        phoneVerification.setModifyTime(DateUtil.getTime());
-        phoneVerificationDao.update(phoneVerification.getId(), phoneVerification);
+        update.set("modifyTime", DateUtil.getTime());
+//        phoneVerification.setModifyTime(DateUtil.getTime());
+
+        phoneVerificationDao.update(phoneVerification.getId(), update);
     }
 
     @Override
@@ -165,7 +171,12 @@ public class PhoneServiceImpl implements PhoneService {
                         PropertiesUtil.getProperty("message.effective.seconds", 7200)));
                 phoneVerify.setModifyTime(DateUtil.getTime());
 
-                phoneVerificationDao.update(phoneVerify.getId(), phoneVerify);
+                Update update = new Update();
+                update.set("code", phoneVerify.getCode());
+                update.set("expire", phoneVerify.getExpire());
+                update.set("modifyTime", phoneVerify.getModifyTime());
+
+                phoneVerificationDao.update(phoneVerify.getId(), update);
             }
         }
 

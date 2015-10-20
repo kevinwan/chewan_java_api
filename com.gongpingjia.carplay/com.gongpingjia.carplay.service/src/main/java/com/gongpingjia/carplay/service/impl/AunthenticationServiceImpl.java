@@ -102,17 +102,24 @@ public class AunthenticationServiceImpl implements AunthenticationService {
                 Criteria.where("applyUserId").is(userId).and("type").is(Constants.AuthType.LICENSE_AUTH)));
         if (application == null) {
             application = new AuthApplication();
-        }
-        application.setApplyTime(current);
-        application.setStatus(Constants.AuthStatus.AUTHORIZING);
-        application.setType(Constants.AuthType.LICENSE_AUTH);
-        application.setApplyUserId(userId);
-        application.setAuthUserId("");
-        application.setAuthTime(0L);
-        if (StringUtils.isEmpty(application.getApplicationId())) {
+//        }
+            application.setApplyTime(current);
+            application.setStatus(Constants.AuthStatus.AUTHORIZING);
+            application.setType(Constants.AuthType.LICENSE_AUTH);
+            application.setApplyUserId(userId);
+            application.setAuthUserId("");
+            application.setAuthTime(0L);
+//        if (StringUtils.isEmpty(application.getApplicationId())) {
             authApplicationDao.save(application);
         } else {
-            authApplicationDao.update(application.getApplicationId(), application);
+            Update updateApplication = new Update();
+            updateApplication.set("applyTime", current);
+            updateApplication.set("status", Constants.AuthStatus.AUTHORIZING);
+            updateApplication.set("type", Constants.AuthType.LICENSE_AUTH);
+            updateApplication.set("applyUserId", userId);
+            updateApplication.set("authUserId", "");
+            updateApplication.set("authTime", 0L);
+            authApplicationDao.update(application.getApplicationId(), updateApplication);
         }
 
         AuthenticationHistory history = new AuthenticationHistory();
@@ -176,17 +183,24 @@ public class AunthenticationServiceImpl implements AunthenticationService {
                 Criteria.where("applyUserId").is(userId).and("type").is(Constants.AuthType.PHOTO_AUTH)));
         if (application == null) {
             application = new AuthApplication();
-        }
-        application.setApplyTime(current);
-        application.setStatus(Constants.AuthStatus.AUTHORIZING);
-        application.setType(Constants.AuthType.PHOTO_AUTH);
-        application.setApplyUserId(userId);
-        application.setAuthUserId("");
-        application.setAuthTime(0L);
-        if (StringUtils.isEmpty(application.getApplicationId())) {
+//        }
+            application.setApplyTime(current);
+            application.setStatus(Constants.AuthStatus.AUTHORIZING);
+            application.setType(Constants.AuthType.PHOTO_AUTH);
+            application.setApplyUserId(userId);
+            application.setAuthUserId("");
+            application.setAuthTime(0L);
+//        if (StringUtils.isEmpty(application.getApplicationId())) {
             authApplicationDao.save(application);
         } else {
-            authApplicationDao.update(application.getApplicationId(), application);
+            Update updateApplication = new Update();
+            updateApplication.set("applyTime", current);
+            updateApplication.set("status", Constants.AuthStatus.AUTHORIZING);
+            updateApplication.set("type", Constants.AuthType.PHOTO_AUTH);
+            updateApplication.set("applyUserId", userId);
+            updateApplication.set("authUserId", "");
+            updateApplication.set("authTime", 0L);
+            authApplicationDao.update(application.getApplicationId(), updateApplication);
         }
 
         AuthenticationHistory history = new AuthenticationHistory();
