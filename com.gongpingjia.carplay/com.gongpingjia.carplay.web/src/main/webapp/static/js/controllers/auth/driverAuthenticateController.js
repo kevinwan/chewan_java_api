@@ -61,7 +61,7 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$loc
             startTime.setTime(startTime.getTime() - 1000 * 60 * 60 * 24 * 7);
 
             var endTime = new Date();
-            endTime.setHours(23, 59, 59);
+            endTime.setHours(0, 0, 0, 0);
 
             $scope.criteria = {status: '', startDate: startTime, endDate: endTime, type: '车主认证'};
         };
