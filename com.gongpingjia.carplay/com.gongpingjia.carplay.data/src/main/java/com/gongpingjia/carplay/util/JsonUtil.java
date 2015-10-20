@@ -12,7 +12,11 @@ import java.lang.reflect.Field;
  */
 public class JsonUtil {
 
-    public static String toJSONString(Object object, SerializerFeature... features) {
+    public static String toString(Object object) {
+        return toJSONString(object, SerializerFeature.WriteMapNullValue, SerializerFeature.DisableCircularReferenceDetect);
+    }
+
+    private static String toJSONString(Object object, SerializerFeature... features) {
         SerializeWriter out = new SerializeWriter();
         String s;
         JSONSerializer serializer = new JSONSerializer(out);
