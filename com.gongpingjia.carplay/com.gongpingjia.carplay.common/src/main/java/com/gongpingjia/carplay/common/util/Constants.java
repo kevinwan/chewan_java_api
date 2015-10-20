@@ -297,7 +297,7 @@ public class Constants {
      */
     public interface ActivityPayType {
 
-        String AA = "AA";
+        String AA = "AA制";
 
         String TREAT_ME = "请我吧";
 

@@ -91,13 +91,13 @@ public class UserActivityController {
      */
     @RequestMapping(value = "/official/userActivity/update", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token,@RequestParam("activityId")String activityId, @RequestBody JSONObject json) {
         LOG.debug("begin /official/userActivity/deleteIds userId:{}", userId);
 
         try {
 
             officialParameterChecker.checkAdminUserInfo(userId, token);
-            return activityService.updateUserActivity(json, userId);
+            return activityService.updateUserActivity(json, activityId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -110,6 +110,7 @@ public class UserActivityController {
 
     @RequestMapping(value = "/official/userActivity/view", method = RequestMethod.GET)
     public ResponseDo viewActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("activityId") String activityId) {
+
         LOG.debug("begin /official/userActivity/deleteIds userId:{}", userId);
 
         try {

@@ -1,16 +1,18 @@
 package com.gongpingjia.carplay.common.util;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.SerializeWriter;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.serializer.ValueFilter;
+import com.alibaba.fastjson.serializer.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * Created by Administrator on 2015/9/28.
  */
 public class JsonUtil {
 
-    public static String toJSONString(Object object,SerializerFeature...features) {
+    public static String toJSONString(Object object, SerializerFeature... features) {
         SerializeWriter out = new SerializeWriter();
         String s;
         JSONSerializer serializer = new JSONSerializer(out);
@@ -21,19 +23,37 @@ public class JsonUtil {
             serializer.config(feature, true);
         }
 
-        serializer.getValueFilters().add(new ValueFilter() {
-            public Object process(Object obj, String s, Object value) {
-                if(null!=value) {
-                    if(value instanceof java.util.Date) {
-                        return String.format("%1$tF %1tT", value);
-                    }else if(value instanceof java.util.List){
-                        return "[]";
-                    }else if (value instanceof java.util.Map) {
-                        return "{}";
+//        serializer.getValueFilters().add(new ValueFilter() {
+//            public Object process(Object obj, String s, Object value) {
+//                if (null != value) {
+//                    if (value instanceof java.util.List) {
+//                        return "[]";
+//                    } else if (value instanceof java.util.Map) {
+//                        return "{}";
+//                    }
+//                    return value;
+//                } else {
+//                    return "";
+//                }
+//            }
+//        });
+
+        serializer.getPropertyPreFilters().add(new PropertyPreFilter() {
+            @Override
+            public boolean apply(JSONSerializer serializer, Object object, String name) {
+                try {
+                    Field field = object.getClass().getDeclaredField(name);
+                    field.setAccessible(true);
+                    if (field.isAnnotationPresent(Id.class)) {
+                        return false;
+                    } else if (field.isAnnotationPresent(Transient.class)) {
+                        return false;
+                    } else {
+                        return true;
                     }
-                    return value;
-                }else {
-                    return "";
+                } catch (Exception e) {
+                    //父类的属性;
+                    return true;
                 }
             }
         });

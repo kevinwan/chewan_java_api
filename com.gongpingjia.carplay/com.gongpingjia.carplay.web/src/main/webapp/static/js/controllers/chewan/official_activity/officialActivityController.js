@@ -158,7 +158,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             if (item.checked) {
                 $scope.deleteIdsSet[item.officialActivityId] = 1;
             } else {
-                delete $scope.deleteIdsSet[item.getOfficialActivityId];
+                delete $scope.deleteIdsSet[item.officialActivityId];
             }
         };
 
@@ -180,14 +180,21 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         };
 
         $scope.selectAll = function (allChecked) {
-            //var allItem = document.getElementById("checkItemAll");
-            //if(allItem.checked) {
-            //    //
-            //    var items =   document.getElementsByName("checkItem");
-            //    for(var index in items) {
-            //        items[index].checked = true;
-            //    }
-            //}
+            if (allChecked) {
+                for (var index in $scope.officialActivities) {
+                    var item = $scope.officialActivities[index];
+                    //不在上架状态中
+                    if ($scope.checkOnItemStatus(item.onFlag, item.end) != 1) {
+                        if (allChecked) {
+                            $scope.deleteIdsSet[item.officialActivityId] = 1;
+                            item.checked = allChecked;
+                        }
+                    }
+                }
+            }
+        };
+
+        $scope.selectAll = function (allChecked) {
             if (allChecked) {
                 for (var index in $scope.officialActivities) {
                     var item = $scope.officialActivities[index];

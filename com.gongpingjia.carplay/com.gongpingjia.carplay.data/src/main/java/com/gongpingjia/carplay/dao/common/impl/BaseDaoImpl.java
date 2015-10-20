@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.dao.common.impl;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.gongpingjia.carplay.common.util.JsonUtil;
 import com.gongpingjia.carplay.dao.common.BaseDao;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -105,7 +107,7 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     @Override
     public void update(K id, T entity) {
         BasicDBObject queryObj = new BasicDBObject("_id", new ObjectId(id.toString()));
-        String jsonStr = JSONObject.fromObject(entity).toString();
+        String jsonStr = JsonUtil.toJSONString(entity, SerializerFeature.WriteMapNullValue);
         DBObject dbObject = (DBObject) JSON.parse(jsonStr);
         mongoTemplate.getCollection(getCollectionName(entity)).update(queryObj, dbObject);
     }

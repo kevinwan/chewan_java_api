@@ -10,6 +10,7 @@ import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
@@ -25,6 +26,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -62,6 +64,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private SubscriberDao subscriberDao;
+
 
     @Override
     public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
@@ -694,9 +697,23 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ResponseDo updateUserActivity(JSONObject json, String activityId) throws ApiException {
-        Activity activity = null;
+
+        Update update = new Update();
         try {
-            activity = (Activity) JSONObject.toBean(json, Activity.class);
+            Address destination = (Address) JSONObject.toBean(json.getJSONObject("destination"), Address.class);
+            update.set("destination", destination);
+            Address establish = (Address) JSONObject.toBean(json.getJSONObject("establish"), Address.class);
+            update.set("establish", establish);
+            Landmark destPoint = (Landmark) JSONObject.toBean(json.getJSONObject("destPoint"), Landmark.class);
+            update.set("destPoint", destPoint);
+            Landmark estabPoint = (Landmark) JSONObject.toBean(json.getJSONObject("estabPoint"), Landmark.class);
+            update.set("estabPoint", estabPoint);
+            String type = json.getString("type");
+            update.set("type", type);
+            String pay = json.getString("pay");
+            update.set("pay", pay);
+            boolean transfer = json.getBoolean("transfer");
+            update.set("transfer", transfer);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             throw new ApiException("活动转换时出错");
@@ -705,7 +722,7 @@ public class ActivityServiceImpl implements ActivityService {
         if (null == toFind) {
             throw new ApiException("该id对应的活动不存在");
         }
-        activityDao.update(activityId, activity);
+        activityDao.update(activityId, update);
         return ResponseDo.buildSuccessResponse();
 
     }
@@ -721,6 +738,17 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("该活动没有组织者");
         }
         activity.setOrganizer(organizer);
+
+        Criteria criteria = new Criteria();
+        criteria.and("activityId").is(activity.getActivityId());
+        Query query = Query.query(criteria);
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
+        List<Appointment> appointmentList = appointmentDao.find(query);
+        if (null != appointmentList && !appointmentList.isEmpty()) {
+            activity.setAppointmentList(appointmentList);
+        }
+
+
         return ResponseDo.buildSuccessResponse(activity);
     }
 

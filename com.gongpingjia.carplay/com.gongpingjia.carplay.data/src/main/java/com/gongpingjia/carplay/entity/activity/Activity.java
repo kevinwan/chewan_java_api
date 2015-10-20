@@ -43,6 +43,7 @@ public class Activity extends ActivityIntention {
     //存放userID的列表信息
     private List<String> members;
 
+
     //对接大众点评活动businessID
     private String businessId;
 
@@ -58,6 +59,8 @@ public class Activity extends ActivityIntention {
     private List<String> applyIds;
 
 
+    @Transient
+    private List<Appointment> appointmentList;
 
 
     public String getActivityId() {
@@ -170,5 +173,14 @@ public class Activity extends ActivityIntention {
 
     public void setApplyIds(List<String> applyIds) {
         this.applyIds = applyIds;
+    }
+
+
+    public List<Appointment> getAppointmentList() {
+        return appointmentList;
+    }
+
+    public void setAppointmentList(List<Appointment> appointmentList) {
+        this.appointmentList = appointmentList;
     }
 }
