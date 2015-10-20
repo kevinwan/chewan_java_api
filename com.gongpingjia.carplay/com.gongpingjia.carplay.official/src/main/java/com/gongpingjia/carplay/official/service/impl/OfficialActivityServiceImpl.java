@@ -16,7 +16,7 @@ import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.EmchatToken;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
-import com.gongpingjia.carplay.service.EmchatTokenService;
+import com.gongpingjia.carplay.service.impl.ChatCommonService;
 import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -48,7 +48,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     private ChatThirdPartyService chatThirdPartyService;
 
     @Autowired
-    private EmchatToken emchatTokenService;
+    private ChatCommonService chatCommonService;
 
     @Autowired
     private UserDao userDao;
@@ -89,7 +89,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
         User user = userDao.findById(activity.getUserId());
 
-        JSONObject jsonResult = chatThirdPartyService.createChatGroup(emchatTokenService.getToken(), activity.getTitle(),
+        JSONObject jsonResult = chatThirdPartyService.createChatGroup(chatCommonService.getChatToken(), activity.getTitle(),
                 activity.getOfficialActivityId(), user.getEmchatName(), null);
         if (json.isEmpty()) {
             LOG.warn("Failed to create chat group");

@@ -15,7 +15,6 @@ import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.service.EmchatTokenService;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.DistanceUtil;

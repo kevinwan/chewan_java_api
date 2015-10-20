@@ -160,18 +160,20 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             LOG.warn("User authentication is not exist with userId:{}", userId);
             return;
         }
-
+        Update update = new Update();
         if (!StringUtils.isEmpty(json.getString("driver"))) {
             DriverLicense driver = (DriverLicense) JSONObject.toBean(json.getJSONObject("driver"), DriverLicense.class);
-            userAuthentication.setDriver(driver);
+            update.set("driver", driver);
+//            userAuthentication.setDriver(driver);
         }
 
         if (!StringUtils.isEmpty(json.getString("license"))) {
             DrivingLicense license = (DrivingLicense) JSONObject.toBean(json.getJSONObject("license"), DrivingLicense.class);
-            userAuthentication.setLicense(license);
+//            userAuthentication.setLicense(license);
+            update.set("license", license);
         }
 
-        userAuthenticationDao.update(userAuthentication.getUserId(), userAuthentication);
+        userAuthenticationDao.update(userAuthentication.getUserId(), update);
     }
 
     @Override
