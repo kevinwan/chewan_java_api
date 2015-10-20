@@ -179,7 +179,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         String type = request.getParameter("type");
 
-        String pay = request.getParameter("payStr");
+        String pay = request.getParameter("pay");
 
         String genderTypeStr = request.getParameter("gender");
 
@@ -235,10 +235,10 @@ public class ActivityServiceImpl implements ActivityService {
         //deleteFlag 为 false 的活动；
         criteria.and("deleteFlag").is(false);
 
-        //剔除掉用户已经申请过该活动
-        if (StringUtils.isNotEmpty(userId)) {
-            criteria.and("applyIds").nin(userId);
-        }
+//        //剔除掉用户已经申请过该活动
+//        if (StringUtils.isNotEmpty(userId)) {
+//            criteria.and("applyIds").nin(userId);
+//        }
 
         if (StringUtils.isNotEmpty(type)) {
             criteria.and("type").is(type);
@@ -314,20 +314,6 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     private JSONArray initResultMap(String userId, List<Activity> rltList) throws ApiException {
-//        //返回的数据类型
-//        JSONObject rltMap = new JSONObject();
-
-//        //判断当前用户是否有图片 没有图片不能看到 其他用户的头像信息；
-//        if (StringUtils.isEmpty(userId)) {
-//            rltMap.put("hasAlbum", false);
-//        } else {
-//            User user = userDao.findById(userId);
-//            if (user != null && user.getAlbum() != null && !user.getAlbum().isEmpty()) {
-//                rltMap.put("hasAlbum", true);
-//            } else {
-//                rltMap.put("hasAlbum", false);
-//            }
-//        }
 
         //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
         JSONArray jsonArray = new JSONArray();
@@ -339,6 +325,22 @@ public class ActivityServiceImpl implements ActivityService {
             jsonItem.put("pay", activity.getPay());
             jsonItem.put("transfer", activity.isTransfer());
             jsonItem.put("destination", activity.getDestination());
+            List<String> applyIds = activity.getApplyIds();
+            if (StringUtils.isEmpty(userId)) {
+                jsonItem.put("applyFlag", false);
+            } else {
+                if (null == applyIds || applyIds.isEmpty()) {
+                    jsonItem.put("applyFlag", false);
+                } else {
+                    boolean applyFlag = false;
+                    for (String id : applyIds) {
+                        if (StringUtils.equals(id, userId)) {
+                            applyFlag = true;
+                        }
+                    }
+                    jsonItem.put("applyFlag", applyFlag);
+                }
+            }
 
             Map<String, Object> itemOrganizer = new HashMap<>();
             User organizer = activity.getOrganizer();
@@ -765,6 +767,6 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("id中含有不存在的值");
         }
         activityDao.deleteByIds(ids);
-        return null;
+        return ResponseDo.buildSuccessResponse();
     }
 }
