@@ -17,11 +17,11 @@ import java.util.*;
 public class ActivityUtil {
 
     public static List<Activity> getSortResult(List<Activity> activities, Date currentTime, Landmark nowLandmark,
-                                               double maxDistance, long maxPubTime, int skip, int limit,int genderType) {
+                                               double maxDistance, long maxPubTime, int skip, int limit,int genderType,Set<String> toRemoveSet) {
 
         //genderType 为 -1 不限制 genderType 为0 搜索男性发布的活动 genderType 为1 搜索女性发布的活动；
 
-        List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime,genderType), skip, limit);
+        List<ActivityWeight> activityWeights = getPageInfo(sortActivityList(activities, currentTime, nowLandmark, maxDistance, maxPubTime,genderType,toRemoveSet), skip, limit);
         if (null == activityWeights) {
             return null;
         }
@@ -33,7 +33,7 @@ public class ActivityUtil {
     }
 
 
-    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime,int genderType) {
+    private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime,int genderType,Set<String> toRemoveSet) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
         for (Activity activity : activities) {
             User user = activity.getOrganizer();
@@ -45,6 +45,11 @@ public class ActivityUtil {
                 }
             }else if (genderType == 1){
                 if (!StringUtils.equals(user.getGender(), Constants.UserGender.FEMALE)) {
+                    continue;
+                }
+            }
+            if (null != toRemoveSet && !toRemoveSet.isEmpty()) {
+                if (toRemoveSet.contains(activity.getActivityId())){
                     continue;
                 }
             }

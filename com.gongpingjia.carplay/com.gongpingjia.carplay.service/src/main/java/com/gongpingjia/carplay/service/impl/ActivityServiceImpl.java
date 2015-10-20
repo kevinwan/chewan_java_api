@@ -298,7 +298,23 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("用户性别设置不正确");
         }
 
-        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType);
+        HashSet<String> removeActivityIdSet = null;
+        //查出 最大发布时间内的 该用户已经申请过的 appointment  将 appointment中的      处于被拒绝 或者 已经接受的  activity 剔除掉；
+        if (StringUtils.isNotEmpty(userId)) {
+            Criteria appointCriteria = Criteria.where("applyUserId").is(userId);
+            criteria.and("createTime").gte(gtTime);
+            //用户活动 非官方活动；
+            criteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
+            List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
+            if (null != appointmentList && !appointmentList.isEmpty()) {
+                removeActivityIdSet = new HashSet<>(appointmentList.size());
+                for (Appointment appointment : appointmentList) {
+                    removeActivityIdSet.add(appointment.getActivityId());
+                }
+            }
+        }
+
+        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType, removeActivityIdSet);
 
         if (null == rltList || rltList.size() == 0) {
             return ResponseDo.buildSuccessResponse("[]");
