@@ -539,12 +539,18 @@ public class UserServiceImpl implements UserService {
         List<User> authUsers = userDao.findByIds(authIds);
 
         LOG.debug("Input map parameter");
-        List<User> data = new ArrayList<>();
+        List<Map<String, Object>> data = new ArrayList<>(authenticationHistories.size());
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
+            Map<String, Object> history = new HashMap<>(8, 1);
             User user = findById(authUsers, authenticationHistory.getAuthId());
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            user.hideSecretInfo();
-            data.add(user);
+            history.put("userId", user.getUserId());
+            history.put("nickname", user.getNickname());
+            history.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+            history.put("authTime", authenticationHistory.getAuthTime());
+            history.put("type", authenticationHistory.getType());
+            history.put("status", authenticationHistory.getStatus());
+            history.put("content", authenticationHistory.getRemark());
+            data.add(history);
         }
 
         return ResponseDo.buildSuccessResponse(data);
