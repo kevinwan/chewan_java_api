@@ -305,6 +305,9 @@ public class ActivityServiceImpl implements ActivityService {
             criteria.and("createTime").gte(gtTime);
             //用户活动 非官方活动；
             criteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
+
+            criteria.and("status").ne(Constants.AppointmentStatus.APPLYING);
+
             List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
             if (null != appointmentList && !appointmentList.isEmpty()) {
                 removeActivityIdSet = new HashSet<>(appointmentList.size());
@@ -314,26 +317,26 @@ public class ActivityServiceImpl implements ActivityService {
             }
         }
 
-        List<Activity> rltList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType, removeActivityIdSet);
+        List<Activity> resultList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType, removeActivityIdSet);
 
-        if (null == rltList || rltList.size() == 0) {
+        if (null == resultList || resultList.size() == 0) {
             return ResponseDo.buildSuccessResponse("[]");
         }
 
-        LOG.debug("rltList size is:" + rltList.size());
+        LOG.debug("resultList size is:" + resultList.size());
 
         //初始化返回数据
-        JSONArray rltArr = initResultMap(userId, rltList);
+        JSONArray rltArr = initResultMap(userId, resultList);
 
 
         return ResponseDo.buildSuccessResponse(rltArr);
     }
 
-    private JSONArray initResultMap(String userId, List<Activity> rltList) throws ApiException {
+    private JSONArray initResultMap(String userId, List<Activity> resultList) throws ApiException {
 
         //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
         JSONArray jsonArray = new JSONArray();
-        for (Activity activity : rltList) {
+        for (Activity activity : resultList) {
             Map<String, Object> jsonItem = new HashMap<>();
             jsonItem.put("type", activity.getType());
             jsonItem.put("activityId", activity.getActivityId());
