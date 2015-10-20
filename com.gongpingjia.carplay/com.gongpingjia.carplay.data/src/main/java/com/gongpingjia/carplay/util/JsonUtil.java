@@ -1,4 +1,4 @@
-package com.gongpingjia.carplay.common.util;
+package com.gongpingjia.carplay.util;
 
 import com.alibaba.fastjson.serializer.*;
 import org.springframework.data.annotation.Id;
