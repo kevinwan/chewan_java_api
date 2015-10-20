@@ -517,7 +517,7 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("申请用户不存在");
         }
 
-        String status = Constants.AppointmentStatus.ACCEPT;
+        int status = Constants.AppointmentStatus.ACCEPT;
         if (!acceptFlag) {
             //不同意
             status = Constants.AppointmentStatus.REJECT;
@@ -586,7 +586,6 @@ public class ActivityServiceImpl implements ActivityService {
     private Appointment checkAppointment(String appointmentId, String userId) throws ApiException {
         //判断申请appointment 是否存在
         Appointment appointment = appointmentDao.findById(appointmentId);
-        //
         if (appointment == null) {
             LOG.warn("appoint not exist");
             throw new ApiException("该邀请不存在");
@@ -597,7 +596,7 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("输入参数有误");
         }
 
-        if (!Constants.AppointmentStatus.APPLYING.equals(appointment.getStatus())) {
+        if (Constants.AppointmentStatus.APPLYING != appointment.getStatus()) {
             LOG.warn("appoint is applying");
             throw new ApiException("活动邀请处理中");
         }

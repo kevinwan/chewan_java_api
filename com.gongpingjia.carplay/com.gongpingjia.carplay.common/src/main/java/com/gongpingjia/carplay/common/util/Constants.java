@@ -199,12 +199,14 @@ public class Constants {
      * 约会状态
      */
     public interface AppointmentStatus {
-
-        String ACCEPT = "应邀";
-
-        String REJECT = "拒绝";
-
-        String APPLYING = "邀请中";
+        //初始状态，没有被邀请
+        int INITIAL = 0;
+        //应邀申请中
+        int APPLYING = 1;
+        //已经接受邀请，已应邀
+        int ACCEPT = 2;
+        //拒绝邀请
+        int REJECT = 3;
     }
 
     public interface Product {

@@ -353,7 +353,8 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(user);
     }
 
-    public ResponseDo getAppointment(String userId, String token, String[] status, Integer limit, Integer ignore) throws ApiException {
+    @Override
+    public ResponseDo getAppointment(String userId, String token, int[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 

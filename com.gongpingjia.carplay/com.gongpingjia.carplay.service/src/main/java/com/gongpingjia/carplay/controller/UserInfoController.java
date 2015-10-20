@@ -161,7 +161,7 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
     public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token,
-                                     @RequestParam(value = "status", required = false) String[] status,
+                                     @RequestParam(value = "status", required = false) int[] status,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
