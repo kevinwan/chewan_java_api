@@ -55,10 +55,10 @@ public interface ActivityService {
 
     /**
      * 管理后台 查询  用户创建的活动
-     * @param request
+     * @param json
      * @return
      */
-    public ResponseDo getUserActivityList(HttpServletRequest request)throws ApiException;
+    public ResponseDo getUserActivityList(JSONObject json,String userId)throws ApiException;
 
 
     public ResponseDo updateUserActivity(JSONObject json,String activityId)throws ApiException;

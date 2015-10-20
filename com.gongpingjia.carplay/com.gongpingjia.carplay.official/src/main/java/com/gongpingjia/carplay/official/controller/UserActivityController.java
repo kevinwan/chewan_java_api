@@ -40,13 +40,13 @@ public class UserActivityController {
      */
     @RequestMapping(value = "/official/userActivity/list", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo registerActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
+    public ResponseDo registerActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("begin /official/userActivity/list userId:{}", userId);
 
         try {
             officialParameterChecker.checkAdminUserInfo(userId, token);
 
-            return activityService.getUserActivityList(request);
+            return activityService.getUserActivityList(json,userId);
 
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);

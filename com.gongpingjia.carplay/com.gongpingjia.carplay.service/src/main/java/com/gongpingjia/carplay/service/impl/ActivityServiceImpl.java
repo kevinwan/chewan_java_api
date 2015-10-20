@@ -651,21 +651,21 @@ public class ActivityServiceImpl implements ActivityService {
      * type -1 全部           type值 对应着 type
      * transfer  -1 全部      true  false
      *
-     * @param request
+     * @param json
      * @return
      * @throws ApiException
      */
     @Override
-    public ResponseDo getUserActivityList(HttpServletRequest request) throws ApiException {
+    public ResponseDo getUserActivityList(JSONObject json,String userId) throws ApiException {
         Criteria criteria = new Criteria();
 
         //
-        String city = request.getParameter("city");
+        String city = json.getString("city");
         if (StringUtils.isNotEmpty(city)) {
             criteria.and("estabPoint.city").is(city);
         }
 
-        String phone = request.getParameter("phone");
+        String phone = json.getString("phone");
         if (StringUtils.isNotEmpty(phone)) {
             User user = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
             if (null == user || StringUtils.isEmpty(user.getUserId())) {
@@ -682,17 +682,17 @@ public class ActivityServiceImpl implements ActivityService {
 //            criteria.and("createTime").gte(start).lte(end);
 //        }
 
-        String pay = request.getParameter("pay");
+        String pay = json.getString("pay");
         if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
             criteria.and("pay").is(pay);
         }
 
-        String type = request.getParameter("type");
+        String type = json.getString("type");
         if (StringUtils.isNotEmpty(type) && !StringUtils.equals(type, "-1")) {
             criteria.and("type").is(type);
         }
 
-        String transferStr = request.getParameter("transfer");
+        String transferStr = json.getString("transfer");
         if (StringUtils.isNotEmpty(transferStr) && !StringUtils.equals(transferStr, "-1")) {
             criteria.and("transfer").is(TypeConverUtil.convertToBoolean("transfer", transferStr, true));
         }
