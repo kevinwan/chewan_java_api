@@ -1,15 +1,17 @@
 'use strict';
 
-gpjApp.controller('userInfoModalController', function ($scope, $rootScope, $location, $modalInstance, userService, moment, $window) {
+gpjApp.controller('userDetailController', function ($scope, $rootScope, $location, userService, moment, $window) {
 
     /**
      * Get feedback info
      */
-    $rootScope.loadingPromise = userService.getUserInfo().success(function (result) {
-        if (result && result.result == 0 && result.data) {
-            $scope.user = result.data;
-        }
-    });
+    $scope.viewUser = function () {
+        userService.getUserInfo().success(function (result) {
+            if (result && result.result == 0 && result.data) {
+                $scope.user = result.data;
+            }
+        });
+    };
 
     /**
      * Browse a photo
@@ -36,4 +38,6 @@ gpjApp.controller('userInfoModalController', function ($scope, $rootScope, $loca
         }
         $location.path("/user/list");
     }
+
+    $scope.viewUser();
 });
