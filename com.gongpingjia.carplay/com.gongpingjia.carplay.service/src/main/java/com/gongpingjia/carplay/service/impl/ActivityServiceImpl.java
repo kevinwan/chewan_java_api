@@ -598,8 +598,8 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         if (!Constants.AppointmentStatus.APPLYING.equals(appointment.getStatus())) {
-            LOG.warn("appoint has done");
-            throw new ApiException("该邀请已经处理过了");
+            LOG.warn("appoint is applying");
+            throw new ApiException("活动邀请处理中");
         }
 
         return appointment;
