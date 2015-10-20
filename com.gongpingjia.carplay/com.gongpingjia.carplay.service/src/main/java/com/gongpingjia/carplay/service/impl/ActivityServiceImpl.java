@@ -178,7 +178,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         String pay = request.getParameter("payStr");
 
-        String genderTypeStr = request.getParameter("genderType");
+        String genderTypeStr = request.getParameter("gender");
 
         String transferStr = request.getParameter("transfer");
 
