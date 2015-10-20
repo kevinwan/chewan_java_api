@@ -13,9 +13,11 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.user.EmchatToken;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
 import com.gongpingjia.carplay.service.EmchatTokenService;
+import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -46,7 +48,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     private ChatThirdPartyService chatThirdPartyService;
 
     @Autowired
-    private EmchatTokenService emchatTokenService;
+    private EmchatToken emchatTokenService;
 
     @Autowired
     private UserDao userDao;
@@ -57,7 +59,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
 
     @Override
-    public ResponseDo registerActivity(JSONObject json,String userId) throws ApiException {
+    public ResponseDo registerActivity(JSONObject json, String userId) throws ApiException {
         LOG.debug("Begin register activity and save data");
 
         //检查参数是否非法        初始化一些信息；
@@ -143,10 +145,10 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 Long toTime = Long.parseLong(toTimeStr);
                 toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
                 criteria.and("start").gte(fromTime).lt(toTime);
-            }else if (StringUtils.isNotEmpty(fromTimeStr) && StringUtils.isEmpty(toTimeStr)) {
+            } else if (StringUtils.isNotEmpty(fromTimeStr) && StringUtils.isEmpty(toTimeStr)) {
                 Long fromTime = Long.parseLong(fromTimeStr);
                 criteria.and("start").gte(fromTime);
-            }else if (StringUtils.isEmpty(fromTimeStr) && StringUtils.isNotEmpty(toTimeStr)) {
+            } else if (StringUtils.isEmpty(fromTimeStr) && StringUtils.isNotEmpty(toTimeStr)) {
                 Long toTime = Long.parseLong(toTimeStr);
                 toTime = DateUtil.addTime(new Date(toTime), Calendar.HOUR, 24);
                 criteria.and("start").lte(toTime);
@@ -189,7 +191,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     }
 
     @Override
-    public ResponseDo updateActivity(String officialActivityId, JSONObject json,String userId) throws ApiException {
+    public ResponseDo updateActivity(String officialActivityId, JSONObject json, String userId) throws ApiException {
         json.remove("members");
         json.remove("photos");
         json.remove("organizer");
@@ -197,13 +199,35 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
         checkParam(json);
 
-        OfficialActivity source = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
-
+//        OfficialActivity source = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
+//
         OfficialActivity officialActivity = activityDao.findById(officialActivityId);
         if (null == officialActivity) {
             throw new ApiException("改数据不存在");
         }
-        activityDao.update(officialActivityId, source);
+//        activityDao.update(officialActivityId, source);
+        String params[] = {"title", "instruction", "destination", "cover", "limitType", "price", "start", "onFlag"};
+        Update update = FetchUtil.initUpdateFromJson(json, params);
+        int limitType = json.getInt("limitType");
+        if (limitType == Constants.OfficialActivityLimitType.TOTAL_LIMIT) {
+            //限制总人数
+            update.set("totalLimit", json.getInt("totalLimit"));
+            update.set("maleLimit", -1);
+            update.set("femaleLimit", -1);
+        } else if (limitType == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+            //分别限制男女人数
+            update.set("femaleLimit", json.getInt("femaleLimit"));
+            update.set("maleLimit", json.getInt("maleLimit"));
+            update.set("totalLimit", -1);
+        } else {
+            //不限制人数
+            update.set("totalLimit", -1);
+            update.set("maleLimit", -1);
+            update.set("femaleLimit", -1);
+        }
+
+        activityDao.update(officialActivityId, update);
+
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -245,7 +269,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         try {
             activity = (OfficialActivity) JSONObject.toBean(json, OfficialActivity.class);
         } catch (Exception e) {
-            LOG.debug(e.getMessage(),e);
+            LOG.debug(e.getMessage(), e);
 
             throw new ApiException("输入参数有误");
         }
@@ -264,7 +288,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
             }
             activity.setMaleLimit(-1);
             activity.setFemaleLimit(-1);
-        }else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+        } else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
             //分别限制男女人数
             if (null == activity.getMaleLimit() || activity.getMaleLimit() < 0) {
                 throw new ApiException("男性数量必须大于等于0");
@@ -277,7 +301,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 throw new ApiException("男女人数不能同时为0");
             }
             activity.setTotalLimit(activity.getMaleLimit() + activity.getFemaleLimit());
-        }else {
+        } else {
             //不限制人数
             activity.setTotalLimit(-1);
             activity.setMaleLimit(-1);
@@ -292,7 +316,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         return activity;
     }
 
-    private void checkParam(JSONObject json) throws ApiException{
+    private void checkParam(JSONObject json) throws ApiException {
         //必填项目
         if (CommonUtil.isEmpty(json, Arrays.asList("title", "instruction", "destination", "cover", "limitType", "price", "start", "onFlag"))) {
             throw new ApiException("参数输入不全 请检查参数");
@@ -312,7 +336,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
             if (null == activity.getTotalLimit() || activity.getTotalLimit() <= 0) {
                 throw new ApiException("总限制人数必须大于0");
             }
-        }else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+        } else if (activity.getLimitType() == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
             //分别限制男女人数
             if (null == activity.getMaleLimit() || activity.getMaleLimit() < 0) {
                 throw new ApiException("男性数量必须大于等于0");

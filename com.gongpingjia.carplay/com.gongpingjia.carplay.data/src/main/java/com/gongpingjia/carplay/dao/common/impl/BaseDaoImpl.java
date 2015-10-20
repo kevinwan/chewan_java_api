@@ -103,13 +103,13 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
         return mongoTemplate.count(query, getCls());
     }
 
-    @Override
-    public void update(K id, T entity) {
-        BasicDBObject queryObj = new BasicDBObject("_id", new ObjectId(id.toString()));
-        String jsonStr = JsonUtil.toString(entity);
-        DBObject dbObject = (DBObject) JSON.parse(jsonStr);
-        mongoTemplate.getCollection(getCollectionName(entity)).update(queryObj, dbObject);
-    }
+//    @Override
+//    public void update(K id, T entity) {
+//        BasicDBObject queryObj = new BasicDBObject("_id", new ObjectId(id.toString()));
+//        String jsonStr = JsonUtil.toString(entity);
+//        DBObject dbObject = (DBObject) JSON.parse(jsonStr);
+//        mongoTemplate.getCollection(getCollectionName(entity)).update(queryObj, dbObject);
+//    }
 
     @Override
     public void update(Query query, Update update) {

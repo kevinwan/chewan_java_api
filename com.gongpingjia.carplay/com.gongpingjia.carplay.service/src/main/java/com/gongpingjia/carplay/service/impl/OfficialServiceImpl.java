@@ -53,7 +53,7 @@ public class OfficialServiceImpl implements OfficialService {
     private ChatThirdPartyService chatThirdPartyService;
 
     @Autowired
-    private EmchatTokenService emchatTokenService;
+    private ChatCommonService chatCommonService;
 
     @Autowired
     private AppointmentDao appointmentDao;
@@ -206,7 +206,7 @@ public class OfficialServiceImpl implements OfficialService {
 
         //加入到环信群组中
         try {
-            chatThirdPartyService.addUserToChatGroup(emchatTokenService.getToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
+            chatThirdPartyService.addUserToChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             throw new ApiException("加入到聊天群组失败");

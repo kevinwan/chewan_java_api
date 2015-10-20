@@ -45,7 +45,7 @@ public interface BaseDao<T,K> {
 
     public long count(Query query);
 
-    public void update(K id,T entity);
+//    public void update(K id,T entity);
 
     public void update(Query query, Update update);
 
