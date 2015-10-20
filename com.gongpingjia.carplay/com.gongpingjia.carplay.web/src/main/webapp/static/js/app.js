@@ -61,8 +61,14 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/user/user_detail.html',
         controller: 'userDetailController'
     }).when('/activity/list', {
-        templateUrl: 'views/chewan/activity.html',
+        templateUrl: 'views/activity/list.html',
         controller: 'activityController'
+    }).when('/activity/view', {
+        templateUrl: 'views/activity/view.html',
+        controller: 'activityViewController'
+    }).when('/activity/update', {
+        templateUrl: 'views/activity/update.html',
+        controller: 'activityUpdateController'
     }).when('/officialActivity/list', {
         templateUrl: 'views/chewan/official_activity/list.html',
         controller: 'officialActivityController'
