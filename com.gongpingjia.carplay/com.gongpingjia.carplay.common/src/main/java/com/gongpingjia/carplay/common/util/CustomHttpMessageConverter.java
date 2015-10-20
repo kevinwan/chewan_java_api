@@ -80,8 +80,8 @@ public class CustomHttpMessageConverter extends AbstractHttpMessageConverter<Obj
             HttpMessageNotWritableException {
 
         OutputStream out = outputMessage.getBody();
-        String text = JsonUtil.toJSONString(obj, features);
-        byte[] bytes = text.getBytes(charset);
-        out.write(bytes);
+//        String text = JsonUti.toJSONString(obj, features);
+//        byte[] bytes = text.getBytes(charset);
+        out.write(null);
     }
 }
