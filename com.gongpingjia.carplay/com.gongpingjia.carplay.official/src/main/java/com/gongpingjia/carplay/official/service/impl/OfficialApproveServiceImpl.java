@@ -27,10 +27,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -84,6 +81,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         userDao.update(application.getApplyUserId(), Update.update("licenseAuthStatus", status));
 
         recordHistory(userId, application, current, status, remarks);
+        sendEmchatMessage(application, status, remarks, Constants.MessageType.LICENSE_AUTH_MSG);
 
         LOG.debug("Finished approved user driving authentication apply");
         return ResponseDo.buildSuccessResponse();
@@ -134,18 +132,27 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         history.setStatus(status);
         history.setRemark(remarks);
         historyDao.save(history);
+    }
+
+    private void sendEmchatMessage(AuthApplication application, String status, String remarks, int messageType) throws ApiException {
+        Map<String, Object> ext = new HashMap<>(2, 1);
+        ext.put("type", messageType);
+        ext.put("result", Constants.Flag.POSITIVE);
 
         User user = userDao.findById(application.getApplyUserId());
         String result = "通过";
         if (Constants.AuthStatus.REJECT.equals(status)) {
             result = "未通过";
+            ext.put("result", Constants.Flag.NEGATIVE);
         }
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.authentication", "您的{0}审核{1}"),
                 application.getType(), result);
         if (Constants.AuthStatus.REJECT.equals(status)) {
             message += ", 原因：" + remarks;
         }
-        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL, user.getEmchatName(), message);
+
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
+                Arrays.asList(user.getEmchatName()), message, ext);
     }
 
     /**
@@ -191,7 +198,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             if (applyUser == null) {
                 continue;
             }
-            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
+            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             if (applyUser.getCar() != null) {
                 applyUser.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
             }
@@ -274,7 +281,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             throw new ApiException("输入参数有误");
         }
         applyUser.hideSecretInfo();
-        applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
+        applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         application.setApplyUser(applyUser);
 
         UserAuthentication userAuthentication = userAuthenticationDao.findById(application.getApplyUserId());
@@ -337,6 +344,9 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         userDao.update(application.getApplyUserId(), Update.update("photoAuthStatus", status));
 
         recordHistory(userId, application, current, status, remarks);
+
+        sendEmchatMessage(application, status, remarks, Constants.MessageType.PHOTO_AUTH_MSG);
+
         LOG.debug("Finished approved user photo authentication apply");
         return ResponseDo.buildSuccessResponse();
     }

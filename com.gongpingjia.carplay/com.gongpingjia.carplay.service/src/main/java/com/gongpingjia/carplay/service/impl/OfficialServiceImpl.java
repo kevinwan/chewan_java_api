@@ -304,9 +304,10 @@ public class OfficialServiceImpl implements OfficialService {
         List<Map<String, Object>> validAreas = new ArrayList<>(areas.size());
         for (Area area : areas) {
             if (area.getValiad()) {
-                Map<String, Object> areaMap = new HashMap<>(2);
+                Map<String, Object> areaMap = new HashMap<>(4, 1);
                 areaMap.put("code", area.getCode());
                 areaMap.put("name", area.getName());
+                areaMap.put("level", area.getLevel());
                 validAreas.add(areaMap);
             }
         }

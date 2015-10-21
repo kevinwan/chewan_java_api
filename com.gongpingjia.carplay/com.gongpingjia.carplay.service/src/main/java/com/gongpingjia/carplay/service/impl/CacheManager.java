@@ -158,8 +158,8 @@ public class CacheManager {
      * @param parentId 父ID
      * @return
      */
-    public JSONArray getAreaList(Integer parentId) {
-        String jsonString = cacheService.get(parentId.toString());
+    public JSONArray getAreaList(int parentId) {
+        String jsonString = cacheService.get(String.valueOf(parentId));
         if (StringUtils.isEmpty(jsonString)) {
             return null;
         }
