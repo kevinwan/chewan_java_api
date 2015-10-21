@@ -35,7 +35,7 @@ public class UserActivityController {
      *
      * @param userId
      * @param token
-     * @param request
+     * @param json
      * @return
      */
     @RequestMapping(value = "/official/userActivity/list", method = RequestMethod.POST,

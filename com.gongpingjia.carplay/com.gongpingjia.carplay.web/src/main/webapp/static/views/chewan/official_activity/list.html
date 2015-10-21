@@ -119,10 +119,10 @@
                     <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice == 0">无</span>
                     <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice != 0">{{item.subsidyPrice}}元</span>
                 </td>
-                <td>{{item.start | date:"yyyy-MM-dd hh:mm"}}</td>
+                <td>{{item.start | date:"yyyy-MM-dd HH:mm"}}</td>
                 <td>
                     <span ng-show="item.end == undefined || item.end == null || item.end === '' ">待定</span>
-                    <span ng-show="item.end != undefined && item.end != null && item.end !== '' ">{{item.end | date:"yyyy-MM-dd hh:mm"}}</span>
+                    <span ng-show="item.end != undefined && item.end != null && item.end !== '' ">{{item.end | date:"yyyy-MM-dd HH:mm"}}</span>
                 </td>
                 <td>
                     <div ng-show="item.onFlag == false">未上架
