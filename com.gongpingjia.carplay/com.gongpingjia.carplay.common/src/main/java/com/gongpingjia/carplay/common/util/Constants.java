@@ -196,6 +196,21 @@ public class Constants {
     }
 
     /**
+     * 消息类型
+     */
+    public interface MessageType {
+
+        //图像认证
+        int PHOTO_AUTH_MSG = 1;
+        //车主认证
+        int LICENSE_AUTH_MSG = 2;
+        //身份证认证
+        int ID_CARD_AUTH_MSG = 3;
+        //约会信息认证
+        int APPOINTMENT_EXPIRED_MSG = 4;
+    }
+
+    /**
      * 约会状态
      */
     public interface AppointmentStatus {

@@ -7,6 +7,62 @@
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context.xsd">
 
+
+    <!--cronExpression
+      0 0 0 1 * ?
+     #       1.秒(0-59)
+     #       2.分钟(0-59)
+     #       3.小时(0-23)
+     #       4.月份中的日期(1-31)
+     #       5.月份(1-12或SUN-DEC)
+     #       6.星期中的日期(1-7或SUN-SAT)
+     #       7.年份(1970-2099)
+     -->
+
+    <!--用户活动过期清理任务-->
+    <bean id="activityCleanJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.gongpingjia.carplay.official.task.ActivityCleanTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="activityCleanCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="activityCleanJob"></property>
+        <property name="cronExpression" value="0 0 2 * * ?"></property>
+    </bean>
+
+    <!--用户约会过期清理任务-->
+    <bean id="appointmetCleanJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.gongpingjia.carplay.official.task.AppointmentCleanTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="appointmentCleanCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="appointmetCleanJob"></property>
+        <property name="cronExpression" value="0 30 2 * * ?"></property>
+    </bean>
+
+    <!--用户约会过期提醒任务-->
+    <bean id="appointmentRemindJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.gongpingjia.carplay.official.task.AppointmentExpiredRemindTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="appointmentRemindCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="appointmentRemindJob"></property>
+        <property name="cronExpression" value="0 0 3 * * ?"></property>
+    </bean>
+
+    <bean id="trigger" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="activityCleanCronTriggerBean"/>
+                <ref bean="appointmentCleanCronTriggerBean"/>
+                <ref bean="appointmentRemindCronTriggerBean"/>
+            </list>
+        </property>
+    </bean>
+
+
     <context:component-scan base-package="com.gongpingjia.carplay.official.service"/>
     <context:annotation-config/>
 
