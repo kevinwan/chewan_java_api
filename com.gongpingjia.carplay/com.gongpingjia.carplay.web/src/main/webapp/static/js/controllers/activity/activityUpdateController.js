@@ -1,8 +1,8 @@
 'use strict';
 
 
-gpjApp.controller('activityUpdateController', ['$scope', '$rootScope', '$location', 'activityService', 'moment', '$window', 'commonService', '$q',
-    function ($scope, $rootScope, $location, activityService, moment, $window, commonService, $q) {
+gpjApp.controller('activityUpdateController', ['$scope', '$rootScope', '$location', 'activityService', 'moment', '$window', 'commonService', '$q','$routeParams',
+    function ($scope, $rootScope, $location, activityService, moment, $window, commonService, $q,$routeParams) {
 
 
         /**
@@ -48,7 +48,7 @@ gpjApp.controller('activityUpdateController', ['$scope', '$rootScope', '$locatio
         };
 
         $scope.initData = function () {
-            var activityId = activityService.getActivityId();
+            var activityId = $routeParams.id;
             $scope.destCityOptions = [];
             $scope.destDistrictOptions = [];
             $scope.destStreetOptions = [];

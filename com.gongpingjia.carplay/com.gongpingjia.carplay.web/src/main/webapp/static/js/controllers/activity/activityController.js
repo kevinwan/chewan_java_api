@@ -118,12 +118,12 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
 
         $scope.updateActivity = function (activityId) {
             activityService.setActivityId(activityId);
-            $location.path("/activity/update");
+            $location.path("/activity/update/"+activityId);
         };
 
         $scope.viewActivity = function (activityId) {
             activityService.setActivityId(activityId);
-            $location.path("/activity/view");
+            $location.path("/activity/view/"+activityId);
         };
 
 

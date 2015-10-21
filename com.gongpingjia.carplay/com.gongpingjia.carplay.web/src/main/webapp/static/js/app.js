@@ -35,6 +35,10 @@ gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/
 gpjApp.constant("ChewanApiProvider", "http://cwapi.gongpingjia.com:8080");
 gpjApp.constant("ChewanApiEndPoint", "/v2");
 
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
+//gpjApp.constant("ChewanApiProvider", "http://localhost:8080");
+//gpjApp.constant("ChewanApiEndPoint", "");
+
 /**
  * Router configuration
  */
@@ -66,7 +70,7 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/activity/view', {
         templateUrl: 'views/activity/view.html',
         controller: 'activityViewController'
-    }).when('/activity/update', {
+    }).when('/activity/update/:id', {
         templateUrl: 'views/activity/update.html',
         controller: 'activityUpdateController'
     }).when('/officialActivity/list', {
@@ -75,10 +79,10 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/officialActivity/add', {
         templateUrl: 'views/chewan/official_activity/add.html',
         controller: 'officialActivityEditController'
-    }).when('/officialActivity/update', {
+    }).when('/officialActivity/update/:id', {
         templateUrl: 'views/chewan/official_activity/update.html',
         controller: 'officialActivityEditController'
-    }).when('/officialActivity/view', {
+    }).when('/officialActivity/view/:id', {
         templateUrl: 'views/chewan/official_activity/view.html',
         controller: 'officialActivityEditController'
     });

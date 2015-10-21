@@ -4,10 +4,7 @@ import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
-import com.gongpingjia.carplay.common.util.CodeGenerator;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
@@ -225,6 +222,29 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
             update.set("maleLimit", -1);
             update.set("femaleLimit", -1);
         }
+
+        String endStr = json.getString("end");
+        if (StringUtils.isNotEmpty(endStr)) {
+            update.set("end", TypeConverUtil.convertToLong("end",endStr,true));
+        }else {
+            update.set("end", null);
+        }
+
+        String description = json.getString("description");
+        if (description != null) {
+            update.set("description", description);
+        }
+
+        String extraDesc = json.getString("extraDesc");
+        if (null != extraDesc) {
+            update.set("extraDesc", extraDesc);
+        }
+
+        String linkTicketUrl = json.getString("linkTicketUrl");
+        if (null != linkTicketUrl) {
+            update.set("linkTicketUrl", linkTicketUrl);
+        }
+
 
         activityDao.update(officialActivityId, update);
 

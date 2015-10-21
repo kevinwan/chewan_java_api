@@ -103,15 +103,12 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         };
 
         $scope.viewOfficialActivity = function (officialActivityId) {
-            officialActivityService.setOfficialActivityId(officialActivityId);
-            $location.path("/officialActivity/view");
-            //$location.path(encodeURI("/officialActivity/view?id="+officialActivityId));
+            //officialActivityService.setOfficialActivityId(officialActivityId);
+            $location.path("/officialActivity/view/"+officialActivityId);
         };
 
         $scope.updateOfficialActivity = function (officialActivityId) {
-            officialActivityService.setOfficialActivityId(officialActivityId);
-            $location.path(("/officialActivity/update"));
-            //$location.path(encodeURI("/officialActivity/update?id="+officialActivityId));
+            $location.path(("/officialActivity/update/"+officialActivityId));
         };
 
         $scope.checkOnItemStatus = function (onFlag, end) {

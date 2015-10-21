@@ -1,8 +1,8 @@
 'use strict';
 
 
-gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', '$timeout',
-    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, $timeout) {
+gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', '$timeout', '$routeParams',
+    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, $timeout, $routeParams) {
 
         //$scope.items = [
         //    { id: 1, name: 'foo' },
@@ -45,9 +45,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         };
 
         $scope.initData = function () {
-            var officialActivityId = officialActivityService.getOfficialActivityId();
+            var officialActivityId = $routeParams.id;
             //var officialActivityId = $location.search()['id'];
-            if (officialActivityId === '') {
+            if (officialActivityId === undefined || officialActivityId === '') {
                 //增加
                 $scope.activity = {destination: {}};
                 $scope.activity.limitType = 0;
@@ -139,6 +139,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          */
         $scope.updateOfficialActivity = function () {
             if (checkTime() && validateAll()) {
+                if($scope.activity.end === undefined || $scope.activity.end === null){
+                    $scope.activity.end = '';
+                }
+
                 $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
                     if (result.result == 0) {
                         $window.alert("更新成功");
