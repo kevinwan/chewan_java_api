@@ -584,9 +584,13 @@ public class ActivityServiceImpl implements ActivityService {
         Criteria criteria = new Criteria();
 
         //
+        String province = json.getString("province");
+        if (StringUtils.isNotEmpty(province)) {
+            criteria.and("destination.province").is(province);
+        }
         String city = json.getString("city");
         if (StringUtils.isNotEmpty(city)) {
-            criteria.and("estabPoint.city").is(city);
+            criteria.and("destination.city").is(city);
         }
 
         String phone = json.getString("phone");
