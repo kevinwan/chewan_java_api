@@ -172,25 +172,64 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException {
         LOG.debug("getNearActivityList");
+        String limitStr = request.getParameter("limit");
+        String ignoreStr = request.getParameter("ignore");
+        int limit = 10;
+        int ignore = 0;
+        if (StringUtils.isNotEmpty(ignoreStr)) {
+            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
+        }
+        if (StringUtils.isNotEmpty(limitStr)) {
+            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
+        }
+
+        AreaRangeInfo areaRangeInfo = new AreaRangeInfo();
+        areaRangeInfo.maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.defaultMaxDistance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
+        areaRangeInfo.maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.defaultMaxPubTime", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
+
+        List<Activity> resultList = null;
+        int searchDepth = 0;
+        do {
+
+            resultList = buildResultList(request, userId, areaRangeInfo);
+            //不是取第一页的信息 跳出此判断
+            if (ignore != 0) {
+                break;
+            }
+            if (searchDepth > 4) {
+                break;
+            }
+            if (resultList == null || resultList.size() < limit) {
+                areaRangeInfo.maxDistance = areaRangeInfo.maxDistance * 10;
+                areaRangeInfo.maxPubTime = areaRangeInfo.maxPubTime * 10;
+                searchDepth++;
+            } else {
+                break;
+            }
+
+        } while (true);
 
 
+        //初始化返回数据
+        JSONArray rltArr = initResultMap(userId, resultList);
 
-        SearchInfo searchInfo = initSearchInfo(request, userId);
 
+        return ResponseDo.buildSuccessResponse(rltArr);
+    }
+
+    public List<Activity> buildResultList(HttpServletRequest request, String userId, AreaRangeInfo areaRangeInfo) throws ApiException {
+        SearchInfo searchInfo = initSearchInfo(request, userId, areaRangeInfo);
 
         //获得所有的满足基础条件的活动；
         List<Activity> allActivityList = activityDao.find(Query.query(searchInfo.criteria));
         if (allActivityList.isEmpty()) {
             LOG.warn("all Activity list is empty");
-            return ResponseDo.buildSuccessResponse("[]");
+            return null;
         }
-
         LOG.debug("allActivityList size is:" + allActivityList.size());
 
-
-        //初始化关注者id
+        //获取出该用户所关注的 所有的 用户 id
         List<String> subscriberIds = initSubscriberIds(userId);
-
         //查询出Activity的 组织者，并初始化
         initOrganizer(allActivityList, subscriberIds);
 
@@ -200,22 +239,16 @@ public class ActivityServiceImpl implements ActivityService {
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
 
-
+        //需要排除 的 activityId 集合
         HashSet<String> removeActivityIdSet = initActivityRemoveSet(userId, searchInfo);
 
         List<Activity> resultList = ActivityUtil.getSortResult(allActivityList, new Date(), searchInfo.landmark, searchInfo.maxDistance, searchInfo.maxPubTime, searchInfo.ignore, searchInfo.limit, searchInfo.genderType, removeActivityIdSet);
 
         if (null == resultList || resultList.size() == 0) {
-            return ResponseDo.buildSuccessResponse("[]");
+            return null;
         }
-
         LOG.debug("resultList size is:" + resultList.size());
-
-        //初始化返回数据
-        JSONArray rltArr = initResultMap(userId, resultList);
-
-
-        return ResponseDo.buildSuccessResponse(rltArr);
+        return resultList;
     }
 
     private HashSet<String> initActivityRemoveSet(String userId, SearchInfo searchInfo) {
@@ -717,7 +750,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
 
-    private SearchInfo initSearchInfo(HttpServletRequest request, String userId) throws ApiException {
+    private SearchInfo initSearchInfo(HttpServletRequest request, String userId, AreaRangeInfo areaRangeInfo) throws ApiException {
         SearchInfo searchInfo = new SearchInfo();
         //必填项
         String longitude = request.getParameter("longitude");
@@ -732,13 +765,13 @@ public class ActivityServiceImpl implements ActivityService {
         searchInfo.landmark = landmark;
 
 
-        //选填项目
-        String maxDistanceStr = request.getParameter("maxDistance");
-        LOG.debug("maxDistanceStr is:{}", maxDistanceStr);
-        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-        if (StringUtils.isNotEmpty(maxDistanceStr)) {
-            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
-        }
+//        //选填项目
+//        String maxDistanceStr = request.getParameter("maxDistance");
+//        LOG.debug("maxDistanceStr is:{}", maxDistanceStr);
+        double maxDistance = areaRangeInfo.maxDistance;
+//        if (StringUtils.isNotEmpty(maxDistanceStr)) {
+//            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
+//        }
         searchInfo.maxDistance = maxDistance;
 
         String type = request.getParameter("type");
@@ -767,7 +800,7 @@ public class ActivityServiceImpl implements ActivityService {
         Criteria criteria = new Criteria();
 
         //查询创建在此时间之前的活动；
-        long maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
+        long maxPubTime = areaRangeInfo.maxPubTime;
         searchInfo.maxPubTime = maxPubTime;
         long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
         criteria.and("createTime").gte(gtTime);
@@ -828,5 +861,10 @@ public class ActivityServiceImpl implements ActivityService {
         public int ignore;
         public int limit;
         public int genderType;
+    }
+
+    class AreaRangeInfo {
+        public long maxPubTime;
+        public double maxDistance;
     }
 }
