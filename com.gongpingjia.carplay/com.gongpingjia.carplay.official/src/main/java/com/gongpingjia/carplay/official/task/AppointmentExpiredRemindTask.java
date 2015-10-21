@@ -97,11 +97,17 @@ public class AppointmentExpiredRemindTask extends QuartzJobBean {
         ext.put("type", Constants.MessageType.APPOINTMENT_EXPIRED_MSG);
 
         try {
+            String invitedUserMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
+                    "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), applier.getNickname(), activity.getType());
             chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL, emchatUsers,
-                    MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired", "{0}邀约明天就要过期"), activity.getType()),
-                    ext);
+                    invitedUserMessage, ext);
+
+            String applierMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
+                    "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), invitedUser.getNickname(), activity.getType());
+            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL, emchatUsers,
+                    applierMessage, ext);
         } catch (ApiException e) {
-            LOG.warn("Send Message failure, applier:{}, inviter:{}", applier.getUserId(), invitedUser.getUserId());
+            LOG.warn("Send message failure, applier:{}, inviter:{}", applier.getUserId(), invitedUser.getUserId());
         }
     }
 

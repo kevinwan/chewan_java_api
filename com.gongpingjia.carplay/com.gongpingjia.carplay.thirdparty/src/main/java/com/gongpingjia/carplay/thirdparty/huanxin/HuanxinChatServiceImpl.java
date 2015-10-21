@@ -305,7 +305,9 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         param.put("msg", msg);
 
         param.put("from", adminUser);
-        param.put("ext", ext);
+        if (ext != null) {
+            param.put("ext", ext);
+        }
 
         final int limit = 20;
         int fromIndex = 0;

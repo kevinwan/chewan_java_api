@@ -104,4 +104,14 @@ public interface UserService {
     ResponseDo bindingPhone(String userId, String token, String phone, String code) throws ApiException;
 
     ResponseDo getAuthenticationHistory(String userId, String token) throws ApiException;
+
+    /**
+     * 记录用户本次上传了照片的数量
+     *
+     *
+     * @param userId
+     * @param token
+     *@param count 上传的照片的数量  @return 返回处理结果
+     */
+    ResponseDo recordUploadPhotoCount(String userId, String token, Integer count) throws ApiException;
 }

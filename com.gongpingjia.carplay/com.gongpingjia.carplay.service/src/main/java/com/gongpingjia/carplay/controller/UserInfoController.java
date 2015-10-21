@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UserService;
@@ -344,7 +345,34 @@ public class UserInfoController {
             String code = json.getString("code");
 
             return userService.bindingPhone(userId, token, phone, code);
-        } catch (Exception e) {
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 记录当前用户上传图片的数量
+     *
+     * @param userId 用户Id
+     * @param token  用户会话Token
+     * @param json   请求Body
+     * @return 返回处理结果
+     */
+    @RequestMapping(value = "/user/{userId}/photoCount", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo recordUploadPhotoCount(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                             @RequestBody JSONObject json) {
+        LOG.info("Begin record user upload photo count, userId:{}, requestBody:{}", userId, json);
+        try {
+            if (CommonUtil.isEmpty(json, "count")) {
+                throw new ApiException("输入参数有误");
+            }
+
+            Integer count = json.getInt("count");
+
+            return userService.recordUploadPhotoCount(userId, token, count);
+        } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }

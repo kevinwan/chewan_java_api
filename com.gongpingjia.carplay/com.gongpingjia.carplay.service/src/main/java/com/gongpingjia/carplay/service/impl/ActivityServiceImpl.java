@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
+import com.gongpingjia.carplay.dao.history.InterestMessageDao;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
@@ -14,6 +15,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -65,6 +67,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private SubscriberDao subscriberDao;
 
+    @Autowired
+    private InterestMessageDao interestMessageDao;
+
 
     /**
      * 注册 活动；
@@ -80,6 +85,8 @@ public class ActivityServiceImpl implements ActivityService {
 
         User user = userDao.findById(userId);
 
+        Long current = DateUtil.getTime();
+
         activity.setActivityId(null);
         //设置活动的创建人ID
         activity.setUserId(userId);
@@ -87,7 +94,7 @@ public class ActivityServiceImpl implements ActivityService {
         //创建人默认加入到活动成员列表中
         memberIds.add(userId);
         activity.setMembers(memberIds);
-        activity.setCreateTime(new Date().getTime());
+        activity.setCreateTime(current);
         activity.setDeleteFlag(false);
 
         activityDao.save(activity);
@@ -100,6 +107,13 @@ public class ActivityServiceImpl implements ActivityService {
 //            LOG.error(e.getMessage(), e);
 //            throw new ApiException("创建环信群组失败");
 //        }
+
+        InterestMessage interestMessage = new InterestMessage();
+        interestMessage.setUserId(userId);
+        interestMessage.setType(InterestMessage.USER_ACTIVITY);
+        interestMessage.setRelatedId(activity.getActivityId());
+        interestMessage.setCreateTime(current);
+        interestMessageDao.save(interestMessage);
 
         //向关注我的人发送感兴趣的信息
         Map<String, Object> ext = new HashMap<>(1);
