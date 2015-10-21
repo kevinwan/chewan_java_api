@@ -756,7 +756,18 @@ public class UserServiceImpl implements UserService {
             Update update = new Update();
             update.set("token", userToken.getToken());
             update.set("expire", userToken.getExpire());
-            userTokenDao.update(userToken.getId(), update);
+            UserToken toFind = userTokenDao.findById(userToken.getId());
+            //TODO
+            if (null == toFind) {
+                userToken = new UserToken();
+                userToken.setUserId(userId);
+                userToken.setToken(token);
+                userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
+                        PropertiesUtil.getProperty("carplay.token.over.date", 7)));
+                userTokenDao.save(userToken);
+            }else {
+                userTokenDao.update(userToken.getId(), update);
+            }
         }
         cacheManager.setUserToken(userToken);
 
