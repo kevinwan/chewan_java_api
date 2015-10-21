@@ -67,16 +67,7 @@ public class OfficialServiceImpl implements OfficialService {
     public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-        OfficialActivity officialActivity = officialActivityDao.findById(officialActivityId);
-        if (null == officialActivity) {
-            LOG.warn("Input officialActivityId:{} is not exist in the database", officialActivityId);
-            throw new ApiException("输入参数有误");
-        }
-
-        if (officialActivity.getDeleteFlag()) {
-            LOG.warn("Official activity already deleted, _id:{}", officialActivityId);
-            throw new ApiException("活动信息不存在");
-        }
+        OfficialActivity officialActivity = checkParameters(officialActivityId);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -94,27 +85,26 @@ public class OfficialServiceImpl implements OfficialService {
             jsonObject.put("isMember", false);
             jsonObject.put("members", new ArrayList<>(0));
         } else {
+            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivityId)
+                    .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
+
             jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
             //获取当前用户和成员信息
             User queryUser = userDao.findById(userId);
             LOG.debug("Build members and organizer");
             List<User> users = userDao.findByIds(officialActivity.getMembers());
+            Map<String, User> userMap = new HashMap<>(users.size());
+            for (User user : users) {
+                userMap.put(user.getUserId(), user);
+            }
             List<Map<String, Object>> members = new ArrayList<>(users.size());
             for (User user : users) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("userId", user.getUserId());
-                map.put("nickname", user.getNickname());
-                map.put("avatar", localServer + user.getAvatar());
-                map.put("gender", user.getGender());
-                map.put("licenseAuthStatus", user.getLicenseAuthStatus());
-                map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
-                        user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
-                if (user.getCar() != null) {
-                    user.getCar().setLogo(gpjServer + user.getCar().getLogo());
-                    map.put("car", user.getCar());
-                } else {
-                    map.put("car", "");
-                }
+                Map<String, Object> map = new HashMap<>(16, 1);
+
+                buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
+
+                buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
+
                 members.add(map);
             }
             jsonObject.put("members", members);
@@ -122,6 +112,73 @@ public class OfficialServiceImpl implements OfficialService {
 
         LOG.debug("Finished build data");
         return ResponseDo.buildSuccessResponse(jsonObject);
+    }
+
+    //构造用户的邀请接收信息
+    private void buildInvitedAcceptInfo(String userId, String localServer, List<Appointment> appointmentList,
+                                        Map<String, User> userMap, User user, Map<String, Object> map) {
+        int invitedCount = 0;
+        List<String> acceptList = new ArrayList<>(16);
+        for (Appointment appointment : appointmentList) {
+            if (appointment.getApplyUserId().equals(user.getUserId())) {
+                invitedCount++;
+                if (Constants.AppointmentStatus.ACCEPT == appointment.getStatus()) {
+                    acceptList.add(appointment.getInvitedUserId());
+                    if (userId.equals(appointment.getApplyUserId())) {
+                        map.put("acceptMe", true);
+                        map.put("phone", user.getPhone());
+                        map.put("emchatName", user.getEmchatName());
+                    }
+                }
+            }
+        }
+        map.put("invitedCount", invitedCount);
+        map.put("acceptCount", acceptList.size());
+        List<Map<String, Object>> acceptMembers = new ArrayList<>();
+        for (String memberId : acceptList) {
+            Map<String, Object> acceptMember = new HashMap<>(4, 1);
+            User acceptUser = userMap.get(memberId);
+            acceptMember.put("userId", acceptUser.getUserId());
+            acceptMember.put("nickname", acceptUser.getNickname());
+            acceptMember.put("avatar", localServer + acceptUser.getAvatar());
+            acceptMembers.add(acceptMember);
+        }
+        map.put("acceptMembers", acceptMembers);
+    }
+
+    //构造用户的基本信息
+    private void buildUserBaseInfo(String localServer, String gpjServer, User queryUser, User user, Map<String, Object> map) {
+        map.put("userId", user.getUserId());
+        map.put("nickname", user.getNickname());
+        map.put("avatar", localServer + user.getAvatar());
+        map.put("gender", user.getGender());
+        map.put("licenseAuthStatus", user.getLicenseAuthStatus());
+        map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
+                user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+        if (user.getCar() != null) {
+            user.getCar().setLogo(gpjServer + user.getCar().getLogo());
+            map.put("car", user.getCar());
+        } else {
+            map.put("car", "");
+        }
+
+        map.put("phone", "");
+        map.put("emchatName", "");
+    }
+
+
+    private OfficialActivity checkParameters(String officialActivityId) throws ApiException {
+        OfficialActivity officialActivity = officialActivityDao.findById(officialActivityId);
+        if (null == officialActivity) {
+            LOG.warn("Input officialActivityId:{} is not exist in the database", officialActivityId);
+            throw new ApiException("输入参数有误");
+        }
+
+        if (officialActivity.getDeleteFlag()) {
+            LOG.warn("Official activity already deleted, _id:{}", officialActivityId);
+            throw new ApiException("活动信息不存在");
+        }
+        return officialActivity;
     }
 
     /**
