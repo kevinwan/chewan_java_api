@@ -73,42 +73,6 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                             }
                         }
 
-
-                        //var findFlag = false;
-                        //var provinceIndex = -1;
-                        //var cityIndex = -1;
-                        //for (var pIndex in $scope.provinceOptions) {
-                        //
-                        //    for (var cIndex in $scope.provinceOptions[pIndex].cities) {
-                        //        if ($scope.provinceOptions[pIndex].cities[cIndex] === $scope.activity.destination.city) {
-                        //            $scope.provinceIndex = pIndex;
-                        //            findFlag = true;
-                        //            provinceIndex = pIndex;
-                        //            cityIndex = cIndex;
-                        //            break;
-                        //        }
-                        //    }
-                        //    if (findFlag) {
-                        //        break;
-                        //    }
-                        //}
-                        //var provinceIndex = 2;
-                        //$scope.provinceIndex = parseInt(provinceIndex);
-                        //$scope.cityOptions = [];
-                        //$scope.cityOptions = $scope.provinceOptions[$scope.provinceIndex].cities;
-                        //
-                        //$scope.activity.destination = {};
-                        //$scope.activity.destination.city = '天津';
-
-
-                        //document.getElementById("province").options[parseInt(provinceIndex) + 1].selected = true;
-                        //$scope.cityOptions = [];
-                        //$scope.cityOptions = $scope.provinceOptions[parseInt(provinceIndex)].cities;
-                        //var cityDom = new Option($scope.activity.destination.city, "0");
-                        //var cityParentDom = document.getElementById("city");
-                        //cityParentDom.add(cityDom);
-                        //document.getElementById("city").options[1].selected = true;
-
                         //初始化封面信息；
                         $scope.photoUrl = $scope.activity.cover.url;
 
@@ -174,7 +138,6 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          * 更新官方活动
          */
         $scope.updateOfficialActivity = function () {
-            //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
             if (checkTime() && validateAll()) {
                 $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
                     if (result.result == 0) {
@@ -193,11 +156,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          * 注册 官方活动;
          */
         $scope.register = function () {
-
             if (checkTime() && validateAll()) {
                 //初始化 省份信息 angular上绑定的 provinceIndex 信息；
                 //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
-                officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
+                $rootScope.loadingPromise = officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
                     if (data.result == 0) {
                         $window.alert("创建成功");
                         $location.path('/officialActivity/list');
