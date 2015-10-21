@@ -290,9 +290,12 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     private JSONArray initResultMap(String userId, List<Activity> resultList) throws ApiException {
+        JSONArray jsonArray = new JSONArray();
+        if (null == resultList || resultList.isEmpty()) {
+            return jsonArray;
+        }
 
         //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
-        JSONArray jsonArray = new JSONArray();
         for (Activity activity : resultList) {
             Map<String, Object> jsonItem = new HashMap<>();
             jsonItem.put("type", activity.getType());
