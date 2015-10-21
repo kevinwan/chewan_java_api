@@ -749,13 +749,7 @@ public class UserServiceImpl implements UserService {
                     PropertiesUtil.getProperty("carplay.token.over.date", 7)));
             userTokenDao.save(userToken);
         } else {
-            userToken.setToken(token);
-            userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
-                    PropertiesUtil.getProperty("carplay.token.over.date", 7)));
 
-            Update update = new Update();
-            update.set("token", userToken.getToken());
-            update.set("expire", userToken.getExpire());
             UserToken toFind = userTokenDao.findById(userToken.getId());
             //TODO
             if (null == toFind) {
@@ -765,8 +759,15 @@ public class UserServiceImpl implements UserService {
                 userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
                         PropertiesUtil.getProperty("carplay.token.over.date", 7)));
                 userTokenDao.save(userToken);
-            }else {
-                userTokenDao.update(userToken.getId(), update);
+            } else {
+                userToken.setToken(token);
+                userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
+                        PropertiesUtil.getProperty("carplay.token.over.date", 7)));
+
+                Update update = new Update();
+                update.set("token", userToken.getToken());
+                update.set("expire", userToken.getExpire());
+                userTokenDao.update(toFind.getId(), update);
             }
         }
         cacheManager.setUserToken(userToken);
