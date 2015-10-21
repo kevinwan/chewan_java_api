@@ -50,7 +50,7 @@ public class ParameterChecker {
         }
 
         if (!userToken.getToken().equals(token)) {
-            LOG.error("User token is not response to userId in the system, token:{}", token);
+            LOG.error("User token is not response to userId:{} in the system, token:{}", userId, token);
             throw new ApiException("会话失效");
         }
 
