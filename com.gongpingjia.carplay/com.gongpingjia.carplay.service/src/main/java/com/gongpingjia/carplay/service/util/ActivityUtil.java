@@ -128,7 +128,7 @@ public class ActivityUtil {
             } else {
                 iterator.next();
             }
-
+            index++;
         } while (iterator.hasNext() && index < offset);
         return toList;
 //        if (skip > activities.size()) {

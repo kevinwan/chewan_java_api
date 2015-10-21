@@ -16,8 +16,8 @@ public interface OfficialActivityService {
     /**
      * 创建官方活动
      *
-     * @param activity 活动对象
-     * @param json     请求参数
+     * @param json     活动对象封装的接送对象
+     * @param userId   用户id
      * @return 返回创建结果信息
      * @throws ApiException
      */

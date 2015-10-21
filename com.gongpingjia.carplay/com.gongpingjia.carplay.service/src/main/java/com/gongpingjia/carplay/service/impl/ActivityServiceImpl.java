@@ -66,6 +66,14 @@ public class ActivityServiceImpl implements ActivityService {
     private SubscriberDao subscriberDao;
 
 
+    /**
+     * 注册 活动；
+     *
+     * @param userId
+     * @param activity
+     * @return
+     * @throws ApiException
+     */
     @Override
     public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
         LOG.debug("activityRegister");
@@ -130,8 +138,6 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseDo getActivityInfo(String userId, String activityId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-
-        //
         Criteria criteria = Criteria.where("activityId").is(activityId);
         criteria.and("deleteFlag").is(false);
         Activity activity = activityDao.findOne(Query.query(criteria));
@@ -141,7 +147,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         User organizer = userDao.findById(activity.getUserId());
         if (null == organizer) {
-            LOG.warn("organizer is null");
+            LOG.error("the activity {} cannot found the organizer user {}", activityId, userId);
             throw new ApiException("该活动找不到对应的 User");
         }
         organizer.hideSecretInfo();
@@ -150,113 +156,30 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     /**
-     * 基础参数转换规则；例如 province 需要转换成 destAddress.province 进行查询
+     * 获取附近的活动；
      *
-     * @param request request中需要其他的信息 ；limit ignore 分页信息；longitude latitude 当前的经纬度；maxDistance 最大搜索距离 不是必须的；
-     *                step 1: 将基础转换参数 转换成查询参数；
-     *                step 2：添加 周边最大距离 以及 最近时间内的 查询参数；
-     *                step 3： 查询出基础Activity List
-     *                step 4：对技术list 中的activity进行 权重计算 以及排序；
-     *                step 5： 根据 limit 和 ignore 信息 取出 排序后的 activity list
+     * @param request
+     * @param userId
+     * @return
+     * @throws ApiException longitude latitude 经纬度信息       必填项；
+     *                      type 活动类型； 选填
+     *                      pay 付费类型    选填
+     *                      gender 性别 选填
+     *                      transfer 是否包接送   选填        true 查询 包接送项      false 查询所有
+     *                      <p/>
+     *                      limit ignore 信息     选填； 默认 ignore ： 0， limit： 10；
      */
     @Override
     public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException {
         LOG.debug("getNearActivityList");
 
-        //必填项
-        String longitude = request.getParameter("longitude");
-        String latitude = request.getParameter("latitude");
-
-        if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
-            LOG.error("longitude or latitude has not init");
-            throw new ApiException("经纬度信息没有提供");
-        }
-
-        //选填项目
-        String maxDistanceStr = request.getParameter("maxDistance");
-        LOG.debug("maxDistanceStr is:" + maxDistanceStr);
 
 
-        String type = request.getParameter("type");
-
-        String pay = request.getParameter("pay");
-
-        String genderTypeStr = request.getParameter("gender");
-
-        String transferStr = request.getParameter("transfer");
-
-        //分页信息  可以不填
-        String limitStr = request.getParameter("limit");
-        String ignoreStr = request.getParameter("ignore");
-
-        Landmark landmark = new Landmark();
-        landmark.setLatitude(TypeConverUtil.convertToDouble("latitude", latitude, true));
-        landmark.setLongitude(TypeConverUtil.convertToDouble("longitude", longitude, true));
-
-
-        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-        if (StringUtils.isNotEmpty(maxDistanceStr)) {
-            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
-        }
-
-
-        //
-        int limit = 10;
-        //ignore是跳过的参数
-        int ignore = 0;
-        //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
-        if (StringUtils.isNotEmpty(limitStr)) {
-            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
-        }
-        if (StringUtils.isNotEmpty(ignoreStr)) {
-            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
-        }
-
-
-        LOG.debug("init Query");
-        //从request读取基础查询参数；
-        Criteria criteria = new Criteria();
-
-        // 添加 距离  时间 查询参数；
-        long maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
-
-        //查询创建在此时间之前的活动；
-        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
-        criteria.and("createTime").gte(gtTime);
-
-        //查询在最大距离内的 活动；      此处的maxDistance 需要换算成 对应的 弧度
-        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance * 180 / DistanceUtil.EARTH_RADIUS);
-
-        //非用户自己创建的活动
-        if (StringUtils.isNotEmpty(userId)) {
-            criteria.and("userId").ne(userId);
-        }
-
-        //deleteFlag 为 false 的活动；
-        criteria.and("deleteFlag").is(false);
-
-//        //剔除掉用户已经申请过该活动
-//        if (StringUtils.isNotEmpty(userId)) {
-//            criteria.and("applyIds").nin(userId);
-//        }
-
-        if (StringUtils.isNotEmpty(type)) {
-            criteria.and("type").is(type);
-        }
-        if (StringUtils.isNotEmpty(pay)) {
-            criteria.and("pay").is(pay);
-        }
-        if (StringUtils.isNotEmpty(transferStr)) {
-            boolean transfer = TypeConverUtil.convertToBoolean("transfer", transferStr, true);
-            //如果包接送
-            if (transfer) {
-                criteria.and("transfer").is(true);
-            }
-        }
+        SearchInfo searchInfo = initSearchInfo(request, userId);
 
 
         //获得所有的满足基础条件的活动；
-        List<Activity> allActivityList = activityDao.find(Query.query(criteria));
+        List<Activity> allActivityList = activityDao.find(Query.query(searchInfo.criteria));
         if (allActivityList.isEmpty()) {
             LOG.warn("all Activity list is empty");
             return ResponseDo.buildSuccessResponse("[]");
@@ -265,17 +188,8 @@ public class ActivityServiceImpl implements ActivityService {
         LOG.debug("allActivityList size is:" + allActivityList.size());
 
 
-        List<Subscriber> subscribers = null;
-        if (StringUtils.isEmpty(userId)) {
-            subscribers = new ArrayList<>();
-        } else {
-            subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        }
-        List<String> subscriberIds = new ArrayList<>(subscribers.size());
-
-        for (Subscriber subscriber : subscribers) {
-            subscriberIds.add(subscriber.getToUser());
-        }
+        //初始化关注者id
+        List<String> subscriberIds = initSubscriberIds(userId);
 
         //查询出Activity的 组织者，并初始化
         initOrganizer(allActivityList, subscriberIds);
@@ -286,38 +200,10 @@ public class ActivityServiceImpl implements ActivityService {
          * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
          */
 
-        int genderType = -1;
 
-        if (StringUtils.isEmpty(genderTypeStr)) {
-            genderType = -1;
-        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.MALE)) {
-            genderType = 0;
-        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.FEMALE)) {
-            genderType = 1;
-        } else {
-            throw new ApiException("用户性别设置不正确");
-        }
+        HashSet<String> removeActivityIdSet = initActivityRemoveSet(userId, searchInfo);
 
-        HashSet<String> removeActivityIdSet = null;
-        //查出 最大发布时间内的 该用户已经申请过的 appointment  将 appointment中的      处于被拒绝 或者 已经接受的  activity 剔除掉；
-        if (StringUtils.isNotEmpty(userId)) {
-            Criteria appointCriteria = Criteria.where("applyUserId").is(userId);
-            criteria.and("createTime").gte(gtTime);
-            //用户活动 非官方活动；
-            criteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
-
-            criteria.and("status").ne(Constants.AppointmentStatus.APPLYING);
-
-            List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
-            if (null != appointmentList && !appointmentList.isEmpty()) {
-                removeActivityIdSet = new HashSet<>(appointmentList.size());
-                for (Appointment appointment : appointmentList) {
-                    removeActivityIdSet.add(appointment.getActivityId());
-                }
-            }
-        }
-
-        List<Activity> resultList = ActivityUtil.getSortResult(allActivityList, new Date(), landmark, maxDistance, maxPubTime, ignore, limit, genderType, removeActivityIdSet);
+        List<Activity> resultList = ActivityUtil.getSortResult(allActivityList, new Date(), searchInfo.landmark, searchInfo.maxDistance, searchInfo.maxPubTime, searchInfo.ignore, searchInfo.limit, searchInfo.genderType, removeActivityIdSet);
 
         if (null == resultList || resultList.size() == 0) {
             return ResponseDo.buildSuccessResponse("[]");
@@ -330,6 +216,44 @@ public class ActivityServiceImpl implements ActivityService {
 
 
         return ResponseDo.buildSuccessResponse(rltArr);
+    }
+
+    private HashSet<String> initActivityRemoveSet(String userId, SearchInfo searchInfo) {
+        HashSet<String> removeActivityIdSet = null;
+        //查出 最大发布时间内的 该用户已经申请过的 appointment  将 appointment中的      处于被拒绝 或者 已经接受的  activity 剔除掉；
+        if (StringUtils.isNotEmpty(userId)) {
+            Criteria appointCriteria = Criteria.where("applyUserId").is(userId);
+
+            appointCriteria.and("createTime").gte(DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) searchInfo.maxPubTime)));
+            //用户活动 非官方活动；
+            appointCriteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
+
+            appointCriteria.and("status").ne(Constants.AppointmentStatus.APPLYING);
+
+            List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
+            if (null != appointmentList && !appointmentList.isEmpty()) {
+                removeActivityIdSet = new HashSet<>(appointmentList.size());
+                for (Appointment appointment : appointmentList) {
+                    removeActivityIdSet.add(appointment.getActivityId());
+                }
+            }
+        }
+        return removeActivityIdSet;
+    }
+
+    private List<String> initSubscriberIds(String userId) {
+        List<Subscriber> subscribers = null;
+        if (StringUtils.isEmpty(userId)) {
+            subscribers = new ArrayList<Subscriber>();
+        } else {
+            subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        }
+        List<String> subscriberIds = new ArrayList<>(subscribers.size());
+
+        for (Subscriber subscriber : subscribers) {
+            subscriberIds.add(subscriber.getToUser());
+        }
+        return subscriberIds;
     }
 
     private JSONArray initResultMap(String userId, List<Activity> resultList) throws ApiException {
@@ -656,7 +580,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @throws ApiException
      */
     @Override
-    public ResponseDo getUserActivityList(JSONObject json,String userId) throws ApiException {
+    public ResponseDo getUserActivityList(JSONObject json, String userId) throws ApiException {
         Criteria criteria = new Criteria();
 
         //
@@ -786,5 +710,119 @@ public class ActivityServiceImpl implements ActivityService {
         }
         activityDao.deleteByIds(ids);
         return ResponseDo.buildSuccessResponse();
+    }
+
+
+    private SearchInfo initSearchInfo(HttpServletRequest request, String userId) throws ApiException {
+        SearchInfo searchInfo = new SearchInfo();
+        //必填项
+        String longitude = request.getParameter("longitude");
+        String latitude = request.getParameter("latitude");
+        if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
+            LOG.error("longitude or latitude has not init");
+            throw new ApiException("经纬度信息没有提供");
+        }
+        Landmark landmark = new Landmark();
+        landmark.setLatitude(TypeConverUtil.convertToDouble("latitude", latitude, true));
+        landmark.setLongitude(TypeConverUtil.convertToDouble("longitude", longitude, true));
+        searchInfo.landmark = landmark;
+
+
+        //选填项目
+        String maxDistanceStr = request.getParameter("maxDistance");
+        LOG.debug("maxDistanceStr is:{}", maxDistanceStr);
+        double maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.default_max_distance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
+        if (StringUtils.isNotEmpty(maxDistanceStr)) {
+            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
+        }
+        searchInfo.maxDistance = maxDistance;
+
+        String type = request.getParameter("type");
+        String pay = request.getParameter("pay");
+        String genderTypeStr = request.getParameter("gender");
+        String transferStr = request.getParameter("transfer");
+
+        //分页信息  可以不填
+        String limitStr = request.getParameter("limit");
+        String ignoreStr = request.getParameter("ignore");
+        int limit = 10;
+        //ignore是跳过的参数
+        int ignore = 0;
+        //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
+        if (StringUtils.isNotEmpty(limitStr)) {
+            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
+        }
+        if (StringUtils.isNotEmpty(ignoreStr)) {
+            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
+        }
+        searchInfo.limit = limit;
+        searchInfo.ignore = ignore;
+
+
+        LOG.debug("init Query");
+        Criteria criteria = new Criteria();
+
+        //查询创建在此时间之前的活动；
+        long maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.default_max_pub_time", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
+        searchInfo.maxPubTime = maxPubTime;
+        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
+        criteria.and("createTime").gte(gtTime);
+
+        //查询在最大距离内的 活动；      此处的maxDistance 需要换算成 对应的 弧度
+        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance * 180 / DistanceUtil.EARTH_RADIUS);
+
+        //非用户自己创建的活动
+        if (StringUtils.isNotEmpty(userId)) {
+            criteria.and("userId").ne(userId);
+        }
+
+        //deleteFlag 为 false 的活动；
+        criteria.and("deleteFlag").is(false);
+
+//        //剔除掉用户已经申请过该活动
+//        if (StringUtils.isNotEmpty(userId)) {
+//            criteria.and("applyIds").nin(userId);
+//        }
+
+        if (StringUtils.isNotEmpty(type)) {
+            criteria.and("type").is(type);
+        }
+        if (StringUtils.isNotEmpty(pay)) {
+            criteria.and("pay").is(pay);
+        }
+        if (StringUtils.isNotEmpty(transferStr)) {
+            boolean transfer = TypeConverUtil.convertToBoolean("transfer", transferStr, true);
+            //如果包接送
+            if (transfer) {
+                criteria.and("transfer").is(true);
+            }
+        }
+        searchInfo.criteria = criteria;
+
+        int genderType = -1;
+
+        if (StringUtils.isEmpty(genderTypeStr)) {
+            genderType = -1;
+        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.MALE)) {
+            genderType = 0;
+        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.FEMALE)) {
+            genderType = 1;
+        } else {
+            throw new ApiException("用户性别设置不正确");
+        }
+        searchInfo.genderType = genderType;
+
+        return searchInfo;
+    }
+
+    class SearchInfo {
+        Criteria criteria;
+        //landmark, maxDistance, maxPubTime, ignore, limit, genderType
+        public Landmark landmark;
+        public double maxDistance;
+        public long maxPubTime;
+        public int ignore;
+        public int limit;
+        public int genderType;
     }
 }
