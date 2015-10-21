@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.common.AreaDao;
@@ -32,6 +33,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.lang.Object;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -278,6 +280,13 @@ public class OfficialServiceImpl implements OfficialService {
         }
         update.inc("nowJoinNum", 1);
         officialActivityDao.update(activityId, update);
+
+        LOG.debug("Send emchat message");
+        User user = userDao.findById(officialActivity.getUserId());
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.status", "{0}{1}了您的申请"),
+                user.getNickname(), "同意");
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
+                applyUser.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
     }

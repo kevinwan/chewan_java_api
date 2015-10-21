@@ -354,13 +354,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo getAppointment(String userId, String token, int[] status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getAppointment(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
         Criteria criteria = Criteria.where("invitedUserId").is(userId);
         if (status != null && status.length > 0) {
-            criteria.and("status").in(status);
+            criteria.and("status").in(Arrays.asList(status));
         }
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
@@ -455,6 +455,7 @@ public class UserServiceImpl implements UserService {
         //将活动创建者与用户一一对应
         for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
             User organizer = organizers.get(orgIndex);
+            organizer.hideSecretInfo();
             for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
                 Activity activity = activitiesData.get(actIndex);
                 if (organizer.getUserId().equals(activity.getUserId())) {
@@ -766,7 +767,7 @@ public class UserServiceImpl implements UserService {
                 userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
                         PropertiesUtil.getProperty("carplay.token.over.date", 7)));
                 userTokenDao.save(userToken);
-            }else {
+            } else {
                 userTokenDao.update(userToken.getId(), update);
             }
         }
@@ -784,8 +785,8 @@ public class UserServiceImpl implements UserService {
         User nowUser = userDao.findById(userId);
 
         if (null == nowUser) {
-            LOG.warn("null nowUser");
-            throw new ApiException("用户数据异常");
+            LOG.warn("No user exist, userId:{}", userId);
+            throw new ApiException("用户不存在");
         }
 
         Criteria criteria = Criteria.where("userId").is(userId);
@@ -801,7 +802,7 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userDao.findByIds(userIdSet);
         //计算distance
         if (null == userList || userList.size() == 0) {
-            return ResponseDo.buildSuccessResponse("[]");
+            return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
         }
         List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {

@@ -70,7 +70,7 @@ public interface UserService {
     /**
      * 获取我的约会信息
      */
-    public ResponseDo getAppointment(String userId, String token, int[] status, Integer limit, Integer ignore) throws ApiException;
+    public ResponseDo getAppointment(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
 
 
     /**
