@@ -1008,7 +1008,7 @@ public class UserServiceImpl implements UserService {
             itemMap.put("pay", activity.getPay());
             itemMap.put("transfer", activity.isTransfer());
             itemMap.put("destination", activity.getDestination());
-            itemMap.put("desPoint", activity.getDestPoint());
+            itemMap.put("destPoint", activity.getDestPoint());
             itemMap.put("createTime", activity.getCreateTime());
 
             //获取该活动 该用户申请状态 0 未申请 1 申请中 3 已经同意 4 已被拒绝
