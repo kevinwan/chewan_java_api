@@ -5,7 +5,9 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.UserService;
+import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,10 @@ public class UserInfoController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ParameterChecker parameterChecker;
+
 
     /**
      * 注册
@@ -160,9 +166,9 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
     public ResponseDo getAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
-                                     @RequestParam(value = "status", required = false) Integer[] status,
-                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                     @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+                                      @RequestParam(value = "status", required = false) Integer[] status,
+                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
         try {
             return userService.getAppointments(userId, token, status, limit, ignore);
@@ -374,5 +380,21 @@ public class UserInfoController {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
+    }
+
+
+    @RequestMapping("/user/{viewUserId}/activity/list")
+    public ResponseDo getUserActivityList(@PathVariable("viewUserId") String viewUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
+                                          @RequestParam("limit") Integer limit, @RequestParam("ignore") Integer ignore) {
+        LOG.info("Begin view user activity viewUserId:{} userId:{}", viewUserId, userId);
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+
+            return userService.getUserActivityList(viewUserId, userId, limit, ignore);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+
     }
 }

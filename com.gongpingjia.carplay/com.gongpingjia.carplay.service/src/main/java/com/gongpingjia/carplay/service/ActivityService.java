@@ -61,9 +61,28 @@ public interface ActivityService {
     public ResponseDo getUserActivityList(JSONObject json,String userId)throws ApiException;
 
 
+    /**
+     * 后台 更新用户的某一个活动；
+     * @param json
+     * @param activityId
+     * @return
+     * @throws ApiException
+     */
     public ResponseDo updateUserActivity(JSONObject json,String activityId)throws ApiException;
 
+    /**
+     * 后台查看用户的活动
+     * @param activityId
+     * @return
+     * @throws ApiException
+     */
     public ResponseDo viewUserActivity(String activityId) throws ApiException;
 
+    /**
+     * 后台 删除用户发布的活动
+     * @param ids
+     * @return
+     * @throws ApiException
+     */
     public ResponseDo deleteUserActivities(Collection ids)throws ApiException;
 }

@@ -26,6 +26,7 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
+import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -909,7 +910,7 @@ public class UserServiceImpl implements UserService {
         }
         List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {
-            User userItem = getUserFromList(userList, itemUId);
+            User userItem = FetchUtil.getUserFromList(userList, itemUId);
             double distance = DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
                     userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
             userItem.setDistance(distance);
@@ -946,7 +947,7 @@ public class UserServiceImpl implements UserService {
         //封装返回数据
         //封装了 认证历史记录 以及 认证人的信息； authUserId 例如 对应着 车玩官方；
         for (AuthenticationHistory history : authenticationHistoryList) {
-            history.setAuthUser(getUserFromList(userList, history.getAuthId()));
+            history.setAuthUser(FetchUtil.getUserFromList(userList, history.getAuthId()));
         }
 //        JSONArray jsonArr = new JSONArray();
 //        for (AuthenticationHistory history : authenticationHistoryList) {
@@ -956,12 +957,74 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(authenticationHistoryList);
     }
 
-    private User getUserFromList(List<User> users, String id) {
-        for (User item : users) {
-            if (item.getUserId().equals(id)) {
-                return item;
-            }
+
+    @Override
+    public ResponseDo getUserActivityList(String viewUserId, String userId, int limit, int ignore) throws ApiException {
+        User viewUser = userDao.findById(viewUserId);
+        if (null == viewUser) {
+            LOG.error("the view user not exist userId is:{}", viewUserId);
+            throw new ApiException("查看的用户不存在");
         }
-        return null;
+
+        //查看自己的活动
+        if (viewUserId.equals(userId)) {
+            LOG.warn("view self:viewUserId:{} userId:{}", viewUserId, userId);
+        }
+
+        Criteria criteria = new Criteria();
+        criteria.and("userId").is(viewUserId);
+        criteria.and("deleteFlag").is(false);
+        Query query = Query.query(criteria);
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
+        query.skip(ignore).limit(limit);
+        List<Activity> activityList = activityDao.find(query);
+
+        if (null == activityList || activityList.isEmpty()) {
+            return ResponseDo.buildSuccessResponse("[]");
+        }
+        //查询出该用户的 所有的活动中  appoinit 中 用户 是否 已经 邀请过了 邀请被同意了 邀请被拒绝了；
+        List<String> activityIds = new ArrayList<>(activityList.size());
+        for (Activity activity : activityList) {
+            activityIds.add(activity.getActivityId());
+        }
+
+        Criteria appointCriteria = new Criteria();
+        appointCriteria.and("activityId").in(activityIds);
+        appointCriteria.and("applyUserId").is(userId);
+        List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
+        if (null == appointmentList) {
+            appointmentList = new ArrayList<>();
+        }
+
+        ArrayList<Map<String, Object>> resultList = new ArrayList<>(activityList.size());
+
+        //初始化每一个活动信息
+        Map<String, Object> itemMap = new HashMap<>();
+        for (Activity activity : activityList) {
+            itemMap.put("activityId", activity.getActivityId());
+            itemMap.put("establish", activity.getEstablish());
+            itemMap.put("estabPoint", activity.getEstabPoint());
+            itemMap.put("type", activity.getType());
+            itemMap.put("pay", activity.getPay());
+            itemMap.put("transfer", activity.isTransfer());
+            itemMap.put("destination", activity.getDestination());
+            itemMap.put("desPoint", activity.getDestPoint());
+            itemMap.put("createTime", activity.getCreateTime());
+
+            //获取该活动 该用户申请状态 0 未申请 1 申请中 3 已经同意 4 已被拒绝
+            //没有申请
+            int applyStatus = Constants.AppointmentStatus.INITIAL;
+            for (Appointment appointment : appointmentList) {
+                if (appointment.getActivityId().equals(activity.getActivityId())) {
+                    //存在appoint
+                    applyStatus = appointment.getStatus();
+                }
+            }
+            itemMap.put("applyStatus", applyStatus);
+
+            resultList.add(itemMap);
+        }
+
+        return ResponseDo.buildSuccessResponse(resultList);
     }
 }

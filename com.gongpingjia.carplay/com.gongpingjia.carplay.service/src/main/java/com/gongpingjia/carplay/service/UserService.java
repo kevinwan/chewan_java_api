@@ -114,4 +114,13 @@ public interface UserService {
      *@param count 上传的照片的数量  @return 返回处理结果
      */
     ResponseDo recordUploadPhotoCount(String userId, String token, Integer count) throws ApiException;
+
+
+    /**
+     * 获取某个用户的所有的活动
+     * @param viewUserId
+     * @return
+     * @throws ApiException
+     */
+    ResponseDo getUserActivityList(String viewUserId,String userId,int limit,int ignore)throws ApiException;
 }
