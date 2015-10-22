@@ -33,7 +33,7 @@ public class UserManagerController {
      * @param phone             查询的手机号码
      * @param nickname          查询的昵称
      * @param licenseAuthStatus 车主认证状态
-     * @param photoAuthStatus   图像认证状态
+     * @param photoAuthStatus   头像认证状态
      * @param start             启动时间
      * @param end               结束时间
      * @param limit             查询限制行数

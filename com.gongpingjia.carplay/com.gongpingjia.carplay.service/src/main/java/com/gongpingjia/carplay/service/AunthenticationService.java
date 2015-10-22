@@ -20,7 +20,7 @@ public interface AunthenticationService {
     ResponseDo licenseAuthenticationApply(JSONObject json, String token, String userId) throws ApiException;
 
     /**
-     * 图像认证申请
+     * 头像认证申请
      *
      * @param userId 用户Id
      * @param token  用户会话token

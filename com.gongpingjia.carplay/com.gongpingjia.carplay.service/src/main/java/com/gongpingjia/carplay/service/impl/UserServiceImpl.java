@@ -39,7 +39,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import sun.rmi.runtime.Log;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -357,11 +356,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo getAppointment(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
-        Criteria criteria = Criteria.where("invitedUserId").is(userId);
+        Criteria criteria = Criteria.where("invitedUserId").is(userId).orOperator(Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
             criteria.and("status").in(Arrays.asList(status));
         }
@@ -505,6 +504,7 @@ public class UserServiceImpl implements UserService {
             userInfo.put("licenseAuthStatus", user.getLicenseAuthStatus());
             userInfo.put("car", user.getCar());
             userInfo.put("avatar", localServer + user.getAvatar());
+            userInfo.put("cover", user.getCover());
             interestMap.put("user", userInfo);
 
             interests.add(interestMap);

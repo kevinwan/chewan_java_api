@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by licheng on 2015/9/22.
- * 用户图像认证
+ * 用户头像认证
  */
 @Document
 public class PhotoAuth {

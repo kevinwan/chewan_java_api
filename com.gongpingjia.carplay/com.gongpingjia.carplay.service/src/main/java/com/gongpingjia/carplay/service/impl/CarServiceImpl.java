@@ -116,6 +116,7 @@ public class CarServiceImpl implements CarService {
                 cacheManager.setCarMode(brand, data);
             } catch (JSONException ex) {
                 LOG.warn("get model_list from gongpingjia error, brand:{}, json:{}", brand, json);
+                LOG.warn(ex.getMessage(), ex);
             }
         } finally {
             HttpClientUtil.close(response);

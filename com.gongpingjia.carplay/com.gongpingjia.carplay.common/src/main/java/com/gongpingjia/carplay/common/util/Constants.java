@@ -188,7 +188,7 @@ public class Constants {
      */
     public interface AuthType {
 
-        String PHOTO_AUTH = "图像认证";
+        String PHOTO_AUTH = "头像认证";
 
         String LICENSE_AUTH = "车主认证";
 
@@ -200,7 +200,7 @@ public class Constants {
      */
     public interface MessageType {
 
-        //图像认证
+        //头像认证
         int PHOTO_AUTH_MSG = 1;
         //车主认证
         int LICENSE_AUTH_MSG = 2;
