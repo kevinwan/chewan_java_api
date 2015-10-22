@@ -1,7 +1,5 @@
 package com.gongpingjia.carplay.entity.user;
 
-import java.util.Date;
-
 /**
  * Created by licheng on 2015/9/19.
  * 用户行驶证

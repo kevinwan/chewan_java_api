@@ -1,10 +1,12 @@
 package com.gongpingjia.carplay.service.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -106,16 +108,15 @@ public class CarServiceImpl implements CarService {
             String data = HttpClientUtil.parseResponse(response);
             json = JSONObject.fromObject(data);
 
-//            dataJson = json.getJSONArray("model_list");
-            if (json.getJSONObject("model_list").isArray()) {
+            try {
                 dataJson = json.getJSONArray("model_list");
-            } else {
-                dataJson = new JSONArray();
+
+                LOG.debug("Refresh data in the cache server");
+
+                cacheManager.setCarMode(brand, data);
+            } catch (JSONException ex) {
+                LOG.warn("get model_list from gongpingjia error, brand:{}, json:{}", brand, json);
             }
-
-            LOG.debug("Refresh data in the cache server");
-
-            cacheManager.setCarMode(brand, data);
         } finally {
             HttpClientUtil.close(response);
         }

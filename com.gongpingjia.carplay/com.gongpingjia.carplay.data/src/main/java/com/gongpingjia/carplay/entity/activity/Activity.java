@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.entity.activity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;

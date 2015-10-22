@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
     <!-- ========================== 自定义输出格式说明================================ -->
     <!-- %p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL -->
@@ -65,6 +65,13 @@
         <appender-ref ref="logFile"/>
         <appender-ref ref="console"/>
     </category>
+
+    <category name="net.sf.json">
+        <priority value="WARN"/>
+        <appender-ref ref="logFile"/>
+        <appender-ref ref="console"/>
+    </category>
+
 
     <root>
         <priority value="debug"/>
