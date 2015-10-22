@@ -57,32 +57,32 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         //我关注的人
         List<Subscriber> mySubscribe = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        //关注我的人
-        List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))));
-
-        Set<String> mySubUserIds = new HashSet<>();
-        Set<String> beSubedUserIds = new HashSet<String>();
-        Set<String> eachSubUserIds = new HashSet<String>();
-
-        for (Subscriber mysub : mySubscribe) {
-            for (Subscriber besub : beSubscribed) {
-                if (mysub.getToUser().equals(besub.getFromUser())) {
-                    //相互关注
-                    eachSubUserIds.add(mysub.getToUser());
-                } else {
-                    //关注我的人
-                    beSubedUserIds.add(besub.getFromUser());
-                }
-            }
-            if (!eachSubUserIds.contains(mysub.getToUser()) && !beSubedUserIds.contains(mysub.getToUser())) {
-                mySubUserIds.add(mysub.getToUser());
-            }
+        Set<String> mySubscribeSet = new HashSet<>(mySubscribe.size());
+        for (Subscriber item : mySubscribe) {
+            mySubscribeSet.add(item.getToUser());
         }
 
+        //关注我的人
+        List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))));
+        Set<String> beSubscribedSet = new HashSet<>(beSubscribed.size());
+        for (Subscriber item : beSubscribed) {
+            beSubscribedSet.add(item.getFromUser());
+        }
+
+        //相互关注的人
+        Set<String> eachSubUserSet = new HashSet<String>();
+        for (String item : mySubscribeSet) {
+            if (beSubscribedSet.contains(item)) {
+                eachSubUserSet.add(item);
+                beSubscribedSet.remove(item);
+            }
+        }
+        mySubscribeSet.removeAll(eachSubUserSet);
+
         LOG.debug("query related users");
-        List<User> mySubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(mySubUserIds)));
-        List<User> eachSubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(eachSubUserIds)));
-        List<User> beSubscribedUsers = userDao.find(Query.query(Criteria.where("userId").in(beSubedUserIds)));
+        List<User> mySubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(mySubscribeSet)));
+        List<User> eachSubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(eachSubUserSet)));
+        List<User> beSubscribedUsers = userDao.find(Query.query(Criteria.where("userId").in(beSubscribedSet)));
 
         LOG.debug("refresh user infomation");
         refreshUserinfo(myself, mySubscribeUsers);
