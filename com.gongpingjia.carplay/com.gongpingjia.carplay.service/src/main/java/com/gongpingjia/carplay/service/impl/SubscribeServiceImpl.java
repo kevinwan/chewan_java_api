@@ -55,19 +55,22 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         User myself = userDao.findById(userId);
 
+        //我关注的人
         List<Subscriber> mySubscribe = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        //关注我的人
         List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))));
-        List<Subscriber> eachSubscribe = new ArrayList<Subscriber>();
 
-        List<String> mySubUserIds = new ArrayList<String>();
-        List<String> beSubedUserIds = new ArrayList<String>();
-        List<String> eachSubUserIds = new ArrayList<String>();
+        Set<String> mySubUserIds = new HashSet<>();
+        Set<String> beSubedUserIds = new HashSet<String>();
+        Set<String> eachSubUserIds = new HashSet<String>();
 
         for (Subscriber mysub : mySubscribe) {
             for (Subscriber besub : beSubscribed) {
                 if (mysub.getToUser().equals(besub.getFromUser())) {
+                    //相互关注
                     eachSubUserIds.add(mysub.getToUser());
                 } else {
+                    //关注我的人
                     beSubedUserIds.add(besub.getFromUser());
                 }
             }
@@ -178,7 +181,7 @@ public class SubscribeServiceImpl implements SubscribeService {
      */
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         for (User user : mySubscribeUsers) {
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
+            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
                     myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
         }
