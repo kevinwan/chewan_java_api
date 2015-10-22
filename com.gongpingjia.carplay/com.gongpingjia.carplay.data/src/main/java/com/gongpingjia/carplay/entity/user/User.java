@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.entity.user;
 
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
@@ -101,7 +102,7 @@ public class User {
      * @param localPhotoServer  本地服务器
      * @param remotePhotoServer 远程服务器
      */
-    public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer,String gpjLogoServer) {
+    public void refreshPhotoInfo(String localPhotoServer, String remotePhotoServer, String gpjLogoServer) {
         if (!StringUtils.isEmpty(this.avatar)) {
             this.avatar = localPhotoServer + this.avatar;
         }
@@ -120,6 +121,27 @@ public class User {
                 this.car.refreshPhotoInfo(gpjLogoServer);
             }
         }
+    }
+
+    /**
+     * 获取用户的展示封面，如果用户上传了照片，显示最新的照片，否则显示用户注册时候的头像
+     *
+     * @return 用户展示封面的url(带http前缀)
+     */
+    public String buildUserCover() {
+        if (this.album != null && !this.album.isEmpty()) {
+            Photo latest = this.album.get(this.album.size() - 1);
+            if (!StringUtils.isEmpty(latest.getUrl())) {
+                return latest.getUrl();
+            }
+            return CommonUtil.getThirdPhotoServer() + latest.getKey();
+        }
+
+        if (this.avatar.startsWith("http://")) {
+            return this.avatar;
+        }
+
+        return CommonUtil.getLocalPhotoServer() + this.avatar;
     }
 
     public Address getAddress() {
