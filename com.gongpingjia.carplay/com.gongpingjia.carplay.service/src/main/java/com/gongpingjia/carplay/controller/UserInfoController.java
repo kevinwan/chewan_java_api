@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.TypeConverUtil;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UserService;
@@ -15,7 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 @RestController
 public class UserInfoController {
@@ -161,13 +159,13 @@ public class UserInfoController {
      * 获取我的约会信息
      */
     @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
-    public ResponseDo getAppointment(@PathVariable("userId") String userId, @RequestParam("token") String token,
+    public ResponseDo getAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                      @RequestParam(value = "status", required = false) Integer[] status,
                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
         try {
-            return userService.getAppointment(userId, token, status, limit, ignore);
+            return userService.getAppointments(userId, token, status, limit, ignore);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

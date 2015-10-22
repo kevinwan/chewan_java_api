@@ -356,11 +356,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo getAppointment(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
-        Criteria criteria = Criteria.where("invitedUserId").is(userId);
+        Criteria criteria = Criteria.where("invitedUserId").is(userId).orOperator(Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
             criteria.and("status").in(Arrays.asList(status));
         }

@@ -241,7 +241,7 @@ public class UploadServiceImpl implements UploadService {
         LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
         User user = userDao.findById(userId);
-        
+
         return uploadLocalServer(userId, data, user.getAvatar());
     }
 
