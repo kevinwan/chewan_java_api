@@ -240,8 +240,9 @@ public class UploadServiceImpl implements UploadService {
         byte[] data = buildFileBytes(multiFile);
         LOG.debug("reUploadUserPhoto upload , userId:{}", userId);
 
-        String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, userId);
-        return uploadLocalServer(userId, data, key);
+        User user = userDao.findById(userId);
+        
+        return uploadLocalServer(userId, data, user.getAvatar());
     }
 
     @Override
