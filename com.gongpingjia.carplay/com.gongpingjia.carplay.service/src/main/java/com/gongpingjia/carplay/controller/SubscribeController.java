@@ -50,7 +50,7 @@ public class SubscribeController {
     @RequestMapping(value = "user/{userId}/listen", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo payAttention(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
-        LOG.info("user/{}/payAttention", userId);
+        LOG.info("user/{}/payAttention, param:{}", userId, json);
         if (CommonUtil.isEmpty(json, "targetUserId")) {
             LOG.warn("Input parameter targetUserId is empty");
             return ResponseDo.buildFailureResponse("输入参数错误");

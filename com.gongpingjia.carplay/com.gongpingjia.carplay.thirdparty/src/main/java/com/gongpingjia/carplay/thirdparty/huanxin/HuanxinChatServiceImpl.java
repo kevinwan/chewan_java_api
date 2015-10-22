@@ -347,7 +347,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
     public JSONObject sendUserGroupMessage(String token, String adminUser, String toUserEmchatName, String textMessage) throws ApiException {
         List<String> emchatNames = new ArrayList<>(1);
         emchatNames.add(toUserEmchatName);
-        return this.sendUserGroupMessage(token, adminUser, emchatNames, textMessage, "");
+        return this.sendUserGroupMessage(token, adminUser, emchatNames, textMessage, new Object());
     }
 
     /**
@@ -385,7 +385,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
                         "YWMtsxGcunDDEeWm6k8ZZ_uVGwAAAVGQX3Ib5a1W7kr5MTSKQkN1BAAgP53U2tE")));
 
         List<String> users = new ArrayList<>(2);
-        users.add("2575a950e18f4a003e1ab082861f572c");
+        users.add("c4fee7d8c48234cf09c41b0013271fac");
 
         JSONObject param = new JSONObject();
         param.put("target_type", "users");
@@ -396,7 +396,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         msg.put("msg", "Test for send message");
         param.put("msg", msg);
 
-        param.put("from", "InterestAdmin");
+        param.put("from", "SubscribeAdmin");
 
         Map<String, Object> ext = new HashMap<>(1);
         ext.put("avatar", "李程测试ext属性avatar");
