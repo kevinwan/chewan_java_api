@@ -307,6 +307,8 @@ public class Constants {
         String DINK = "喝酒";
 
         String MIDNIGHT_SNACK = "夜宵";
+
+        List<String> TYPE_LIST = Arrays.asList(EAT, SING, SHOPPING, NIGHT_CLUB, FILM, WALK_DOG, COFFEE, SPORT, DINK, MIDNIGHT_SNACK);
     }
 
     /**
@@ -319,5 +321,7 @@ public class Constants {
         String TREAT_ME = "请我吧";
 
         String MY_TREAT = "我请客";
+
+        List<String> TYPE_LIST = Arrays.asList(AA, TREAT_ME, MY_TREAT);
     }
 }

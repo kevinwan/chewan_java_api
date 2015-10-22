@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
@@ -55,6 +56,11 @@ public class ActivityController {
             if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "destination", "destPoint", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
+
+            //检查 type pay 是否在合法的参数范围内
+            parameterChecker.checkTypeIsIn(jsonObject.getString("type"), Constants.ActivityType.TYPE_LIST);
+            parameterChecker.checkTypeIsIn(jsonObject.getString("pay"),Constants.ActivityPayType.TYPE_LIST);
+
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, activity);
         } catch (ApiException e) {

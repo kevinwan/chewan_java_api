@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2015/9/22.
  */
@@ -173,6 +175,30 @@ public class ParameterChecker {
         if (phoneVerify.getExpire() < DateUtil.getTime()) {
             LOG.warn("Phone verify code is expired, please re acquisition");
             throw new ApiException("该验证码已过期，请重新获取验证码");
+        }
+    }
+
+
+    /**
+     * 检查type是否在 typeList中；
+     * @param type
+     * @param typeList
+     * @throws ApiException
+     */
+    public void checkTypeIsIn(String type, List<String> typeList) throws ApiException {
+        if (null == type || type.equals("")) {
+            LOG.warn("type is empty");
+            throw new ApiException("type is empty");
+        }
+        boolean isIn = false;
+        for (String typeItem : typeList) {
+            if (type.equals(typeItem)) {
+                isIn = true;
+            }
+        }
+        if (!isIn) {
+            LOG.error("type {} is not in the typeList", type);
+            throw new ApiException("this type is illegal");
         }
     }
 }

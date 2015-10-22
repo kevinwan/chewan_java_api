@@ -20,6 +20,8 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             $location.path('/officialActivity/list');
         };
 
+        $scope.showMeridian = false;
+
         /**
          * Get province and city info
          */
@@ -51,6 +53,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 //增加
                 $scope.activity = {destination: {}};
                 $scope.activity.limitType = 0;
+
+                //$scope.startTime = {};
+                //$scope.startTime.time = new Date();
                 return;
             } else {
                 $rootScope.loadingPromise = officialActivityService.getOfficialActivity(officialActivityId).success(function (result) {
@@ -246,6 +251,11 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("活动标题不能为空");
                 return false;
             }
+            if(commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.province)){
+                $window.alert("省不能为空");
+                return false;
+            }
+
             if (commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.city)) {
                 $window.alert("城市不能为空");
                 return false;
