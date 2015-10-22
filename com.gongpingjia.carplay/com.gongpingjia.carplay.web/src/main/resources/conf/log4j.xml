@@ -49,7 +49,7 @@
     </category>
 
     <category name="org.springframework">
-        <priority value="INFO"/>
+        <priority value="WARN"/>
         <appender-ref ref="logFile"/>
         <appender-ref ref="console"/>
     </category>
@@ -61,7 +61,7 @@
     </category>
 
     <category name="org.quartz">
-        <priority value="INFO"/>
+        <priority value="WARN"/>
         <appender-ref ref="logFile"/>
         <appender-ref ref="console"/>
     </category>

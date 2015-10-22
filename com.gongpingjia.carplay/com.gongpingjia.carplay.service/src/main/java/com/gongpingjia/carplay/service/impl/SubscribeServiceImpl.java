@@ -123,7 +123,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.subscribe", "{0}关注了我"),
                 fromUser.getNickname());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.SUBSCRIBE,
-                fromUser.getEmchatName(), message);
+                toUser.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
     }

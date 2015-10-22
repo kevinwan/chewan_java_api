@@ -9,25 +9,24 @@ import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
+import com.gongpingjia.carplay.dao.history.InterestMessageDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
-import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
+import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import net.sf.json.JSONObject;
-import org.apache.commons.collections.ListUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import sun.rmi.runtime.Log;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -94,6 +94,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private SubscriberDao subscriberDao;
+
+    @Autowired
+    private InterestMessageDao interestMessageDao;
 
     @Override
     public ResponseDo register(User user) throws ApiException {
@@ -354,13 +357,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo getAppointment(String userId, String token, int[] status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getAppointment(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
         Criteria criteria = Criteria.where("invitedUserId").is(userId);
         if (status != null && status.length > 0) {
-            criteria.and("status").in(status);
+            criteria.and("status").in(Arrays.asList(status));
         }
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
@@ -441,32 +444,87 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Begin check input parameters");
         checker.checkUserInfo(userId, token);
 
+        List<InterestMessage> interestMessages = buildInterestMessages(userId, ignore, limit);
+
+        Map<String, Activity> activityMap = new HashMap<>(interestMessages.size(), 1);
+        Map<String, User> userMap = new HashMap<>(interestMessages.size(), 1);
+        for (InterestMessage message : interestMessages) {
+            if (message.getType() == InterestMessage.USER_ACTIVITY) {
+                activityMap.put(message.getRelatedId(), null);
+            }
+            userMap.put(message.getUserId(), null);
+        }
+
+        List<Activity> activityList = activityDao.findByIds(activityMap.keySet());
+        for (Activity activity : activityList) {
+            activityMap.put(activity.getActivityId(), activity);
+        }
+        List<User> userList = userDao.findByIds(userMap.keySet());
+        for (User user : userList) {
+            userMap.put(user.getUserId(), user);
+        }
+
+        return ResponseDo.buildSuccessResponse(buildResponseData(interestMessages, activityMap, userMap));
+    }
+
+    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap) {
+        LOG.debug("Build response data");
+        String localServer = CommonUtil.getLocalPhotoServer();
+        List<Map<String, Object>> interests = new ArrayList<>(interestMessages.size());
+        for (int index = 0; index < interestMessages.size(); index++) {
+            InterestMessage message = interestMessages.get(index);
+            Map<String, Object> interestMap = new HashMap<>();
+            interestMap.put("id", message.getId());
+            interestMap.put("type", message.getType());
+            interestMap.put("relatedId", message.getRelatedId());
+            interestMap.put("createTime", message.getCreateTime());
+            if (message.getType() == InterestMessage.USER_ACTIVITY) {
+                //用户创建活动
+                Activity activity = activityMap.get(message.getRelatedId());
+                interestMap.put("activityType", activity.getType());
+                interestMap.put("activityPay", activity.getPay());
+                interestMap.put("activityTransfer", activity.isTransfer());
+                interestMap.put("activityDestination", activity.getDestination());
+                interestMap.put("photoCount", 0);
+            } else if (message.getType() == InterestMessage.USER_ALBUM) {
+                //用户上传相册
+                interestMap.put("activityType", "");
+                interestMap.put("activityPay", "");
+                interestMap.put("activityTransfer", "");
+                interestMap.put("activityDestination", "");
+                interestMap.put("photoCount", message.getCount());
+            }
+
+            User user = userMap.get(message.getUserId());
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("userId", user.getUserId());
+            userInfo.put("nickname", user.getNickname());
+            userInfo.put("gender", user.getGender());
+            userInfo.put("age", user.getAge());
+            userInfo.put("photoAuthStatus", user.getPhotoAuthStatus());
+            userInfo.put("licenseAuthStatus", user.getLicenseAuthStatus());
+            userInfo.put("car", user.getCar());
+            userInfo.put("avatar", localServer + user.getAvatar());
+            interestMap.put("user", userInfo);
+
+            interests.add(interestMap);
+        }
+        return interests;
+    }
+
+    private List<InterestMessage> buildInterestMessages(String userId, Integer ignore, Integer limit) {
+        //获取我关注的人
         List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        List<String> toUserIds = new ArrayList<>(subscribers.size());
+        Set<String> toUserIds = new HashSet<>(subscribers.size());
         for (Subscriber subscriber : subscribers) {
             toUserIds.add(subscriber.getToUser());
         }
 
-        List<User> organizers = userDao.findByIds(toUserIds);
+        LOG.debug("Query interest messages");
+        Query query = Query.query(Criteria.where("userId").in(toUserIds))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))).skip(ignore).limit(limit);
 
-        Query query = Query.query(Criteria.where("userId").in(toUserIds)).with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))).skip(ignore).limit(limit);
-        List<Activity> activitiesData = activityDao.find(query);
-
-        //将活动创建者与用户一一对应
-        for (int orgIndex = 0; orgIndex < organizers.size(); orgIndex++) {
-            User organizer = organizers.get(orgIndex);
-            for (int actIndex = 0; actIndex < activitiesData.size(); actIndex++) {
-                Activity activity = activitiesData.get(actIndex);
-                if (organizer.getUserId().equals(activity.getUserId())) {
-                    organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-                    organizer.hideSecretInfo();
-                    activity.setOrganizer(organizer);
-                    break;
-                }
-            }
-        }
-
-        return ResponseDo.buildSuccessResponse(activitiesData);
+        return interestMessageDao.find(query);
     }
 
     @Override
@@ -518,7 +576,7 @@ public class UserServiceImpl implements UserService {
 
         checker.checkPhoneVerifyCode(phone, code);
 
-        if (!user.getPhone().isEmpty()) {
+        if (user.getPhone() != null && !user.getPhone().isEmpty()) {
             LOG.warn("The user have phone Number");
             throw new ApiException("该用户已有手机号");
         }
@@ -555,6 +613,52 @@ public class UserServiceImpl implements UserService {
         }
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    @Override
+    public ResponseDo recordUploadPhotoCount(String userId, String token, Integer count) throws ApiException {
+        LOG.debug("record upload photo count:{}", count);
+        checker.checkUserInfo(userId, token);
+
+        User user = userDao.findById(userId);
+        if (user.getAlbum() == null || user.getAlbum().isEmpty()) {
+            LOG.warn("User:{} album count is empty", userId);
+            throw new ApiException("输入参数错误");
+        }
+
+        if (count <= 0 || count > user.getAlbum().size()) {
+            LOG.warn("Input parameter count:{} is over album size:{}", count, user.getAlbum().size());
+            throw new ApiException("输入参数有误");
+        }
+
+        InterestMessage interestMessage = new InterestMessage();
+        interestMessage.setRelatedId(userId);
+        interestMessage.setUserId(userId);
+        interestMessage.setType(InterestMessage.USER_ALBUM);
+        interestMessage.setCount(count);
+        interestMessage.setCreateTime(DateUtil.getTime());
+        interestMessageDao.save(interestMessage);
+        LOG.debug("Finished record message and send emchat message");
+
+        List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("toUser").is(userId)));
+        if (!subscribers.isEmpty()) {
+            List<String> userIds = new ArrayList<>(subscribers.size());
+            for (Subscriber subscriber : subscribers) {
+                userIds.add(subscriber.getFromUser());
+            }
+
+            List<User> users = userDao.findByIds(userIds);
+            List<String> emchatNames = new ArrayList<>(users.size());
+            for (User item : users) {
+                emchatNames.add(item.getEmchatName());
+            }
+            String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.album", "{0}上传了{1}张照片"),
+                    user.getNickname(), count);
+
+            chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,
+                    emchatNames, message, null);
+        }
+        return ResponseDo.buildSuccessResponse();
     }
 
     private User findById(List<User> users, String id) {
@@ -766,7 +870,7 @@ public class UserServiceImpl implements UserService {
                 userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE,
                         PropertiesUtil.getProperty("carplay.token.over.date", 7)));
                 userTokenDao.save(userToken);
-            }else {
+            } else {
                 userTokenDao.update(userToken.getId(), update);
             }
         }
@@ -784,8 +888,8 @@ public class UserServiceImpl implements UserService {
         User nowUser = userDao.findById(userId);
 
         if (null == nowUser) {
-            LOG.warn("null nowUser");
-            throw new ApiException("用户数据异常");
+            LOG.warn("No user exist, userId:{}", userId);
+            throw new ApiException("用户不存在");
         }
 
         Criteria criteria = Criteria.where("userId").is(userId);
@@ -801,7 +905,7 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userDao.findByIds(userIdSet);
         //计算distance
         if (null == userList || userList.size() == 0) {
-            return ResponseDo.buildSuccessResponse("[]");
+            return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
         }
         List<User> users = new ArrayList<User>(userIdSet.size());
         for (String itemUId : userIdSet) {
