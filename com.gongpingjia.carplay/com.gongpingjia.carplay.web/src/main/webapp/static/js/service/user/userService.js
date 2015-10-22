@@ -49,7 +49,7 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
             updateUserInfo: function (user) {
                 var photoIds = new Array();
                 for (var index in user.album) {
-                    photoIds.add(user.album[index]);
+                    photoIds.push(user.album[index].id);
                 }
 
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/user/" + user.userId + "/update?userId="
