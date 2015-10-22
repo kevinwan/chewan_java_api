@@ -87,7 +87,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         User user = userDao.findById(activity.getUserId());
 
         JSONObject jsonResult = chatThirdPartyService.createChatGroup(chatCommonService.getChatToken(), activity.getTitle(),
-                activity.getOfficialActivityId(), user.getEmchatName(), null);
+                "", user.getEmchatName(), null);
         if (json.isEmpty()) {
             LOG.warn("Failed to create chat group");
             activityDao.deleteById(activity.getOfficialActivityId());
@@ -225,8 +225,8 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
         String endStr = json.getString("end");
         if (StringUtils.isNotEmpty(endStr)) {
-            update.set("end", TypeConverUtil.convertToLong("end",endStr,true));
-        }else {
+            update.set("end", TypeConverUtil.convertToLong("end", endStr, true));
+        } else {
             update.set("end", null);
         }
 

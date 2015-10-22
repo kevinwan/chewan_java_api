@@ -17,12 +17,10 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.OfficialService;
-import com.gongpingjia.carplay.service.util.ActivityUtil;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.omg.CORBA.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +30,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.lang.Object;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2015/9/29.
@@ -245,7 +245,7 @@ public class OfficialServiceImpl implements OfficialService {
         OfficialActivity officialActivity = officialActivityDao.findById(activityId);
         if (null == officialActivity) {
             LOG.warn("no activity match activityId");
-            throw new ApiException("没有对应的官方活动");
+            throw new ApiException("官方活动不存在");
         }
 
         List<String> members = officialActivity.getMembers();
@@ -288,7 +288,27 @@ public class OfficialServiceImpl implements OfficialService {
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                 applyUser.getEmchatName(), message);
 
+        modifyChatGroup(officialActivity, members, user);
+
         return ResponseDo.buildSuccessResponse();
+    }
+
+    //修改聊天群组的description信息，用于记录群组的图像
+    private void modifyChatGroup(OfficialActivity officialActivity, List<String> members, User user) throws ApiException {
+        if (members == null || members.isEmpty()) {
+            chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
+                    officialActivity.getTitle(), CommonUtil.getLocalPhotoServer() + user.getAvatar());
+        } else if (members.size() < Constants.CHATGROUP_MAX_PHOTO_COUNT) {
+            //用户群聊的图片数量限制4
+            StringBuilder builder = new StringBuilder();
+            List<User> users = userDao.findByIds(members);
+            String localServer = CommonUtil.getLocalPhotoServer();
+            for (User item : users) {
+                builder.append(localServer).append(item.getAvatar()).append(";");
+            }
+            chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
+                    officialActivity.getTitle(), builder.toString());
+        }
     }
 
     private void checkUserOverflowed(OfficialActivity officialActivity, User applyUser) throws ApiException {
@@ -319,13 +339,16 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Override
     public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException {
-
+        LOG.debug("user:{} invited user:{} together", fromUserId, toUserId);
         //查询是否已经邀请过了
-        Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
+        Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
+                .and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
                 .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
         if (null != toFind) {
+            LOG.warn("User alread has bean invited by each other");
             throw new ApiException("已经邀请过此用户");
         }
+
         Appointment appointment = new Appointment();
         appointment.setActivityId(activityId);
         appointment.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);
@@ -335,8 +358,14 @@ public class OfficialServiceImpl implements OfficialService {
         appointment.setModifyTime(DateUtil.getTime());
         appointment.setStatus(Constants.AppointmentStatus.APPLYING);
         appointment.setTransfer(transfer);
-
         appointmentDao.save(appointment);
+
+        User fromUser = userDao.findById(fromUserId);
+        User toUser = userDao.findById(toUserId);
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.official.activity.invite",
+                "{0}邀请您{1}同去参加官方活动"), fromUser.getNickname(), toUser.getNickname());
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
+                toUser.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
     }

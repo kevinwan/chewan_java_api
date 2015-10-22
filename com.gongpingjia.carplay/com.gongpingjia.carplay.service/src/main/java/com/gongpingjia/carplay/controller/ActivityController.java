@@ -52,14 +52,15 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            parameterChecker.checkUserInfo(userId, token);
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "destination", "destPoint", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
+            parameterChecker.checkUserInfo(userId, token);
+
             //检查 type pay 是否在合法的参数范围内
-            parameterChecker.checkTypeIsIn(jsonObject.getString("type"), Constants.ActivityType.TYPE_LIST);
-            parameterChecker.checkTypeIsIn(jsonObject.getString("pay"),Constants.ActivityPayType.TYPE_LIST);
+            //parameterChecker.checkTypeIsIn(jsonObject.getString("type"), Constants.ActivityType.TYPE_LIST);
+            parameterChecker.checkTypeIsIn(jsonObject.getString("pay"), Constants.ActivityPayType.TYPE_LIST);
 
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, activity);
@@ -110,7 +111,7 @@ public class ActivityController {
             } else {
                 userId = "";
             }
-            return activityService.getNearActivityList( request, userId);
+            return activityService.getNearActivityList(request, userId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
