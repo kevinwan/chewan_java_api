@@ -626,7 +626,7 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("输入参数错误");
         }
 
-        if (count > user.getAlbum().size()) {
+        if (count <= 0 || count > user.getAlbum().size()) {
             LOG.warn("Input parameter count:{} is over album size:{}", count, user.getAlbum().size());
             throw new ApiException("输入参数有误");
         }
