@@ -55,31 +55,34 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         User myself = userDao.findById(userId);
 
+        //我关注的人
         List<Subscriber> mySubscribe = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))));
-        List<Subscriber> eachSubscribe = new ArrayList<Subscriber>();
-
-        List<String> mySubUserIds = new ArrayList<String>();
-        List<String> beSubedUserIds = new ArrayList<String>();
-        List<String> eachSubUserIds = new ArrayList<String>();
-
-        for (Subscriber mysub : mySubscribe) {
-            for (Subscriber besub : beSubscribed) {
-                if (mysub.getToUser().equals(besub.getFromUser())) {
-                    eachSubUserIds.add(mysub.getToUser());
-                } else {
-                    beSubedUserIds.add(besub.getFromUser());
-                }
-            }
-            if (!eachSubUserIds.contains(mysub.getToUser())) {
-                mySubUserIds.add(mysub.getToUser());
-            }
+        Set<String> mySubscribeSet = new HashSet<>(mySubscribe.size());
+        for (Subscriber item : mySubscribe) {
+            mySubscribeSet.add(item.getToUser());
         }
 
+        //关注我的人
+        List<Subscriber> beSubscribed = subscriberDao.find(Query.query((Criteria.where("toUser").is(userId))));
+        Set<String> beSubscribedSet = new HashSet<>(beSubscribed.size());
+        for (Subscriber item : beSubscribed) {
+            beSubscribedSet.add(item.getFromUser());
+        }
+
+        //相互关注的人
+        Set<String> eachSubUserSet = new HashSet<String>();
+        for (String item : mySubscribeSet) {
+            if (beSubscribedSet.contains(item)) {
+                eachSubUserSet.add(item);
+                beSubscribedSet.remove(item);
+            }
+        }
+        mySubscribeSet.removeAll(eachSubUserSet);
+
         LOG.debug("query related users");
-        List<User> mySubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(mySubUserIds)));
-        List<User> eachSubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(eachSubUserIds)));
-        List<User> beSubscribedUsers = userDao.find(Query.query(Criteria.where("userId").in(beSubedUserIds)));
+        List<User> mySubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(mySubscribeSet)));
+        List<User> eachSubscribeUsers = userDao.find(Query.query(Criteria.where("userId").in(eachSubUserSet)));
+        List<User> beSubscribedUsers = userDao.find(Query.query(Criteria.where("userId").in(beSubscribedSet)));
 
         LOG.debug("refresh user infomation");
         refreshUserinfo(myself, mySubscribeUsers);
@@ -178,7 +181,8 @@ public class SubscribeServiceImpl implements SubscribeService {
      */
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         for (User user : mySubscribeUsers) {
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(),CommonUtil.getGPJBrandLogoPrefix());
+            user.hideSecretInfo();
+            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
                     myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
         }
