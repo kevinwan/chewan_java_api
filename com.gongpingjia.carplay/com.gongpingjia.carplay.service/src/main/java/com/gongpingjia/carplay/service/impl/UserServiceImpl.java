@@ -39,7 +39,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import sun.rmi.runtime.Log;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -505,6 +504,7 @@ public class UserServiceImpl implements UserService {
             userInfo.put("licenseAuthStatus", user.getLicenseAuthStatus());
             userInfo.put("car", user.getCar());
             userInfo.put("avatar", localServer + user.getAvatar());
+            userInfo.put("cover", user.getCover());
             interestMap.put("user", userInfo);
 
             interests.add(interestMap);

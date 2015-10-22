@@ -128,7 +128,7 @@ public class User {
      *
      * @return 用户展示封面的url(带http前缀)
      */
-    public String buildUserCover() {
+    public String getCover() {
         if (this.album != null && !this.album.isEmpty()) {
             Photo latest = this.album.get(this.album.size() - 1);
             if (!StringUtils.isEmpty(latest.getUrl())) {

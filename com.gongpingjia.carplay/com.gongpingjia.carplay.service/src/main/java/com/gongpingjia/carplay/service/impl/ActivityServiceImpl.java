@@ -356,6 +356,7 @@ public class ActivityServiceImpl implements ActivityService {
 
             itemOrganizer.put("photoAuthStatus", activity.getOrganizer().getPhotoAuthStatus());
             itemOrganizer.put("subscribeFlag", activity.getOrganizer().getSubscribeFlag());
+            itemOrganizer.put("cover", activity.getOrganizer().getCover());//活动封面展示的URL图像
             jsonItem.put("organizer", itemOrganizer);
             jsonArray.add(jsonItem);
         }
