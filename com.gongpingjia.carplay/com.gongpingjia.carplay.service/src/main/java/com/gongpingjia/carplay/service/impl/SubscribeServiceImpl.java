@@ -181,6 +181,7 @@ public class SubscribeServiceImpl implements SubscribeService {
      */
     private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
         for (User user : mySubscribeUsers) {
+            user.hideSecretInfo();
             user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
                     myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
