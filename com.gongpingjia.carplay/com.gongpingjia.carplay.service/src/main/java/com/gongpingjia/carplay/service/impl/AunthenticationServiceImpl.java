@@ -207,14 +207,14 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         history.setApplicationId(application.getApplicationId());
         history.setStatus(application.getStatus());
         history.setAuthTime(current);
-        history.setRemark("个人图像认证申请");
+        history.setRemark("个人头像认证申请");
         historyDao.save(history);
 
         return ResponseDo.buildSuccessResponse();
     }
 
     /**
-     * 检查用户的图像认证申请参数的正确性
+     * 检查用户的头像认证申请参数的正确性
      *
      * @param userId
      * @param json
@@ -236,11 +236,11 @@ public class AunthenticationServiceImpl implements AunthenticationService {
         User user = userDao.findById(userId);
         if (Constants.AuthStatus.AUTHORIZING.equals(user.getPhotoAuthStatus())) {
             LOG.warn("user already apply photo authentication");
-            throw new ApiException("用户图像认证中，请勿重复申请");
+            throw new ApiException("用户头像认证中，请勿重复申请");
         }
         if (Constants.AuthStatus.ACCEPT.equals(user.getPhotoAuthStatus())) {
             LOG.warn("user already accept photo authentication");
-            throw new ApiException("用户图像已认证，请勿重复认证");
+            throw new ApiException("用户头像已认证，请勿重复认证");
         }
         return photoKey;
     }

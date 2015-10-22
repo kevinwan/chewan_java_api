@@ -50,7 +50,7 @@ public interface OfficialApproveService {
     ResponseDo modifyUserAuthenticationInfo(String userId, JSONObject json) throws ApiException;
 
     /**
-     * 用户图像认证
+     * 用户头像认证
      *
      * @param userId 审批用户Id
      * @param json   审批结果信息

@@ -42,7 +42,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             var endTime = new Date();
             endTime.setHours(23, 59, 59);
 
-            $scope.criteria = {status: '', startDate: startTime, endDate: endTime, type: '图像认证'};
+            $scope.criteria = {status: '', startDate: startTime, endDate: endTime, type: '头像认证'};
         };
 
         /**
@@ -59,7 +59,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             authenticationService.processUserPhotoApplication(true, application.remarks, application.applicationId).success(
                 function (result) {
                     if (result && result.result == 0) {
-                        alert('成功完成图像认证');
+                        alert('成功完成头像认证');
                     } else {
                         alert(result.errmsg);
                     }
@@ -77,7 +77,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             authenticationService.processUserPhotoApplication(true, application.remarks, application.applicationId).success(
                 function (result) {
                     if (result && result.result == 0) {
-                        alert('成功完成图像认证');
+                        alert('成功完成头像认证');
                     } else {
                         alert(result.errmsg);
                     }

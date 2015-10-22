@@ -17,7 +17,7 @@ public interface UploadService {
     ResponseDo uploadAvatarPhoto(MultipartFile multiFile) throws ApiException;
 
     /**
-     * 上传用户图像认证图片
+     * 上传用户头像认证图片
      *
      * @param multipartFile 图片资源文件
      * @param userId

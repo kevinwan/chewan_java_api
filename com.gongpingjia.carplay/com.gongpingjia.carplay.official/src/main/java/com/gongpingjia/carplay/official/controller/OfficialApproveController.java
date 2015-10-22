@@ -151,7 +151,7 @@ public class OfficialApproveController {
     }
 
     /**
-     * 用户图像认证审批
+     * 用户头像认证审批
      *
      * @return
      */

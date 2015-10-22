@@ -46,9 +46,9 @@ public class UploadController {
     }
 
     /**
-     * 上传个人图像，用于个人图像认证
+     * 上传个人图像，用于个人头像认证
      *
-     * @param attach 图像附件
+     * @param attach 头像附件
      * @return 返回上传结果
      */
     @RequestMapping(value = "/user/{userId}/photo/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})

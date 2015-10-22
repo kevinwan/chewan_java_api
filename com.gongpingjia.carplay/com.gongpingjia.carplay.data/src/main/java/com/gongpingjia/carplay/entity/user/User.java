@@ -40,7 +40,7 @@ public class User {
     @Transient
     private Integer age;
 
-    //图像认证图片,photo.jpg
+    //头像认证图片,photo.jpg
     private String photo;
     private String photoAuthStatus;
 
