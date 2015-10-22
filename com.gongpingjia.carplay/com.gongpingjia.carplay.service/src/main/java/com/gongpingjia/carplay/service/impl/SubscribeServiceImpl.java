@@ -74,7 +74,7 @@ public class SubscribeServiceImpl implements SubscribeService {
                     beSubedUserIds.add(besub.getFromUser());
                 }
             }
-            if (!eachSubUserIds.contains(mysub.getToUser())) {
+            if (!eachSubUserIds.contains(mysub.getToUser()) && !beSubedUserIds.contains(mysub.getToUser())) {
                 mySubUserIds.add(mysub.getToUser());
             }
         }
