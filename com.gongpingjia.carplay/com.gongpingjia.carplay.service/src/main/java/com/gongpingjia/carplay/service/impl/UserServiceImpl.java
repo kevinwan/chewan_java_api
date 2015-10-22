@@ -369,7 +369,7 @@ public class UserServiceImpl implements UserService {
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
         User user = userDao.findById(userId);
-        HashMap<String, User> users = buildUsers(userId, appointments);
+        Map<String, User> users = buildUsers(userId, appointments);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String remoteServer = CommonUtil.getThirdPhotoServer();
@@ -377,20 +377,26 @@ public class UserServiceImpl implements UserService {
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
-            User applicantUser = users.get(appointment.getApplyUserId()); //userDao.findById(appointment.getApplyUserId());
-            applicantUser.hideSecretInfo();
-            applicantUser.refreshPhotoInfo(localServer, remoteServer, gpjServer);
-            applicantUser.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    applicantUser.getLandmark().getLongitude(), applicantUser.getLandmark().getLatitude()));
+            User userInfo = null;
+            if (userId.equals(appointment.getApplyUserId())) {
+                userInfo = users.get(appointment.getInvitedUserId());
+            } else {
+                userInfo = users.get(appointment.getApplyUserId());
+            }
 
-            appointment.setApplicant(applicantUser);
+            userInfo.hideSecretInfo();
+            userInfo.refreshPhotoInfo(localServer, remoteServer, gpjServer);
+            userInfo.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
+
+            appointment.setApplicant(userInfo);
         }
 
         return ResponseDo.buildSuccessResponse(appointments);
     }
 
-    private HashMap<String, User> buildUsers(String userId, List<Appointment> appointments) {
-        HashMap<String, User> users = new HashMap<>(appointments.size());
+    private Map<String, User> buildUsers(String userId, List<Appointment> appointments) {
+        Map<String, User> users = new HashMap<>(appointments.size());
         for (Appointment appointment : appointments) {
             users.put(appointment.getApplyUserId(), null);
             users.put(appointment.getInvitedUserId(), null);

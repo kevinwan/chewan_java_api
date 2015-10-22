@@ -16,6 +16,11 @@ public class Constants {
     public static final int HTTP_STATUS_OK = 200;
 
     /**
+     * 群聊用户图像最大数量
+     */
+    public static final int CHATGROUP_MAX_PHOTO_COUNT = 4;
+
+    /**
      * 标志位
      */
     public interface Flag {

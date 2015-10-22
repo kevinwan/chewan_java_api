@@ -1,6 +1,8 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
@@ -9,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 
 /**
@@ -119,9 +123,16 @@ public class OfficialController {
                                          @RequestBody JSONObject json) {
 
         try {
+            if (CommonUtil.isEmpty(json, Arrays.asList("invitedUserId", "transfer"))) {
+                throw new ApiException("输入参数有误");
+            }
+
             String invitedUserId = json.getString("invitedUserId");
             Boolean transfer = json.getBoolean("transfer");
+
             parameterChecker.checkUserInfo(userId, token);
+            parameterChecker.isUserExist(invitedUserId);
+
             return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
