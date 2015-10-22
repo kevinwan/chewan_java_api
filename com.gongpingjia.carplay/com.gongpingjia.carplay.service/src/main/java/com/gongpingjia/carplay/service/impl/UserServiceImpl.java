@@ -1022,7 +1022,7 @@ public class UserServiceImpl implements UserService {
                     applyStatus = appointment.getStatus();
                 }
             }
-            itemMap.put("applyStatus", applyStatus);
+            itemMap.put("status", applyStatus);
 
             activityInfoList.add(itemMap);
         }
