@@ -1,25 +1,17 @@
 package com.gongpingjia.carplay.official.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
 import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -115,19 +107,15 @@ public class OfficialActivityController {
 
     @RequestMapping(value = "/official/activity/deleteIds", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONArray json) {
+    public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody ArrayList<String> ids) {
         try {
 
             officialParameterChecker.checkAdminUserInfo(userId, token);
 
-            if (json == null || json.size() == 0) {
+            if (ids == null || ids.size() == 0) {
                 return ResponseDo.buildFailureResponse("请选择需要删除的项");
             }
-            List<String> ids = new ArrayList<>(json.size());
-            Iterator<Object> iterator = json.iterator();
-            while (iterator.hasNext()) {
-                ids.add((String) iterator.next());
-            }
+
             return officialActivityService.deleteActivities(ids);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);

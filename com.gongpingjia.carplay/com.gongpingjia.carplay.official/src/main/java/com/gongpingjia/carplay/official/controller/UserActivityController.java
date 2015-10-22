@@ -1,17 +1,16 @@
 package com.gongpingjia.carplay.official.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.ActivityService;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -59,20 +58,18 @@ public class UserActivityController {
      *
      * @param userId
      * @param token
-     * @param json
+     * @param ids
      * @return
      */
     @RequestMapping(value = "/official/userActivity/deleteIds", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo deleteActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONArray json) {
+    public ResponseDo deleteActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody ArrayList<String> ids)  {
         LOG.debug("begin /official/userActivity/deleteIds userId:{}", userId);
 
         try {
             officialParameterChecker.checkAdminUserInfo(userId, token);
-            ArrayList<String> ids = new ArrayList<>();
-            Iterator iterator = json.iterator();
-            while (iterator.hasNext()) {
-                ids.add((String) iterator.next());
+            if (null == ids || ids.isEmpty()) {
+                throw new ApiException("请至少传一个需要删除的id");
             }
             return activityService.deleteUserActivities(ids);
         } catch (ApiException e) {

@@ -37,7 +37,7 @@ public class OfficialController {
     @RequestMapping(value = "/official/activity/{activityId}/join", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo joinActivity(@PathVariable("activityId") String activityId,
-                                   @RequestParam("userId") String userId, @RequestParam String token) {
+                                   @RequestParam("userId") String userId, @RequestParam("token") String token) {
         try {
             parameterChecker.checkUserInfo(userId, token);
 
