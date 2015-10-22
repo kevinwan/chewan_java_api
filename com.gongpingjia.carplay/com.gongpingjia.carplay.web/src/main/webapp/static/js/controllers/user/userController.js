@@ -59,8 +59,8 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
                 nickname: '',
                 licenseAuthStatus: '',
                 photoAuthStatus: '',
-                start: start.getFullYear() + "-" + (start.getMonth() + 1) + "-" + start.getDate(),
-                end: end.getFullYear() + "-" + (end.getMonth() + 1) + "-" + end.getDate()
+                startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+                endDate: moment().format('YYYY-MM-DD')
             };
         };
 
@@ -68,6 +68,10 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
          * Search users based on criteria
          */
         $scope.searchUsers = function () {
+
+            $scope.criteria.start = new Date($scope.criteria.startDate).getTime();
+            $scope.criteria.end = new Date($scope.criteria.endDate).getTime();
+
             $rootScope.loadingPromise = userService.listUsers($scope.criteria).success(function (result) {
                 $scope.users = (result.result === 0 ? result.data : undefined);
             });
@@ -78,7 +82,7 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
          */
         $scope.viewUser = function (userId) {
             userService.setUser(userId);
-            $location.path("/user/detail");
+            $location.path("/user/detail/" + userId);
         };
 
         /**

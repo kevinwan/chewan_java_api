@@ -80,7 +80,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                 type: '-1',
                 pay: '-1',
                 transfer: '-1',
-                fromDate: moment().format('YYYY-MM-DD'),
+                fromDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
                 toDate: moment().format('YYYY-MM-DD'),
                 fromTime: '',
                 toTime: ''

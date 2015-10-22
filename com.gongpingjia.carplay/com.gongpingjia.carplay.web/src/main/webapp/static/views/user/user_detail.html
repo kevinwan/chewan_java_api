@@ -1,114 +1,114 @@
-<div class="" xmlns="http://www.w3.org/1999/html">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" ng-click="close()">&times;</button>
-            <h4 class="modal-title">用户详情</h4>
+<div class="">
+    <h4 class="modal-title">用户详情</h4>
+
+
+    <div class="form-inline" style="height: 380px;">
+        <div class="control-group col-md-5">
+            <img src="{{user.photo}}" width="350px" height="300px">
         </div>
-        <div class="modal-body" style="height: 380px;">
 
-            <div class="form-inline">
-                <div class="control-group col-md-5">
-                    <img src="{{user.photo}}" ng-click="browsePhoto()" width="350px" height="300px">
-
-                    <p>[用户图像] 点击图片查看原图</p>
-                </div>
-
-                <div class="control-group col-md-7">
-                    <div>
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">昵称：</div>
-                                <input type="text" id="name" ng-model="user.nickname" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">手机：</div>
-                                <input type="text" id="phone" ng-model="user.phone" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">性别：</div>
-                                <input type="text" id="gender" ng-model="user.gender" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">生日：</div>
-                                <input type="text" id="birthday" ng-model="user.birthday" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">图像认证：</div>
-                                <input type="text" id="photoAuthStatus" ng-model="user.photoAuthStatus"
-                                       ng-disable="disableFields" readonly/>
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">车主认证：</div>
-                                <input type="text" id="licenseAuthStatus" ng-model="user.licenseAuthStatus"
-                                       ng-disable="disableFields" readonly/>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">车型：</div>
-                                <input type="text" id="model" ng-model="user.car.model" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">驾龄：</div>
-                                <input type="text" id="drivingYears" ng-model="user.drivingYears"
-                                       ng-disable="disableFields" readonly/>
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">注册渠道：</div>
-                                <input type="text" id="channel" ng-model="user.channel" ng-disable="disableFields"
-                                       readonly/>
-                            </div>
-                            <div class="control-group col-md-6">
-                                <div class="bolder">角色：</div>
-                                <select id="role" ng-init="user.role" ng-model="user.role" style="width:90%;">
-                                    <option value="普通用户">普通用户</option>
-                                    <option value="官方用户">官方用户</option>
-                                    <option value="ADMIN">管理员</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-inline">
-                            <div class="control-group col-md-6">
-                                <div class="bolder ">状态：</div>
-                                <input type="checkbox" id="subscribeFlag" ng-model="user.subscribeFlag">已删除</input>
-                            </div>
-                        </div>
+        <div class="control-group col-md-7">
+            <div>
+                <div class="form-inline">
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">昵称：</div>
+                        <input type="text" id="name" ng-model="user.nickname" ng-disable="disableFields"
+                               readonly/>
+                    </div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">手机：</div>
+                        <input type="text" id="phone" ng-model="user.phone" ng-disable="disableFields"
+                               readonly/>
                     </div>
                 </div>
 
-                <div style="margin-top:20px;"><span>用户相册</span></div>
+                <div class="form-inline">
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">性别：</div>
+                        <input type="text" id="gender" ng-model="user.gender" ng-disable="disableFields"
+                               readonly/>
+                    </div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">生日：</div>
+                        <input type="text" id="birthday" ng-model="user.birthday" ng-disable="disableFields"
+                               readonly/>
+                    </div>
+                </div>
 
-                <div class="col-md-12">
-                    <ul id="albums" class="thumbnails" ng-repeat="photo in album">
-                        <!--Add dynamic-->
-                        <li class="col-md-3">
-                            <a href="#" class="thumbnail">
-                                <img src="photo.url" alt="">
-                            </a>
-                        </li>
-                    </ul>
+                <div class="form-inline">
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">图像认证：</div>
+                        <input type="text" id="photoAuthStatus" ng-model="user.photoAuthStatus"
+                               ng-disable="disableFields" readonly/>
+                    </div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">车主认证：</div>
+                        <input type="text" id="licenseAuthStatus" ng-model="user.licenseAuthStatus"
+                               ng-disable="disableFields" readonly/>
+                    </div>
+                </div>
+                <div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">车型：</div>
+                        <input type="text" id="model" ng-model="user.car.model" ng-disable="disableFields"
+                               readonly/>
+                    </div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">驾龄：</div>
+                        <input type="text" id="drivingYears" ng-model="user.drivingYears"
+                               ng-disable="disableFields" readonly/>
+                    </div>
+                </div>
+
+                <div class="form-inline">
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">注册渠道：</div>
+                        <input type="text" id="channel" ng-model="user.channel" ng-disable="disableFields"
+                               readonly/>
+                    </div>
+                    <div class="control-group col-md-6">
+                        <div class="bolder">角色：</div>
+                        <select id="role" ng-init="user.role" ng-model="user.role" style="width:90%;">
+                            <option value="普通用户">普通用户</option>
+                            <option value="官方用户">官方用户</option>
+                            <option value="ADMIN">管理员</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-inline">
+                    <div class="control-group col-md-6">
+                        <div class="bolder ">状态：</div>
+                        <input type="checkbox" id="subscribeFlag" ng-model="user.deleteFlag">是否删除</input>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="update()">修改</button>
-        <button class="btn btn-primary" ng-click="close()">取消</button>
+
+    <div class="form-inline">
+        <div class="col-md-12" style="margin-top:20px;"><span>用户相册</span></div>
+        <div class="col-md-12">
+            <ul id="albums" class="thumbnails">
+                <!--Add dynamic-->
+                <li class="col-md-3" style="margin-top: 10px;list-style-type: none;" ng-repeat="photo in user.album">
+
+                    <div class="thumbnail" style="position: relative">
+                        <button ng-click="removePhoto(photo.id)" class="glyphicon glyphicon-remove"
+                                style=" display: inline-block;position: absolute;top: 0;right: 0;"></button>
+
+                        <img src="{{photo.url}}" width="100%" height="200px">
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
+
+
+    <div class="form-inline col-md-12" style="margin-top: 20px;">
+        <button class="btn btn-info" ng-click="update()">修改</button>
+        <button class="btn" ng-click="close()">取消</button>
+    </div>
+
+
 </div>

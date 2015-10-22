@@ -107,7 +107,7 @@
                 <td>{{ user.licenseAuthStatus }}</td>
                 <td>{{ user.photoAuthStatus }}</td>
                 <td>{{ (user.role == "ADMIN") ? "管理员" : user.role }}</td>
-                <td>{{ user.drivingYears }}</td>
+                <td>{{ user.drivingYears}}</td>
                 <td>{{ user.deleteFlag ? "已删除" : "活跃"}}</td>
                 <td class="center">
                     <button type="button" ng-click="viewUser(user.userId)"

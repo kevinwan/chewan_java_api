@@ -56,7 +56,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
                 title: '',
                 detailAddress: '',
                 status: '-1',
-                fromDate: moment().format('YYYY-MM-DD'),
+                fromDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
                 toDate: moment().format('YYYY-MM-DD')
             };
             //document.getElementById("startDate").value = "";

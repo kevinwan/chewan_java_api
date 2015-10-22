@@ -34,25 +34,25 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
                 param += "&nickname=" + criteria.nickname;
                 param += "&licenseAuthStatus=" + criteria.licenseAuthStatus;
                 param += "&photoAuthStatus=" + criteria.photoAuthStatus;
-                param += "&start=" + commonService.transferDateStringToLong(criteria.start);
-                param += "&end=" + commonService.transferDateStringToLong(criteria.end);
+                param += "&start=" + criteria.start;
+                param += "&end=" + criteria.end;
 
                 return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/user/list?userId="
                 + authService.getUser().userId + "&token=" + authService.getUser().token + param);
             },
 
-            getUserInfo: function () {
+            getUserInfo: function (userId) {
                 return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/user/" + userId + "/detail?userId="
                 + authService.getUser().userId + "&token=" + authService.getUser().token);
             },
 
             updateUserInfo: function (user) {
                 var photoIds = new Array();
-                for (var photo in user.album) {
-                    photoIds.add(photo.id);
+                for (var index in user.album) {
+                    photoIds.add(user.album[index]);
                 }
 
-                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/user/" + user + "/update?userId="
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/user/" + user.userId + "/update?userId="
                     + authService.getUser().userId + "&token=" + authService.getUser().token,
                     JSON.stringify({
                         role: user.role,

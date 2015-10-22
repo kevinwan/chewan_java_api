@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,7 +45,14 @@ public class UserManagerServiceImpl implements UserManagerService {
     public ResponseDo listUsers(String phone, String nickname, String licenseAuthStatus, String photoAuthStatus,
                                 Long start, Long end, Integer limit, Integer ignore) {
         LOG.debug("Begin build query criteria");
-        Criteria criteria = new Criteria().where("registerTime").gte(start).lt(end);
+
+//        Criteria criteria = Criteria.where("registerTime").gte(start).lt(end);
+        Criteria criteria = new Criteria();
+        if (null != end && null != start) {
+            end = end + 24*60*60*1000;
+            criteria.and("registerTime").gte(start).lte(end);
+        }
+
         if (!StringUtils.isEmpty(phone)) {
             criteria.and("phone").is(phone);
         }
