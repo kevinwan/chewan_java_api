@@ -996,8 +996,10 @@ public class UserServiceImpl implements UserService {
             appointmentList = new ArrayList<>();
         }
 
-        ArrayList<Map<String, Object>> resultList = new ArrayList<>(activityList.size());
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("cover", viewUser.getCover());
 
+        ArrayList<Map<String, Object>> activityInfoList = new ArrayList<>(activityList.size());
         //初始化每一个活动信息
         Map<String, Object> itemMap = new HashMap<>();
         for (Activity activity : activityList) {
@@ -1022,9 +1024,11 @@ public class UserServiceImpl implements UserService {
             }
             itemMap.put("applyStatus", applyStatus);
 
-            resultList.add(itemMap);
+            activityInfoList.add(itemMap);
         }
 
-        return ResponseDo.buildSuccessResponse(resultList);
+        resultMap.put("activities", activityInfoList);
+
+        return ResponseDo.buildSuccessResponse(resultMap);
     }
 }
