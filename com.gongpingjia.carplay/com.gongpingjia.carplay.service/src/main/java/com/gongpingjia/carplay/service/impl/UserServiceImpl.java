@@ -369,11 +369,20 @@ public class UserServiceImpl implements UserService {
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
         User user = userDao.findById(userId);
-        Map<String, User> users = buildUsers(userId, appointments);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String remoteServer = CommonUtil.getThirdPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
+
+        LOG.debug("hide user info");
+        Map<String, User> users = buildUsers(userId, appointments);
+        for (Map.Entry<String, User> entry : users.entrySet()) {
+            User userInfo = entry.getValue();
+            userInfo.hideSecretInfo();
+            userInfo.refreshPhotoInfo(localServer, remoteServer, gpjServer);
+            userInfo.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
+        }
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
@@ -383,12 +392,6 @@ public class UserServiceImpl implements UserService {
             } else {
                 userInfo = users.get(appointment.getApplyUserId());
             }
-
-            userInfo.hideSecretInfo();
-            userInfo.refreshPhotoInfo(localServer, remoteServer, gpjServer);
-            userInfo.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
-
             appointment.setApplicant(userInfo);
         }
 
