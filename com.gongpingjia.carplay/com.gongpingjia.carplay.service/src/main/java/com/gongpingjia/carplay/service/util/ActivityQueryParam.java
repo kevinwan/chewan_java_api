@@ -44,45 +44,6 @@ public class ActivityQueryParam {
      * @return 返回查询条件
      */
     public Criteria buildCommonQueryParam() {
-        //查询未删除的
-        Criteria criteria = new Criteria();
-        if (!StringUtils.isEmpty(userId)) {
-            //排除活动创建人员
-            criteria.andOperator(Criteria.where("userId").ne(userId));
-        }
-
-        if (!StringUtils.isEmpty(type)) {
-            //类型
-            criteria.andOperator(Criteria.where("type").is(type));
-        }
-
-        if (!StringUtils.isEmpty(pay)) {
-            //付费
-            criteria.andOperator(Criteria.where("pay").is(pay));
-        }
-
-        if (!StringUtils.isEmpty(gender)) {
-            //性别
-            criteria.andOperator(Criteria.where("gender").is(gender));
-        }
-
-        if (transfer != null && transfer) {
-            //只有选择包接送才会执行这个
-            criteria.andOperator(Criteria.where("transfer").is(transfer));
-        }
-
-        if (!StringUtils.isEmpty(province)) {
-            //省
-            criteria.andOperator(Criteria.where("destination.province").is(gender));
-        }
-        if (!StringUtils.isEmpty(city)) {
-            //市
-            criteria.andOperator(Criteria.where("destination.city").is(gender));
-        }
-        if (!StringUtils.isEmpty(district)) {
-            //区
-            criteria.andOperator(Criteria.where("destination.district").is(gender));
-        }
 
         //距离计算
         Double distance = maxDistance;
@@ -91,13 +52,47 @@ public class ActivityQueryParam {
                     String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
             maxDistance = distance;
         }
-        criteria.andOperator(Criteria.where("estabPoint").near(new Point(this.longitude, this.latitude))
-                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS));
+        //查询未删除的
+        Criteria criteria = Criteria.where("estabPoint").near(new Point(this.longitude, this.latitude))
+                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS).and("deleteFlag").is(false);
 
+        if (!StringUtils.isEmpty(userId)) {
+            //排除活动创建人员
+            criteria.and("userId").ne(userId);
+        }
 
-        //未删除的活动
-        criteria.andOperator(Criteria.where("deleteFlag").is(false));
+        if (!StringUtils.isEmpty(type)) {
+            //类型
+            criteria.and("type").is(type);
+        }
 
+        if (!StringUtils.isEmpty(pay)) {
+            //付费
+            criteria.and("pay").is(pay);
+        }
+
+        if (!StringUtils.isEmpty(gender)) {
+            //性别
+            criteria.and("gender").is(gender);
+        }
+
+        if (transfer != null && transfer) {
+            //只有选择包接送才会执行这个
+            criteria.and("transfer").is(transfer);
+        }
+
+        if (!StringUtils.isEmpty(province)) {
+            //省
+            criteria.and("destination.province").is(gender);
+        }
+        if (!StringUtils.isEmpty(city)) {
+            //市
+            criteria.and("destination.city").is(gender);
+        }
+        if (!StringUtils.isEmpty(district)) {
+            //区
+            criteria.and("destination.district").is(gender);
+        }
         return criteria;
     }
 
@@ -107,12 +102,6 @@ public class ActivityQueryParam {
      * @return 查询参数
      */
     public Criteria buildExpandQueryParam() {
-        Criteria criteria = new Criteria();
-
-        if (!StringUtils.isEmpty(type)) {
-            //类型
-            criteria.andOperator(Criteria.where("type").is(type));
-        }
         //距离计算
         Double distance = maxDistance;
         if (distance == null) {
@@ -120,11 +109,14 @@ public class ActivityQueryParam {
                     String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
             maxDistance = distance;
         }
-        criteria.andOperator(Criteria.where("estabPoint").near(new Point(this.longitude, this.latitude))
-                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS));
 
-        //未删除的活动
-        criteria.andOperator(Criteria.where("deleteFlag").is(false));
+        Criteria criteria = Criteria.where("estabPoint").near(new Point(this.longitude, this.latitude))
+                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS).and("deleteFlag").is(false);
+
+        if (!StringUtils.isEmpty(type)) {
+            //类型
+            criteria.and("type").is(type);
+        }
 
         return criteria;
     }

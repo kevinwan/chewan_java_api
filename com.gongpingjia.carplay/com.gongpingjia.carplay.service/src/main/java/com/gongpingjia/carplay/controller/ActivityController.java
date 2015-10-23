@@ -101,30 +101,30 @@ public class ActivityController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
-    public ResponseDo getNearByActivityList(HttpServletRequest request) {
-        LOG.debug("activity/{activityId}/info begin");
-        try {
-            String userId = request.getParameter("userId");
-            String token = request.getParameter("token");
-            if (StringUtils.isNotEmpty(userId)) {
-                parameterChecker.checkUserInfo(userId, token);
-            } else {
-                userId = "";
-            }
-            return activityService.getNearActivityList(request, userId);
-        } catch (ApiException e) {
-            LOG.warn(e.getMessage(), e);
-            return ResponseDo.buildFailureResponse(e.getMessage());
-        }
-    }
+//    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
+//    public ResponseDo getNearByActivityList(HttpServletRequest request) {
+//        LOG.debug("activity/{activityId}/info begin");
+//        try {
+//            String userId = request.getParameter("userId");
+//            String token = request.getParameter("token");
+//            if (StringUtils.isNotEmpty(userId)) {
+//                parameterChecker.checkUserInfo(userId, token);
+//            } else {
+//                userId = "";
+//            }
+//            return activityService.getNearActivityList(request, userId);
+//        } catch (ApiException e) {
+//            LOG.warn(e.getMessage(), e);
+//            return ResponseDo.buildFailureResponse(e.getMessage());
+//        }
+//    }
 
     /**
      * 获取附近的活动, 匹配约会信息
      *
      * @return
      */
-//    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
     public ResponseDo getNearByActivityList(@RequestParam(value = "userId", required = false) String userId,
                                             @RequestParam(value = "token", required = false) String token,
                                             @RequestParam(value = "type", required = false) String type,

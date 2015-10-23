@@ -932,97 +932,6 @@ public class ActivityServiceImpl implements ActivityService {
         return ResponseDo.buildSuccessResponse(buildResponse(userMap, remainActivities, subscriberSet));
     }
 
-    /**
-     * 根据请求参数构造查询条件,附近活动，活动匹配
-     *
-     * @return 返回查询条件
-     */
-    public Criteria buildCommonQueryParam(ActivityQueryParam param) {
-        //查询未删除的
-        Criteria criteria = new Criteria();
-        if (!org.springframework.util.StringUtils.isEmpty(param.getUserId())) {
-            //排除活动创建人员
-            criteria.andOperator(Criteria.where("userId").ne(param.getUserId()));
-        }
-
-        if (!org.springframework.util.StringUtils.isEmpty(param.getType())) {
-            //类型
-            criteria.andOperator(Criteria.where("type").is(param.getType()));
-        }
-
-        if (!org.springframework.util.StringUtils.isEmpty(param.getPay())) {
-            //付费
-            criteria.andOperator(Criteria.where("pay").is(param.getPay()));
-        }
-
-        if (!org.springframework.util.StringUtils.isEmpty(param.getGender())) {
-            //性别
-            criteria.andOperator(Criteria.where("gender").is(param.getGender()));
-        }
-
-        if (param.getTransfer() != null && param.getTransfer()) {
-            //只有选择包接送才会执行这个
-            criteria.andOperator(Criteria.where("transfer").is(param.getTransfer()));
-        }
-
-        if (!org.springframework.util.StringUtils.isEmpty(param.getProvince())) {
-            //省
-            criteria.andOperator(Criteria.where("destination.province").is(param.getProvince()));
-        }
-        if (!org.springframework.util.StringUtils.isEmpty(param.getCity())) {
-            //市
-            criteria.andOperator(Criteria.where("destination.city").is(param.getCity()));
-        }
-        if (!org.springframework.util.StringUtils.isEmpty(param.getDistrict())) {
-            //区
-            criteria.andOperator(Criteria.where("destination.district").is(param.getDistrict()));
-        }
-
-        //距离计算
-        Double distance = param.getMaxDistance();
-        if (distance == null) {
-            distance = Double.parseDouble(PropertiesUtil.getProperty("activity.defaultMaxDistance",
-                    String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-            param.setMaxDistance(distance);
-        }
-        criteria.andOperator(Criteria.where("estabPoint").near(new Point(param.getLongitude(), param.getLatitude()))
-                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS));
-
-
-        //未删除的活动
-        criteria.andOperator(Criteria.where("deleteFlag").is(false));
-
-        return criteria;
-    }
-
-    /**
-     * 构造扩展查询条件，只有类型，距离，非当前用户，适用于活动匹配扩展查询
-     *
-     * @return 查询参数
-     */
-    public Criteria buildExpandQueryParam(ActivityQueryParam param) {
-        Criteria criteria = new Criteria();
-
-        if (!org.springframework.util.StringUtils.isEmpty(param.getType())) {
-            //类型
-            criteria.andOperator(Criteria.where("type").is(param.getType()));
-        }
-        //距离计算
-        Double distance = param.getMaxDistance();
-        if (distance == null) {
-            distance = Double.parseDouble(PropertiesUtil.getProperty("activity.defaultMaxDistance",
-                    String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-            param.setMaxDistance(distance);
-        }
-        criteria.andOperator(Criteria.where("estabPoint").near(new Point(param.getLongitude(), param.getLatitude()))
-                .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS));
-
-        //未删除的活动
-        criteria.andOperator(Criteria.where("deleteFlag").is(false));
-
-        return criteria;
-    }
-
     private List<Map<String, Object>> buildResponse(Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
         String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> result = new ArrayList<>(remainActivities.size());
@@ -1146,6 +1055,7 @@ public class ActivityServiceImpl implements ActivityService {
         int counts = 0;
         List<Activity> activities = new ArrayList<>(0);
         do {
+            //距离最多扩展4个数量级
             if (counts >= 4) {
                 break;
             }

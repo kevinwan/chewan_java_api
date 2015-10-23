@@ -387,10 +387,10 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 //        JSONObject json = new JSONObject();
 //        StringBuilder description = new StringBuilder();
 //
-//        description.append("http:||localhost:8080|com.gongpingjia.carplay.web|photos|asset|user|867b8ca6-c472-4d86-a5ea-c18c007778f2|avatar.jpg;");
-//        description.append("http:||localhost:8080|com.gongpingjia.carplay.web|photos|asset|user|867b8ca6-c472-4d86-a5ea-c18c007778f2|avatar.jpg;");
-//        description.append("http:||localhost:8080|com.gongpingjia.carplay.web|photos|asset|user|867b8ca6-c472-4d86-a5ea-c18c007778f2|avatar.jpg;");
-//        description.append("http:||localhost:8080|com.gongpingjia.carplay.web|photos|asset|user|867b8ca6-c472-4d86-a5ea-c18c007778f2|avatar.jpg;");
+//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
 //        json.put("description", description.toString());
 //
 ////        List<String> users = new ArrayList<>(2);
