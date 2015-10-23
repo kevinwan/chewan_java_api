@@ -81,7 +81,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         userDao.update(application.getApplyUserId(), Update.update("licenseAuthStatus", status));
 
         recordHistory(userId, application, current, status, remarks);
-        sendEmchatMessage(application, status, remarks, Constants.MessageType.LICENSE_AUTH_MSG);
+        sendEmchatMessage(userId, application, status, remarks, Constants.MessageType.LICENSE_AUTH_MSG);
 
         LOG.debug("Finished approved user driving authentication apply");
         return ResponseDo.buildSuccessResponse();
@@ -134,10 +134,15 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         historyDao.save(history);
     }
 
-    private void sendEmchatMessage(AuthApplication application, String status, String remarks, int messageType) throws ApiException {
+    private void sendEmchatMessage(String authUserId, AuthApplication application, String status, String remarks, int messageType) throws ApiException {
         Map<String, Object> ext = new HashMap<>(2, 1);
         ext.put("type", messageType);
         ext.put("result", Constants.Flag.POSITIVE);
+
+        User authUser = userDao.findById(authUserId);
+        ext.put("nickName", authUser.getNickname());
+        ext.put("headUrl", CommonUtil.getLocalPhotoServer() + authUser.getAvatar());
+        ext.put("userId", authUserId);
 
         User user = userDao.findById(application.getApplyUserId());
         String result = "通过";
@@ -345,7 +350,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
         recordHistory(userId, application, current, status, remarks);
 
-        sendEmchatMessage(application, status, remarks, Constants.MessageType.PHOTO_AUTH_MSG);
+        sendEmchatMessage(userId, application, status, remarks, Constants.MessageType.PHOTO_AUTH_MSG);
 
         LOG.debug("Finished approved user photo authentication apply");
         return ResponseDo.buildSuccessResponse();

@@ -200,6 +200,12 @@ public class UploadServiceImpl implements UploadService {
         // 2.查数据库信息
         User user = userDao.findById(userId);
 
+        //3.检查是否达到上限
+        if (user.getAlbum() != null && user.getAlbum().size() >= PropertiesUtil.getProperty("carplay.photos.upper.limit", 40)) {
+            LOG.warn("User:{} album count is over upper limit", user.getAlbum().size());
+            throw new ApiException("用户照片数量已经达到上限，不能继续上传");
+        }
+
         LOG.debug("transfer photo file into byte array and upload photo to server");
         // 3.上传个人相册图片
         byte[] data = buildFileBytes(multiFile);

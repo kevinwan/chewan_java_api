@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.service.util.ActivityQueryParam;
 import net.sf.json.JSONObject;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,8 +34,7 @@ public interface ActivityService {
     /**
      * 获取周边的活动列表
      */
-    public ResponseDo getNearActivityList( HttpServletRequest request,String userId) throws ApiException;
-
+    public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException;
 
 
     /**
@@ -44,6 +44,7 @@ public interface ActivityService {
 
     /**
      * 处理活动加入申请
+     *
      * @param appointmentId
      * @param userId
      * @param acceptFlag
@@ -55,23 +56,26 @@ public interface ActivityService {
 
     /**
      * 管理后台 查询  用户创建的活动
+     *
      * @param json
      * @return
      */
-    public ResponseDo getUserActivityList(JSONObject json,String userId)throws ApiException;
+    public ResponseDo getUserActivityList(JSONObject json, String userId) throws ApiException;
 
 
     /**
      * 后台 更新用户的某一个活动；
+     *
      * @param json
      * @param activityId
      * @return
      * @throws ApiException
      */
-    public ResponseDo updateUserActivity(JSONObject json,String activityId)throws ApiException;
+    public ResponseDo updateUserActivity(JSONObject json, String activityId) throws ApiException;
 
     /**
      * 后台查看用户的活动
+     *
      * @param activityId
      * @return
      * @throws ApiException
@@ -80,9 +84,26 @@ public interface ActivityService {
 
     /**
      * 后台 删除用户发布的活动
+     *
      * @param ids
      * @return
      * @throws ApiException
      */
-    public ResponseDo deleteUserActivities(Collection ids)throws ApiException;
+    public ResponseDo deleteUserActivities(Collection ids) throws ApiException;
+
+    /**
+     * 根据param参数获取附近的活动信息
+     *
+     * @param param 请求参数
+     * @return 返回结果信息
+     */
+    ResponseDo getNearByActivityList(ActivityQueryParam param);
+
+    /**
+     * 随便看看接口
+     *
+     * @param param 查询参数
+     * @return
+     */
+    ResponseDo getRandomActivities(ActivityQueryParam param);
 }

@@ -361,9 +361,9 @@ public class UserServiceImpl implements UserService {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
-        Criteria criteria = Criteria.where("invitedUserId").is(userId).orOperator(Criteria.where("applyUserId").is(userId));
+        Criteria criteria = new Criteria().orOperator(Criteria.where("invitedUserId").is(userId), Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
-            criteria.and("status").in(Arrays.asList(status));
+            criteria.andOperator(Criteria.where("status").in(Arrays.asList(status)));
         }
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
@@ -1036,5 +1036,22 @@ public class UserServiceImpl implements UserService {
         resultMap.put("activities", activityInfoList);
 
         return ResponseDo.buildSuccessResponse(resultMap);
+    }
+
+    @Override
+    public ResponseDo getUserEmchatInfo(String emchatName) throws ApiException {
+        LOG.debug("Query user infomation by emchatName:{}", emchatName);
+        User user = userDao.findOne(Query.query(Criteria.where("emchatName").is(emchatName)));
+        if (user == null) {
+            LOG.warn("No user exist with ehcmatName:{}", emchatName);
+            throw new ApiException("用户不存在");
+        }
+
+        Map<String, Object> data = new HashMap<>(4, 1);
+        data.put("userId", user.getUserId());
+        data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+        data.put("nickname", user.getNickname());
+        data.put("emchatName", user.getEmchatName());
+        return ResponseDo.buildSuccessResponse(data);
     }
 }
