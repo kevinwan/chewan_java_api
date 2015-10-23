@@ -136,7 +136,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
 
         JSONObject json = new JSONObject();
         json.put("groupname", groupName);
-        json.put("desc", description);
+        json.put("description", description);
 
         List<Header> headers = buildCommonHeaders(token);
 

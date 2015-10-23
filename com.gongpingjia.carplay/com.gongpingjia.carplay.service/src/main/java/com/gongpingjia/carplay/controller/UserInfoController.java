@@ -383,7 +383,17 @@ public class UserInfoController {
     }
 
 
-    @RequestMapping("/user/{viewUserId}/activity/list")
+    /**
+     * 获取他的活动详情
+     *
+     * @param viewUserId
+     * @param userId
+     * @param token
+     * @param limit
+     * @param ignore
+     * @return
+     */
+    @RequestMapping(value = "/user/{viewUserId}/activity/list", method = RequestMethod.GET)
     public ResponseDo getUserActivityList(@PathVariable("viewUserId") String viewUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
                                           @RequestParam("limit") Integer limit, @RequestParam("ignore") Integer ignore) {
         LOG.info("Begin view user activity viewUserId:{} userId:{}", viewUserId, userId);
@@ -396,5 +406,27 @@ public class UserInfoController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
 
+    }
+
+    /**
+     * @param userId
+     * @param token
+     * @param emchatName
+     * @return
+     */
+    @RequestMapping(value = "/user/emchatInfo", method = RequestMethod.GET)
+    public ResponseDo getUserChatInfo(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                      @RequestParam("emchatName") String emchatName) {
+
+        LOG.info("Begin query user chat info by userId:{}", userId);
+
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+
+            return userService.getUserEmchatInfo(emchatName);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 }

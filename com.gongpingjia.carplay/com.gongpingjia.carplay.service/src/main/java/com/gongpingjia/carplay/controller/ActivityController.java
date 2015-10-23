@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
+import com.gongpingjia.carplay.service.util.ActivityQueryParam;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "pay", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
@@ -117,6 +118,68 @@ public class ActivityController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    /**
+     * 获取附近的活动, 匹配约会信息
+     *
+     * @return
+     */
+//    @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
+    public ResponseDo getNearByActivityList(@RequestParam(value = "userId", required = false) String userId,
+                                            @RequestParam(value = "token", required = false) String token,
+                                            @RequestParam(value = "type", required = false) String type,
+                                            @RequestParam(value = "pay", required = false) String pay,
+                                            @RequestParam(value = "gender", required = false) String gender,
+                                            @RequestParam(value = "transfer", required = false) Boolean transfer,
+                                            @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+                                            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                            @RequestParam(value = "longitude") Double longitude,
+                                            @RequestParam(value = "latitude") Double latitude,
+                                            @RequestParam(value = "province", required = false) String province,
+                                            @RequestParam(value = "city", required = false) String city,
+                                            @RequestParam(value = "district", required = false) String district) {
+        LOG.info("Begin get nearby activities");
+
+        ActivityQueryParam param = new ActivityQueryParam();
+        param.setUserId(userId);
+        param.setToken(token);
+        param.setType(type);
+        param.setPay(pay);
+        param.setGender(gender);
+        param.setTransfer(transfer);
+        param.setIgnore(ignore);
+        param.setLimit(limit);
+        param.setLongitude(longitude);
+        param.setLatitude(latitude);
+        param.setProvince(province);
+        param.setCity(city);
+        param.setDistrict(district);
+
+        return activityService.getNearByActivityList(param);
+    }
+
+    /**
+     * 获取附近的活动, 匹配约会信息
+     *
+     * @return
+     */
+    @RequestMapping(value = "/activity/randomLook", method = RequestMethod.GET)
+    public ResponseDo getRandomActivities(@RequestParam(value = "userId", required = false) String userId,
+                                          @RequestParam(value = "token", required = false) String token,
+                                          @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                          @RequestParam(value = "longitude") Double longitude,
+                                          @RequestParam(value = "latitude") Double latitude) {
+        LOG.info("Begin get nearby activities, longitude:{}, latitude:{}", longitude, latitude);
+        ActivityQueryParam param = new ActivityQueryParam();
+        param.setUserId(userId);
+        param.setToken(token);
+        param.setLimit(limit);
+        param.setLongitude(longitude);
+        param.setLatitude(latitude);
+
+        return activityService.getRandomActivities(param);
+    }
+
 
     /**
      * 约她 申请加入活动

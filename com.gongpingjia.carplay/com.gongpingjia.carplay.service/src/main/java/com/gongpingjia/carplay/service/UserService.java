@@ -123,4 +123,11 @@ public interface UserService {
      * @throws ApiException
      */
     ResponseDo getUserActivityList(String viewUserId,String userId,int limit,int ignore)throws ApiException;
+
+    /**
+     * 根据用户的环信ID，获取用户的聊天信息
+     * @param emchatName 环信ID
+     * @return 返回用户的聊天必须信息
+     */
+    ResponseDo getUserEmchatInfo(String emchatName) throws ApiException;
 }

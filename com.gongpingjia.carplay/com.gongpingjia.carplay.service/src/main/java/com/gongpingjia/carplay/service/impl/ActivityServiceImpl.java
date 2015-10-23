@@ -19,10 +19,7 @@ import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
-import com.gongpingjia.carplay.service.util.ActivityUtil;
-import com.gongpingjia.carplay.service.util.ActivityWeight;
-import com.gongpingjia.carplay.service.util.DistanceUtil;
-import com.gongpingjia.carplay.service.util.FetchUtil;
+import com.gongpingjia.carplay.service.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -769,7 +766,6 @@ public class ActivityServiceImpl implements ActivityService {
         return ResponseDo.buildSuccessResponse();
     }
 
-
     private SearchInfo initSearchInfo(HttpServletRequest request, String userId, AreaRangeInfo areaRangeInfo) throws ApiException {
         SearchInfo searchInfo = new SearchInfo();
         //必填项
@@ -887,4 +883,202 @@ public class ActivityServiceImpl implements ActivityService {
         public long maxPubTime;
         public double maxDistance;
     }
+
+
+    /**
+     * 获取附近的匹配的活动列表
+     *
+     * @param param 请求参数
+     * @return
+     */
+    @Override
+    public ResponseDo getNearByActivityList(ActivityQueryParam param) {
+        LOG.info("Query parameters:{}", param.toString());
+        //获取所有的活动列表
+        List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
+        if (activityList.isEmpty()) {
+            //如果没有找到活动，进行拓展查询
+            LOG.info("No result find, begin expand query");
+            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
+        }
+
+        if (activityList.isEmpty()) {
+            LOG.warn("No activity result found fron database");
+            return ResponseDo.buildSuccessResponse(activityList);
+        }
+
+        Map<String, User> userMap = buildUserMap(activityList);
+
+        //获取出该用户所关注的 所有的 用户 id
+        List<Activity> activities = rebuildActivities(param, activityList, userMap);
+
+        //按照权重进行排序
+        Collections.sort(activities);
+        if (activities.size() < param.getIgnore()) {
+            LOG.warn("No data exist after ignore:{}", param.getIgnore());
+            return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
+        }
+
+        List<Activity> remainActivities = activities.subList(param.getIgnore(), activities.size() - param.getIgnore());
+        if (remainActivities.size() > param.getLimit()) {
+            remainActivities = remainActivities.subList(0, param.getLimit());
+        }
+
+        LOG.debug("Query user subscriber info");
+        Map<String, Subscriber> subscriberMap = initSubscriberMap(param.getUserId());
+        Set<String> subscriberSet = subscriberMap.keySet();
+
+        //查询出Activity的 组织者，并初始化
+        return ResponseDo.buildSuccessResponse(buildResponse(userMap, remainActivities, subscriberSet));
+    }
+
+    private List<Map<String, Object>> buildResponse(Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
+        String localServer = CommonUtil.getLocalPhotoServer();
+        List<Map<String, Object>> result = new ArrayList<>(remainActivities.size());
+        for (Activity item : remainActivities) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("activityId", item.getActivityId());
+            map.put("transfer", item.isTransfer());
+            map.put("distance", item.getDistance());
+
+            User user = userMap.get(item.getUserId());
+            Map<String, Object> organizer = new HashMap<>(8, 1);
+            if (user != null) {
+                organizer.put("car", user.getCar());
+                organizer.put("subscribeFlag", subscriberSet.contains(item.getUserId()));
+                organizer.put("nickname", user.getNickname());
+                organizer.put("gender", user.getGender());
+                organizer.put("photoAuthStatus", user.getPhotoAuthStatus());
+                organizer.put("licenseAuthStatus", user.getLicenseAuthStatus());
+                organizer.put("avatar", localServer + user.getAvatar());
+                organizer.put("cover", user.getCover());
+            }
+            map.put("organizer", organizer);
+            map.put("pay", item.getPay());
+            map.put("type", item.getType());
+            map.put("destination", item.getDestination());
+            result.add(map);
+        }
+        return result;
+    }
+
+    private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
+        LOG.debug("Filter user by idle status and compute weight");
+        Long current = DateUtil.getTime();
+        List<Activity> activities = new ArrayList<>(activityList.size());
+        for (Activity item : activityList) {
+            User user = userMap.get(item.getUserId());
+            if (user != null || user.getIdle()) {
+                //只有当用户空闲的情况下才参与排序计算
+                item.setSortFactor(computeWeight(param, current, item, user));
+                activities.add(item);
+            }
+        }
+        return activities;
+    }
+
+    /**
+     * 权重计算
+     *
+     * @param param   权重因子参数
+     * @param current 当前时间
+     * @param item    活动
+     * @param user    活动发布人员
+     * @return 返回权重
+     */
+    private double computeWeight(ActivityQueryParam param, Long current, Activity item, User user) {
+        //距离权重计算
+        item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(),
+                item.getEstabPoint().getLongitude(), item.getEstabPoint().getLatitude()));
+        double sortFactor = 0.2 * (1 - item.getDistance() / param.getMaxDistance());
+        sortFactor += 0.1 * (1 - (current - item.getCreateTime()) * 0.1 / param.getMaxTimeLimit());
+
+        //用户车主认证权重计算
+        if (Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {
+            sortFactor += 0.15;
+        }
+        //用户头像认证权重计算
+        if (Constants.AuthStatus.ACCEPT.equals(user.getPhotoAuthStatus())) {
+            sortFactor += 0.25;
+        }
+        //TODO 添加身份认证权重计算
+
+        //目的地权重计算
+        if (item.getDestination() != null) {
+            Address address = item.getDestination();
+            if (address.getProvince() != null && address.getDistrict() != null) {
+                sortFactor += 0.15;
+            }
+        }
+        //活动时间权重计算，都包含时间
+        sortFactor += 0.05;
+        return sortFactor;
+    }
+
+    private Map<String, User> buildUserMap(List<Activity> activityList) {
+        LOG.debug("Query users by activity list");
+        Map<String, User> userMap = new HashMap<>(activityList.size(), 1);
+        for (Activity item : activityList) {
+            userMap.put(item.getUserId(), null);
+        }
+
+        List<User> users = userDao.findByIds(userMap.keySet());
+        for (User item : users) {
+            userMap.put(item.getUserId(), item);
+        }
+
+        return userMap;
+    }
+
+    private Map<String, Subscriber> initSubscriberMap(String userId) {
+        List<Subscriber> subscribers = new ArrayList<>(0);
+        if (!StringUtils.isEmpty(userId)) {
+            subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        }
+
+        Map<String, Subscriber> subscriberMap = new HashMap<>(subscribers.size(), 1);
+        for (Subscriber item : subscribers) {
+            subscriberMap.put(item.getToUser(), item);
+        }
+        return subscriberMap;
+    }
+
+    /**
+     * 获取用户看看数据
+     *
+     * @param param 查询参数
+     * @return
+     */
+    public ResponseDo getRandomActivities(ActivityQueryParam param) {
+        LOG.info("Query random activities parameters:{}", param.toString());
+
+        int counts = 0;
+        List<Activity> activities = new ArrayList<>(0);
+        do {
+            if (counts >= 4) {
+                break;
+            }
+            if (counts > 0) {
+                //距离程10倍的扩张
+                param.setMaxDistance(param.getMaxDistance() * 10);
+            }
+            //获取所有的活动列表
+            List<Activity> activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
+            Map<String, User> userMap = buildUserMap(activityList);
+
+            //获取出该用户所关注的 所有的 用户 id
+            activities = rebuildActivities(param, activityList, userMap);
+            counts++;
+        } while (activities.size() < param.getLimit());
+
+        if (activities.size() > param.getLimit()) {
+            activities = activities.subList(0, param.getLimit());
+        }
+
+        Map<String, User> userMap = buildUserMap(activities);
+
+        LOG.debug("Begin build response");
+        return ResponseDo.buildSuccessResponse(buildResponse(userMap, activities, new HashSet<String>(0)));
+    }
+
 }

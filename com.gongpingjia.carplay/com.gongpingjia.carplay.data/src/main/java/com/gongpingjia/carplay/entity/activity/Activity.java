@@ -15,7 +15,7 @@ import java.util.List;
  * 用户创建的活动信息
  */
 @Document
-public class Activity extends ActivityIntention {
+public class Activity extends ActivityIntention implements Comparable<Activity> {
 
 
     @Id
@@ -61,6 +61,9 @@ public class Activity extends ActivityIntention {
     @Transient
     private List<Appointment> appointmentList;
 
+    //该字段仅用于计算排序权重
+    @Transient
+    private double sortFactor;
 
     public String getActivityId() {
         return activityId;
@@ -181,5 +184,19 @@ public class Activity extends ActivityIntention {
 
     public void setAppointmentList(List<Appointment> appointmentList) {
         this.appointmentList = appointmentList;
+    }
+
+    public double getSortFactor() {
+        return sortFactor;
+    }
+
+    public void setSortFactor(double sortFactor) {
+        this.sortFactor = sortFactor;
+    }
+
+
+    @Override
+    public int compareTo(Activity o) {
+        return (int) ((this.sortFactor - o.sortFactor) * 100);
     }
 }
