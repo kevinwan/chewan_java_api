@@ -1,7 +1,8 @@
 'use strict';
 
 
-gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', '$timeout', '$routeParams',
+gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonSer' +
+'vice', '$timeout', '$routeParams',
     function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, $timeout, $routeParams) {
 
         //$scope.items = [
@@ -83,58 +84,69 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
 
                         //初始化 开始 结束 时间信息；
                         document.getElementById("startDate").value = commonService.transferLongToDateString($scope.activity.start);
-                        document.getElementById("startTime").value = commonService.transferLongToTimeString($scope.activity.start);
+                        //document.getElementById("startTime").value = commonService.transferLongToTimeString($scope.activity.start);
+                        if($scope.startTime === undefined) {
+                            $scope.startTime = {};
+                        }
+                        if($scope.endTime === undefined) {
+                            $scope.endTime = {};
+                        }
+                        $scope.startTime.date = commonService.transferLongToDateString($scope.activity.start);
+                        $scope.startTime.time = new Date($scope.activity.start);
                         //结束时间可能不存在
                         if ($scope.activity.end != undefined && $scope.activity.end != null && $scope.activity.end !== "") {
                             document.getElementById("endDate").value = commonService.transferLongToDateString($scope.activity.end);
-                            document.getElementById("endTime").value = commonService.transferLongToTimeString($scope.activity.end);
+                            //document.getElementById("endTime").value = commonService.transferLongToTimeString($scope.activity.end);
+                            $scope.endTime.date = commonService.transferLongToDateString($scope.activity.end);
+                            $scope.endTime.time = new Date($scope.activity.end);
                         }
                     }
                 });
             }
         };
 
+
         /**
          * 检查时间 并且初始化时间
          * @returns {boolean}
          */
         function checkTime() {
-            var startDate = document.getElementById("startDate").value;
-            var startTime = document.getElementById("startTime").value;
-            var endDate = document.getElementById("endDate").value;
-            var endTime = document.getElementById("endTime").value;
-            if (startDate == undefined || startDate == null || startDate == "") {
+            if (commonService.isNull($scope.startTime)) {
                 $window.alert("请选择开始时间");
                 return false;
             }
-            if (startTime == undefined || startTime == null || startTime == "") {
+            if (commonService.isStrEmpty($scope.startTime.date) || commonService.isStrEmpty($scope.startTime.time)) {
                 $window.alert("请选择开始时间");
                 return false;
             }
-            if (endDate != undefined && endDate != null && endDate != "") {
-                if (endTime == undefined || endTime == null || endTime == "") {
-                    $window.alert("请选择结束时间");
+            if (!commonService.isNull($scope.endTime)) {
+                //结束时间不是空
+                if(commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)){
+                    $window.alert("请选择合法的结束时间");
+                    return false;
+                }
+
+                if (!commonService.isStrEmpty($scope.endTime.date) && commonService.isStrEmpty($scope.endTime.time)) {
+                    $window.alert("请选择合法的结束时间");
                     return false;
                 }
             }
-            if (endTime != undefined && endTime != null && endTime != "") {
-                if (endDate == undefined || endDate == null || endDate == "") {
-                    $window.alert("请选择结束时间");
-                    return false;
-                }
-            }
-            var startStr = startDate + " " + startTime;
-            var endStr = endDate + " " + endTime;
 
-            var start = new Date(startStr);
-            var end = new Date(endStr);
-            $scope.activity.start = start.getTime();
 
-            if (endStr !== " ") {
-                $scope.activity.end = end.getTime();
-            } else {
+            //注意 time 是一个 date 对象 日期等都含有;
+            //
+
+            //初始化绑定参数时间
+            var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours()+":"+$scope.startTime.time.getMinutes();
+            $scope.activity.start = new Date(startStr).getTime();
+            if (!commonService.isNull($scope.endTime) && !commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
+                var endStr = $scope.endTime.date + " " + $scope.endTime.time.getHours()+":"+$scope.endTime.time.getMinutes();
+                $scope.activity.end = new Date(endStr).getTime();
+            }else{
                 $scope.activity.end = null;
             }
+
+            //校验通过
             return true;
         };
 
@@ -144,7 +156,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          */
         $scope.updateOfficialActivity = function () {
             if (checkTime() && validateAll()) {
-                if($scope.activity.end === undefined || $scope.activity.end === null){
+                if ($scope.activity.end === undefined || $scope.activity.end === null) {
                     $scope.activity.end = '';
                 }
 
@@ -251,7 +263,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("活动标题不能为空");
                 return false;
             }
-            if(commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.province)){
+            if (commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.province)) {
                 $window.alert("省不能为空");
                 return false;
             }
