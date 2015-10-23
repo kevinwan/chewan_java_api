@@ -118,6 +118,11 @@ public class ActivityQueryParam {
             criteria.and("type").is(type);
         }
 
+        if (!StringUtils.isEmpty(userId)) {
+            //排除活动创建人员
+            criteria.and("userId").ne(userId);
+        }
+
         return criteria;
     }
 

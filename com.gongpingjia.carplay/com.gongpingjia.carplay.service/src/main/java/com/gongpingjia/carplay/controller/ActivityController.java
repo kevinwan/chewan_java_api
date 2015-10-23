@@ -155,7 +155,16 @@ public class ActivityController {
         param.setCity(city);
         param.setDistrict(district);
 
-        return activityService.getNearByActivityList(param);
+        try {
+            if (!StringUtils.isEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+            return activityService.getNearByActivityList(param);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+
     }
 
     /**
@@ -177,7 +186,16 @@ public class ActivityController {
         param.setLongitude(longitude);
         param.setLatitude(latitude);
 
-        return activityService.getRandomActivities(param);
+        try {
+            if (!StringUtils.isEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+
+            return activityService.getRandomActivities(param);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
     }
 
 

@@ -929,10 +929,28 @@ public class ActivityServiceImpl implements ActivityService {
         Set<String> subscriberSet = subscriberMap.keySet();
 
         //查询出Activity的 组织者，并初始化
-        return ResponseDo.buildSuccessResponse(buildResponse(userMap, remainActivities, subscriberSet));
+        return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, remainActivities, subscriberSet));
     }
 
-    private List<Map<String, Object>> buildResponse(Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
+    private boolean isApplied(String userId, List<String> applyIds) {
+        if (StringUtils.isEmpty(userId)) {
+            return false;
+        }
+
+        if (null == applyIds || applyIds.isEmpty()) {
+            return false;
+        }
+
+        boolean applyFlag = false;
+        for (String id : applyIds) {
+            if (StringUtils.equals(id, userId)) {
+                applyFlag = true;
+            }
+        }
+        return applyFlag;
+    }
+
+    private List<Map<String, Object>> buildResponse(ActivityQueryParam param, Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
         String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> result = new ArrayList<>(remainActivities.size());
         for (Activity item : remainActivities) {
@@ -940,7 +958,7 @@ public class ActivityServiceImpl implements ActivityService {
             map.put("activityId", item.getActivityId());
             map.put("transfer", item.isTransfer());
             map.put("distance", item.getDistance());
-
+            map.put("applyFlag", isApplied(param.getUserId(), item.getApplyIds()));
             User user = userMap.get(item.getUserId());
             Map<String, Object> organizer = new HashMap<>(8, 1);
             if (user != null) {
@@ -1079,7 +1097,7 @@ public class ActivityServiceImpl implements ActivityService {
         Map<String, User> userMap = buildUserMap(activities);
 
         LOG.debug("Begin build response");
-        return ResponseDo.buildSuccessResponse(buildResponse(userMap, activities, new HashSet<String>(0)));
+        return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, activities, new HashSet<String>(0)));
     }
 
 }
