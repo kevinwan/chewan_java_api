@@ -297,7 +297,7 @@ public class OfficialServiceImpl implements OfficialService {
     private void modifyChatGroup(OfficialActivity officialActivity, List<String> members, User user) throws ApiException {
         if (members == null || members.isEmpty()) {
             chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
-                    officialActivity.getTitle(), CommonUtil.getLocalPhotoServer() + user.getAvatar());
+                    officialActivity.getTitle(), (CommonUtil.getLocalPhotoServer() + user.getAvatar()).replace("/", "|"));
         } else if (members.size() < Constants.CHATGROUP_MAX_PHOTO_COUNT) {
             //用户群聊的图片数量限制4
             StringBuilder builder = new StringBuilder();
@@ -307,7 +307,7 @@ public class OfficialServiceImpl implements OfficialService {
                 builder.append(localServer).append(item.getAvatar()).append(";");
             }
             chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
-                    officialActivity.getTitle(), builder.toString());
+                    officialActivity.getTitle(), builder.toString().replace("/", "|"));
         }
     }
 
