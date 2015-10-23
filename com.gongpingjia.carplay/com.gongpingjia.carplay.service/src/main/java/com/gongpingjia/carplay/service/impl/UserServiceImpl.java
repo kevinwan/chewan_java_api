@@ -361,9 +361,9 @@ public class UserServiceImpl implements UserService {
         LOG.debug("get user appointment infomation");
         checker.checkUserInfo(userId, token);
 
-        Criteria criteria = Criteria.where("invitedUserId").is(userId).orOperator(Criteria.where("applyUserId").is(userId));
+        Criteria criteria = new Criteria().orOperator(Criteria.where("invitedUserId").is(userId), Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
-            criteria.and("status").in(Arrays.asList(status));
+            criteria.andOperator(Criteria.where("status").in(Arrays.asList(status)));
         }
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
