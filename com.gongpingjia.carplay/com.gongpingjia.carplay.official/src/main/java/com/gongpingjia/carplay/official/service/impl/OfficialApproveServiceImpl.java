@@ -135,7 +135,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     private void sendEmchatMessage(String authUserId, AuthApplication application, String status, String remarks, int messageType) throws ApiException {
-        Map<String, Object> ext = new HashMap<>(2, 1);
+        Map<String, Object> ext = new HashMap<>(8, 1);
         ext.put("type", messageType);
         ext.put("result", Constants.Flag.POSITIVE);
 
