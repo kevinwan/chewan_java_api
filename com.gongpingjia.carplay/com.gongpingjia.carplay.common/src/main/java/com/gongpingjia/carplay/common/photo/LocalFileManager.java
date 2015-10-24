@@ -82,6 +82,7 @@ public class LocalFileManager implements PhotoService {
 		} finally {
 			if (outputStream != null) {
 				try {
+					outputStream.flush();
 					outputStream.close();
 				} catch (IOException e) {
 					LOG.warn("Close outputStream failure");
