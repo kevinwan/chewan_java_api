@@ -55,7 +55,7 @@
     </category>
 
     <category name="com.mongodb">
-        <priority value="INFO"/>
+        <priority value="DEBUG"/>
         <appender-ref ref="logFile"/>
         <appender-ref ref="console"/>
     </category>
