@@ -188,7 +188,8 @@ public class UserInfoController {
      * @return
      */
     @RequestMapping(value = "/user/{userId}/view/history")
-    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestParam("limit") int limit, @RequestParam("ignore") int ignore) {
+    public ResponseDo getViewHistory(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                     @RequestParam(value = "limit", defaultValue = "10") int limit, @RequestParam(value = "ignore", defaultValue = "0") int ignore) {
         LOG.debug("/user/{}/view/history", userId);
         try {
             return userService.getViewHistory(userId, token, limit, ignore);

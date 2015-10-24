@@ -943,20 +943,11 @@ public class UserServiceImpl implements UserService {
         LOG.debug("get user view history information, userId:{}", userId);
         checker.checkUserInfo(userId, token);
 
-        //获取当前的用户信息；
-        User nowUser = userDao.findById(userId);
-
-        if (null == nowUser) {
-            LOG.warn("No user exist, userId:{}", userId);
-            throw new ApiException("用户不存在");
-        }
-
         Criteria criteria = Criteria.where("userId").is(userId);
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "viewTime"))).skip(ignore).limit(limit);
         List<AlbumViewHistory> viewHistoryList = albumViewHistoryDao.find(query);
-
-        LinkedHashSet<String> userIdSet = new LinkedHashSet<>();
+        Set<String> userIdSet = new HashSet<>(viewHistoryList.size());
         for (AlbumViewHistory item : viewHistoryList) {
             userIdSet.add(item.getViewUserId());
         }
@@ -966,14 +957,30 @@ public class UserServiceImpl implements UserService {
         if (null == userList || userList.size() == 0) {
             return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
         }
-        List<User> users = new ArrayList<User>(userIdSet.size());
-        for (String itemUId : userIdSet) {
-            User userItem = FetchUtil.getUserFromList(userList, itemUId);
-            double distance = DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
-                    userItem.getLandmark().getLongitude(), userItem.getLandmark().getLatitude());
-            userItem.setDistance(distance);
-            userItem.hideSecretInfo();
-            users.add(userItem);
+
+        Map<String, User> userMap = new HashMap<>(userList.size());
+        for (User item : userList) {
+            userMap.put(item.getUserId(), item);
+        }
+
+        //获取当前的用户信息；
+        User nowUser = userDao.findById(userId);
+
+        String localServer = CommonUtil.getLocalPhotoServer();
+        List<Map<String, Object>> users = new ArrayList<>(userIdSet.size());
+        for (AlbumViewHistory item : viewHistoryList) {
+            User user = userMap.get(item.getViewUserId());
+            Map<String, Object> map = new HashMap<>(8, 1);
+            map.put("userId", user.getUserId());
+            map.put("nickname", user.getNickname());
+            map.put("gender", user.getGender());
+            map.put("age", user.getAge());
+            map.put("avatar", localServer + user.getAvatar());
+            map.put("distance", DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
+                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+            map.put("viewTime", item.getViewTime());
+            map.put("cover", user.getCover());
+            users.add(map);
         }
         return ResponseDo.buildSuccessResponse(users);
     }
