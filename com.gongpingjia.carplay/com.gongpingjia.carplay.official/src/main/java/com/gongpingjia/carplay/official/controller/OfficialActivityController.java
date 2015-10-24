@@ -59,6 +59,7 @@ public class OfficialActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo getActivityList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         try {
+            LOG.debug("official/activity/list");
             officialParameterChecker.checkAdminUserInfo(userId, token);
 
             return officialActivityService.getActivityList(userId, json);

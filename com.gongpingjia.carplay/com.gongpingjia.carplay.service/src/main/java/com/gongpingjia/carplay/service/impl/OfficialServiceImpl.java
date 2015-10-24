@@ -152,9 +152,11 @@ public class OfficialServiceImpl implements OfficialService {
     private void buildUserBaseInfo(String localServer, String gpjServer, User queryUser, User user, Map<String, Object> map) {
         map.put("userId", user.getUserId());
         map.put("nickname", user.getNickname());
+        map.put("age", user.getAge());
         map.put("avatar", localServer + user.getAvatar());
         map.put("gender", user.getGender());
         map.put("licenseAuthStatus", user.getLicenseAuthStatus());
+        map.put("photoAuthStatus", user.getPhotoAuthStatus());
         map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
                 user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
         if (user.getCar() != null) {
