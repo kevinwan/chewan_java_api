@@ -473,11 +473,30 @@ public class UserServiceImpl implements UserService {
             userMap.put(user.getUserId(), user);
         }
 
-        return ResponseDo.buildSuccessResponse(buildResponseData(interestMessages, activityMap, userMap));
+        Map<String, Appointment> appointmentMap = buildActivityIdToAppointmentMap(userId, activityMap);
+
+        return ResponseDo.buildSuccessResponse(buildResponseData(interestMessages, activityMap, userMap,appointmentMap,userId));
     }
 
-    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap) {
+    private Map<String,Appointment> buildActivityIdToAppointmentMap(String userId, Map<String, Activity> activityMap) {
+        Criteria criteria = Criteria.where("applyUserId").is(userId);
+        criteria.and("activityId").in(activityMap.keySet());
+        List<Appointment> appointmentList = appointmentDao.find(Query.query(criteria));
+        Map<String, Appointment> appointmentMap = new HashMap<>(appointmentList.size(), 1);
+        for (Appointment appointment : appointmentList) {
+            //注意 key 存放的 是 activityId
+            appointmentMap.put(appointment.getActivityId(), appointment);
+        }
+        return appointmentMap;
+    }
+
+    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap,Map<String,Appointment> appointmentMap,String userId) {
         LOG.debug("Build response data");
+        //fetch own user
+        User ownUser = userDao.findById(userId);
+
+        //注意 appointmentMap中 key 存放的是 activityId  即为 从 activityId 找找到对应的 appoint 因为 只会出查找  该用户对此活动申请的 appointment 所以 是唯一对应关系；
+
         String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> interests = new ArrayList<>(interestMessages.size());
         for (int index = 0; index < interestMessages.size(); index++) {
@@ -490,11 +509,22 @@ public class UserServiceImpl implements UserService {
             if (message.getType() == InterestMessage.USER_ACTIVITY) {
                 //用户创建活动
                 Activity activity = activityMap.get(message.getRelatedId());
+
                 interestMap.put("activityType", activity.getType());
                 interestMap.put("activityPay", activity.getPay());
                 interestMap.put("activityTransfer", activity.isTransfer());
                 interestMap.put("activityDestination", activity.getDestination());
                 interestMap.put("photoCount", 0);
+
+                //该活动距离当前用户的距离
+                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), activity.getEstabPoint().getLongitude(), activity.getEstabPoint().getLatitude()));
+                Appointment appointment = appointmentMap.get(activity.getActivityId());
+                if (null == appointment) {
+                    //没有发送邀请;
+                    interestMap.put("activityStatus", Constants.AppointmentStatus.INITIAL);
+                }else {
+                    interestMap.put("activityStatus", appointment.getStatus());
+                }
             } else if (message.getType() == InterestMessage.USER_ALBUM) {
                 //用户上传相册
                 interestMap.put("activityType", "");
@@ -502,6 +532,9 @@ public class UserServiceImpl implements UserService {
                 interestMap.put("activityTransfer", "");
                 interestMap.put("activityDestination", "");
                 interestMap.put("photoCount", message.getCount());
+
+                interestMap.put("distance", "");
+                interestMap.put("activityStatus", "");
             }
 
             User user = userMap.get(message.getUserId());
