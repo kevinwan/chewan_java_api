@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -160,7 +161,9 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 String titleReg = ".*" + title + ".*";
                 criteria.and("title").regex(titleReg);
             }
-            List<OfficialActivity> officialActivities = activityDao.find(Query.query(criteria));
+            Query query = Query.query(criteria);
+            query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "start")));
+            List<OfficialActivity> officialActivities = activityDao.find(query);
             return ResponseDo.buildSuccessResponse(officialActivities);
         } catch (Exception e) {
             throw new ApiException(e.getMessage());

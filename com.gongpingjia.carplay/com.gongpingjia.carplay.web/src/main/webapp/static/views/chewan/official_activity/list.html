@@ -83,7 +83,7 @@
                 <th>补贴</th>
                 <th>开始时间</th>
                 <th>结束时间</th>
-                <th>上架状态</th>
+                <th width="100px">上架状态</th>
                 <th style="display: none"></th>
             </tr>
             </thead>
@@ -125,8 +125,7 @@
                     <span ng-show="item.end != undefined && item.end != null && item.end !== '' ">{{item.end | date:"yyyy-MM-dd HH:mm"}}</span>
                 </td>
                 <td>
-                    <div ng-show="item.onFlag == false">未上架
-                        <button ng-click="sendOnFlag(item.officialActivityId)" style="margin-left:5px;">上架</button>
+                    <div ng-show="item.onFlag == false"><span>未上架</span><button ng-click="sendOnFlag(item.officialActivityId)" style="margin-left:5px;">上架</button>
                     </div>
                     <div ng-show="checkOnItemStatus(item.onFlag,item.end)  == 1">
                         上架中

@@ -919,7 +919,7 @@ public class ActivityServiceImpl implements ActivityService {
             return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
         }
 
-        List<Activity> remainActivities = activities.subList(param.getIgnore(), activities.size() - param.getIgnore());
+        List<Activity> remainActivities = activities.subList(param.getIgnore(), activityList.size());
         if (remainActivities.size() > param.getLimit()) {
             remainActivities = remainActivities.subList(0, param.getLimit());
         }
