@@ -130,8 +130,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
                 } else if (status == 1) {
                     //上架中
                     criteria.and("onFlag").is(true);
-                    criteria.and("end").gte(new Date().getTime());
-//                    criteria.and("end").exists(false).orOperator(Criteria.where("end").gte(new Date().getTime()));
+                    criteria.orOperator(Criteria.where("end").exists(false), Criteria.where("end").gte(new Date().getTime()));
                 } else if (status == 2) {
                     //已经下架
                     criteria.and("onFlag").is(true);
