@@ -328,7 +328,7 @@ public class UserServiceImpl implements UserService {
     public ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException {
         LOG.debug("Begin get user information, check input parameters");
         checker.checkUserInfo(viewUser, token);
-        
+
         User beViewedUserInfo = userDao.findById(beViewedUser);
         if (beViewedUserInfo == null) {
             LOG.warn("No user exist by userId:{}", beViewedUser);
@@ -385,7 +385,6 @@ public class UserServiceImpl implements UserService {
                     userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
         }
 
-        List<Map<String, Object>> data = new ArrayList<>(appointments.size());
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
             User userInfo = null;
