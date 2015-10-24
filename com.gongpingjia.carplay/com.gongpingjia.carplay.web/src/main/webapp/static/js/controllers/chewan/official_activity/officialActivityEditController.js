@@ -160,6 +160,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     $scope.activity.end = '';
                 }
 
+                //高德bug
+                $scope.activity.destination.detail = document.getElementById('keyword').value;
+
                 $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
                     if (result.result == 0) {
                         $window.alert("更新成功");
@@ -178,6 +181,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          */
         $scope.register = function () {
             if (checkTime() && validateAll()) {
+
+
+                //高德数字bug
+                $scope.activity.destination.detail = document.getElementById('keyword').value;
                 //初始化 省份信息 angular上绑定的 provinceIndex 信息；
                 //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
                 $rootScope.loadingPromise = officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
