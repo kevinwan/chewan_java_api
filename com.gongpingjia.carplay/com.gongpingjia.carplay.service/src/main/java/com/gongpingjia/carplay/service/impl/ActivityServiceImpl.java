@@ -986,6 +986,12 @@ public class ActivityServiceImpl implements ActivityService {
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
             User user = userMap.get(item.getUserId());
+            if (StringUtils.isNotEmpty(param.getGender())) {
+                if (!StringUtils.equals(param.getGender(), user.getGender())) {
+                    //如果用户的性别不符合要求；
+                    continue;
+                }
+            }
             if (user != null || user.getIdle()) {
                 //只有当用户空闲的情况下才参与排序计算
                 item.setSortFactor(computeWeight(param, current, item, user));
@@ -1009,7 +1015,8 @@ public class ActivityServiceImpl implements ActivityService {
         item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(),
                 item.getEstabPoint().getLongitude(), item.getEstabPoint().getLatitude()));
         double sortFactor = 0.2 * (1 - item.getDistance() / param.getMaxDistance());
-        sortFactor += 0.1 * (1 - (current - item.getCreateTime()) * 0.1 / param.getMaxTimeLimit());
+
+        sortFactor += 0.1 * (1 - (current - item.getCreateTime()) / param.getMaxTimeLimit());
 
         //用户车主认证权重计算
         if (Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {

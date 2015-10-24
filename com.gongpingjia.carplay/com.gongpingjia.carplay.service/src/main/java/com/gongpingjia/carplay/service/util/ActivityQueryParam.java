@@ -71,10 +71,10 @@ public class ActivityQueryParam {
             criteria.and("pay").is(pay);
         }
 
-        if (!StringUtils.isEmpty(gender)) {
-            //性别
-            criteria.and("gender").is(gender);
-        }
+//        if (!StringUtils.isEmpty(gender)) {
+//            //性别
+//            criteria.and("gender").is(gender);
+//        }
 
         if (transfer != null && transfer) {
             //只有选择包接送才会执行这个
