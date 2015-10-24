@@ -160,17 +160,36 @@ public class SubscribeServiceImpl implements SubscribeService {
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "subscribeTime")))
                 .skip(ignore).limit(limit));
 
-        List<String> subUserIdSet = new ArrayList<String>(beSubscribed.size());
+        Map<String, User> userMap = new HashMap<>(beSubscribed.size());
         for (Subscriber sub : beSubscribed) {
-            subUserIdSet.add(sub.getFromUser());
+            userMap.put(sub.getFromUser(), null);
         }
 
         //获取关注我的用户的信息
-        List<User> users = userDao.findByIds(subUserIdSet);
+        List<User> users = userDao.findByIds(userMap.keySet());
+        for (User item : users) {
+            userMap.put(item.getUserId(), item);
+        }
 
-        refreshUserinfo(myself, users);
+        LOG.debug("Build response data");
+        String localServer = CommonUtil.getLocalPhotoServer();
+        List<Map<String, Object>> data = new ArrayList<>(beSubscribed.size());
+        for (Subscriber item : beSubscribed) {
+            Map<String, Object> map = new HashMap<>(8, 1);
+            User user = userMap.get(item.getFromUser());
+            map.put("userId", user.getUserId());
+            map.put("nickname", user.getNickname());
+            map.put("gender", user.getGender());
+            map.put("age", user.getAge());
+            map.put("avatar", localServer + user.getAvatar());
+            map.put("distance", DistanceUtil.getDistance(myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude(),
+                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+            map.put("cover", user.getCover());
+            map.put("subscribeTime", item.getSubscribeTime());
+            data.add(map);
+        }
 
-        return ResponseDo.buildSuccessResponse(users);
+        return ResponseDo.buildSuccessResponse(data);
     }
 
     /**
