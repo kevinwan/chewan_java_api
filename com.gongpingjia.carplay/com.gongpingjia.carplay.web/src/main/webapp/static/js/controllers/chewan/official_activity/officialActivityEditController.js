@@ -260,7 +260,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 return false;
             }
             if (commonService.isStrEmpty($scope.activity.instruction)) {
-                $window.alert("活动标题不能为空");
+                $window.alert("活动介绍不能为空");
                 return false;
             }
             if (commonService.isNull($scope.activity.destination) || commonService.isStrEmpty($scope.activity.destination.province)) {
