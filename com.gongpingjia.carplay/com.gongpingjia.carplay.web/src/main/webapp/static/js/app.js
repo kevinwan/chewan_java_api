@@ -10,8 +10,8 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
 
 
 gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
-gpjApp.constant("ChewanApiProvider", "http://cwapi.gongpingjia.com:8080");
-gpjApp.constant("ChewanApiEndPoint", "/v2");
+gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
+gpjApp.constant('ChewanApiEndPoint', '/v2');
 
 //gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
 //gpjApp.constant("ChewanApiProvider", "http://localhost:8080");
