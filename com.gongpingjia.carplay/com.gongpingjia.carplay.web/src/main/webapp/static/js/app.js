@@ -39,7 +39,7 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/user/list', {
         templateUrl: 'views/user/user.html',
         controller: 'userController'
-    }).when('/user/detail', {
+    }).when('/user/detail/:id', {
         templateUrl: 'views/user/user_detail.html',
         controller: 'userDetailController'
     }).when('/activity/list', {
