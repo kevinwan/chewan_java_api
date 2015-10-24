@@ -185,6 +185,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             map.put("distance", DistanceUtil.getDistance(myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude(),
                     user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
             map.put("cover", user.getCover());
+            map.put("subscribeTime", item.getSubscribeTime());
             data.add(map);
         }
 
