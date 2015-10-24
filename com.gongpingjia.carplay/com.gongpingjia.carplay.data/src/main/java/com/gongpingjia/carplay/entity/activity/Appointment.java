@@ -33,8 +33,13 @@ public class Appointment extends ActivityIntention {
 
     private Long modifyTime;
 
+    //申请人员信息
     @Transient
     private Object applicant;
+
+    //活动动态信息，当前用户是否是活动申请人员
+    @Transient
+    private Boolean isApplicant;
 
     public String getAppointmentId() {
         return appointmentId;
@@ -114,5 +119,13 @@ public class Appointment extends ActivityIntention {
 
     public void setApplicant(Object applicant) {
         this.applicant = applicant;
+    }
+
+    public Boolean getIsApplicant() {
+        return isApplicant;
+    }
+
+    public void setIsApplicant(Boolean isApplicant) {
+        this.isApplicant = isApplicant;
     }
 }

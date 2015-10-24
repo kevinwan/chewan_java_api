@@ -328,9 +328,9 @@ public class UserServiceImpl implements UserService {
     public ResponseDo getUserInfo(String beViewedUser, String viewUser, String token) throws ApiException {
         LOG.debug("Begin get user information, check input parameters");
         checker.checkUserInfo(viewUser, token);
-
-        User user = userDao.findById(beViewedUser);
-        if (user == null) {
+        
+        User beViewedUserInfo = userDao.findById(beViewedUser);
+        if (beViewedUserInfo == null) {
             LOG.warn("No user exist by userId:{}", beViewedUser);
             return ResponseDo.buildFailureResponse("用户不存在");
         }
@@ -343,17 +343,18 @@ public class UserServiceImpl implements UserService {
             history.setUserId(beViewedUser);
             historyDao.save(history);
 
+            User viewUserInfo = userDao.findById(viewUser);
             String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.view", "{0}看过了我的相册"),
-                    user.getNickname());
+                    viewUserInfo.getNickname());
             chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.USER_VIEW,
-                    user.getEmchatName(), message);
+                    beViewedUserInfo.getEmchatName(), message);
         }
 
-        user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        user.setCompletion(computeCompletion(user));
-        user.hideSecretInfo();
+        beViewedUserInfo.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
+        beViewedUserInfo.setCompletion(computeCompletion(beViewedUserInfo));
+        beViewedUserInfo.hideSecretInfo();
 
-        return ResponseDo.buildSuccessResponse(user);
+        return ResponseDo.buildSuccessResponse(beViewedUserInfo);
     }
 
     @Override
@@ -384,15 +385,31 @@ public class UserServiceImpl implements UserService {
                     userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
         }
 
+        List<Map<String, Object>> data = new ArrayList<>(appointments.size());
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
             User userInfo = null;
             if (userId.equals(appointment.getApplyUserId())) {
                 userInfo = users.get(appointment.getInvitedUserId());
+                appointment.setIsApplicant(true);
             } else {
                 userInfo = users.get(appointment.getApplyUserId());
+                appointment.setIsApplicant(false);
             }
-            appointment.setApplicant(userInfo);
+
+            Map<String, Object> userMap = new HashMap<>(16, 1);
+            userMap.put("userId", userInfo.getUserId());
+            userMap.put("nickname", userInfo.getNickname());
+            userMap.put("gender", userInfo.getGender());
+            userMap.put("age", userInfo.getAge());
+            userMap.put("role", userInfo.getRole());
+            userMap.put("avatar", userInfo.getAvatar());
+            userMap.put("drivingYears", userInfo.getDrivingYears());
+            userMap.put("photoAuthStatus", userInfo.getPhotoAuthStatus());
+            userMap.put("licenseAuthStatus", userInfo.getLicenseAuthStatus());
+            userMap.put("cover", userInfo.getCover());
+            userMap.put("car", userInfo.getCar());
+            appointment.setApplicant(userMap);
         }
 
         return ResponseDo.buildSuccessResponse(appointments);
@@ -475,10 +492,10 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Appointment> appointmentMap = buildActivityIdToAppointmentMap(userId, activityMap);
 
-        return ResponseDo.buildSuccessResponse(buildResponseData(interestMessages, activityMap, userMap,appointmentMap,userId));
+        return ResponseDo.buildSuccessResponse(buildResponseData(interestMessages, activityMap, userMap, appointmentMap, userId));
     }
 
-    private Map<String,Appointment> buildActivityIdToAppointmentMap(String userId, Map<String, Activity> activityMap) {
+    private Map<String, Appointment> buildActivityIdToAppointmentMap(String userId, Map<String, Activity> activityMap) {
         Criteria criteria = Criteria.where("applyUserId").is(userId);
         criteria.and("activityId").in(activityMap.keySet());
         List<Appointment> appointmentList = appointmentDao.find(Query.query(criteria));
@@ -490,7 +507,7 @@ public class UserServiceImpl implements UserService {
         return appointmentMap;
     }
 
-    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap,Map<String,Appointment> appointmentMap,String userId) {
+    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap, Map<String, Appointment> appointmentMap, String userId) {
         LOG.debug("Build response data");
         //fetch own user
         User ownUser = userDao.findById(userId);
@@ -522,7 +539,7 @@ public class UserServiceImpl implements UserService {
                 if (null == appointment) {
                     //没有发送邀请;
                     interestMap.put("activityStatus", Constants.AppointmentStatus.INITIAL);
-                }else {
+                } else {
                     interestMap.put("activityStatus", appointment.getStatus());
                 }
             } else if (message.getType() == InterestMessage.USER_ALBUM) {
