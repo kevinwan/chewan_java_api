@@ -22,10 +22,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by licheng on 2015/10/21.
@@ -89,23 +86,23 @@ public class AppointmentExpiredRemindTask extends QuartzJobBean {
 
     private void sendMessage(ChatCommonService chatCommonService, ChatThirdPartyService chatThirdPartyService,
                              Activity activity, User invitedUser, User applier) {
-        List<String> emchatUsers = new ArrayList<>(2);
-        emchatUsers.add(invitedUser.getEmchatName());
-        emchatUsers.add(applier.getEmchatName());
-
         Map<String, Object> ext = new HashMap<>(2, 1);
         ext.put("type", Constants.MessageType.APPOINTMENT_EXPIRED_MSG);
 
         try {
+            //发给活动申请人
             String invitedUserMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
                     "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), applier.getNickname(), activity.getType());
-            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL, emchatUsers,
-                    invitedUserMessage, ext);
+            ext.put("userId", invitedUser.getUserId());
+            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
+                    Arrays.asList(applier.getEmchatName()), invitedUserMessage, ext);
 
+            //发给活动接收人(被邀请人员)
             String applierMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
                     "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), invitedUser.getNickname(), activity.getType());
-            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL, emchatUsers,
-                    applierMessage, ext);
+            ext.put("userId", applier.getUserId());
+            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
+                    Arrays.asList(invitedUser.getEmchatName()), applierMessage, ext);
         } catch (ApiException e) {
             LOG.warn("Send message failure, applier:{}, inviter:{}", applier.getUserId(), invitedUser.getUserId());
         }
