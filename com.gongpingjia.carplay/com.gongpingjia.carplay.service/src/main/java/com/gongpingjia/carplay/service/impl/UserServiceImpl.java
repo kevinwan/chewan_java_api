@@ -387,6 +387,15 @@ public class UserServiceImpl implements UserService {
                     userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
         }
 
+
+        //获取所有的appointment 对应的 user 信息；
+
+        List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
+        Set<String> subscriberIdSet = new HashSet<>(subscribers.size(), 1);
+        for (Subscriber subscriber : subscribers) {
+            subscriberIdSet.add(subscriber.getToUser());
+        }
+
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
             User userInfo = null;
@@ -410,6 +419,8 @@ public class UserServiceImpl implements UserService {
             userMap.put("licenseAuthStatus", userInfo.getLicenseAuthStatus());
             userMap.put("cover", userInfo.getCover());
             userMap.put("car", userInfo.getCar());
+            //是否在subscriberIdSet中 即为 是否关注了该用户
+            userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
             appointment.setApplicant(userMap);
         }
 
@@ -566,6 +577,8 @@ public class UserServiceImpl implements UserService {
             userInfo.put("car", user.getCar());
             userInfo.put("avatar", localServer + user.getAvatar());
             userInfo.put("cover", user.getCover());
+            userInfo.put("subscribeFlag", true);
+
             interestMap.put("user", userInfo);
 
             interests.add(interestMap);
