@@ -127,6 +127,7 @@ public class ActivityController {
     @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
     public ResponseDo getNearByActivityList(@RequestParam(value = "userId", required = false) String userId,
                                             @RequestParam(value = "token", required = false) String token,
+                                            @RequestParam(value = "majorType",required = false)String majorType,
                                             @RequestParam(value = "type", required = false) String type,
                                             @RequestParam(value = "pay", required = false) String pay,
                                             @RequestParam(value = "gender", required = false) String gender,
@@ -144,6 +145,7 @@ public class ActivityController {
         param.setUserId(userId);
         param.setToken(token);
         param.setType(type);
+        param.setMajorType(majorType);
         param.setPay(pay);
         param.setGender(gender);
         param.setTransfer(transfer);

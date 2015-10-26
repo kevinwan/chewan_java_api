@@ -10,6 +10,9 @@ public class ActivityIntention {
 
     //活动类型,吃饭，唱歌，KTV
     protected String type;
+
+    private String majorType;
+
     //付费类型
     protected String pay;
 
@@ -27,6 +30,14 @@ public class ActivityIntention {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getMajorType() {
+        return majorType;
+    }
+
+    public void setMajorType(String majorType) {
+        this.majorType = majorType;
     }
 
     public String getPay() {

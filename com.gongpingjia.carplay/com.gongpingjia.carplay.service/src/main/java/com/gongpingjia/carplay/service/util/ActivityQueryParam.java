@@ -13,6 +13,7 @@ public class ActivityQueryParam {
     private String userId;
     private String token;
 
+    private String majorType;
     private String type;
     private String pay;
     private String gender;
@@ -59,6 +60,10 @@ public class ActivityQueryParam {
         if (!StringUtils.isEmpty(userId)) {
             //排除活动创建人员
             criteria.and("userId").ne(userId);
+        }
+
+        if (!StringUtils.isEmpty(majorType)) {
+            criteria.and("majorType").is(majorType);
         }
 
         if (!StringUtils.isEmpty(type)) {
@@ -112,6 +117,10 @@ public class ActivityQueryParam {
 
         Criteria criteria = Criteria.where("estabPoint").near(new Point(this.longitude, this.latitude))
                 .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS).and("deleteFlag").is(false);
+
+        if (!StringUtils.isEmpty(majorType)) {
+            criteria.and("majorType").is(majorType);
+        }
 
         if (!StringUtils.isEmpty(type)) {
             //类型
@@ -168,6 +177,14 @@ public class ActivityQueryParam {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getMajorType() {
+        return majorType;
+    }
+
+    public void setMajorType(String majorType) {
+        this.majorType = majorType;
     }
 
     public String getType() {
