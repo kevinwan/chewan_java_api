@@ -281,6 +281,57 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
     }
 
 
+    /**
+     * json中     limitType  0:无限制 1：限制总人数 2：限制男女人数
+     *
+     * @param activityId
+     * @param json
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    public ResponseDo updateActivityLimit(String activityId, JSONObject json) throws ApiException {
+
+        OfficialActivity officialActivity = activityDao.findById(activityId);
+        if (null == officialActivity) {
+            throw new ApiException("没有改官方活动");
+        }
+
+        int limitType = json.getInt("limitType");
+        Update update = Update.update("limitType", limitType);
+        if (limitType == Constants.OfficialActivityLimitType.NO_LIMIT) {
+            //无限制
+            update.set("totalLimit", -1);
+            update.set("maleLimit", -1);
+            update.set("femaleLimit", -1);
+        } else if (limitType == Constants.OfficialActivityLimitType.TOTAL_LIMIT) {
+            //限制总人数
+            int totalLimit = json.getInt("totalLimit");
+            if (totalLimit < officialActivity.getNowJoinNum()) {
+                throw new ApiException("总人数限制不能小于当前已经参加的人数");
+            }
+            update.set("totalLimit", totalLimit);
+            update.set("maleLimit", -1);
+            update.set("femaleLimit", -1);
+        } else if (limitType == Constants.OfficialActivityLimitType.GENDER_LIMIT) {
+            //分别限制男女总数
+            int maleLimit = json.getInt("maleLimit");
+            int femaleLimit = json.getInt("femaleLimit");
+            if (maleLimit < officialActivity.getMaleLimit() || femaleLimit < officialActivity.getFemaleLimit()) {
+                throw new ApiException("男女限制人数不能小于当前的男女参加人数");
+            }
+            update.set("totalLimit", -1);
+            update.set("maleLimit", maleLimit);
+            update.set("femaleLimit", femaleLimit);
+        } else {
+            throw new ApiException("限制类型参数错误");
+        }
+
+        activityDao.update(activityId, update);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
     private OfficialActivity checkAndInitSaveEntity(String userId, JSONObject json) throws ApiException {
         //必填项目
         if (CommonUtil.isEmpty(json, Arrays.asList("title", "instruction", "destination", "cover", "limitType", "price", "start", "onFlag"))) {

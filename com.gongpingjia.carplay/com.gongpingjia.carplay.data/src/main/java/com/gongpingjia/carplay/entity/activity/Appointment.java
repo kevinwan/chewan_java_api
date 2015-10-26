@@ -31,6 +31,8 @@ public class Appointment extends ActivityIntention {
 
     private String remark;
 
+    private String message;
+
     private Long modifyTime;
 
     //申请人员信息
@@ -127,5 +129,13 @@ public class Appointment extends ActivityIntention {
 
     public void setIsApplicant(Boolean isApplicant) {
         this.isApplicant = isApplicant;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

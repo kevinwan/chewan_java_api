@@ -33,4 +33,7 @@ public interface OfficialActivityService {
     ResponseDo getActivity(String officialActivityId) throws ApiException;
 
     ResponseDo deleteActivities(List<String> officialActivityIds) throws ApiException;
+
+
+    ResponseDo updateActivityLimit(String activityId,JSONObject json) throws ApiException;
 }

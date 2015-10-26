@@ -340,7 +340,7 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
     @Override
-    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException {
+    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer,String message) throws ApiException {
         LOG.debug("user:{} invited user:{} together", fromUserId, toUserId);
         //查询是否已经邀请过了
         Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
@@ -360,14 +360,15 @@ public class OfficialServiceImpl implements OfficialService {
         appointment.setModifyTime(DateUtil.getTime());
         appointment.setStatus(Constants.AppointmentStatus.APPLYING);
         appointment.setTransfer(transfer);
+        appointment.setMessage(message);
         appointmentDao.save(appointment);
 
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
-        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.official.activity.invite",
+        String pushMsg = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.official.activity.invite",
                 "{0}邀请您{1}同去参加官方活动"), fromUser.getNickname(), toUser.getNickname());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
-                toUser.getEmchatName(), message);
+                toUser.getEmchatName(), pushMsg);
 
         return ResponseDo.buildSuccessResponse();
     }

@@ -32,7 +32,7 @@ public interface OfficialService {
     ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
 
 
-    ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer) throws ApiException;
+    ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer,String message) throws ApiException;
 
     /**
      * 获取区域信息

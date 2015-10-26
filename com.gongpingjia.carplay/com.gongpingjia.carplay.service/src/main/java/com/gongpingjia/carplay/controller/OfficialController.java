@@ -129,12 +129,13 @@ public class OfficialController {
 
             String invitedUserId = json.getString("invitedUserId");
             Boolean transfer = json.getBoolean("transfer");
+            String message = json.getString("message");
 
             parameterChecker.checkUserInfo(userId, token);
             parameterChecker.isUserExist(invitedUserId);
 
-            return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer);
-        } catch (Exception e) {
+            return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer,message);
+        } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }

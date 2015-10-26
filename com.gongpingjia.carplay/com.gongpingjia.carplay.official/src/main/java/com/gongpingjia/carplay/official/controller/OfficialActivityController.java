@@ -55,6 +55,14 @@ public class OfficialActivityController {
     }
 
 
+    /**
+     * 查看官方活动列表
+     *
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
     @RequestMapping(value = "/official/activity/list", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo getActivityList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
@@ -69,6 +77,14 @@ public class OfficialActivityController {
         }
     }
 
+    /**
+     * 更新官方活动的上架状态
+     *
+     * @param userId
+     * @param token
+     * @param officialActivityId
+     * @return
+     */
     @RequestMapping(value = "official/activity/onFlag", method = RequestMethod.GET)
     public ResponseDo changeOnFlag(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
         try {
@@ -81,6 +97,16 @@ public class OfficialActivityController {
         }
     }
 
+
+    /**
+     * 更新官方活动
+     *
+     * @param userId
+     * @param token
+     * @param officialActivityId
+     * @param json
+     * @return
+     */
     @RequestMapping(value = "/official/activity/update", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo updateActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId, @RequestBody JSONObject json) {
@@ -94,6 +120,14 @@ public class OfficialActivityController {
         }
     }
 
+    /**
+     * 获取官方活动详情
+     *
+     * @param userId
+     * @param token
+     * @param officialActivityId
+     * @return
+     */
     @RequestMapping(value = "official/activity/info", method = RequestMethod.GET)
     public ResponseDo getInfo(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("officialActivityId") String officialActivityId) {
         try {
@@ -106,6 +140,15 @@ public class OfficialActivityController {
         }
     }
 
+    /**
+     * 删除官方活动
+     * 软删除  将deleteFlag置为true
+     *
+     * @param userId
+     * @param token
+     * @param ids
+     * @return
+     */
     @RequestMapping(value = "/official/activity/deleteIds", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo deleteOfficialActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody ArrayList<String> ids) {
@@ -118,6 +161,27 @@ public class OfficialActivityController {
             }
 
             return officialActivityService.deleteActivities(ids);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新官方活动的人数限制
+     *
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/official/activity/{activityId}/updateLimit", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo updateOfficialActivityLimit(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+        LOG.info("/official/activity/{}/updateLimit           starts", activityId);
+        try {
+            officialParameterChecker.checkAdminUserInfo(userId, token);
+            return officialActivityService.updateActivityLimit(activityId, json);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
