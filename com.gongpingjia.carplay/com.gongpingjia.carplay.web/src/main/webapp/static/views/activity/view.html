@@ -1,0 +1,164 @@
+<div class="">
+    <h3 class="">活动详情</h3>
+
+    <div class="control-group">
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>创建人昵称
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="organizer.nickname" ng-model="activity.organizer.nickname"
+                       placeholder="活动类型"/>
+            </div>
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>创建人手机号
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="organizer.phone" ng-model="activity.organizer.phone"
+                       placeholder="活动类型"/>
+            </div>
+        </div>
+
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>创建时间
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="createTime"
+                       value="{{activity.createTime | date:'yyyy-MM-dd hh:mm'}}"
+                       placeholder="活动类型"/>
+            </div>
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>活动类型
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="type" ng-model="activity.type"
+                       placeholder="活动类型"/>
+            </div>
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>付款方式
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="pay" ng-model="activity.pay"
+                       placeholder="活动类型"/>
+            </div>
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>包接送
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <select ng-model="activity.transfer">
+                    <option value="true">是</option>
+                    <option value="false">否</option>
+                </select>
+            </div>
+        </div>
+
+        <div class=" col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>活动地址
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <div class="col-md-12">
+                    <span class="col-md-3">{{activity.destination.province}}</span>
+                    <span class="col-md-3">{{activity.destination.city}}</span>
+                    <span class="col-md-3">{{activity.destination.district}}</span>
+                    <span class="col-md-3">{{activity.destination.detail}}</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>活动经纬度
+            </label>
+
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>经度
+            </label>
+
+
+            <div class="col-md-3 no-padding-left">
+                <input type="text" class="form-control" id="destPoint.longitude" ng-model="activity.destPoint.longitude"
+                       placeholder="活动经度"/>
+            </div>
+
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>纬度
+            </label>
+
+            <div class="col-md-3 no-padding-left">
+                <input type="text" class="form-control" id="destPoint.latitude" ng-model="activity.destPoint.latitude"
+                       placeholder="活动纬度"/>
+            </div>
+        </div>
+
+
+        <div class=" col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>创建地址
+            </label>
+
+            <div class="col-md-9 no-padding-left">
+                <div class="col-md-12">
+                    <span class="col-md-3">{{activity.establish.province}}</span>
+                    <span class="col-md-3">{{activity.establish.city}}</span>
+                    <span class="col-md-3">{{activity.establish.district}}</span>
+                    <span class="col-md-3">{{activity.establish.detail}}</span>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>活动经纬度
+            </label>
+
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>经度
+            </label>
+
+
+            <div class="col-md-3 no-padding-left">
+                <input type="text" class="form-control" id="estabPoint.longitude" ng-model="activity.estabPoint.longitude"
+                       placeholder="活动经度"/>
+            </div>
+
+            <label class="col-md-1 control-label no-padding-right">
+                <span style="color:red">*</span>纬度
+            </label>
+
+            <div class="col-md-3 no-padding-left">
+                <input type="text" class="form-control" id="estabPoint.latitude" ng-model="activity.estabPoint.latitude"
+                       placeholder="活动纬度"/>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</div>
+</div>

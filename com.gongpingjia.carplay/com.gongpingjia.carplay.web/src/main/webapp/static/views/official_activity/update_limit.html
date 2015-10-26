@@ -1,0 +1,356 @@
+<!--<div>-->
+<!--<select ng-model="selectedItem" ng-options="item.id as item.name for item in items"></select>-->
+<!--<pre>{{selectedItem | json}}</pre>-->
+<!--</div>-->
+
+<script type="text/javascript"
+        src="js/lib/map/maps.js?_=1444959283384"></script>
+<!-- start add.html -->
+<div class="">
+    <h3 class="">活动详情</h3>
+
+    <div class="control-group">
+        <!-- input 1 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label no-padding-right"><span
+                    style="color:red">*</span>活动标题</label>
+
+            <div class="col-md-9 no-padding-left">
+                <input type="text" class="form-control" id="title" ng-model="activity.title" disabled="disabled"
+                       placeholder="活动标题"/>
+            </div>
+        </div>
+        <!-- end 1 / input 2-->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>活动介绍</label>
+
+            <div class="col-md-9 no-padding-left">
+                <textarea rows="6" type="text" id="instruction" ng-model="activity.instruction" disabled="disabled"
+                          placeholder="活动介绍"/>
+            </div>
+        </div>
+        <!-- end 2 /input 3 -->
+        <!-- end 3/ inpput 4  -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label" for="province"> <span style="color:red">*</span>省</label>
+
+            <div class="col-md-3 no-padding-left">
+                <select id="province" ng-model="activity.destination.province" disabled="disabled"
+                        ng-options=" item.province as item.province for item in provinceOptions"
+                        ng-change="changeProvince(activity.destination.province)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+        </div>
+        <!-- end 4/input 5 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label" for="city"> <span style="color:red">*</span>市</label>
+
+            <div class="col-md-3 no-padding-left">
+                <select id="city" ng-model="activity.destination.city" disabled="disabled"
+                        ng-options=" item as item for item in cityOptions">
+                    <option value="">全部</option>
+                </select>
+            </div>
+        </div>
+        <!-- end 5/input 6 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>目的地</label>
+
+            <div class="col-md-9 no-padding-left">
+                <div class="autoclass">
+                    <input type="text" id="keyword" name="keyword" ng-model="activity.destination.detail"
+                           disabled="disabled"
+                           class="autoSearch">
+
+                    <div id="result1" class="autobox" name="result1"></div>
+                    <div id="address" style="display: none"></div>
+                </div>
+                <div id="mapContainer" style="display: none"></div>
+            </div>
+        </div>
+        <!-- end 6/input 7 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>封面照片</label>
+
+            <div class="col-md-9 no-padding-left">
+                <div class="upload">
+                    <div id="thumbnails"><img src="{{photoUrl}}" height="60px" width="80px"></div>
+                    <!--<input type="file" class="upload_file" multiple ng-model-instant id="uploadFile"-->
+                    <!--onchange="angular.element(this).scope().uploadFile(this)">-->
+                </div>
+            </div>
+        </div>
+        <!-- end 7/input 8 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>人数设置</label>
+
+            <div class="col-md-9 no-padding-left">
+                <!--0 不限制 1 不限男女 2男女人数分别限制-->
+                <div class="col-md-3">
+                    <input type="radio" name="limitType" id="limitType-1"
+                           onchange="angular.element(this).scope().changeLimitType(this)" value="1"/>总数设置
+                </div>
+                <div class="col-md-3">
+                    <input type="radio" name="limitType" id="limitType-2"
+                           onchange="angular.element(this).scope().changeLimitType(this)" value="2"/>男女人数分别限制
+                </div>
+                <div class="col-md-3">
+                    <input type="radio" name="limitType" id="limitType-0"
+                           onchange="angular.element(this).scope().changeLimitType(this)" checked
+                           value="0"/>不限
+                </div>
+
+                <div ng-show="activity.limitType === 1" class="form-inline col-md-12"><!--  -->
+                    <div class="col-md-12">
+                        总人数: <input type="text" placeholder="参与人数总数" ng-model="activity.totalLimit"/>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            已参与{{activity.nowJoinNum}}人
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="activity.limitType === 2" class="form-inline col-md-12"><!--  -->
+                    <div class="form-inline col-md-6">
+                        <div>
+                            男: <input type="text" placeholder="男性参与人数" ng-model="activity.maleLimit"/>
+                        </div>
+                        <div>
+                            已参与{{activity.maleNum}}人
+                        </div>
+                    </div>
+                    <div class="form-inline col-md-6">
+                        <div>
+                            女： <input type="text" placeholder="女性参与人数" ng-model="activity.femaleLimit"/>
+                        </div>
+                        <div>
+                            已参与{{activity.femaleNum}}人
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="activity.limitType === 0" class="form-inline col-md-12"><!--  -->
+                    <div class="col-md-12">
+                        <input type="text" readonly="true" placeholder="参与人数总数"/>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            不限制
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end 8 -->
+        <!-- input 9 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>门票价格</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <input type="text" id="price" ng-model="activity.price" disabled="disabled"
+                       placeholder="门票价格"/>
+            </div>
+        </div>
+        <!-- input 10 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label">官方补贴</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <input type="text" id="subsidyPrice" ng-model="activity.subsidyPrice" disabled="disabled"
+                       placeholder="官方补贴"/>
+            </div>
+        </div>
+        <!-- input 11 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>开始时间</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <div class="col-md-2 no-padding-left">
+                    <input type="text" id="startDate" ui-date ui-date-format="yy-mm-dd" ng-model="startTime.date"
+                           disabled="disabled"
+                           placeholder="开始日期">
+                </div>
+                <div class="col-md-2 no-padding-left">
+                    <timepicker-pop disabled="true" class="input-group" input-time="startTime.time"
+                                    ng-model="startTime.time" id="startTime"
+                                    show-meridian="showMeridian"></timepicker-pop>
+                </div>
+            </div>
+        </div>
+        <!-- input 12 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label">结束时间</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <div class="col-md-2 no-padding-left">
+                    <input type="text" id="endDate" ui-date ui-date-format="yy-mm-dd" ng-model="endTime.date"
+                           disabled="disabled"
+                           placeholder="不限制">
+                </div>
+                <div class="col-md-2 no-padding-left">
+                    <timepicker-pop class="input-group" disabled="true" input-time="endTime.time"
+                                    ng-model="endTime.time" id="endTime" show-meridian="showMeridian"></timepicker-pop>
+                </div>
+            </div>
+        </div>
+        <!-- input 13 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label">活动内容</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <input type="text" id="description" ng-model="activity.description" disabled="disabled"
+                       placeholder="活动内容"/>
+            </div>
+        </div>
+        <!-- input 14 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label">活动补充说明</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <input type="text" id="extraDesc" ng-model="activity.extraDesc" disabled="disabled"
+                       placeholder="活动补充说明"/>
+            </div>
+        </div>
+        <!-- input 15 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label">第三方购票平台链接</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <input type="text" id="linkTicketUrl" ng-model="activity.linkTicketUrl" readonly="true"
+                       placeholder="第三方购票平台链接"/>
+            </div>
+        </div>
+        <!-- input 16 -->
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-1 control-label"><span style="color:red">*</span>是否上架</label>
+
+            <div class="col-md-9 no-padding-left" style="text-align:left">
+                <select id="onFlag" ng-init="activity.onFlag = 'false'" disabled
+                        data-ng-model="activity.onFlag" style="width:200px">
+                    <option value="true">是 将在app上展示</option>
+                    <option value="false">否 不会再app上展示</option>
+                </select>
+                <!--<div style="position: absolute;left:90px;top: 4px">将在app上展示</div>-->
+            </div>
+        </div>
+
+        <!-- button -->
+        <div class="form-inline col-md-12" style="margin-top: 20px;">
+            <button class="btn btn-info" style="margin-left: 10px;" ng-click="updateLimit()">确定</button>
+            <button class="btn" style="margin-left: 20px;" ng-click="close()">取消</button>
+        </div>
+    </div>
+</div>
+<!-- end add.html -->
+
+<script type="text/javascript">
+    //地图加载
+    var map = new AMap.Map("mapContainer", {
+        resizeEnable: true,
+        center: [116.397428, 39.90923],//地图中心点
+        zoom: 13, //地图显示的缩放级别
+        keyboardEnable: false
+    });
+    document.getElementById("keyword").onkeyup = keydown;
+    //输入提示
+    function autoSearch() {
+        var keywords = document.getElementById("keyword").value;
+        var auto;
+        //加载输入提示插件
+        map.plugin(["AMap.Autocomplete"], function () {
+            var autoOptions = {
+                city: "" //城市，默认全国
+            };
+            auto = new AMap.Autocomplete(autoOptions);
+            //查询成功时返回查询结果
+            if (keywords.length > 0) {
+                AMap.event.addListener(auto, "complete", autocomplete_CallBack);
+                auto.search(keywords);
+            }
+            else {
+                document.getElementById("result1").style.display = "none";
+            }
+        });
+    }
+    function autocomplete_CallBack(data) {
+        var resultStr = "";
+        var tipArr = data.tips;
+        //var len=tipArr.length;
+        if (tipArr && tipArr.length > 0) {
+            for (var i = 0; i < tipArr.length; i++) {
+                resultStr += "<div id='divid" + (i + 1) + "' onmouseover='openMarkerTipById(" + (i + 1)
+                + ",this)' onclick='selectResult(" + i + ")' onmouseout='onmouseout_MarkerStyle(" + (i + 1)
+                + ",this)' style=\"font-size: 13px;cursor:pointer;padding:5px 5px 5px 5px;\">" + tipArr[i].name + "<span style='color:#C1C1C1;'>" + tipArr[i].district + "</span></div>";
+            }
+        }
+        else {
+            resultStr = "";
+        }
+
+        document.getElementById("result1").curSelect = -1;
+        document.getElementById("result1").tipArr = tipArr;
+        document.getElementById("result1").innerHTML = resultStr;
+        document.getElementById("result1").style.display = "block";
+    }
+
+    //鼠标移入时样式
+    function openMarkerTipById(pointid, thiss) {
+        thiss.style.background = '#CAE1FF';
+    }
+    //鼠标移开后样式恢复
+    function onmouseout_MarkerStyle(pointid, thiss) {
+        thiss.style.background = "";
+    }
+    //选择输入提示关键字
+    function selectResult(index) {
+        if (navigator.userAgent.indexOf("MSIE") > 0) {
+            document.getElementById("keyword").onpropertychange = null;
+            document.getElementById("keyword").onfocus = focus_callback;
+        }
+        //截取输入提示的关键字部分
+        var text = document.getElementById("divid" + (index + 1)).innerHTML.replace(/<[^>].*?>.*<\/[^>].*?>/g, "");
+
+        document.getElementById("keyword").value = text;
+        document.getElementById("result1").style.display = "none";
+    }
+
+    function focus_callback() {
+        if (navigator.userAgent.indexOf("MSIE") > 0) {
+            document.getElementById("keyword").onpropertychange = autoSearch;
+        }
+    }
+    function keydown(event) {
+        var key = (event || window.event).keyCode;
+        var result = document.getElementById("result1");
+        var cur = result.curSelect;
+        if (key === 40) {//down key
+            if (cur + 1 < result.childNodes.length) {
+                if (result.childNodes[cur]) {
+                    result.childNodes[cur].style.background = '';
+                }
+                result.curSelect = cur + 1;
+                result.childNodes[cur + 1].style.background = '#CAE1FF';
+                document.getElementById("keyword").value = result.tipArr[cur + 1].name;
+            }
+        } else if (key === 38) {//up key
+            if (cur - 1 >= 0) {
+                if (result.childNodes[cur]) {
+                    result.childNodes[cur].style.background = '';
+                }
+                result.curSelect = cur - 1;
+                result.childNodes[cur - 1].style.background = '#CAE1FF';
+                document.getElementById("keyword").value = result.tipArr[cur - 1].name;
+            }
+        } else if (key === 13) {
+            var res = document.getElementById("result1");
+            if (res && res['curSelect'] !== -1) {
+                selectResult(document.getElementById("result1").curSelect);
+            }
+
+        } else {
+            autoSearch();
+        }
+    }
+</script>
