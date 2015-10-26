@@ -63,6 +63,9 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/officialActivity/view/:id', {
         templateUrl: 'views/chewan/official_activity/view.html',
         controller: 'officialActivityEditController'
+    }).when('/officialActivity/updateLimit/:id',{
+        templateUrl: 'views/chewan/official_activity/update_limit.html',
+        controller: 'officialActivityEditController'
     });
 }]);
 //    .config(function ($timepickerProvider) {
