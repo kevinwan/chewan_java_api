@@ -21,6 +21,7 @@ import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,7 +399,30 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("已经邀请过此用户");
         }
 
+        //校验 只能 参加了该活动的人 能够邀请 和 被邀请
+        OfficialActivity officialActivity = officialActivityDao.findById(activityId);
+        if (null == officialActivity) {
+            LOG.warn("活动不存在");
+            throw new ApiException("该活动不存在");
+        }
+
+        List<String> members = officialActivity.getMembers();
+        if (null == members || members.size() == 0) {
+            LOG.warn("members size is 0");
+            throw new ApiException("该活动没有参加成员");
+        }
+        if (members.contains(fromUserId)) {
+            LOG.warn("this userId not in the members userId is:{}", fromUserId);
+            throw new ApiException("你没有参加该活动");
+
+        }
+        if (members.contains(toUserId)) {
+            LOG.warn("this userId not in the members userId is {}", toUserId);
+            throw new ApiException("被邀请的成员并没有参加该活动");
+        }
+
         saveAppointment(activityId, fromUserId, toUserId, transfer, Constants.AppointmentStatus.APPLYING, Constants.ActivityCatalog.TOGETHER);
+
 
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
