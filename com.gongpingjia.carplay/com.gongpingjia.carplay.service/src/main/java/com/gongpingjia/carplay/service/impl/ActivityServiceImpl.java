@@ -756,7 +756,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         String type = json.getString("type");
         if (StringUtils.isNotEmpty(type) && !StringUtils.equals(type, "-1")) {
-            criteria.and("type").is(type);
+            criteria.and("majorType").is(type);
         }
 
         String transferStr = json.getString("transfer");
