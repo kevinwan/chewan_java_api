@@ -6,6 +6,9 @@ package com.gongpingjia.carplay.entity.common;
  */
 public class Landmark {
 
+    private static final Double LONGITUDE_LIMIT = 180D;
+    private static final Double LATITUDE_LIMIT = 90D;
+
     private Double longitude;
 
     private Double latitude;
@@ -24,6 +27,27 @@ public class Landmark {
 
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
+    }
+
+    /**
+     * 检查经纬度信息是否正确
+     *
+     * @return
+     */
+    public boolean isLandmarkCorrect() {
+        if (this.latitude == null || this.latitude == null) {
+            return false;
+        }
+
+        if (this.longitude <= -LONGITUDE_LIMIT || this.longitude >= LONGITUDE_LIMIT) {
+            return false;
+        }
+
+        if (this.latitude <= -LATITUDE_LIMIT || this.latitude >= LATITUDE_LIMIT) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

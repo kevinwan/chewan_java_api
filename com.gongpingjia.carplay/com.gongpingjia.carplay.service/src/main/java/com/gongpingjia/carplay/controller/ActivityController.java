@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import com.gongpingjia.carplay.service.util.ActivityQueryParam;
@@ -53,7 +54,7 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("majorType","type", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("majorType", "type", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
@@ -64,6 +65,13 @@ public class ActivityController {
             //parameterChecker.checkTypeIsIn(jsonObject.getString("pay"), Constants.ActivityPayType.TYPE_LIST);
 
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
+
+            Landmark landmark = activity.getEstabPoint();
+            if (landmark == null || !landmark.isLandmarkCorrect()) {
+                LOG.warn("Input parameter estabPoint error, landmark:{}", landmark);
+                throw new ApiException("输入参数错误");
+            }
+
             return activityService.activityRegister(userId, activity);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
@@ -127,7 +135,7 @@ public class ActivityController {
     @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
     public ResponseDo getNearByActivityList(@RequestParam(value = "userId", required = false) String userId,
                                             @RequestParam(value = "token", required = false) String token,
-                                            @RequestParam(value = "majorType",required = false)String majorType,
+                                            @RequestParam(value = "majorType", required = false) String majorType,
                                             @RequestParam(value = "type", required = false) String type,
                                             @RequestParam(value = "pay", required = false) String pay,
                                             @RequestParam(value = "gender", required = false) String gender,

@@ -233,6 +233,12 @@ public class UserServiceImpl implements UserService {
     public void checkRegisterParameters(User user, JSONObject json) throws ApiException {
         LOG.debug("Begin check input parameters of register");
 
+        Landmark landmark = user.getLandmark();
+        if (landmark == null || !user.getLandmark().isLandmarkCorrect()) {
+            LOG.warn("Input parameter landmark error, out of range, landmark:{}", landmark);
+            throw new ApiException("输入参数错误");
+        }
+
         if (!StringUtils.isEmpty(user.getAvatar())) {
             user.setAvatar(MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, user.getAvatar()));
             // 判断图片是否存在
