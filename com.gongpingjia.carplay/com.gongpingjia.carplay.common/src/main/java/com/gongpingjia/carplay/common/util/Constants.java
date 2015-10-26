@@ -147,6 +147,8 @@ public class Constants {
         String COMMON = "普通活动";
 
         String OFFICIAL = "官方活动";
+
+        String TOGETHER = "邀请同去";
     }
 
     public interface UserCatalog {
@@ -261,6 +263,11 @@ public class Constants {
          * 车玩官方
          */
         String OFFICIAL = "OfficialAdmin";
+
+        /**
+         * 附近活动推送
+         */
+        String NEARBY = "NearbyAdmin";
     }
 
     /**
