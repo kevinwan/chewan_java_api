@@ -58,6 +58,7 @@ public class User {
     /**
      * 用户第三方登录信息
      */
+    @Indexed
     private String uid;
     /**
      * 第三方登录渠道:qq/wechat/sinaWeibo

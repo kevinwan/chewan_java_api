@@ -1,6 +1,8 @@
 package com.gongpingjia.carplay.entity.auth;
 
 import com.gongpingjia.carplay.entity.common.Car;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,11 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class LicenseAuth {
 
+    @Id
     private String id;
 
     /**
      * 申请人
      */
+    @Indexed
     private String userId;
 
     /**

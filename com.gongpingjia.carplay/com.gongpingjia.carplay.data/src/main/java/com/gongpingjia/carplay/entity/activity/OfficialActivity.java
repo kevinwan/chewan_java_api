@@ -4,6 +4,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class OfficialActivity {
     private String officialActivityId;
 
     //创建人 id
+    @Indexed
     private String userId;
 
     //活动目的地
@@ -26,9 +28,11 @@ public class OfficialActivity {
 
 
     //开始时间
+    @Indexed
     private Long start;
 
     //结束时间
+    @Indexed
     private Long end;
 
     //成员
@@ -95,6 +99,7 @@ public class OfficialActivity {
     private Integer femaleNum;
 
     //创建时间
+    @Indexed
     private Long createTime;
 
     //上下架 标志 true 上架 false 下架   注意三种状态：

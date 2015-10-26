@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -20,16 +21,23 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
 
     @Id
     private String activityId;
+
+
     //活动创建人员
+    @Indexed
     private String userId;
 
     @Transient
     private User organizer;
 
+    @Indexed
     private Long start;
+
+    @Indexed
     private Long end;
 
     //环信群组Id
+    @Indexed
     private String emchatGroupId;
 
     //活动创建地
@@ -47,6 +55,7 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     private String businessId;
 
     //活动创建时间
+    @Indexed
     private Long createTime;
 
 

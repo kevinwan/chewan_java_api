@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.entity.user;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -12,8 +13,10 @@ public class AuthApplication {
     @Id
     private String applicationId;
 
+    @Indexed
     private String applyUserId;
 
+    @Indexed
     private String authUserId;
 
     /**
@@ -23,8 +26,10 @@ public class AuthApplication {
 
     private String status;
 
+    @Indexed
     private Long applyTime;
 
+    @Indexed
     private Long authTime;
 
     private String remarks;

@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.common;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -12,8 +13,10 @@ public class Message {
     @Id
     private String id;
 
+    @Indexed
     private String fromUser;
 
+    @Indexed
     private String toUser;
 
     private String type;

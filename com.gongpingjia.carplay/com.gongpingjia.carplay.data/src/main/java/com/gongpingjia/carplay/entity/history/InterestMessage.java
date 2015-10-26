@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.history;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -18,9 +19,11 @@ public class InterestMessage {
     private String id;
 
     //关联的ID，如果是创建活动，则为活动Id
+    @Indexed
     private String relatedId;
 
     //操作员Id
+    @Indexed
     private String userId;
 
     //类型,0为创建活动，1为相册图像上传
@@ -28,6 +31,7 @@ public class InterestMessage {
     //如果为上传照片，显示上传照片的数量
     private Integer count;
     //创建该记录的时间
+    @Indexed
     private Long createTime;
 
     public String getId() {

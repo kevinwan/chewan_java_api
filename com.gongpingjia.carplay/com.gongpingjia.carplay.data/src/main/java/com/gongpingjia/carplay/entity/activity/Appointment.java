@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.entity.activity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -14,17 +15,21 @@ public class Appointment extends ActivityIntention {
     @Id
     private String appointmentId;
 
+    @Indexed
     private String activityId;
 
     private String activityCategory;
 
     //邀请申请人
+    @Indexed
     private String applyUserId;
 
     //应邀人员
     //创建该活动的人；
+    @Indexed
     private String invitedUserId;
 
+    @Indexed
     private Long createTime;
 
     private int status;

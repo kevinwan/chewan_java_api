@@ -123,7 +123,7 @@ public class OfficialServiceImpl implements OfficialService {
         int invitedCount = 0;
 
         //邀请他人成功的 userId list
-        List<String> acceptList = new ArrayList<>(16);
+        List<String> acceptList = new ArrayList<>();
 
         //是否邀请过该用户
         boolean inviteFlag = false;
@@ -181,6 +181,9 @@ public class OfficialServiceImpl implements OfficialService {
         for (String memberId : acceptList) {
             Map<String, Object> acceptMember = new HashMap<>(4, 1);
             User acceptUser = userMap.get(memberId);
+            if (null == acceptUser) {
+                LOG.error("the user is not the official activity member userId is {} activityId is:", memberId);
+            }
             acceptMember.put("userId", acceptUser.getUserId());
             acceptMember.put("nickname", acceptUser.getNickname());
             acceptMember.put("avatar", localServer + acceptUser.getAvatar());

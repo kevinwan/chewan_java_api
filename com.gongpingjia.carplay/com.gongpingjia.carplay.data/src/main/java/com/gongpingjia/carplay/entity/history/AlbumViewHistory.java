@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.history;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -12,11 +13,14 @@ public class AlbumViewHistory {
     @Id
     private String id;
 
+    @Indexed
     private String userId;
 
     //userId
+    @Indexed
     private String viewUserId;
 
+    @Indexed
     private Long viewTime;
 
     public String getId() {

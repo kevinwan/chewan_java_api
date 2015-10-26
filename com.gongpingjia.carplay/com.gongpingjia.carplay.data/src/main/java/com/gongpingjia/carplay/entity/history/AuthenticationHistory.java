@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.entity.history;
 import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -13,13 +14,16 @@ public class AuthenticationHistory {
     @Id
     private String id;
 
+    @Indexed
     private String applyUserId;
 
+    @Indexed
     private String authId;
 
     @Transient
     private User authUser;
 
+    @Indexed
     private String applicationId;
 
     private String type;
@@ -28,6 +32,7 @@ public class AuthenticationHistory {
 
     private String remark;
 
+    @Indexed
     private Long authTime;
 
     public String getId() {
