@@ -119,23 +119,64 @@ public class OfficialServiceImpl implements OfficialService {
     //构造用户的邀请接收信息
     private void buildInvitedAcceptInfo(String userId, String localServer, List<Appointment> appointmentList,
                                         Map<String, User> userMap, User user, Map<String, Object> map) {
+        //被邀请的次数
         int invitedCount = 0;
+
+        //邀请他人成功的 userId list
         List<String> acceptList = new ArrayList<>(16);
+
+        //是否邀请过该用户
+        boolean inviteFlag = false;
+        //是否被该用户邀请过
+        boolean beInvitedFlag = false;
+
         for (Appointment appointment : appointmentList) {
-            if (appointment.getApplyUserId().equals(user.getUserId())) {
+            //
+            if (appointment.getInvitedUserId().equals(user.getUserId())) {
+                //别人邀请他的
                 invitedCount++;
-                if (Constants.AppointmentStatus.ACCEPT == appointment.getStatus()) {
-                    acceptList.add(appointment.getInvitedUserId());
-                    if (userId.equals(appointment.getApplyUserId())) {
-                        map.put("acceptMe", true);
-                        map.put("phone", user.getPhone());
-                        map.put("emchatName", user.getEmchatName());
-                    }
+            } else if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                //他邀请别人的；并且别人接受了
+                acceptList.add(appointment.getInvitedUserId());
+            }
+
+            //我 邀请 该用户
+            if (appointment.getApplyUserId().equals(userId) && appointment.getInvitedUserId().equals(user.getUserId())) {
+                //邀请过该用户
+                inviteFlag = true;
+                map.put("inviteStatus", appointment.getStatus());
+                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                    map.put("phone", user.getPhone());
+                    map.put("emchatName", user.getEmchatName());
+                }
+            }
+
+            //该用户 邀请 我
+            if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getInvitedUserId().equals(userId)) {
+                beInvitedFlag = true;
+                map.put("beInvitedStatus", appointment.getStatus());
+                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                    map.put("phone", user.getPhone());
+                    map.put("emchatName", user.getEmchatName());
                 }
             }
         }
-        map.put("invitedCount", invitedCount);
+        //没要邀请过
+        if (!inviteFlag) {
+            map.put("inviteStatus", Constants.AppointmentStatus.INITIAL);
+        }
+        //没有被邀请过
+        if (!beInvitedFlag) {
+            map.put("beInvitedStatus", Constants.AppointmentStatus.INITIAL);
+        }
+
+
+        //该用户被别人邀请的次数
+        map.put("beInvitedCount", invitedCount);
+        //该用户邀请别人并且被同意的次数
         map.put("acceptCount", acceptList.size());
+
+        //接受了他的邀请的用户列表信息
         List<Map<String, Object>> acceptMembers = new ArrayList<>();
         for (String memberId : acceptList) {
             Map<String, Object> acceptMember = new HashMap<>(4, 1);
@@ -340,7 +381,7 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
     @Override
-    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer,String message) throws ApiException {
+    public ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer, String message) throws ApiException {
         LOG.debug("user:{} invited user:{} together", fromUserId, toUserId);
         //查询是否已经邀请过了
         Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
