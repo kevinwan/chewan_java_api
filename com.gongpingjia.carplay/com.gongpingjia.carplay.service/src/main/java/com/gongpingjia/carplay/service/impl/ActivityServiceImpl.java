@@ -594,9 +594,12 @@ public class ActivityServiceImpl implements ActivityService {
             userIdSet.add(activity.getUserId());
         }
         List<User> users = userDao.findByIds(userIdSet);
-
+        Map<String, User> userMap = new HashMap<>(users.size(), 1);
+        for (User user : users) {
+            userMap.put(user.getUserId(), user);
+        }
         for (Activity activity : activityList) {
-            User organizer = FetchUtil.getUserFromList(users, activity.getUserId());
+            User organizer = userMap.get(activity.getUserId());
             if (null == organizer) {
                 throw new ApiException("数据非法 该Activity没有找到对应的Organizer");
             }
@@ -685,8 +688,12 @@ public class ActivityServiceImpl implements ActivityService {
             userIdSet.add(activity.getUserId());
         }
         List<User> userList = userDao.findByIds(userIdSet);
+        Map<String, User> userMap = new HashMap<>(userList.size());
+        for (User user : userList) {
+            userMap.put(user.getUserId(), user);
+        }
         for (Activity activity : activityList) {
-            activity.setOrganizer(FetchUtil.getUserFromList(userList, activity.getUserId()));
+            activity.setOrganizer(userMap.get(activity.getUserId()));
         }
 
         return ResponseDo.buildSuccessResponse(activityList);

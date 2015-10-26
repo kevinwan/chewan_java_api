@@ -13,15 +13,6 @@ import java.util.List;
  */
 public class FetchUtil {
 
-    public static User getUserFromList(List<User> userList, String userId) {
-        for (User user : userList) {
-            if (StringUtils.equals(userId, user.getUserId())) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     public static Update initUpdateFromJson(JSONObject jsonObject, String... params){
         Update update = new Update();
 

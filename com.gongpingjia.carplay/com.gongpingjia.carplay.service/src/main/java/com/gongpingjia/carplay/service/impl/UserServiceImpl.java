@@ -1008,11 +1008,15 @@ public class UserServiceImpl implements UserService {
             authUserIds.add(item.getAuthId());
         }
         List<User> userList = userDao.findByIds(authUserIds);
+        Map<String, User> userMap = new HashMap<>(userList.size(), 1);
+        for (User user : userList) {
+            userMap.put(user.getUserId(), user);
+        }
 
         //封装返回数据
         //封装了 认证历史记录 以及 认证人的信息； authUserId 例如 对应着 车玩官方；
         for (AuthenticationHistory history : authenticationHistoryList) {
-            history.setAuthUser(FetchUtil.getUserFromList(userList, history.getAuthId()));
+            history.setAuthUser(userMap.get(history.getAuthId()));
         }
 //        JSONArray jsonArr = new JSONArray();
 //        for (AuthenticationHistory history : authenticationHistoryList) {
