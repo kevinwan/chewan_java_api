@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
+import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
@@ -16,6 +17,7 @@ import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
@@ -97,6 +99,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private InterestMessageDao interestMessageDao;
+
+    @Autowired
+    private OfficialActivityDao officialActivityDao;
 
     @Override
     public ResponseDo register(User user) throws ApiException {
@@ -360,7 +365,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseDo getAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
 
-        LOG.info("getAppointments userId {}",userId);
+        LOG.info("getAppointments userId {}", userId);
 
         checker.checkUserInfo(userId, token);
 
@@ -371,24 +376,9 @@ public class UserServiceImpl implements UserService {
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
-        User user = userDao.findById(userId);
-
-        String localServer = CommonUtil.getLocalPhotoServer();
-        String remoteServer = CommonUtil.getThirdPhotoServer();
-        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
-
-        LOG.debug("hide user info");
-        Map<String, User> users = buildUsers(userId, appointments);
-        for (Map.Entry<String, User> entry : users.entrySet()) {
-            User userInfo = entry.getValue();
-            userInfo.hideSecretInfo();
-            userInfo.refreshPhotoInfo(localServer, remoteServer, gpjServer);
-            userInfo.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
-        }
-
-
         //获取所有的appointment 对应的 user 信息；
+        Map<String, User> users = buildUsers(userId, appointments);
+        Map<String, OfficialActivity> officialActivityMap = buildOfficialActivityMap(appointments);
 
         List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
         Set<String> subscriberIdSet = new HashSet<>(subscribers.size(), 1);
@@ -396,47 +386,92 @@ public class UserServiceImpl implements UserService {
             subscriberIdSet.add(subscriber.getToUser());
         }
 
-        for (int i = 0; i < appointments.size(); i++) {
-            Appointment appointment = appointments.get(i);
-            User userInfo = null;
-            if (userId.equals(appointment.getApplyUserId())) {
-                userInfo = users.get(appointment.getInvitedUserId());
-                appointment.setIsApplicant(true);
-            } else {
-                userInfo = users.get(appointment.getApplyUserId());
-                appointment.setIsApplicant(false);
-            }
+        LOG.debug("Begin build response data");
+        List<Object> data = new ArrayList<>(appointments.size());
+        String localServer = CommonUtil.getLocalPhotoServer();
+        for (Appointment appointment : appointments) {
+            if (Constants.ActivityCatalog.OFFICIAL.equals(appointment.getActivityCategory())) {
+                //官方活动
+                OfficialActivity officialActivity = officialActivityMap.get(appointment.getActivityId());
+                User user = users.get(appointment.getInvitedUserId());
 
-            Map<String, Object> userMap = new HashMap<>(16, 1);
-            userMap.put("userId", userInfo.getUserId());
-            userMap.put("nickname", userInfo.getNickname());
-            userMap.put("gender", userInfo.getGender());
-            userMap.put("age", userInfo.getAge());
-            userMap.put("role", userInfo.getRole());
-            userMap.put("avatar", userInfo.getAvatar());
-            userMap.put("drivingYears", userInfo.getDrivingYears());
-            userMap.put("photoAuthStatus", userInfo.getPhotoAuthStatus());
-            userMap.put("licenseAuthStatus", userInfo.getLicenseAuthStatus());
-            userMap.put("cover", userInfo.getCover());
-            userMap.put("car", userInfo.getCar());
-            //是否在subscriberIdSet中 即为 是否关注了该用户
-            userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
-            appointment.setApplicant(userMap);
+                Map<String, Object> organizer = new HashMap<>(2, 1);
+                organizer.put("nickname", user.getNickname());
+                organizer.put("avatar", localServer + user.getAvatar());
+                officialActivity.setOrganizer(organizer);
+                data.add(officialActivity);
+            } else {
+                //邀他同去， 普通邀约
+                buildCommonAppointment(userId, users, subscriberIdSet, appointment);
+                data.add(appointment);
+            }
         }
 
-        return ResponseDo.buildSuccessResponse(appointments);
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
+    private void buildCommonAppointment(String userId, Map<String, User> users, Set<String> subscriberIdSet, Appointment appointment) {
+        User userInfo = null;
+        if (userId.equals(appointment.getApplyUserId())) {
+            userInfo = users.get(appointment.getInvitedUserId());
+            appointment.setIsApplicant(true);
+        } else {
+            userInfo = users.get(appointment.getApplyUserId());
+            appointment.setIsApplicant(false);
+        }
+        Map<String, Object> userMap = new HashMap<>(16, 1);
+        userMap.put("userId", userInfo.getUserId());
+        userMap.put("nickname", userInfo.getNickname());
+        userMap.put("gender", userInfo.getGender());
+        userMap.put("age", userInfo.getAge());
+        userMap.put("role", userInfo.getRole());
+        userMap.put("avatar", userInfo.getAvatar());
+        userMap.put("drivingYears", userInfo.getDrivingYears());
+        userMap.put("photoAuthStatus", userInfo.getPhotoAuthStatus());
+        userMap.put("licenseAuthStatus", userInfo.getLicenseAuthStatus());
+        userMap.put("cover", userInfo.getCover());
+        userMap.put("car", userInfo.getCar());
+        //是否在subscriberIdSet中 即为 是否关注了该用户
+        userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
+        appointment.setApplicant(userMap);
+    }
+
+    private Map<String, OfficialActivity> buildOfficialActivityMap(List<Appointment> appointments) {
+        LOG.debug("Begin build official activities");
+        Map<String, OfficialActivity> officialActivityMap = new HashMap<>();
+        for (Appointment item : appointments) {
+            if (Constants.ActivityCatalog.OFFICIAL.equals(item.getActivityCategory())) {
+                officialActivityMap.put(item.getActivityId(), null);
+            }
+        }
+        List<OfficialActivity> officialActivityList = officialActivityDao.findByIds(officialActivityMap.keySet());
+        for (OfficialActivity item : officialActivityList) {
+            officialActivityMap.put(item.getOfficialActivityId(), item);
+        }
+
+        return officialActivityMap;
     }
 
     private Map<String, User> buildUsers(String userId, List<Appointment> appointments) {
+        User user = userDao.findById(userId);
+
+        String localServer = CommonUtil.getLocalPhotoServer();
+        String remoteServer = CommonUtil.getThirdPhotoServer();
+        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
+
+        LOG.debug("build users and hide user info");
         Map<String, User> users = new HashMap<>(appointments.size());
         for (Appointment appointment : appointments) {
             users.put(appointment.getApplyUserId(), null);
             users.put(appointment.getInvitedUserId(), null);
         }
-        users.remove(userId);
 
         List<User> userList = userDao.findByIds(users.keySet());
         for (User item : userList) {
+            item.hideSecretInfo();
+            item.refreshPhotoInfo(localServer, remoteServer, gpjServer);
+            item.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    item.getLandmark().getLongitude(), item.getLandmark().getLatitude()));
             users.put(item.getUserId(), item);
         }
 
