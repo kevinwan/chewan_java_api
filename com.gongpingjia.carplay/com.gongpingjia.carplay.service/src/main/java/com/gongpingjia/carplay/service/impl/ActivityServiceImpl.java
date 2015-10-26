@@ -978,6 +978,7 @@ public class ActivityServiceImpl implements ActivityService {
                 organizer.put("licenseAuthStatus", user.getLicenseAuthStatus());
                 organizer.put("avatar", localServer + user.getAvatar());
                 organizer.put("cover", user.getCover());
+                organizer.put("age", user.getAge());
             }
             map.put("organizer", organizer);
             map.put("pay", item.getPay());
