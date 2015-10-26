@@ -407,13 +407,13 @@ public class OfficialServiceImpl implements OfficialService {
         return ResponseDo.buildSuccessResponse();
     }
 
-    private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String catalog) {
+    private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String category) {
         OfficialActivity activity = officialActivityDao.findById(activityId);
         Long current = DateUtil.getTime();
 
         Appointment appointment = new Appointment();
         appointment.setActivityId(activityId);
-        appointment.setActivityCategory(catalog);
+        appointment.setActivityCategory(category);
         appointment.setApplyUserId(fromUserId);
         appointment.setInvitedUserId(toUserId);
         appointment.setCreateTime(current);
