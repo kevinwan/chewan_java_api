@@ -313,6 +313,9 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("加入到聊天群组失败");
         }
 
+        //将当前活动添加到约会信息中，已经接受，并且是官方活动类型
+        saveAppointment(activityId, userId, officialActivity.getUserId(), false, Constants.AppointmentStatus.ACCEPT, Constants.ActivityCatalog.OFFICIAL);
+
         //加入到 members中;
         Update update = new Update();
         update.addToSet("members", userId);
@@ -392,17 +395,7 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("已经邀请过此用户");
         }
 
-        Appointment appointment = new Appointment();
-        appointment.setActivityId(activityId);
-        appointment.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);
-        appointment.setApplyUserId(fromUserId);
-        appointment.setInvitedUserId(toUserId);
-        appointment.setCreateTime(DateUtil.getTime());
-        appointment.setModifyTime(DateUtil.getTime());
-        appointment.setStatus(Constants.AppointmentStatus.APPLYING);
-        appointment.setTransfer(transfer);
-        appointment.setMessage(message);
-        appointmentDao.save(appointment);
+        saveAppointment(activityId, fromUserId, toUserId, transfer, Constants.AppointmentStatus.APPLYING, Constants.ActivityCatalog.TOGETHER);
 
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
@@ -412,6 +405,25 @@ public class OfficialServiceImpl implements OfficialService {
                 toUser.getEmchatName(), pushMsg);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String category) {
+        OfficialActivity activity = officialActivityDao.findById(activityId);
+        Long current = DateUtil.getTime();
+
+        Appointment appointment = new Appointment();
+        appointment.setActivityId(activityId);
+        appointment.setActivityCategory(category);
+        appointment.setApplyUserId(fromUserId);
+        appointment.setInvitedUserId(toUserId);
+        appointment.setCreateTime(current);
+        appointment.setModifyTime(current);
+        appointment.setStatus(status);
+        appointment.setTransfer(transfer);
+
+        appointment.setDestination(activity.getDestination());
+        appointment.setType(activity.getTitle());
+        appointmentDao.save(appointment);
     }
 
     @Override

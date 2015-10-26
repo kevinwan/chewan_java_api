@@ -21,7 +21,7 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
     private Class cls;
 
     @Autowired
-    private MongoTemplate mongoTemplate;
+    protected MongoTemplate mongoTemplate;
 
     private Class<T> getCls() {
         if (this.cls == null) {
@@ -144,4 +144,5 @@ public class BaseDaoImpl<T, K> implements BaseDao<T, K> {
             return new String(chars);
         }
     }
+
 }

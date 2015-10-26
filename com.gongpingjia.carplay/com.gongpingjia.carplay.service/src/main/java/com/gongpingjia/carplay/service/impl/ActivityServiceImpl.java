@@ -6,11 +6,13 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
+import com.gongpingjia.carplay.dao.activity.PushInfoDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
+import com.gongpingjia.carplay.entity.activity.PushInfo;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
@@ -67,6 +69,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private InterestMessageDao interestMessageDao;
 
+    @Autowired
+    private PushInfoDao pushInfoDao;
+
 
     /**
      * 注册 活动；
@@ -120,7 +125,88 @@ public class ActivityServiceImpl implements ActivityService {
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,
                 buildUserSubscribers(userId), message, ext);
 
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
+                buildNearByUsers(user), message, ext);
+
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private List<String> buildNearByUsers(User user) {
+        LOG.debug("Send nearby user message, sendUser:{}", user.getUserId());
+        PushInfo pushInfo = pushInfoDao.findOne(Query.query(Criteria.where("sendUserId").is(user.getUserId())));
+        if (pushInfo != null) {            //用户的活动今天已经推送过一次
+            LOG.info("User:{} has already send push once today", user.getUserId());
+            return new ArrayList<>(0);
+        }
+
+        //用户今天没有发送过
+        Double distance = Double.parseDouble(PropertiesUtil.getProperty("carplay.nearby.distance.limit", "6000")); //查找附近用户距离限制
+        Set<String> subUserIdSet = getSubscribeUsers(user);
+        LOG.debug("Get nearby users");
+        List<User> nearbyUserList = userDao.find(Query.query(
+                Criteria.where("landmark").near(new Point(user.getLandmark().getLongitude(), user.getLandmark().getLatitude()))
+                        .maxDistance(distance * 180 / DistanceUtil.EARTH_RADIUS).and("deleteFlag").is(false)));
+        Map<String, User> userMap = new HashMap<>(nearbyUserList.size());
+        for (User item : nearbyUserList) {
+            if (item.getUserId().equals(user.getUserId())) {
+                continue;//忽略自己
+            }
+            if (subUserIdSet.contains(item.getUserId())) {
+                continue;//关注我的人已经推送过感兴趣的，不能重复推送
+            }
+            userMap.put(item.getUserId(), item);
+        }
+
+        return buildEmchatNames(user, nearbyUserList, userMap);
+    }
+
+    /**
+     * @param user           消息发送人员
+     * @param nearbyUserList
+     * @param userMap
+     * @return
+     */
+    private List<String> buildEmchatNames(User user, List<User> nearbyUserList, Map<String, User> userMap) {
+        LOG.debug("Get already pushed message users");
+        Long current = DateUtil.getTime();
+
+        Integer pushLimit = Integer.parseInt(PropertiesUtil.getProperty("carplay.nearby.push.limit", "3"));// 每个用户推送的限制
+        Set<String> pushedUsers = pushInfoDao.groupByReceivedUsers(userMap.keySet(), pushLimit); // 已经推送的信息
+
+        Integer userLimit = Integer.parseInt(PropertiesUtil.getProperty("carplay.nearby.users.limit", "3"));//附近用户的限制
+        List<String> emchatNames = new ArrayList<>(userLimit);//环信ID群组
+        int count = 0;
+        for (User item : nearbyUserList) {
+            if (count >= userLimit) {
+                break;   //已经达到了推送的上限，退出
+            }
+            if (!userMap.containsKey(item.getUserId())) {
+                continue;//如果用户不在限制的userMap中，就走下一个循环
+            }
+            if (pushedUsers.contains(item.getUserId())) {
+                continue;  //如果推送的消息已满的用户在其中，才发送
+            }
+            PushInfo info = new PushInfo();
+            info.setSendUserId(user.getUserId());
+            info.setReceivedUserId(item.getUserId());
+            info.setCreateTime(current);
+            pushInfoDao.save(info);
+
+            emchatNames.add(item.getEmchatName());
+            count++;
+        }
+        LOG.debug("Finished build push users");
+        return emchatNames;
+    }
+
+    private Set<String> getSubscribeUsers(User user) {
+        LOG.debug("Get subscribed users");
+        List<Subscriber> subscriberList = subscriberDao.find(Query.query(Criteria.where("toUser").is(user.getUserId())));
+        Set<String> subUserIdSet = new HashSet<>(subscriberList.size());
+        for (Subscriber item : subscriberList) {
+            subUserIdSet.add(item.getFromUser());
+        }
+        return subUserIdSet;
     }
 
     /**
@@ -575,7 +661,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         if (Constants.AppointmentStatus.APPLYING != appointment.getStatus()) {
             LOG.warn("appoint is applying");
-            throw new ApiException("活动邀请处理中");
+            throw new ApiException("活动邀请已处理");
         }
 
         return appointment;

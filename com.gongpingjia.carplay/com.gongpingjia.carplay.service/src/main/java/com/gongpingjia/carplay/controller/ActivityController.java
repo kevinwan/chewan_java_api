@@ -61,7 +61,7 @@ public class ActivityController {
 
             //检查 type pay 是否在合法的参数范围内
             //parameterChecker.checkTypeIsIn(jsonObject.getString("type"), Constants.ActivityType.TYPE_LIST);
-            parameterChecker.checkTypeIsIn(jsonObject.getString("pay"), Constants.ActivityPayType.TYPE_LIST);
+            //parameterChecker.checkTypeIsIn(jsonObject.getString("pay"), Constants.ActivityPayType.TYPE_LIST);
 
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
             return activityService.activityRegister(userId, activity);

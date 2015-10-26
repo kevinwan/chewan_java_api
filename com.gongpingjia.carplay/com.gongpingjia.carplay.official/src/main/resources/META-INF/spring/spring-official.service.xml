@@ -52,12 +52,24 @@
         <property name="cronExpression" value="0 0 3 * * ?"></property>
     </bean>
 
+    <!--每天清理一次推送的消息,需要配置为每天0:00执行-->
+    <bean id="pushInfoCleanJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.gongpingjia.carplay.official.task.PushInfoCleanTask"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="pushInfoCleanCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="pushInfoCleanJob"/>
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+
     <bean id="trigger" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
             <list>
                 <ref bean="activityCleanCronTriggerBean"/>
                 <ref bean="appointmentCleanCronTriggerBean"/>
                 <ref bean="appointmentRemindCronTriggerBean"/>
+                <ref bean="pushInfoCleanCronTriggerBean"/>
             </list>
         </property>
     </bean>
