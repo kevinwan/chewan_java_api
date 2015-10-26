@@ -22,7 +22,7 @@ gpjApp.constant('ChewanApiEndPoint', '/v2');
  */
 gpjApp.config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/', {
-        templateUrl: 'views/chewan/official_activity/list.html',
+        templateUrl: 'views/official_activity/list.html',
         controller: 'officialActivityController'
     }).when('/driverAuthentication/list', {
         templateUrl: 'views/auth/driver_authentication.html',
@@ -33,9 +33,6 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/photoAuthentication/list', {
         templateUrl: 'views/auth/user_photo_authentication.html',
         controller: 'userPhotoAuthenticationController'
-    }).when('/feedback/list', {
-        templateUrl: 'views/chewan/feedback_main.html',
-        controller: 'feedbackController'
     }).when('/user/list', {
         templateUrl: 'views/user/user.html',
         controller: 'userController'
@@ -52,19 +49,19 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/activity/update.html',
         controller: 'activityUpdateController'
     }).when('/officialActivity/list', {
-        templateUrl: 'views/chewan/official_activity/list.html',
+        templateUrl: 'views/official_activity/list.html',
         controller: 'officialActivityController'
     }).when('/officialActivity/add', {
-        templateUrl: 'views/chewan/official_activity/add.html',
+        templateUrl: 'views/official_activity/add.html',
         controller: 'officialActivityEditController'
     }).when('/officialActivity/update/:id', {
-        templateUrl: 'views/chewan/official_activity/update.html',
+        templateUrl: 'views/official_activity/update.html',
         controller: 'officialActivityEditController'
     }).when('/officialActivity/view/:id', {
-        templateUrl: 'views/chewan/official_activity/view.html',
+        templateUrl: 'views/official_activity/view.html',
         controller: 'officialActivityEditController'
     }).when('/officialActivity/updateLimit/:id',{
-        templateUrl: 'views/chewan/official_activity/update_limit.html',
+        templateUrl: 'views/official_activity/update_limit.html',
         controller: 'officialActivityEditController'
     });
 }]);
