@@ -36,6 +36,9 @@ gpjApp.factory('officialActivityService', ['$http','restProxyService', 'authServ
             updateOfficialActivity: function (id,data) {
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/activity/update?token=' + USER_TOKEN + "&userId=" + USER_ID + "&officialActivityId=" + id, data);
             },
+            updateLimit: function(id,data) {
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/activity/' + id + "/updateLimit?token=" + USER_TOKEN + "&userId=" + USER_ID, data);
+            },
             uploadFile: function(data) {
                 return $http({
                     method: 'POST',

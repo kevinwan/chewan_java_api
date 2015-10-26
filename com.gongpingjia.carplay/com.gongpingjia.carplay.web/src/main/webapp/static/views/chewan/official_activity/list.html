@@ -101,15 +101,20 @@
                 <td>
                     <!--未上架   修改-->
                     <a ng-show="item.onFlag == false" ng-click="updateOfficialActivity(item.officialActivityId)">{{item.title}}</a>
-                    <!--上架中 已经下架   查看-->
-                    <a ng-show="item.onFlag == true" ng-click="viewOfficialActivity(item.officialActivityId)">{{item.title}}</a>
+
+                    <!--上架中    给修改 限制类型与 数量-->
+                    <a ng-show="checkOnItemStatus(item.onFlag,item.end) == 1"
+                       ng-click="updateOfficialActivityLimit(item.officialActivityId)">{{item.title}}</a>
+
+                    <!--已经下架 只能查看-->
+                    <a ng-show="checkOnItemStatus(item.onFlag,item.end) == 2"
+                       ng-click="viewOfficialActivity(item.officialActivityId)">{{item.title}}</a>
 
                 </td>
                 <td>
                     <span ng-show="item.limitType == 0">不限总人数 {{item.nowJoinNum}} / 不限制</span>
                     <span ng-show="item.limitType == 1">总人数 {{item.nowJoinNum}} / {{item.totalLimit}} </span>
                     <span ng-show="item.limitType == 2">男 {{item.maleNum}}/{{item.maleLimit}} 女 {{item.femaleNum}}/{{item.femaleLimit}}</span>
-
 
 
                 </td>
@@ -125,7 +130,8 @@
                     <span ng-show="item.end != undefined && item.end != null && item.end !== '' ">{{item.end | date:"yyyy-MM-dd HH:mm"}}</span>
                 </td>
                 <td>
-                    <div ng-show="item.onFlag == false"><span>未上架</span><button ng-click="sendOnFlag(item.officialActivityId)" style="margin-left:5px;">上架</button>
+                    <div ng-show="item.onFlag == false"><span>未上架</span>
+                        <button ng-click="sendOnFlag(item.officialActivityId)" style="margin-left:5px;">上架</button>
                     </div>
                     <div ng-show="checkOnItemStatus(item.onFlag,item.end)  == 1">
                         上架中

@@ -111,6 +111,10 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             $location.path(("/officialActivity/update/"+officialActivityId));
         };
 
+        $scope.updateOfficialActivityLimit = function(officialActivityId){
+            $location.path("/officialActivity/updateLimit/" + officialActivityId);
+        };
+
         $scope.checkOnItemStatus = function (onFlag, end) {
             if (onFlag == false) {
                 //未上架
