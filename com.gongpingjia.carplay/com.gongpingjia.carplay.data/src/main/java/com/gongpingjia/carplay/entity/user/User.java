@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
@@ -49,6 +50,9 @@ public class User {
 
     //用户位置信息
     private Address address;
+
+    //用户经纬度地理位置索引
+    @GeoSpatialIndexed
     private Landmark landmark;
 
     //用户车辆信息,驾龄
