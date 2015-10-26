@@ -53,7 +53,7 @@ public class ActivityController {
                                        @RequestBody JSONObject jsonObject) {
         LOG.debug("activity/register begin");
         try {
-            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("type", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(jsonObject, Arrays.asList("majorType","type", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
 
