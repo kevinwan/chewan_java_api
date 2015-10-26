@@ -85,10 +85,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         //初始化 开始 结束 时间信息；
                         document.getElementById("startDate").value = commonService.transferLongToDateString($scope.activity.start);
                         //document.getElementById("startTime").value = commonService.transferLongToTimeString($scope.activity.start);
-                        if($scope.startTime === undefined) {
+                        if ($scope.startTime === undefined) {
                             $scope.startTime = {};
                         }
-                        if($scope.endTime === undefined) {
+                        if ($scope.endTime === undefined) {
                             $scope.endTime = {};
                         }
                         $scope.startTime.date = commonService.transferLongToDateString($scope.activity.start);
@@ -121,7 +121,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             }
             if (!commonService.isNull($scope.endTime)) {
                 //结束时间不是空
-                if(commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)){
+                if (commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
                     $window.alert("请选择合法的结束时间");
                     return false;
                 }
@@ -137,12 +137,16 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             //
 
             //初始化绑定参数时间
-            var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours()+":"+$scope.startTime.time.getMinutes();
+            var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours() + ":" + $scope.startTime.time.getMinutes();
             $scope.activity.start = new Date(startStr).getTime();
             if (!commonService.isNull($scope.endTime) && !commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
-                var endStr = $scope.endTime.date + " " + $scope.endTime.time.getHours()+":"+$scope.endTime.time.getMinutes();
+                var endStr = $scope.endTime.date + " " + $scope.endTime.time.getHours() + ":" + $scope.endTime.time.getMinutes();
                 $scope.activity.end = new Date(endStr).getTime();
-            }else{
+                if($scope.activity.end <= $scope.activity.start) {
+                    $window.alert("结束时间必须大于开始时间");
+                    return false;
+                }
+            } else {
                 $scope.activity.end = null;
             }
 
@@ -173,6 +177,47 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     }
                 });
             }
+        };
+
+
+        /**
+         * 上架中 只能更新官方活动的 人数类型   已经 人数限制
+         */
+        $scope.updateLimit = function () {
+            //validator limitType  and limit number;
+            var data = {};
+            data.limitType = $scope.activity.limitType;
+            if ($scope.activity.limitType === 0 || $scope.activity.limitType === '0') {
+                //0 无限制
+            } else if ($scope.activity.limitType === 1 || $scope.activity.limitType === '1') {
+                //1 限制总人数;
+                if ($scope.activity.nowJoinNum > $scope.activity.totalLimit) {
+                    $window.alert("总人数限制不能小于当前总人数");
+                    return;
+                }
+                data.totalLimit = $scope.activity.totalLimit;
+            } else if ($scope.activity.limitType === 2 || $scope.activity.limitType === '2') {
+                //2 分别限制 男性 女性 数量；
+                if ($scope.activity.maleNum > $scope.activity.maleLimitNum) {
+                    $window.alert("男性人数限制必须大于现在参加的男性数目");
+                    return;
+                }
+                if ($scope.activity.femaleNum > $scope.activity.femaleLimit) {
+                    $window.alert("女性人数限制必须大于现在参加的女性数目");
+                    return;
+                }
+
+                data.maleLimit = $scope.activity.maleLimit;
+                data.femaleLimit = $scope.activity.femaleLimit;
+            }
+
+            $rootScope.loadingPromise = officialActivityService.updateLimit($scope.activity.officialActivityId, data).success(function(result){
+                if(result.result ===0){
+                    $window.alert("设置成功");
+                }else{
+                    $window.alert("设置失败 " + result.errmsg);
+                }
+            });
         };
 
         /**
