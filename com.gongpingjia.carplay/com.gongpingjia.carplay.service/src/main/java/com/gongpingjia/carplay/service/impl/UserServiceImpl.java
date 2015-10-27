@@ -1174,11 +1174,13 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("用户不存在");
         }
 
-        Map<String, Object> data = new HashMap<>(4, 1);
+        Map<String, Object> data = new HashMap<>(8, 1);
         data.put("userId", user.getUserId());
         data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         data.put("nickname", user.getNickname());
         data.put("emchatName", user.getEmchatName());
+        data.put("gender", user.getGender());
+        data.put("age", user.getAge());
         return ResponseDo.buildSuccessResponse(data);
     }
 }
