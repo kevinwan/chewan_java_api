@@ -1253,6 +1253,13 @@ public class ActivityServiceImpl implements ActivityService {
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))));
         Map<String, User> userMap = buildUserMap(activityList);
 
+        User user = userDao.findById(userId);
+        for (Activity item : activityList) {
+            User organizer = userMap.get(item.getUserId());
+            item.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    organizer.getLandmark().getLongitude(), organizer.getLandmark().getLatitude()));
+        }
+
         LOG.debug("Finished query data, begin build response");
         return ResponseDo.buildSuccessResponse(buildResponse(userId, userMap, activityList, subscriberSet));
     }
