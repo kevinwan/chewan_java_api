@@ -398,7 +398,7 @@ public class UserServiceImpl implements UserService {
 
         LOG.debug("Begin build response data");
         List<Object> data = new ArrayList<>(appointments.size());
-        String localServer = CommonUtil.getLocalPhotoServer();
+        String thirdServer = CommonUtil.getThirdPhotoServer();
         for (Appointment appointment : appointments) {
             if (Constants.ActivityCatalog.OFFICIAL.equals(appointment.getActivityCategory())) {
                 //官方活动
@@ -411,6 +411,7 @@ public class UserServiceImpl implements UserService {
                 organizer.put("emchatName", user.getEmchatName());
                 officialActivity.setOrganizer(organizer);
 
+                officialActivity.setCovers(new String[]{thirdServer + officialActivity.getCover().getKey()});
                 officialActivity.setActivityCategory(appointment.getActivityCategory());
                 data.add(officialActivity);
             } else {
