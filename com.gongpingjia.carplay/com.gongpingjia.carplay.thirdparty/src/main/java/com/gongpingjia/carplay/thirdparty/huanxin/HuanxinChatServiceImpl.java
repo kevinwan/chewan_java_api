@@ -46,6 +46,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.post(httpUrl.toString(), params, headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -66,6 +67,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.post(httpUrl.toString(), userMap, headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 // 只有在返回为200 的情况向才解析结果
                 return HttpClientUtil.parseResponseGetJson(response);
@@ -108,6 +110,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.post(httpUrl.toString(), json.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -143,6 +146,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.put(httpUrl.toString(), json.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -165,6 +169,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.delete(httpUrl.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -188,6 +193,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.post(httpUrl.toString(), "", headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -211,6 +217,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.delete(httpUrl.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -274,6 +281,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.put(httpUrl.toString(), param.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (HttpClientUtil.isStatusOK(response)) {
                 return HttpClientUtil.parseResponseGetJson(response);
             }
@@ -362,6 +370,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientUtil.post(httpUrl.toString(), param.toString(), headers, Constants.Charset.UTF8);
+            LOG.info("response:{}", response);
             if (!HttpClientUtil.isStatusOK(response)) {
                 LOG.warn("Send emchat message failure, param:{}", param);
             } else {

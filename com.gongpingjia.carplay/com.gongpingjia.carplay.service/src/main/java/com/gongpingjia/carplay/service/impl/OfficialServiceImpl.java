@@ -311,7 +311,8 @@ public class OfficialServiceImpl implements OfficialService {
 
         //加入到环信群组中
         try {
-            chatThirdPartyService.addUserToChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
+            JSONObject result = chatThirdPartyService.addUserToChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(), applyUser.getEmchatName());
+            LOG.info("Join result:{}", result);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             throw new ApiException("加入到聊天群组失败");
