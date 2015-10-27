@@ -405,9 +405,10 @@ public class UserServiceImpl implements UserService {
                 OfficialActivity officialActivity = officialActivityMap.get(appointment.getActivityId());
                 User user = users.get(appointment.getInvitedUserId());
 
-                Map<String, Object> organizer = new HashMap<>(2, 1);
+                Map<String, Object> organizer = new HashMap<>(4, 1);
                 organizer.put("nickname", user.getNickname());
                 organizer.put("avatar", user.getAvatar());
+                organizer.put("emchatName", user.getEmchatName());
                 officialActivity.setOrganizer(organizer);
 
                 officialActivity.setActivityCategory(appointment.getActivityCategory());
@@ -445,6 +446,7 @@ public class UserServiceImpl implements UserService {
         userMap.put("car", userInfo.getCar());
         //是否在subscriberIdSet中 即为 是否关注了该用户
         userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
+        userMap.put("emchatName", userInfo.getEmchatName());
         appointment.setApplicant(userMap);
     }
 
