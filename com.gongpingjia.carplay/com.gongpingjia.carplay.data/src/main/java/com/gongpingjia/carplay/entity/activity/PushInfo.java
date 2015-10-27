@@ -29,7 +29,7 @@ public class PushInfo {
     private Long createTime;
 
     //是否删除标识
-    private Boolean deleteFlag;
+    private boolean deleteFlag = false;
 
     public String getId() {
         return id;
@@ -63,11 +63,11 @@ public class PushInfo {
         this.createTime = createTime;
     }
 
-    public Boolean getDeleteFlag() {
+    public boolean isDeleteFlag() {
         return deleteFlag;
     }
 
-    public void setDeleteFlag(Boolean deleteFlag) {
+    public void setDeleteFlag(boolean deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
 
