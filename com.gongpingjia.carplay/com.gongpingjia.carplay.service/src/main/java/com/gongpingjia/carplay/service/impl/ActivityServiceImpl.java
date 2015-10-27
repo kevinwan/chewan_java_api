@@ -1075,16 +1075,26 @@ public class ActivityServiceImpl implements ActivityService {
         return result;
     }
 
+    /**
+     * 重新按照条件梳理一下活动信息
+     *
+     * @param param
+     * @param activityList
+     * @param userMap
+     * @return
+     */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
             User user = userMap.get(item.getUserId());
-            if (StringUtils.isNotEmpty(param.getGender())) {
-                if (!StringUtils.equals(param.getGender(), user.getGender())) {
-                    //如果用户的性别不符合要求；
-                    continue;
+            if (param.isCommonQuery()) {
+                if (StringUtils.isNotEmpty(param.getGender())) {
+                    if (!StringUtils.equals(param.getGender(), user.getGender())) {
+                        //如果用户的性别不符合要求；
+                        continue;
+                    }
                 }
             }
             if (user != null || user.getIdle()) {
@@ -1200,6 +1210,29 @@ public class ActivityServiceImpl implements ActivityService {
 
         LOG.debug("Begin build response");
         return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, activities, new HashSet<String>(0)));
+    }
+
+    @Override
+    public ResponseDo getNearByActivityCount(ActivityQueryParam param) {
+        LOG.info("Query parameters:{}", param.toString());
+        Map<String, Object> data = new HashMap<>(1);
+        //获取所有的活动列表
+        List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
+        if (activityList.isEmpty()) {
+            //如果没有找到活动，进行拓展查询
+            LOG.info("No result find, begin expand query");
+            data.put("count", 0);
+            return ResponseDo.buildSuccessResponse(data);
+        }
+
+        Map<String, User> userMap = buildUserMap(activityList);
+
+        //获取出该用户所关注的 所有的 用户 id
+        List<Activity> activities = rebuildActivities(param, activityList, userMap);
+
+        data.put("count", activities.size());
+        //查询出Activity的 组织者，并初始化
+        return ResponseDo.buildSuccessResponse(data);
     }
 
 }

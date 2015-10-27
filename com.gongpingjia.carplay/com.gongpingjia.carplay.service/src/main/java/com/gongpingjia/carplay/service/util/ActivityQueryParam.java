@@ -31,6 +31,9 @@ public class ActivityQueryParam {
     //单位为毫秒
     private Long maxTimeLimit;
 
+    //是否进行普通查询
+    private boolean commonQuery;
+
     public ActivityQueryParam() {
         this.maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.defaultMaxDistance",
                 String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
@@ -98,6 +101,8 @@ public class ActivityQueryParam {
             //区
             criteria.and("destination.district").is(gender);
         }
+
+        this.commonQuery = true;
         return criteria;
     }
 
@@ -131,7 +136,7 @@ public class ActivityQueryParam {
             //排除活动创建人员
             criteria.and("userId").ne(userId);
         }
-
+        this.commonQuery = false;
         return criteria;
     }
 
@@ -288,4 +293,11 @@ public class ActivityQueryParam {
         this.maxTimeLimit = maxTimeLimit;
     }
 
+    public boolean isCommonQuery() {
+        return commonQuery;
+    }
+
+    public void setCommonQuery(boolean commonQuery) {
+        this.commonQuery = commonQuery;
+    }
 }

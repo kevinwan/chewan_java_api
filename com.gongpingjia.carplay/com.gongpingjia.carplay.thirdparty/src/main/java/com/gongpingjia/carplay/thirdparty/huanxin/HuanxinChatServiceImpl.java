@@ -376,7 +376,7 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
     }
 
 //    public static void main(String[] args) throws ApiException {
-//        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/chatgroups/119630275910042168";
+//        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/chatgroups/121539051185504692";
 //
 //        List<Header> headers = new ArrayList<Header>(2);
 //        headers.add(new BasicHeader("Content-Type", "application/json"));
