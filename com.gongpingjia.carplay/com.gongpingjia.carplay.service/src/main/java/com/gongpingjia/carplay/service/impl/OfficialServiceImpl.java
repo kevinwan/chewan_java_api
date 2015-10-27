@@ -131,6 +131,9 @@ public class OfficialServiceImpl implements OfficialService {
         //是否被该用户邀请过
         boolean beInvitedFlag = false;
 
+        map.put("phone", "");
+        map.put("emchatName", "");
+
         for (Appointment appointment : appointmentList) {
             //
             if (appointment.getInvitedUserId().equals(user.getUserId())) {
@@ -147,7 +150,14 @@ public class OfficialServiceImpl implements OfficialService {
                 inviteFlag = true;
                 map.put("inviteStatus", appointment.getStatus());
                 if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                    //jackjson 不允许有null 存在
+                    if (user.getPhone() == null) {
+                        user.setPhone("");
+                    }
                     map.put("phone", user.getPhone());
+                    if (user.getEmchatName() == null) {
+                        user.setEmchatName("");
+                    }
                     map.put("emchatName", user.getEmchatName());
                 }
             }
@@ -157,7 +167,14 @@ public class OfficialServiceImpl implements OfficialService {
                 beInvitedFlag = true;
                 map.put("beInvitedStatus", appointment.getStatus());
                 if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                    //jackjson 不允许有null 存在
+                    if (user.getPhone() == null) {
+                        user.setPhone("");
+                    }
                     map.put("phone", user.getPhone());
+                    if (user.getEmchatName() == null) {
+                        user.setEmchatName("");
+                    }
                     map.put("emchatName", user.getEmchatName());
                 }
             }

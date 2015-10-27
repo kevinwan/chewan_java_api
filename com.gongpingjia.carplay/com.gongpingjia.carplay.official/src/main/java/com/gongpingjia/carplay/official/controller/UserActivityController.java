@@ -39,7 +39,7 @@ public class UserActivityController {
      */
     @RequestMapping(value = "/official/userActivity/list", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo registerActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+    public ResponseDo getActivityList(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("begin /official/userActivity/list userId:{}", userId);
 
         try {

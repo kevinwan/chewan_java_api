@@ -720,16 +720,22 @@ public class ActivityServiceImpl implements ActivityService {
      */
     @Override
     public ResponseDo getUserActivityList(JSONObject json, String userId) throws ApiException {
+        //TODO重构
+        int draw = json.getInt("draw");
+        int start = json.getInt("start");
+        int length = json.getInt("length");
+
+        JSONObject resultJson = new JSONObject();
+
+        Query query = new Query();
         Criteria criteria = new Criteria();
 
-        //
-        String province = json.getString("province");
-        if (StringUtils.isNotEmpty(province)) {
-            criteria.and("destination.province").is(province);
-        }
-        String city = json.getString("city");
-        if (StringUtils.isNotEmpty(city)) {
-            criteria.and("destination.city").is(city);
+        String startTimeStr = json.getString("fromTime");
+        String endTimeStr = json.getString("toTime");
+        if (StringUtils.isNotEmpty(startTimeStr) && StringUtils.isNotEmpty(endTimeStr)) {
+            long startTime = TypeConverUtil.convertToLong("fromTime", startTimeStr, true);
+            long endTime = TypeConverUtil.convertToLong("toTime", endTimeStr, true) + 24 * 60 * 60 * 1000;
+            criteria.and("createTime").gte(startTime).lte(endTime);
         }
 
         String phone = json.getString("phone");
@@ -741,13 +747,17 @@ public class ActivityServiceImpl implements ActivityService {
             criteria.and("userId").is(user.getUserId());
         }
 
-//        String startTimeStr = request.getParameter("startTime");
-//        String endTimeStr = request.getParameter("endTime");
-//        if (StringUtils.isNotEmpty(startTimeStr) && StringUtils.isNotEmpty(endTimeStr)) {
-//            long start = TypeConverUtil.convertToLong("startDate", startTimeStr, true);
-//            long end = TypeConverUtil.convertToLong("endDate", endTimeStr, true) + 24 * 60 * 60 * 1000;
-//            criteria.and("createTime").gte(start).lte(end);
-//        }
+        criteria.and("deleteFlag").is(false);
+
+        String province = json.getString("province");
+        if (StringUtils.isNotEmpty(province)) {
+            criteria.and("destination.province").is(province);
+        }
+
+        String city = json.getString("city");
+        if (StringUtils.isNotEmpty(city)) {
+            criteria.and("destination.city").is(city);
+        }
 
         String pay = json.getString("pay");
         if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
@@ -764,25 +774,54 @@ public class ActivityServiceImpl implements ActivityService {
             criteria.and("transfer").is(TypeConverUtil.convertToBoolean("transfer", transferStr, true));
         }
 
-        List<Activity> activityList = activityDao.find(Query.query(criteria));
+        query.addCriteria(criteria);
+
+        long totalNum = activityDao.count(query);
+
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
+        query.skip(start).limit(length);
+        List<Activity> activityList = activityDao.find(query);
+
+        resultJson.put("draw", draw);
+        resultJson.put("recordsFiltered", totalNum);
+        resultJson.put("recordsTotal", totalNum);
+
         if (null == activityList || activityList.isEmpty()) {
-            return ResponseDo.buildSuccessResponse("[]");
+            return ResponseDo.buildSuccessResponse(resultJson);
         }
 
-        HashSet<String> userIdSet = new HashSet<>(activityList.size());
+        Set<String> userIdSet = new HashSet<>(activityList.size());
         for (Activity activity : activityList) {
             userIdSet.add(activity.getUserId());
         }
+
         List<User> userList = userDao.findByIds(userIdSet);
+
         Map<String, User> userMap = new HashMap<>(userList.size());
+        if (null == userList || userList.isEmpty()) {
+            throw new ApiException("用户列表为空 数据参数异常");
+        }
         for (User user : userList) {
             userMap.put(user.getUserId(), user);
         }
-        for (Activity activity : activityList) {
-            activity.setOrganizer(userMap.get(activity.getUserId()));
-        }
 
-        return ResponseDo.buildSuccessResponse(activityList);
+        JSONArray jsonArray = new JSONArray();
+        for (Activity activity : activityList) {
+            JSONObject item = new JSONObject();
+            item.put("activityId", activity.getActivityId());
+            item.put("nickname", userMap.get(activity.getUserId()).getNickname());
+            item.put("phone", userMap.get(activity.getUserId()).getPhone());
+            item.put("establish", activity.getEstablish());
+            item.put("destination", activity.getDestination());
+            item.put("type", activity.getType());
+            item.put("pay", activity.getPay());
+            item.put("transfer", activity.isTransfer());
+            item.put("createTime", activity.getCreateTime());
+            jsonArray.add(item);
+        }
+        resultJson.put("activityList", jsonArray);
+
+        return ResponseDo.buildSuccessResponse(resultJson);
     }
 
 
@@ -855,7 +894,7 @@ public class ActivityServiceImpl implements ActivityService {
         if (byIds.size() != ids.size()) {
             throw new ApiException("id中含有不存在的值");
         }
-        activityDao.deleteByIds(ids);
+        activityDao.update(Query.query(Criteria.where("_id").in(ids)), Update.update("deleteFlag", true));
         return ResponseDo.buildSuccessResponse();
     }
 
@@ -1202,4 +1241,113 @@ public class ActivityServiceImpl implements ActivityService {
         return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, activities, new HashSet<String>(0)));
     }
 
+
+    @Override
+    public ResponseDo getTestUserActivityList(JSONObject json) throws ApiException {
+        //
+
+        int draw = json.getInt("draw");
+        int start = json.getInt("start");
+        int length = json.getInt("length");
+
+        JSONObject resultJson = new JSONObject();
+
+        Query query = new Query();
+
+
+        Criteria criteria = new Criteria();
+
+        String startTimeStr = json.getString("fromTime");
+        String endTimeStr = json.getString("toTime");
+        if (StringUtils.isNotEmpty(startTimeStr) && StringUtils.isNotEmpty(endTimeStr)) {
+            long startTime = TypeConverUtil.convertToLong("fromTime", startTimeStr, true);
+            long endTime = TypeConverUtil.convertToLong("toTime", endTimeStr, true) + 24 * 60 * 60 * 1000;
+            criteria.and("createTime").gte(startTime).lte(endTime);
+        }
+
+        String phone = json.getString("phone");
+        if (StringUtils.isNotEmpty(phone)) {
+            User user = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+            if (null == user || StringUtils.isEmpty(user.getUserId())) {
+                throw new ApiException("未找到该号码发布的活动");
+            }
+            criteria.and("userId").is(user.getUserId());
+        }
+
+        criteria.and("deleteFlag").is(false);
+
+        String province = json.getString("province");
+        if (StringUtils.isNotEmpty(province)) {
+            criteria.and("destination.province").is(province);
+        }
+
+        String city = json.getString("city");
+        if (StringUtils.isNotEmpty(city)) {
+            criteria.and("destination.city").is(city);
+        }
+
+
+        String pay = json.getString("pay");
+        if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
+            criteria.and("pay").is(pay);
+        }
+
+        String type = json.getString("type");
+        if (StringUtils.isNotEmpty(type) && !StringUtils.equals(type, "-1")) {
+            criteria.and("majorType").is(type);
+        }
+
+        String transferStr = json.getString("transfer");
+        if (StringUtils.isNotEmpty(transferStr) && !StringUtils.equals(transferStr, "-1")) {
+            criteria.and("transfer").is(TypeConverUtil.convertToBoolean("transfer", transferStr, true));
+        }
+
+        query.addCriteria(criteria);
+        long totalNum = activityDao.count(query);
+
+        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
+        query.skip(start).limit(length);
+        List<Activity> activityList = activityDao.find(query);
+
+        resultJson.put("draw", draw);
+        resultJson.put("recordsFiltered", totalNum);
+        resultJson.put("recordsTotal", totalNum);
+
+        if (null == activityList || activityList.isEmpty()) {
+            return ResponseDo.buildSuccessResponse(resultJson);
+        }
+
+        Set<String> userIdSet = new HashSet<>(activityList.size());
+        for (Activity activity : activityList) {
+            userIdSet.add(activity.getUserId());
+        }
+
+        List<User> userList = userDao.findByIds(userIdSet);
+
+        Map<String, User> userMap = new HashMap<>(userList.size());
+        if (null == userList || userList.isEmpty()) {
+            throw new ApiException("用户列表为空 数据参数异常");
+        }
+        for (User user : userList) {
+            userMap.put(user.getUserId(), user);
+        }
+
+        JSONArray jsonArray = new JSONArray();
+        for (Activity activity : activityList) {
+            JSONObject item = new JSONObject();
+            item.put("activityId", activity.getActivityId());
+            item.put("nickname", userMap.get(activity.getUserId()).getNickname());
+            item.put("phone", userMap.get(activity.getUserId()).getPhone());
+            item.put("establish", activity.getEstablish());
+            item.put("destination", activity.getDestination());
+            item.put("type", activity.getType());
+            item.put("pay", activity.getPay());
+            item.put("transfer", activity.isTransfer());
+            item.put("createTime", activity.getCreateTime());
+            jsonArray.add(item);
+        }
+        resultJson.put("activityList", jsonArray);
+
+        return ResponseDo.buildSuccessResponse(resultJson);
+    }
 }

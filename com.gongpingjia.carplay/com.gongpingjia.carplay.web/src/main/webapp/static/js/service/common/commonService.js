@@ -89,6 +89,13 @@ gpjApp.factory('commonService', ['restProxyService', function (restProxyService)
         },
         isStrEmpty:function(str) {
             return (str === undefined || str === null || str === "");
+        },
+        transferIllegalToEmpty:function(str) {
+            if(str === undefined || str === null) {
+                return "";
+            }else{
+                return str;
+            }
         }
     }
 }]);

@@ -112,12 +112,12 @@
     </div>
 
     <div class="control-group col-md-12">
-        <table datatable="ng" dt-options="dtOptions"
-               dt-columns="dtColumnDefs" class="table table-bordered table-hover">
+        <table datatable="ng" dt-options="dtOptions" dt-instance="dtInstance" dt-columns="dtColumns"
+               dt-column-defs="dtColumnDefs" class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>全选 <input type="checkbox" id="checkItemAll" ng-model="allSelected"
-                              ng-change="selectAll(allSelected)"/></th>
+                <th>全选 <input type="checkbox" id="checkItemAll" ng-model="allCheckItem"
+                              ng-change="checkAll()"/></th>
                 <th>创建人昵称</th>
                 <th>活动发布地</th>
                 <th>活动目的地</th>
@@ -130,38 +130,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="item in activities">
-                <td>
-                    <input type="checkbox" name="checkItem" ng-model="item.checked" ng-change="checkItem(item)"/>
-                </td>
-                <td>
-                    <span>{{item.organizer.nickname}}    ({{item.organizer.phone}})</span>
-                </td>
-                <td>
-                    <span>{{item.establish.city}}市/{{item.establish.district}}/{{item.establish.street}}/{{item.establish.detail}}</span>
-                </td>
-                <td>
-                    <span>{{item.destination.city}}市/{{item.destination.district}}/{{item.destination.street}}/{{item.destination.detail}}</span>
-                </td>
-                <td>
-                    {{item.type}}
-                </td>
-                <td>
-                    {{item.pay}}
-                </td>
-                <td>
-                    <span ng-show="item.transfer == true ">是</span>
-                    <span ng-show="item.transfer == false ">否</span>
-                </td>
-                <td>
-                    {{item.createTime | date:"yyyy-MM-dd HH:mm"}}
-                </td>
-                <td>
-                    <button ng-click="updateActivity(item.activityId)">修改</button>
-                </td>
-                <td style="display: none">
-                    {{item.activityId}}
-                </td>
+            <tr ng-repeat="item in items">
             </tr>
             </tbody>
         </table>
@@ -173,7 +142,7 @@
         <thead>
         <tr>
             <th>
-                <div><span>总计{{officialActivities.length ? officialActivities.length : 0}}条</span></div>
+                <div><span>总计{{total ? total : 0}}条</span></div>
             </th>
         </tr>
         </thead>
