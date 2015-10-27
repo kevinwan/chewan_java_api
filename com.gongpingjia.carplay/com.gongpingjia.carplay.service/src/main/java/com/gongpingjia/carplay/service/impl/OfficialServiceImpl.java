@@ -338,19 +338,21 @@ public class OfficialServiceImpl implements OfficialService {
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                 applyUser.getEmchatName(), message);
 
-        modifyChatGroup(officialActivity, members, user);
+        modifyChatGroup(officialActivity, members, userId);
 
         return ResponseDo.buildSuccessResponse();
     }
 
     //修改聊天群组的description信息，用于记录群组的图像
-    private void modifyChatGroup(OfficialActivity officialActivity, List<String> members, User user) throws ApiException {
+    private void modifyChatGroup(OfficialActivity officialActivity, List<String> members, String joinUserId) throws ApiException {
         if (members == null || members.isEmpty()) {
+            User joinUser = userDao.findById(joinUserId);
             chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
-                    officialActivity.getTitle(), (CommonUtil.getLocalPhotoServer() + user.getAvatar()).replace("/", "|"));
+                    officialActivity.getTitle(), (CommonUtil.getLocalPhotoServer() + joinUser.getAvatar()).replace("/", "|"));
         } else if (members.size() < Constants.CHATGROUP_MAX_PHOTO_COUNT) {
             //用户群聊的图片数量限制4
             StringBuilder builder = new StringBuilder();
+            members.add(joinUserId);
             List<User> users = userDao.findByIds(members);
             String localServer = CommonUtil.getLocalPhotoServer();
             for (User item : users) {
