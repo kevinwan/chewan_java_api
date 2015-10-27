@@ -359,11 +359,15 @@ public class UserServiceImpl implements UserService {
                     viewUserInfo.getNickname());
             chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.USER_VIEW,
                     beViewedUserInfo.getEmchatName(), message);
+
+            Subscriber subscriber = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(viewUser).and("toUser").is(beViewedUser)));
+            beViewedUserInfo.setSubscribeFlag(subscriber != null ? true : false);
         }
 
         beViewedUserInfo.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         beViewedUserInfo.setCompletion(computeCompletion(beViewedUserInfo));
         beViewedUserInfo.hideSecretInfo();
+
 
         return ResponseDo.buildSuccessResponse(beViewedUserInfo);
     }
@@ -405,6 +409,8 @@ public class UserServiceImpl implements UserService {
                 organizer.put("nickname", user.getNickname());
                 organizer.put("avatar", localServer + user.getAvatar());
                 officialActivity.setOrganizer(organizer);
+
+                officialActivity.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);
                 data.add(officialActivity);
             } else {
                 //邀他同去， 普通邀约
