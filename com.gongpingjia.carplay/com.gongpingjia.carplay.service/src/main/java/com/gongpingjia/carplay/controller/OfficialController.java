@@ -127,11 +127,12 @@ public class OfficialController {
                 throw new ApiException("输入参数有误");
             }
 
+            parameterChecker.checkUserInfo(userId, token);
+
             String invitedUserId = json.getString("invitedUserId");
             Boolean transfer = json.getBoolean("transfer");
             String message = json.getString("message");
 
-            parameterChecker.checkUserInfo(userId, token);
             parameterChecker.isUserExist(invitedUserId);
 
             return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer,message);

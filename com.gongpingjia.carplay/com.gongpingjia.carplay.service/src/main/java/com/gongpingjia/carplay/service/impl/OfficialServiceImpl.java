@@ -395,7 +395,7 @@ public class OfficialServiceImpl implements OfficialService {
                 .and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
                 .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
         if (null != toFind) {
-            LOG.warn("User alread has bean invited by each other");
+            LOG.warn("User already has bean invited by each other");
             throw new ApiException("已经邀请过此用户");
         }
 
@@ -411,12 +411,12 @@ public class OfficialServiceImpl implements OfficialService {
             LOG.warn("members size is 0");
             throw new ApiException("该活动没有参加成员");
         }
-        if (members.contains(fromUserId)) {
+        if (!members.contains(fromUserId)) {
             LOG.warn("this userId not in the members userId is:{}", fromUserId);
             throw new ApiException("你没有参加该活动");
 
         }
-        if (members.contains(toUserId)) {
+        if (!members.contains(toUserId)) {
             LOG.warn("this userId not in the members userId is {}", toUserId);
             throw new ApiException("被邀请的成员并没有参加该活动");
         }
@@ -427,7 +427,7 @@ public class OfficialServiceImpl implements OfficialService {
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
         String pushMsg = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.official.activity.invite",
-                "{0}邀请您{1}同去参加官方活动"), fromUser.getNickname(), toUser.getNickname());
+                "{0}邀请您同去参加官方活动"), fromUser.getNickname());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                 toUser.getEmchatName(), pushMsg);
 
