@@ -114,4 +114,11 @@ public interface ActivityService {
      * @return 返回结果信息
      */
     ResponseDo getNearByActivityCount(ActivityQueryParam param);
+
+    /**
+     * 获取当前用户的附近的推送消息
+     * @param userId
+     * @return
+     */
+    ResponseDo getActivityPushInfos(String userId);
 }

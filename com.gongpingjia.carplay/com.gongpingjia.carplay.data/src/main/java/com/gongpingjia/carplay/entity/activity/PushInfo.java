@@ -21,6 +21,9 @@ public class PushInfo {
     @Indexed
     private String receivedUserId;
 
+    @Indexed
+    private String activityId;
+
     //发送时间
     @Indexed
     private Long createTime;
@@ -66,6 +69,14 @@ public class PushInfo {
 
     public void setDeleteFlag(Boolean deleteFlag) {
         this.deleteFlag = deleteFlag;
+    }
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 
     @Override
