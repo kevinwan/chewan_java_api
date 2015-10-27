@@ -178,6 +178,54 @@ public class ActivityController {
     }
 
     /**
+     * 获取附近的活动, 匹配约会的总数量，转圈等待
+     *
+     * @return
+     */
+    @RequestMapping(value = "/activity/count", method = RequestMethod.GET)
+    public ResponseDo getNearByActivityCount(@RequestParam(value = "userId", required = false) String userId,
+                                             @RequestParam(value = "token", required = false) String token,
+                                             @RequestParam(value = "majorType", required = false) String majorType,
+                                             @RequestParam(value = "type", required = false) String type,
+                                             @RequestParam(value = "pay", required = false) String pay,
+                                             @RequestParam(value = "gender", required = false) String gender,
+                                             @RequestParam(value = "transfer", required = false) Boolean transfer,
+                                             @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
+                                             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                             @RequestParam(value = "longitude") Double longitude,
+                                             @RequestParam(value = "latitude") Double latitude,
+                                             @RequestParam(value = "province", required = false) String province,
+                                             @RequestParam(value = "city", required = false) String city,
+                                             @RequestParam(value = "district", required = false) String district) {
+        LOG.info("Begin get nearby activities");
+        ActivityQueryParam param = new ActivityQueryParam();
+        param.setUserId(userId);
+        param.setToken(token);
+        param.setType(type);
+        param.setMajorType(majorType);
+        param.setPay(pay);
+        param.setGender(gender);
+        param.setTransfer(transfer);
+        param.setIgnore(ignore);
+        param.setLimit(limit);
+        param.setLongitude(longitude);
+        param.setLatitude(latitude);
+        param.setProvince(province);
+        param.setCity(city);
+        param.setDistrict(district);
+
+        try {
+            if (!StringUtils.isEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+            return activityService.getNearByActivityCount(param);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
      * 获取附近的活动, 匹配约会信息
      *
      * @return
@@ -262,5 +310,23 @@ public class ActivityController {
         }
     }
 
+    /**
+     * 获取当前用户的附近推送的消息列表
+     *
+     * @param userId
+     * @param token
+     * @return
+     */
+    @RequestMapping(value = "/activity/pushInfo", method = RequestMethod.GET)
+    public ResponseDo getPushActivities(@RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("/activity/pushInfo, userId:{}", userId);
+        try {
+            parameterChecker.checkUserInfo(userId, token);
 
+            return activityService.getActivityPushInfos(userId);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }

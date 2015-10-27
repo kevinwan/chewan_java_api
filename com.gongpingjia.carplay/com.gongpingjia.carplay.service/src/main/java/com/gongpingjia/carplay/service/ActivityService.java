@@ -106,4 +106,19 @@ public interface ActivityService {
      * @return
      */
     ResponseDo getRandomActivities(ActivityQueryParam param);
+
+    /**
+     * 获取附近的匹配活动的数量
+     *
+     * @param param 查询参数
+     * @return 返回结果信息
+     */
+    ResponseDo getNearByActivityCount(ActivityQueryParam param);
+
+    /**
+     * 获取当前用户的附近的推送消息
+     * @param userId
+     * @return
+     */
+    ResponseDo getActivityPushInfos(String userId);
 }

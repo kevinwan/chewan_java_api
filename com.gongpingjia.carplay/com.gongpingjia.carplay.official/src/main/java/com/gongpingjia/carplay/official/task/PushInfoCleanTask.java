@@ -24,7 +24,8 @@ public class PushInfoCleanTask extends QuartzJobBean {
         LOG.info("============Begin clean all pushInfo, execute at:{}", DateUtil.getDate());
 
         PushInfoDao pushInfoDao = BeanUtil.getBean(PushInfoDao.class);
-        pushInfoDao.update(Query.query(Criteria.where("deleteFlag").is(false)), Update.update("deleteFlag", true));
+        pushInfoDao.update(Query.query(Criteria.where("createTime").lte(DateUtil.getExpiredLimitTime())
+                .and("deleteFlag").is(false)), Update.update("deleteFlag", true));
 
         LOG.info("============Finished clean all pushInfo data");
     }

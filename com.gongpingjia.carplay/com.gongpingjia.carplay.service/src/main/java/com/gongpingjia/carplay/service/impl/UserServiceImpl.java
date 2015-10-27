@@ -398,18 +398,20 @@ public class UserServiceImpl implements UserService {
 
         LOG.debug("Begin build response data");
         List<Object> data = new ArrayList<>(appointments.size());
-        String localServer = CommonUtil.getLocalPhotoServer();
+        String thirdServer = CommonUtil.getThirdPhotoServer();
         for (Appointment appointment : appointments) {
             if (Constants.ActivityCatalog.OFFICIAL.equals(appointment.getActivityCategory())) {
                 //官方活动
                 OfficialActivity officialActivity = officialActivityMap.get(appointment.getActivityId());
                 User user = users.get(appointment.getInvitedUserId());
 
-                Map<String, Object> organizer = new HashMap<>(2, 1);
+                Map<String, Object> organizer = new HashMap<>(4, 1);
                 organizer.put("nickname", user.getNickname());
-                organizer.put("avatar", localServer + user.getAvatar());
+                organizer.put("avatar", user.getAvatar());
+                organizer.put("emchatName", user.getEmchatName());
                 officialActivity.setOrganizer(organizer);
 
+                officialActivity.setCovers(new String[]{thirdServer + officialActivity.getCover().getKey()});
                 officialActivity.setActivityCategory(appointment.getActivityCategory());
                 data.add(officialActivity);
             } else {
@@ -445,6 +447,7 @@ public class UserServiceImpl implements UserService {
         userMap.put("car", userInfo.getCar());
         //是否在subscriberIdSet中 即为 是否关注了该用户
         userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
+        userMap.put("emchatName", userInfo.getEmchatName());
         appointment.setApplicant(userMap);
     }
 
@@ -1172,11 +1175,13 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("用户不存在");
         }
 
-        Map<String, Object> data = new HashMap<>(4, 1);
+        Map<String, Object> data = new HashMap<>(8, 1);
         data.put("userId", user.getUserId());
         data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         data.put("nickname", user.getNickname());
         data.put("emchatName", user.getEmchatName());
+        data.put("gender", user.getGender());
+        data.put("age", user.getAge());
         return ResponseDo.buildSuccessResponse(data);
     }
 }

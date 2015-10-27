@@ -126,12 +126,12 @@ public class ActivityServiceImpl implements ActivityService {
                 buildUserSubscribers(userId), message, ext);
 
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
-                buildNearByUsers(user), message, ext);
+                buildNearByUsers(user, activity.getActivityId()), message, ext);
 
         return ResponseDo.buildSuccessResponse();
     }
 
-    private List<String> buildNearByUsers(User user) {
+    private List<String> buildNearByUsers(User user, String activityId) {
         LOG.debug("Send nearby user message, sendUser:{}", user.getUserId());
         PushInfo pushInfo = pushInfoDao.findOne(Query.query(Criteria.where("sendUserId").is(user.getUserId())));
         if (pushInfo != null) {            //用户的活动今天已经推送过一次
@@ -157,7 +157,7 @@ public class ActivityServiceImpl implements ActivityService {
             userMap.put(item.getUserId(), item);
         }
 
-        return buildEmchatNames(user, nearbyUserList, userMap);
+        return buildEmchatNames(user, nearbyUserList, userMap, activityId);
     }
 
     /**
@@ -166,7 +166,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @param userMap
      * @return
      */
-    private List<String> buildEmchatNames(User user, List<User> nearbyUserList, Map<String, User> userMap) {
+    private List<String> buildEmchatNames(User user, List<User> nearbyUserList, Map<String, User> userMap, String activityId) {
         LOG.debug("Get already pushed message users");
         Long current = DateUtil.getTime();
 
@@ -190,6 +190,7 @@ public class ActivityServiceImpl implements ActivityService {
             info.setSendUserId(user.getUserId());
             info.setReceivedUserId(item.getUserId());
             info.setCreateTime(current);
+            info.setActivityId(activityId);
             pushInfoDao.save(info);
 
             emchatNames.add(item.getEmchatName());
@@ -1061,7 +1062,7 @@ public class ActivityServiceImpl implements ActivityService {
         Set<String> subscriberSet = subscriberMap.keySet();
 
         //查询出Activity的 组织者，并初始化
-        return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, remainActivities, subscriberSet));
+        return ResponseDo.buildSuccessResponse(buildResponse(param.getUserId(), userMap, remainActivities, subscriberSet));
     }
 
     private boolean isApplied(String userId, List<String> applyIds) {
@@ -1082,7 +1083,7 @@ public class ActivityServiceImpl implements ActivityService {
         return applyFlag;
     }
 
-    private List<Map<String, Object>> buildResponse(ActivityQueryParam param, Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
+    private List<Map<String, Object>> buildResponse(String userId, Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
         String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> result = new ArrayList<>(remainActivities.size());
         for (Activity item : remainActivities) {
@@ -1090,7 +1091,7 @@ public class ActivityServiceImpl implements ActivityService {
             map.put("activityId", item.getActivityId());
             map.put("transfer", item.isTransfer());
             map.put("distance", item.getDistance());
-            map.put("applyFlag", isApplied(param.getUserId(), item.getApplyIds()));
+            map.put("applyFlag", isApplied(userId, item.getApplyIds()));
             User user = userMap.get(item.getUserId());
             Map<String, Object> organizer = new HashMap<>(9, 1);
             if (user != null) {
@@ -1114,16 +1115,26 @@ public class ActivityServiceImpl implements ActivityService {
         return result;
     }
 
+    /**
+     * 重新按照条件梳理一下活动信息
+     *
+     * @param param
+     * @param activityList
+     * @param userMap
+     * @return
+     */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
             User user = userMap.get(item.getUserId());
-            if (StringUtils.isNotEmpty(param.getGender())) {
-                if (!StringUtils.equals(param.getGender(), user.getGender())) {
-                    //如果用户的性别不符合要求；
-                    continue;
+            if (param.isCommonQuery()) {
+                if (StringUtils.isNotEmpty(param.getGender())) {
+                    if (!StringUtils.equals(param.getGender(), user.getGender())) {
+                        //如果用户的性别不符合要求；
+                        continue;
+                    }
                 }
             }
             if (user != null || user.getIdle()) {
@@ -1238,7 +1249,58 @@ public class ActivityServiceImpl implements ActivityService {
         Map<String, User> userMap = buildUserMap(activities);
 
         LOG.debug("Begin build response");
-        return ResponseDo.buildSuccessResponse(buildResponse(param, userMap, activities, new HashSet<String>(0)));
+        return ResponseDo.buildSuccessResponse(buildResponse(param.getUserId(), userMap, activities, new HashSet<String>(0)));
+    }
+
+    @Override
+    public ResponseDo getNearByActivityCount(ActivityQueryParam param) {
+        LOG.info("Query parameters:{}", param.toString());
+        Map<String, Object> data = new HashMap<>(1);
+        //获取所有的活动列表
+        List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
+        if (activityList.isEmpty()) {
+            //如果没有找到活动，进行拓展查询
+            LOG.info("No result find, begin expand query");
+            data.put("count", 0);
+            return ResponseDo.buildSuccessResponse(data);
+        }
+
+        Map<String, User> userMap = buildUserMap(activityList);
+
+        //获取出该用户所关注的 所有的 用户 id
+        List<Activity> activities = rebuildActivities(param, activityList, userMap);
+
+        data.put("count", activities.size());
+        //查询出Activity的 组织者，并初始化
+        return ResponseDo.buildSuccessResponse(data);
+    }
+
+    @Override
+    public ResponseDo getActivityPushInfos(String userId) {
+        LOG.debug("Query user pushInfo, userId:{}", userId);
+        List<PushInfo> pushInfoList = pushInfoDao.find(Query.query(Criteria.where("receivedUserId").is(userId).and("deleteFlag").is(false)));
+
+        Set<String> activityIds = new HashSet<>(pushInfoList.size(), 1);
+        for (PushInfo item : pushInfoList) {
+            activityIds.add(item.getActivityId());
+        }
+        LOG.debug("Query user subscriber info");
+        Map<String, Subscriber> subscriberMap = initSubscriberMap(userId);
+        Set<String> subscriberSet = subscriberMap.keySet();
+
+        List<Activity> activityList = activityDao.find(Query.query(Criteria.where("activityId").in(activityIds).and("deleteFlag").is(false))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))));
+        Map<String, User> userMap = buildUserMap(activityList);
+
+        User user = userDao.findById(userId);
+        for (Activity item : activityList) {
+            User organizer = userMap.get(item.getUserId());
+            item.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
+                    organizer.getLandmark().getLongitude(), organizer.getLandmark().getLatitude()));
+        }
+
+        LOG.debug("Finished query data, begin build response");
+        return ResponseDo.buildSuccessResponse(buildResponse(userId, userMap, activityList, subscriberSet));
     }
 
 
