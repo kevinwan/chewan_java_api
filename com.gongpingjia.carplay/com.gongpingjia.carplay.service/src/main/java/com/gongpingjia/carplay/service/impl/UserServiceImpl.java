@@ -410,7 +410,7 @@ public class UserServiceImpl implements UserService {
                 organizer.put("avatar", localServer + user.getAvatar());
                 officialActivity.setOrganizer(organizer);
 
-                officialActivity.setActivityCategory(Constants.ActivityCatalog.OFFICIAL);
+                officialActivity.setActivityCategory(appointment.getActivityCategory());
                 data.add(officialActivity);
             } else {
                 //邀他同去， 普通邀约
