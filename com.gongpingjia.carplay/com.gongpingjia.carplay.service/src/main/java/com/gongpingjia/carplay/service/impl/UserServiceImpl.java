@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
 
                 Map<String, Object> organizer = new HashMap<>(2, 1);
                 organizer.put("nickname", user.getNickname());
-                organizer.put("avatar", localServer + user.getAvatar());
+                organizer.put("avatar", user.getAvatar());
                 officialActivity.setOrganizer(organizer);
 
                 officialActivity.setActivityCategory(appointment.getActivityCategory());

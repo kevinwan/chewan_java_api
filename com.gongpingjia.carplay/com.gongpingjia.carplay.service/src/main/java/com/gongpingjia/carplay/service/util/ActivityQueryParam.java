@@ -66,10 +66,10 @@ public class ActivityQueryParam {
             criteria.and("majorType").is(majorType);
         }
 
-        if (!StringUtils.isEmpty(type)) {
-            //类型
-            criteria.and("type").is(type);
-        }
+//        if (!StringUtils.isEmpty(type)) {
+//            //类型
+//            criteria.and("type").is(type);
+//        }
 
         if (!StringUtils.isEmpty(pay)) {
             //付费
