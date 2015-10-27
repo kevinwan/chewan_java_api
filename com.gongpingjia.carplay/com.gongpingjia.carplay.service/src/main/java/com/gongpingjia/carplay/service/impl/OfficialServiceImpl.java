@@ -89,7 +89,7 @@ public class OfficialServiceImpl implements OfficialService {
             jsonObject.put("members", new ArrayList<>(0));
         } else {
             List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivityId)
-                    .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
+                    .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
 
             jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
             //获取当前用户和成员信息
@@ -393,7 +393,7 @@ public class OfficialServiceImpl implements OfficialService {
         //查询是否已经邀请过了
         Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
                 .and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
-                .and("activityCategory").is(Constants.ActivityCatalog.OFFICIAL)));
+                .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
         if (null != toFind) {
             LOG.warn("User already has bean invited by each other");
             throw new ApiException("已经邀请过此用户");

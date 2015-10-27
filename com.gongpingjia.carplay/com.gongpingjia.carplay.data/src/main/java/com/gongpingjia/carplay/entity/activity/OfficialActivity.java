@@ -119,6 +119,12 @@ public class OfficialActivity {
     private Map<String, Object> organizer;
 
     /**
+     * 活动类型：官方活动,用于标识
+     */
+    @Transient
+    private String activityCategory;
+
+    /**
      * 封面信息
      */
     @Transient
@@ -354,5 +360,13 @@ public class OfficialActivity {
 
     public void setCovers(String[] covers) {
         this.covers = covers;
+    }
+
+    public String getActivityCategory() {
+        return activityCategory;
+    }
+
+    public void setActivityCategory(String activityCategory) {
+        this.activityCategory = activityCategory;
     }
 }
