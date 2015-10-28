@@ -35,14 +35,19 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            var startTime = new Date();
-            startTime.setHours(0, 0, 0, 0);
-            startTime.setTime(startTime.getTime() - 1000 * 60 * 60 * 24 * 7);
+            //var startTime = new Date();
+            //startTime.setHours(0, 0, 0, 0);
+            //startTime.setTime(startTime.getTime() - 1000 * 60 * 60 * 24 * 7);
+            //
+            //var endTime = new Date();
+            //endTime.setHours(23, 59, 59);
 
-            var endTime = new Date();
-            endTime.setHours(23, 59, 59);
-
-            $scope.criteria = {status: '', startDate: startTime, endDate: endTime, type: '头像认证'};
+            $scope.criteria = {
+                status: '',
+                startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+                endDate: moment().add('days', 1).subtract('month').format('YYYY-MM-DD'),
+                type: '头像认证'
+            };
         };
 
         /**

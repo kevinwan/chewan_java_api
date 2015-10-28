@@ -16,8 +16,8 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     param += "&token=" + authService.getUser().token;
                     param += (criteria.status ? ("&status=" + criteria.status) : "");
                     param += (criteria.type ? ("&type=" + criteria.type) : "");
-                    param += (criteria.startDate ? ("&start=" + criteria.startDate.getTime()) : "");
-                    param += (criteria.endDate ? ("&end=" + criteria.endDate.getTime()) : "");
+                    param += (criteria.startDate ? ("&start=" + commonService.transferDateStringToLong(criteria.startDate)) : "");
+                    param += (criteria.endDate ? ("&end=" + commonService.transferDateStringToLong(criteria.endDate)) : "");
 
                     return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/official/authentication/list?' + param);
                 },
