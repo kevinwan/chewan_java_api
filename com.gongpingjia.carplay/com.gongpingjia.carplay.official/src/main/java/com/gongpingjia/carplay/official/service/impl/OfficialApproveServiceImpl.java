@@ -153,7 +153,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.authentication", "您的{0}审核{1}"),
                 application.getType(), result);
         if (Constants.AuthStatus.REJECT.equals(status)) {
-            message += "\n原因：" + remarks;
+            message += "\n原因：" + remarks + "\n重新认证";
         }
 
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
