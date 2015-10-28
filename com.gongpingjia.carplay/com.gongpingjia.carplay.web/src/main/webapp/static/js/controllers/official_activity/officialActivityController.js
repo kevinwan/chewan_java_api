@@ -14,6 +14,19 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             $location.path("/officialActivity/add");
         }
 
+        $scope.viewOfficialActivity = function (officialActivityId) {
+            //officialActivityService.setOfficialActivityId(officialActivityId);
+            $location.path("/officialActivity/view/" + officialActivityId);
+        };
+
+        $scope.updateOfficialActivity = function (officialActivityId) {
+            $location.path(("/officialActivity/update/" + officialActivityId));
+        };
+
+        $scope.updateOfficialActivityLimit = function (officialActivityId) {
+            $location.path("/officialActivity/updateLimit/" + officialActivityId);
+        };
+
 
         var rowClickHandler = function (info) {
         };
@@ -59,12 +72,11 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
                 fromDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
                 toDate: moment().format('YYYY-MM-DD')
             };
-            //document.getElementById("startDate").value = "";
-            //document.getElementById("endDate").value = "";
         };
 
         /**
-         * Search users based on criteria
+         * search official activity;
+         * @param criteria criteria = $scope.criteria
          */
         $scope.searchOfficialActivities = function (criteria) {
 
@@ -85,6 +97,10 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             });
         };
 
+        /**
+         * 上架
+         * @param officialActivityId
+         */
         $scope.sendOnFlag = function (officialActivityId) {
             $rootScope.loadingPromise = officialActivityService.sendOnFlag(officialActivityId).success(function (result) {
                 if (result.result === 0) {
@@ -102,18 +118,6 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             });
         };
 
-        $scope.viewOfficialActivity = function (officialActivityId) {
-            //officialActivityService.setOfficialActivityId(officialActivityId);
-            $location.path("/officialActivity/view/"+officialActivityId);
-        };
-
-        $scope.updateOfficialActivity = function (officialActivityId) {
-            $location.path(("/officialActivity/update/"+officialActivityId));
-        };
-
-        $scope.updateOfficialActivityLimit = function(officialActivityId){
-            $location.path("/officialActivity/updateLimit/" + officialActivityId);
-        };
 
         $scope.checkOnItemStatus = function (onFlag, start) {
             if (onFlag == false) {
@@ -138,30 +142,38 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         };
 
         $scope.checkItem = function (item) {
-            //var id = itemCheckbox.id.substring(9,itemCheckbox.id.length);
-            //if(itemCheckbox.checked){
-            //    //如果被选中
-            //    //已经存在
-            //    for(var index in $scope.deleteIds) {
-            //        if($scope.deleteIds[index] === id) {
-            //            return;
-            //        }
-            //    }
-            //    $scope.deleteIds.push(id);
-            //}else{
-            //    //不选中
-            //    for(var index in $scope.deleteIds) {
-            //        if($scope.deleteIds[index] === id) {
-            //           $scope.deleteIds.splice(index,1)
-            //        }
-            //    }
-            //}
             if (item.checked) {
                 $scope.deleteIdsSet[item.officialActivityId] = 1;
             } else {
                 delete $scope.deleteIdsSet[item.officialActivityId];
             }
         };
+
+
+
+        $scope.selectAll = function (allChecked) {
+            if (allChecked) {
+                for (var index in $scope.officialActivities) {
+                    var item = $scope.officialActivities[index];
+                    //不在上架状态中
+                    if ($scope.checkOnItemStatus(item.onFlag, item.start) != 1) {
+                        $scope.deleteIdsSet[item.officialActivityId] = 1;
+                        item.checked = allChecked;
+                    }
+                }
+            } else {
+                //全部不选中
+                for (var index in $scope.officialActivities) {
+                    var item = $scope.officialActivities[index];
+                    //不在上架状态中
+                    if ($scope.checkOnItemStatus(item.onFlag, item.start) != 1) {
+                        item.checked = allChecked;
+                    }
+                }
+                $scope.deleteIdsSet = {};
+            }
+        };
+
 
         $scope.deleteOfficialActivities = function () {
             if ($window.confirm("确定删除")) {
@@ -177,36 +189,6 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
                         $window.alert(result.errmsg);
                     }
                 });
-            }
-        };
-
-        $scope.selectAll = function (allChecked) {
-            if (allChecked) {
-                for (var index in $scope.officialActivities) {
-                    var item = $scope.officialActivities[index];
-                    //不在上架状态中
-                    if ($scope.checkOnItemStatus(item.onFlag, item.end) != 1) {
-                        if (allChecked) {
-                            $scope.deleteIdsSet[item.officialActivityId] = 1;
-                            item.checked = allChecked;
-                        }
-                    }
-                }
-            }
-        };
-
-        $scope.selectAll = function (allChecked) {
-            if (allChecked) {
-                for (var index in $scope.officialActivities) {
-                    var item = $scope.officialActivities[index];
-                    //不在上架状态中
-                    if ($scope.checkOnItemStatus(item.onFlag, item.end) != 1) {
-                        if (allChecked) {
-                            $scope.deleteIdsSet[item.officialActivityId] = 1;
-                            item.checked = allChecked;
-                        }
-                    }
-                }
             }
         };
 
