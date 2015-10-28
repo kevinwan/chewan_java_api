@@ -139,6 +139,11 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             //初始化绑定参数时间
             var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours() + ":" + $scope.startTime.time.getMinutes();
             $scope.activity.start = new Date(startStr).getTime();
+            if($scope.activity.start < new Date().getTime()) {
+                $window.alert("开始时间必须大于当前时间");
+                return false;
+            }
+
             if (!commonService.isNull($scope.endTime) && !commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
                 var endStr = $scope.endTime.date + " " + $scope.endTime.time.getHours() + ":" + $scope.endTime.time.getMinutes();
                 $scope.activity.end = new Date(endStr).getTime();
