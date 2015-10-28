@@ -1141,6 +1141,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseDo getUserActivityList(String viewUserId, String userId, int limit, int ignore) throws ApiException {
         User viewUser = userDao.findById(viewUserId);
+        User nowUser = userDao.findById(userId);
         if (null == viewUser) {
             LOG.error("the view user not exist userId is:{}", viewUserId);
             throw new ApiException("查看的用户不存在");
@@ -1178,6 +1179,7 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("cover", viewUser.getCover());
+        resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark().getLongitude(), viewUser.getLandmark().getLatitude(), nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude()));
 
         ArrayList<Map<String, Object>> activityInfoList = new ArrayList<>(activityList.size());
         //初始化每一个活动信息
