@@ -244,6 +244,12 @@ public class OfficialServiceImpl implements OfficialService {
             LOG.warn("Official activity already deleted, _id:{}", officialActivityId);
             throw new ApiException("活动信息不存在");
         }
+
+        //未上架
+        if (!officialActivity.getOnFlag()) {
+            LOG.warn("当前官方活动未上架");
+            throw new ApiException("该活动未上架");
+        }
         return officialActivity;
     }
 
@@ -264,6 +270,7 @@ public class OfficialServiceImpl implements OfficialService {
             criteria.and("destination.city").is(address.getCity());
         }
         criteria.and("deleteFlag").is(false);//过滤已经删除了的官方活动
+        criteria.and("onFlag").is(true);       //过滤 未上架的官方活动；
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
@@ -310,6 +317,17 @@ public class OfficialServiceImpl implements OfficialService {
         if (null == officialActivity) {
             LOG.warn("no activity match activityId");
             throw new ApiException("官方活动不存在");
+        }
+
+        if (!officialActivity.getOnFlag()) {
+            LOG.warn("the activity onFlag is false");
+            throw new ApiException("官方活动未上架");
+        }
+
+        //报名时间超过开始时间 该 活动已经下架
+        if (DateUtil.getDate().getTime() > officialActivity.getStart()) {
+            LOG.warn("the activity is offline");
+            throw new ApiException("官方活动已经下架");
         }
 
         List<String> members = officialActivity.getMembers();
@@ -425,6 +443,16 @@ public class OfficialServiceImpl implements OfficialService {
         if (null == officialActivity) {
             LOG.warn("活动不存在");
             throw new ApiException("该活动不存在");
+        }
+
+        if (!officialActivity.getOnFlag()) {
+            LOG.warn("活动未上架");
+            throw new ApiException("该活动未上架");
+        }
+
+        if (DateUtil.getDate().getTime() > officialActivity.getStart()) {
+            LOG.warn("活动已经开始 即 已下架");
+            throw new ApiException("该活动已经下架");
         }
 
         List<String> members = officialActivity.getMembers();
