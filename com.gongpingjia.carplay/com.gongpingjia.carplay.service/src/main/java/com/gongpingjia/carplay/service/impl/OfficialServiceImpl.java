@@ -95,7 +95,8 @@ public class OfficialServiceImpl implements OfficialService {
             User queryUser = userDao.findById(userId);
             LOG.debug("Build members and organizer");
 
-            int ignore = 0, limit = 10;
+            //TODO
+            int ignore = 0, limit = 100;
             //获取 分页段的 成员的用户id
             if (ignore >= officialActivity.getMembers().size()) {
                 return ResponseDo.buildSuccessResponse("[]");
