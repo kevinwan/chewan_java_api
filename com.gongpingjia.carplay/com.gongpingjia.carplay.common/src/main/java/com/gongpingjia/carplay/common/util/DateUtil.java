@@ -1,5 +1,7 @@
 package com.gongpingjia.carplay.common.util;
 
+import com.gongpingjia.carplay.common.exception.ApiException;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -88,6 +90,7 @@ public class DateUtil {
 
     /**
      * 获取当前日期的零点
+     *
      * @param date
      * @return
      */
@@ -103,6 +106,7 @@ public class DateUtil {
 
     /**
      * 获取当前日期的下一个零点
+     *
      * @param date
      * @return
      */
@@ -114,6 +118,28 @@ public class DateUtil {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
+
+    /**
+     * 将YYYY-MM-DD日期字符串转换成时间
+     *
+     * @param formatString YYYY-MM-DD日期字符串
+     * @return 时间
+     */
+    public static Long getTimeByDateFormatString(String formatString) throws ApiException {
+        String[] date = formatString.split("-");
+        if (date.length != 3) {
+            return 0L;
+        }
+
+        int year = TypeConverUtil.convertToInteger("YYYY", date[0], true);
+        int month = TypeConverUtil.convertToInteger("MM", date[1], true);
+        int day = TypeConverUtil.convertToInteger("DD", date[2], true);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 0, 0, 0);
         return calendar.getTimeInMillis();
     }
 }
