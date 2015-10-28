@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -128,8 +129,8 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("未能成功创建环信用户");
         }
 
-        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())),
-                Update.update("emchatName", chatCommonService.getUsernameByUserid(user.getUserId())));
+        String emchatName = chatCommonService.getUsernameByUserid(user.getUserId());
+        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), Update.update("emchatName", emchatName));
 
         UserToken userToken = new UserToken();
         userToken.setUserId(user.getUserId());
@@ -142,13 +143,29 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> data = new HashMap<String, Object>(2, 1);
         data.put("userId", user.getUserId());
         data.put("token", userToken.getToken());
+
         if (StringUtils.isEmpty(user.getAvatar())) {
             data.put("avatar", "");
         } else {
             data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         }
 
+        pushNearbyActivity(emchatName, user.getLandmark());
+
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    public void pushNearbyActivity(String emchatName, Landmark landmark) throws ApiException {
+        LOG.debug("push user nearby activity");
+
+        Activity activity = activityDao.findOne(Query.query(Criteria.where("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude()))));
+
+        User organizer = userDao.findById(activity.getUserId());
+        Map<String, Object> ext = new HashMap<>(1);
+        ext.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"), organizer.getNickname(), activity.getType());
+
+        chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY, Arrays.asList(emchatName), message, ext);
     }
 
     @Override

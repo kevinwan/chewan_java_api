@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.common.Message;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UploadService;
@@ -248,7 +249,16 @@ public class UploadServiceImpl implements UploadService {
 
         User user = userDao.findById(userId);
 
-        return uploadLocalServer(userId, data, user.getAvatar());
+        String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, CodeGenerator.generatorId());
+
+        ResponseDo responseDo = uploadLocalServer(userId, data, key);
+
+        if (responseDo.success()) {
+            userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("avatar", key));
+            localFileManager.delete(user.getAvatar());
+        }
+
+        return responseDo;
     }
 
     @Override

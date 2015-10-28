@@ -384,54 +384,54 @@ public class HuanxinChatServiceImpl implements ChatThirdPartyService {
         return response;
     }
 
-//    public static void main(String[] args) throws ApiException {
-//        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/chatgroups/121539051185504692";
+    public static void main(String[] args) throws ApiException {
+        String httpUrl = "https://a1.easemob.com:443/gongpingjia/carplayapp/chatgroups/121923092766261788";
+
+        List<Header> headers = new ArrayList<Header>(2);
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        headers.add(new BasicHeader("Authorization",
+                MessageFormat.format(AUTH_HEADER_FORMAT,
+                        "YWMtsxGcunDDEeWm6k8ZZ_uVGwAAAVGQX3Ib5a1W7kr5MTSKQkN1BAAgP53U2tE")));
+
+        JSONObject json = new JSONObject();
+        StringBuilder description = new StringBuilder();
+
+        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
+        json.put("description", description.toString());
+
+//        List<String> users = new ArrayList<>(2);
+//        users.add("c4fee7d8c48234cf09c41b0013271fac");
 //
-//        List<Header> headers = new ArrayList<Header>(2);
-//        headers.add(new BasicHeader("Content-Type", "application/json"));
-//        headers.add(new BasicHeader("Authorization",
-//                MessageFormat.format(AUTH_HEADER_FORMAT,
-//                        "YWMtsxGcunDDEeWm6k8ZZ_uVGwAAAVGQX3Ib5a1W7kr5MTSKQkN1BAAgP53U2tE")));
+//        JSONObject param = new JSONObject();
+//        param.put("target_type", "users");
+//        param.put("target", users);
 //
-//        JSONObject json = new JSONObject();
-//        StringBuilder description = new StringBuilder();
+//        JSONObject msg = new JSONObject();
+//        msg.put("type", "txt");
+//        msg.put("msg", "Test for send message");
+//        param.put("msg", msg);
 //
-//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
-//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
-//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
-//        description.append("http:||cwapi.gongpingjia.com:8080|v2|photos|asset|user|279e4778-d7c3-4ea2-90a0-3df3964792ca|avatar.jpg;");
-//        json.put("description", description.toString());
+//        param.put("from", "SubscribeAdmin");
 //
-////        List<String> users = new ArrayList<>(2);
-////        users.add("c4fee7d8c48234cf09c41b0013271fac");
-////
-////        JSONObject param = new JSONObject();
-////        param.put("target_type", "users");
-////        param.put("target", users);
-////
-////        JSONObject msg = new JSONObject();
-////        msg.put("type", "txt");
-////        msg.put("msg", "Test for send message");
-////        param.put("msg", msg);
-////
-////        param.put("from", "SubscribeAdmin");
-////
-////        Map<String, Object> ext = new HashMap<>(1);
-////        ext.put("avatar", "李程测试ext属性avatar");
-////        param.put("ext", ext);
-//
-////        System.out.println(param.toString());
-//        CloseableHttpResponse response = HttpClientUtil.get(httpUrl.toString(),
-//                new HashMap<String, String>(0), headers,
+//        Map<String, Object> ext = new HashMap<>(1);
+//        ext.put("avatar", "李程测试ext属性avatar");
+//        param.put("ext", ext);
+
+//        System.out.println(param.toString());
+        CloseableHttpResponse response = HttpClientUtil.get(httpUrl.toString(),
+                new HashMap<String, String>(0), headers,
+                Constants.Charset.UTF8);
+
+//        CloseableHttpResponse response = HttpClientUtil.put(httpUrl.toString(),
+//                json.toString(), headers,
 //                Constants.Charset.UTF8);
-//
-////        CloseableHttpResponse response = HttpClientUtil.put(httpUrl.toString(),
-////                json.toString(), headers,
-////                Constants.Charset.UTF8);
-//
-//        System.out.println(response.getStatusLine());
-//        JSONObject result = HttpClientUtil.parseResponseGetJson(response);
-//
-//        System.out.println(result);
-//    }
+
+        System.out.println(response);
+        JSONObject result = HttpClientUtil.parseResponseGetJson(response);
+
+        System.out.println(result);
+    }
 }

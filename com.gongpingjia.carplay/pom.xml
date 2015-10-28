@@ -25,6 +25,7 @@
         <module>com.gongpingjia.carplay.cache</module>
         <module>com.gongpingjia.carplay.data</module>
         <module>com.gongpingjia.carplay.official</module>
+        <module>com.gongpingjia.carplay.statistic</module>
     </modules>
 
     <dependencies>
