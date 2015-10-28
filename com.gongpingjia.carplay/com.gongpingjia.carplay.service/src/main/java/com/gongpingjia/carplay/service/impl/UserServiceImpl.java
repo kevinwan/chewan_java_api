@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
+import com.gongpingjia.carplay.dao.activity.PushInfoDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
@@ -18,6 +19,7 @@ import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
+import com.gongpingjia.carplay.entity.activity.PushInfo;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
@@ -104,6 +106,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private OfficialActivityDao officialActivityDao;
 
+    @Autowired
+    private PushInfoDao pushInfoDao;
+
     @Override
     public ResponseDo register(User user) throws ApiException {
         LOG.debug("Save register data begin");
@@ -150,22 +155,35 @@ public class UserServiceImpl implements UserService {
             data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
         }
 
-        pushNearbyActivity(emchatName, user.getLandmark());
+        pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
 
         return ResponseDo.buildSuccessResponse(data);
     }
 
-    public void pushNearbyActivity(String emchatName, Landmark landmark) throws ApiException {
+    public void pushNearbyActivity(String receivedUserId, String emchatName, Landmark landmark) throws ApiException {
         LOG.debug("push user nearby activity");
 
         Activity activity = activityDao.findOne(Query.query(Criteria.where("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude()))));
+        if (activity == null) {
+            //在系统中如果没有活动就直接退出，主要是第一个用手机注册活动的人员可能会遇到
+            return;
+        }
+
+        PushInfo info = new PushInfo();
+        info.setSendUserId(activity.getUserId());
+        info.setReceivedUserId(receivedUserId);
+        info.setCreateTime(DateUtil.getTime());
+        info.setActivityId(activity.getActivityId());
+        pushInfoDao.save(info);
 
         User organizer = userDao.findById(activity.getUserId());
         Map<String, Object> ext = new HashMap<>(1);
         ext.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"), organizer.getNickname(), activity.getType());
 
-        chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY, Arrays.asList(emchatName), message, ext);
+        JSONObject result = chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
+                Arrays.asList(emchatName), message, ext);
+        LOG.info("Push result:{}", result);
     }
 
     @Override
@@ -205,6 +223,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 后台管理员用户登录
+     *
      * @param user
      * @return
      * @throws ApiException
@@ -229,7 +248,7 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-            if (!userData.getRole().equals(Constants.UserCatalog.ADMIN) && !userData.getRole().equals(Constants.UserCatalog.OFFICIAL)) {
+        if (!userData.getRole().equals(Constants.UserCatalog.ADMIN) && !userData.getRole().equals(Constants.UserCatalog.OFFICIAL)) {
             LOG.warn("User is not  ADMIN OR OFFICIAL");
             return ResponseDo.buildFailureResponse("无权限");
         }
