@@ -378,7 +378,7 @@ public class OfficialServiceImpl implements OfficialService {
                 builder.append(localServer).append(item.getAvatar()).append(";");
             }
             chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
-                    officialActivity.getTitle(), builder.toString().replace("/", "|"));
+                    officialActivity.getTitle(), builder.substring(0, builder.length() - 1).replace("/", "|"));
         }
     }
 
