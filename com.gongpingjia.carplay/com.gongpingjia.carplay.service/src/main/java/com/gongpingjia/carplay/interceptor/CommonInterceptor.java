@@ -1,12 +1,12 @@
 package com.gongpingjia.carplay.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class CommonInterceptor implements HandlerInterceptor {
 
@@ -29,7 +29,7 @@ public class CommonInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object paramObject)
             throws Exception {
-        LOG.info("======Request URL: {}", request.getRequestURL());
+        LOG.info("======Request URL: {}, ServletPath:{}", request.getRequestURL(), request.getServletPath());
         LOG.info("======Request parameter:{}", request.getParameterMap().toString());
         return true;
     }

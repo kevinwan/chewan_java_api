@@ -4,7 +4,7 @@ import com.gongpingjia.carplay.dao.common.BaseDao;
 import com.gongpingjia.carplay.entity.statistic.StatisticActivityMatch;
 
 /**
- * Created by licheng on 2015/10/27.
+ * Created by 123 on 2015/10/28.
  */
-public interface ActivityStatisticDao extends BaseDao<StatisticActivityMatch, String> {
+public interface StatisticActivityMatchDao extends BaseDao<StatisticActivityMatch, String> {
 }

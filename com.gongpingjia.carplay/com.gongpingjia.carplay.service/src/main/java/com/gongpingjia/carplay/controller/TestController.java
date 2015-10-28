@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,7 @@ public class TestController {
 
     @RequestMapping(value = "/test/string", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo testPost() {
+    public ResponseDo testPost(@RequestBody JSONObject jsonObject) {
 //        User user = new User();
 //        Address address = new Address();
 //        address.setCity("NJ");
@@ -49,7 +50,7 @@ public class TestController {
 //        List<User> userList = new ArrayList<>();
 //        userList.add(user);
 //        return ResponseDo.buildSuccessResponse(userList);
-
+        System.out.println(jsonObject);
         PushInfoDao dao = BeanUtil.getBean(PushInfoDao.class);
         Set<String> result = dao.groupByReceivedUsers(Arrays.asList("123", "345", "456"), 5);
         return ResponseDo.buildSuccessResponse(result);
