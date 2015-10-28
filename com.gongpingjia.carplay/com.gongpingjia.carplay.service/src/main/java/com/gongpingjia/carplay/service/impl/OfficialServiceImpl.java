@@ -32,10 +32,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2015/9/29.
@@ -99,7 +96,8 @@ public class OfficialServiceImpl implements OfficialService {
             int ignore = 0, limit = 100;
             //获取 分页段的 成员的用户id
             if (ignore >= officialActivity.getMembers().size()) {
-                return ResponseDo.buildSuccessResponse("[]");
+                jsonObject.put("members", new ArrayList<>(0));
+                return ResponseDo.buildSuccessResponse(jsonObject);
             }
             int endIndex = ignore + limit;
             endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
@@ -110,15 +108,25 @@ public class OfficialServiceImpl implements OfficialService {
                     .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
                     .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
 
+            Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
+            for (String item : pageMemberUserIds) {
+                userIdSet.add(item);
+            }
+            for (Appointment appointment : appointmentList) {
+                userIdSet.add(appointment.getApplyUserId());
+                userIdSet.add(appointment.getInvitedUserId());
+            }
+
             //获取 分页成员的具体信息；
-            List<User> users = userDao.findByIds(pageMemberUserIds);
+            List<User> users = userDao.findByIds(userIdSet);
             Map<String, User> userMap = new HashMap<>(users.size());
             for (User user : users) {
                 userMap.put(user.getUserId(), user);
             }
-            List<Map<String, Object>> members = new ArrayList<>(users.size());
-            for (User user : users) {
-                Map<String, Object> map = new HashMap<>(16, 1);
+            List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
+            for (String userItemId : pageMemberUserIds) {
+                Map<String, Object> map = new HashMap<>();
+                User user = userMap.get(userItemId);
 
                 buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
 
@@ -136,7 +144,6 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Override
     public ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException {
-
         if (limit <= 0) {
             LOG.warn("limit is {}", limit);
             throw new ApiException("参数异常 limit为正整数");
@@ -147,17 +154,27 @@ public class OfficialServiceImpl implements OfficialService {
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
 
+        JSONObject jsonObject = new JSONObject();
+
         if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty()) {
-            return ResponseDo.buildSuccessResponse("[]");
+            jsonObject.put("isMember", false);
+            jsonObject.put("members", new ArrayList<>(0));
+            return ResponseDo.buildSuccessResponse(jsonObject);
         } else {
             //获取当前用户和成员信息
             User queryUser = userDao.findById(userId);
             LOG.debug("Build members and organizer");
 
+            if (officialActivity.getMembers().contains(queryUser.getUserId())) {
+                jsonObject.put("isMember", true);
+            } else {
+                jsonObject.put("isMember", false);
+            }
 
-            //获取 分页段的 成员的用户id
+            //获取 分页段的
             if (ignore >= officialActivity.getMembers().size()) {
-                return ResponseDo.buildSuccessResponse("[]");
+                jsonObject.put("members", new ArrayList<>(0));
+                return ResponseDo.buildSuccessResponse(jsonObject);
             }
             int endIndex = ignore + limit;
             endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
@@ -168,15 +185,25 @@ public class OfficialServiceImpl implements OfficialService {
                     .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
                     .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
 
+            Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
+            for (String item : pageMemberUserIds) {
+                userIdSet.add(item);
+            }
+            for (Appointment appointment : appointmentList) {
+                userIdSet.add(appointment.getApplyUserId());
+                userIdSet.add(appointment.getInvitedUserId());
+            }
+
             //获取 分页成员的具体信息；
-            List<User> users = userDao.findByIds(pageMemberUserIds);
+            List<User> users = userDao.findByIds(userIdSet);
             Map<String, User> userMap = new HashMap<>(users.size());
             for (User user : users) {
                 userMap.put(user.getUserId(), user);
             }
-            List<Map<String, Object>> members = new ArrayList<>(users.size());
-            for (User user : users) {
-                Map<String, Object> map = new HashMap<>(16, 1);
+            List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
+            for (String userItemId : pageMemberUserIds) {
+                Map<String, Object> map = new HashMap<>();
+                User user = userMap.get(userItemId);
 
                 buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
 
@@ -185,7 +212,9 @@ public class OfficialServiceImpl implements OfficialService {
                 members.add(map);
             }
             LOG.debug("Finished build data");
-            return ResponseDo.buildSuccessResponse(members);
+
+            jsonObject.put("members", members);
+            return ResponseDo.buildSuccessResponse(jsonObject);
         }
     }
 
@@ -196,7 +225,7 @@ public class OfficialServiceImpl implements OfficialService {
         int invitedCount = 0;
 
         //邀请他人成功的 userId list
-        List<String> acceptList = new ArrayList<>();
+        List<String> acceptList = new ArrayList<>(appointmentList.size());
 
         //是否邀请过该用户
         boolean inviteFlag = false;
