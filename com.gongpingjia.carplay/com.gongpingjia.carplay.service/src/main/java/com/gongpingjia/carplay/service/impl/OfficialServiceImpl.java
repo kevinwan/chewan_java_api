@@ -336,7 +336,7 @@ public class OfficialServiceImpl implements OfficialService {
         }
 
         //将当前活动添加到约会信息中，已经接受，并且是官方活动类型
-        saveAppointment(activityId, userId, officialActivity.getUserId(), false, Constants.AppointmentStatus.ACCEPT, Constants.ActivityCatalog.OFFICIAL);
+        saveAppointment(activityId, userId, officialActivity.getUserId(), false, Constants.AppointmentStatus.ACCEPT, Constants.ActivityCatalog.OFFICIAL, "");
 
         //加入到 members中;
         Update update = new Update();
@@ -442,8 +442,7 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("被邀请的成员并没有参加该活动");
         }
 
-        saveAppointment(activityId, fromUserId, toUserId, transfer, Constants.AppointmentStatus.APPLYING, Constants.ActivityCatalog.TOGETHER);
-
+        saveAppointment(activityId, fromUserId, toUserId, transfer, Constants.AppointmentStatus.APPLYING, Constants.ActivityCatalog.TOGETHER, message);
 
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
@@ -455,7 +454,7 @@ public class OfficialServiceImpl implements OfficialService {
         return ResponseDo.buildSuccessResponse();
     }
 
-    private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String category) {
+    private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String category, String message) {
         OfficialActivity activity = officialActivityDao.findById(activityId);
         Long current = DateUtil.getTime();
 
@@ -468,6 +467,7 @@ public class OfficialServiceImpl implements OfficialService {
         appointment.setModifyTime(current);
         appointment.setStatus(status);
         appointment.setTransfer(transfer);
+        appointment.setMessage(message);
 
         appointment.setDestination(activity.getDestination());
         appointment.setType(activity.getTitle());

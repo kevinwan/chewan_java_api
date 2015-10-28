@@ -131,11 +131,13 @@ public class OfficialController {
 
             String invitedUserId = json.getString("invitedUserId");
             Boolean transfer = json.getBoolean("transfer");
-            String message = json.getString("message");
-
+            String message = "";
+            if (json.containsKey("message")) {
+                message = json.getString("message");
+            }
             parameterChecker.isUserExist(invitedUserId);
 
-            return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer,message);
+            return officialService.inviteUserTogether(activityId, userId, invitedUserId, transfer, message);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
