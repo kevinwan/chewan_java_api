@@ -185,6 +185,52 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(userData);
     }
 
+
+    /**
+     * 后台管理员用户登录
+     * @param user
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    public ResponseDo loginAdminUser(User user) throws ApiException {
+        // 验证参数
+        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+            LOG.warn("Invalid params, phone:{}", user.getPhone());
+            return ResponseDo.buildFailureResponse("输入参数有误");
+        }
+
+        // 查找用户
+        User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
+        if (userData == null) {
+            LOG.warn("Fail to find user");
+            return ResponseDo.buildFailureResponse("用户不存在，请注册后登录");
+        }
+
+        if (!user.getPassword().equals(userData.getPassword())) {
+            LOG.warn("User password is incorrect");
+            return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
+        }
+
+            if (!userData.getRole().equals(Constants.UserCatalog.ADMIN) && !userData.getRole().equals(Constants.UserCatalog.OFFICIAL)) {
+            LOG.warn("User is not  ADMIN OR OFFICIAL");
+            return ResponseDo.buildFailureResponse("无权限");
+        }
+
+        //刷新用户Token
+        userData.setToken(refreshUserToken(userData.getUserId()));
+
+        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
+        // 查询用户车辆信息
+        if (userData.getCar() != null) {
+            userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
+        }
+
+        userData.setCompletion(computeCompletion(userData));
+
+        return ResponseDo.buildSuccessResponse(userData);
+    }
+
     /**
      * 计算用户的信息的完善程度
      *

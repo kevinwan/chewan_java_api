@@ -91,6 +91,29 @@ public class UserInfoController {
     }
 
     /**
+     * 后台管理用户登录
+     *
+     * @param user 参数列表
+     * @return 登录结果
+     */
+    @RequestMapping(value = "/admin/login", method = RequestMethod.POST, headers = {
+            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo loginAdminUser(@RequestBody User user) {
+        LOG.debug("admin login starts");
+        try {
+            if (StringUtils.isEmpty(user.getPassword()) || StringUtils.isEmpty(user.getPhone())) {
+                LOG.warn("Input parameters password or phone is empty");
+                throw new ApiException("输入参数有误");
+            }
+
+            return userService.loginAdminUser(user);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
      * 忘记密码
      *
      * @param json 参数列表

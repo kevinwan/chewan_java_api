@@ -30,6 +30,9 @@ public interface UserService {
     ResponseDo loginUser(User user) throws ApiException;
 
 
+    ResponseDo loginAdminUser(User user)throws ApiException;
+
+
     /**
      * 检查注册用户的参数是否正确
      *
