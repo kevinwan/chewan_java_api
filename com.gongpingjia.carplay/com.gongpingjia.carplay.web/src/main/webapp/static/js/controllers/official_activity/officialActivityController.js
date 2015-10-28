@@ -115,19 +115,19 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
             $location.path("/officialActivity/updateLimit/" + officialActivityId);
         };
 
-        $scope.checkOnItemStatus = function (onFlag, end) {
+        $scope.checkOnItemStatus = function (onFlag, start) {
             if (onFlag == false) {
                 //未上架
                 return 0;
             } else {
                 //上架中
-                var endNum = parseFloat(end);
-                if (isNaN(endNum)) {
+                var startNum = parseFloat(start);
+                if (isNaN(startNum)) {
                     return 1;
                 } else {
                     var nowTime = new Date().getTime();
-                    //当前时间大于 活动 截止时间 活动处于下架状态
-                    if (nowTime > endNum) {
+                    //当前时间大于 活动 开始时间 活动处于下架状态
+                    if (nowTime > startNum) {
                         return 2;
                     } else {
                         //活动没有到截止时间 处于 上架中

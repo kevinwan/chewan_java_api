@@ -311,6 +311,10 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("活动标题不能为空");
                 return false;
             }
+            if($scope.activity.title.length > 36) {
+                $window.alert("标题不能超过36个字符");
+                return false;
+            }
             if (commonService.isStrEmpty($scope.activity.instruction)) {
                 $window.alert("活动介绍不能为空");
                 return false;
