@@ -75,6 +75,20 @@ public class OfficialController {
         }
     }
 
+    @RequestMapping(value = "/official/activity/{officialActivityId}/members", method = RequestMethod.GET)
+    public ResponseDo getActivityMembersInfo(@PathVariable("officialActivityId") String officialActivityId,
+                                             @RequestParam("userId") String userId, @RequestParam("token") String token,
+                                             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                             @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+            return officialService.getActivityPageMemberInfo(officialActivityId, userId, ignore, limit);
+        } catch (ApiException e) {
+            LOG.error(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
 
     /**
      * 获取官方活动列表

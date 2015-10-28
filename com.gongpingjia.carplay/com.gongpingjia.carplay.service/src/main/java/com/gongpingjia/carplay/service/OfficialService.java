@@ -16,6 +16,9 @@ public interface OfficialService {
     ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException;
 
 
+    ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException;
+
+
     /**
      * 获取官方活动
      *
