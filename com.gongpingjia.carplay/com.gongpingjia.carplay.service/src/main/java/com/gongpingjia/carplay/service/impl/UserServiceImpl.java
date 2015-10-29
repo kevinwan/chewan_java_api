@@ -802,12 +802,16 @@ public class UserServiceImpl implements UserService {
             authIds.add(authenticationHistory.getAuthId());
         }
         List<User> authUsers = userDao.findByIds(authIds);
+        Map<String, User> authUserMap = new HashMap<>(authUsers.size());
+        for (User user : authUsers) {
+            authUserMap.put(user.getUserId(), user);
+        }
 
         LOG.debug("Input map parameter");
         List<Map<String, Object>> data = new ArrayList<>(authenticationHistories.size());
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
-            Map<String, Object> history = new HashMap<>(8, 1);
-            User user = findById(authUsers, authenticationHistory.getAuthId());
+            Map<String, Object> history = new HashMap<>();
+            User user = authUserMap.get(authenticationHistory.getAuthId());
             history.put("userId", user.getUserId());
             history.put("nickname", user.getNickname());
             history.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
@@ -815,6 +819,7 @@ public class UserServiceImpl implements UserService {
             history.put("type", authenticationHistory.getType());
             history.put("status", authenticationHistory.getStatus());
             history.put("content", authenticationHistory.getRemark());
+
             data.add(history);
         }
 
@@ -865,15 +870,6 @@ public class UserServiceImpl implements UserService {
                     emchatNames, message, null);
         }
         return ResponseDo.buildSuccessResponse();
-    }
-
-    private User findById(List<User> users, String id) {
-        for (User user : users) {
-            if (user.getUserId().equals(id)) {
-                return user;
-            }
-        }
-        return null;
     }
 
     /**
@@ -1174,6 +1170,15 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    /**
+     * 获取某一个用户的发布的活动信息；
+     * @param viewUserId
+     * @param userId
+     * @param limit
+     * @param ignore
+     * @return
+     * @throws ApiException
+     */
     @Override
     public ResponseDo getUserActivityList(String viewUserId, String userId, int limit, int ignore) throws ApiException {
         User viewUser = userDao.findById(viewUserId);
@@ -1182,12 +1187,12 @@ public class UserServiceImpl implements UserService {
             LOG.error("the view user not exist userId is:{}", viewUserId);
             throw new ApiException("查看的用户不存在");
         }
-
         //查看自己的活动
         if (viewUserId.equals(userId)) {
             LOG.warn("view self:viewUserId:{} userId:{}", viewUserId, userId);
         }
 
+        //分页查询出 他的活动列表；     创建时间 降序排序
         Criteria criteria = new Criteria();
         criteria.and("userId").is(viewUserId);
         criteria.and("deleteFlag").is(false);
@@ -1199,28 +1204,39 @@ public class UserServiceImpl implements UserService {
         if (null == activityList || activityList.isEmpty()) {
             return ResponseDo.buildSuccessResponse("[]");
         }
-        //查询出该用户的 所有的活动中  appoinit 中 用户 是否 已经 邀请过了 邀请被同意了 邀请被拒绝了；
+
+        //根据 activityIds applyUserId(userId) 查询出 这些活动 所对应的 我发起的 appointment
         List<String> activityIds = new ArrayList<>(activityList.size());
         for (Activity activity : activityList) {
             activityIds.add(activity.getActivityId());
         }
-
         Criteria appointCriteria = new Criteria();
-        appointCriteria.and("activityId").in(activityIds);
         appointCriteria.and("applyUserId").is(userId);
+        appointCriteria.and("activityId").in(activityIds);
+        appointCriteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
         List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
         if (null == appointmentList) {
             appointmentList = new ArrayList<>();
         }
 
+        //AppointmentList 中的每一个Appointment applyUserId=userId invitedUserId=viewUserId
+        //所以 activityId 可以 一一对应 AppointmentList中的 Appointment
+        Map<String, Appointment> activityIdToAppointmentMap = new HashMap<>(appointmentList.size());
+        for (Appointment appointment : appointmentList) {
+            activityIdToAppointmentMap.put(appointment.getActivityId(), appointment);
+        }
+
         Map<String, Object> resultMap = new HashMap<>();
+        //被查看用户的照片
         resultMap.put("cover", viewUser.getCover());
+        //被查看的用户与我的距离
         resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark().getLongitude(), viewUser.getLandmark().getLatitude(), nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude()));
 
+        //被查看用户的活动信息：基本信息+我申请该活动的状态
         ArrayList<Map<String, Object>> activityInfoList = new ArrayList<>(activityList.size());
-        //初始化每一个活动信息
-        Map<String, Object> itemMap = new HashMap<>();
+
         for (Activity activity : activityList) {
+            Map<String, Object> itemMap = new HashMap<>();
             itemMap.put("activityId", activity.getActivityId());
             itemMap.put("establish", activity.getEstablish());
             itemMap.put("estabPoint", activity.getEstabPoint());
@@ -1232,13 +1248,10 @@ public class UserServiceImpl implements UserService {
             itemMap.put("createTime", activity.getCreateTime());
 
             //获取该活动 该用户申请状态 0 未申请 1 申请中 3 已经同意 4 已被拒绝
-            //没有申请
             int applyStatus = Constants.AppointmentStatus.INITIAL;
-            for (Appointment appointment : appointmentList) {
-                if (appointment.getActivityId().equals(activity.getActivityId())) {
-                    //存在appoint
-                    applyStatus = appointment.getStatus();
-                }
+            Appointment appointment = activityIdToAppointmentMap.get(activity.getActivityId());
+            if (null != appointment) {
+                applyStatus = appointment.getStatus();
             }
             itemMap.put("status", applyStatus);
 
@@ -1250,6 +1263,13 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(resultMap);
     }
 
+    /**
+     *
+     * 获取环信信息
+     * @param emchatName 环信ID
+     * @return
+     * @throws ApiException
+     */
     @Override
     public ResponseDo getUserEmchatInfo(String emchatName) throws ApiException {
         LOG.debug("Query user infomation by emchatName:{}", emchatName);
