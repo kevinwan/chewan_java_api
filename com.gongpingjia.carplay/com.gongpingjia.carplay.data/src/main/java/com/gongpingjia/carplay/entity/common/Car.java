@@ -20,7 +20,9 @@ public class Car {
      */
     public void refreshPhotoInfo(String photoServerUrl) {
         if (!StringUtils.isEmpty(this.logo)) {
-            this.logo = photoServerUrl + this.logo;
+            if (!photoServerUrl.startsWith("http://")) {
+                this.logo = photoServerUrl + this.logo;
+            }
         }
     }
 

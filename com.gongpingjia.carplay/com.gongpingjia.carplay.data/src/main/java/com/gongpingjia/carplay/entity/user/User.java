@@ -34,7 +34,7 @@ public class User {
     private Long birthday;
     private Long registerTime;
     private String role;
-    private boolean deleteFlag;
+    private boolean deleteFlag = false;
 
     @Indexed
     private String phone;
