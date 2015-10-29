@@ -5,7 +5,6 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.service.ActivityService;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
@@ -276,10 +275,15 @@ public class UserInfoController {
                                      @RequestBody JSONObject json) {
         try {
             LOG.debug("Begin change user loaction, request:{}", json);
-            if (CommonUtil.isEmpty(json, Arrays.asList("userId", "token", "longitude", "latitude"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("longitude", "latitude"))) {
                 throw new ApiException("输入参数有误");
             }
             Landmark landmark = (Landmark) JSONObject.toBean(json, Landmark.class);
+
+            if (!landmark.correct()) {
+                LOG.warn("Input parameter landmark error:{}", landmark);
+                throw new ApiException("输入参数有误");
+            }
 
             return userService.changeLocation(userId, token, landmark);
         } catch (Exception e) {
@@ -419,7 +423,7 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{viewUserId}/activity/list", method = RequestMethod.GET)
     public ResponseDo getUserActivityList(@PathVariable("viewUserId") String viewUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
-                                          @RequestParam("limit") Integer limit, @RequestParam("ignore") Integer ignore) {
+                                          @RequestParam(value = "limit", defaultValue = "10") Integer limit, @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.info("Begin view user activity viewUserId:{} userId:{}", viewUserId, userId);
         try {
             parameterChecker.checkUserInfo(userId, token);

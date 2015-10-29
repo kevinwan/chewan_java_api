@@ -34,7 +34,7 @@ public class Landmark {
      *
      * @return
      */
-    public boolean isLandmarkCorrect() {
+    public boolean correct() {
         if (this.latitude == null || this.latitude == null) {
             return false;
         }

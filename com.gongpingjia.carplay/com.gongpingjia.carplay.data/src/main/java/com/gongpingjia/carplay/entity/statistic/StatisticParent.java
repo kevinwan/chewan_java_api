@@ -2,6 +2,8 @@ package com.gongpingjia.carplay.entity.statistic;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.Calendar;
+
 /**
  * Created by 123 on 2015/10/28.
  */
@@ -23,6 +25,17 @@ public class StatisticParent {
     private Integer day;
     private Integer hour;
     private Integer minute;
+
+    public void recordTime(Long current) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(current);
+        this.createTime = current;
+        this.year = calendar.get(Calendar.YEAR);
+        this.month = calendar.get(Calendar.MONTH) + 1;
+        this.day = calendar.get(Calendar.DAY_OF_MONTH);
+        this.hour = calendar.get(Calendar.HOUR_OF_DAY);
+        this.minute = calendar.get(Calendar.MINUTE);
+    }
 
     public String getId() {
         return id;

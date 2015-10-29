@@ -83,6 +83,8 @@ public class User {
      */
     private Boolean idle;
 
+    private String deviceToken;
+
     //用户信息完善程度，运行时计算
     @Transient
     private Integer completion;
@@ -392,12 +394,21 @@ public class User {
         this.subscribeFlag = subscribeFlag;
     }
 
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
     /**
      * 隐藏用户的隐私信息
      */
     public User hideSecretInfo() {
         this.token = null;
         this.password = null;
+        this.deviceToken = null;
         return this;
     }
 }

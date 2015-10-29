@@ -3,15 +3,16 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.util.BeanUtil;
 import com.gongpingjia.carplay.dao.activity.PushInfoDao;
+import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.user.PhoneVerification;
 import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -20,6 +21,17 @@ import java.util.*;
  */
 @RestController
 public class TestController {
+
+    private PhoneVerificationDao phoneVerificationDao;
+
+    @RequestMapping(value = "/test/{phone}", method = RequestMethod.GET)
+    public ResponseDo getPhoneVerification(@PathVariable("phone") String phone) {
+        PhoneVerification phoneVerification = phoneVerificationDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+        if (phoneVerification == null) {
+            return ResponseDo.buildFailureResponse("没有手机号对应的验证码信息");
+        }
+        return ResponseDo.buildSuccessResponse(phoneVerification.getCode());
+    }
 
     @RequestMapping(value = "/test/string", method = RequestMethod.GET)
     public ResponseDo testStr() {

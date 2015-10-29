@@ -3,9 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.entity.activity.Activity;
-import com.gongpingjia.carplay.entity.activity.ActivityIntention;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -16,13 +14,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by heyongyu on 2015/9/22.
@@ -67,7 +61,7 @@ public class ActivityController {
             Activity activity = (Activity) JSONObject.toBean(jsonObject, Activity.class);
 
             Landmark landmark = activity.getEstabPoint();
-            if (landmark == null || !landmark.isLandmarkCorrect()) {
+            if (landmark == null || !landmark.correct()) {
                 LOG.warn("Input parameter estabPoint error, landmark:{}", landmark);
                 throw new ApiException("输入参数错误");
             }
