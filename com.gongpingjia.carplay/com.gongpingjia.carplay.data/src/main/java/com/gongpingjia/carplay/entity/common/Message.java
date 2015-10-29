@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.common;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -25,6 +26,7 @@ public class Message {
 
     private boolean checked;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long createTime;
 
     public String getId() {

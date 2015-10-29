@@ -4,6 +4,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -28,11 +29,11 @@ public class OfficialActivity {
 
 
     //开始时间
-    @Indexed
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long start;
 
     //结束时间
-    @Indexed
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long end;
 
     //成员

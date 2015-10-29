@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.auth;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,8 +23,10 @@ public class PhotoAuth {
      */
     private String status;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long applyTime;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long authTime;
 
     public String getId() {

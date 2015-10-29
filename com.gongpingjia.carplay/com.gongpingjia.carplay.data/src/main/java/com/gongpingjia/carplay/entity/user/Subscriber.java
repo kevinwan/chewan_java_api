@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.user;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,6 +21,7 @@ public class Subscriber {
     @Indexed
     private String toUser;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long subscribeTime;
 
     public String getId() {

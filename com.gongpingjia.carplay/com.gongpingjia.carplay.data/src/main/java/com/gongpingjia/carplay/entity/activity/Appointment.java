@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.entity.activity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -38,6 +39,7 @@ public class Appointment extends ActivityIntention {
 
     private String message;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long modifyTime;
 
     //申请人员信息

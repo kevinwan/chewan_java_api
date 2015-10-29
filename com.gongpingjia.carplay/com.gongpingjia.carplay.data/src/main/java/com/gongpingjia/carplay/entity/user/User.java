@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
@@ -32,6 +33,7 @@ public class User {
     private String avatar;
     private String gender;
     private Long birthday;
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long registerTime;
     private String role;
     private boolean deleteFlag = false;

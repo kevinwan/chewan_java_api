@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.history;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,7 +32,7 @@ public class InterestMessage {
     //如果为上传照片，显示上传照片的数量
     private Integer count;
     //创建该记录的时间
-    @Indexed
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long createTime;
 
     public String getId() {

@@ -1,6 +1,7 @@
 package com.gongpingjia.carplay.entity.activity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -25,7 +26,7 @@ public class PushInfo {
     private String activityId;
 
     //发送时间
-    @Indexed
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long createTime;
 
     //是否删除标识

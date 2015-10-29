@@ -6,6 +6,8 @@ import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.index.IndexDefinition;
+import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -55,7 +57,7 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     private String businessId;
 
     //活动创建时间
-    @Indexed
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long createTime;
 
     private Boolean deleteFlag = false;

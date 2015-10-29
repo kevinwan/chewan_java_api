@@ -1,6 +1,8 @@
 package com.gongpingjia.carplay.entity.common;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class FeedBack {
 
     private String content;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long createTime;
 
     public String getId() {
