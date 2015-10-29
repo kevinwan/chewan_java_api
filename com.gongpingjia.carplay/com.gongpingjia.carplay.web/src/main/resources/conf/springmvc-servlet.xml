@@ -43,6 +43,13 @@
         </mvc:interceptor>
     </mvc:interceptors>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/test/string" />
+            <bean class="com.gongpingjia.carplay.statistic.interceptor.TestInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
     <mvc:default-servlet-handler/>
     <mvc:resources location="/html/" mapping="/html/**"></mvc:resources>
     <mvc:resources location="/photos/" mapping="/photos/**"></mvc:resources>

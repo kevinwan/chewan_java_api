@@ -1,116 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-	id="schedule-console" version="3.0">
-	<display-name>Carplay Web Application</display-name>
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         id="schedule-console" version="3.0">
+    <display-name>Carplay Web Application</display-name>
 
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath*:META-INF/spring/*.service.xml
-		</param-value>
-	</context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath*:META-INF/spring/*.service.xml
+        </param-value>
+    </context-param>
 
-	<!-- 日志记录 -->
-	<context-param>
-		<param-name>log4jConfigLocation</param-name>
-		<param-value>classpath:conf/log4j.xml</param-value>
-	</context-param>
+    <!-- 日志记录 -->
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>classpath:conf/log4j.xml</param-value>
+    </context-param>
 
-	<!-- Spring字符集过滤器 -->
-	<filter>
-		<filter-name>SpringEncodingFilter</filter-name>
-		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-		<init-param>
-			<param-name>forceEncoding</param-name>
-			<param-value>true</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>SpringEncodingFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    <!-- Spring字符集过滤器 -->
+    <filter>
+        <filter-name>SpringEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>SpringEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>CrossDomain</filter-name>
-		<filter-class>com.gongpingjia.carplay.filter.SimpleCORSFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>CrossDomain</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>CrossDomain</filter-name>
+        <filter-class>com.gongpingjia.carplay.filter.SimpleCORSFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CrossDomain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-	</listener>
+    <filter>
+        <filter-name>RequestWrapperFilter</filter-name>
+        <filter-class>com.gongpingjia.carplay.statistic.filter.HttpServletRequestReplacedFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RequestWrapperFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
 
-	<!-- springMVC核心配置 -->
-	<servlet>
-		<servlet-name>springmvc</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<!-- 读取spring配置文件 -->
-			<param-name>contextConfigLocation</param-name>
-			<param-value>
-				classpath:conf/springmvc-servlet.xml
-			</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>springmvc</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-	</welcome-file-list>
+    <!-- springMVC核心配置 -->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <!-- 读取spring配置文件 -->
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                classpath:conf/springmvc-servlet.xml
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
-	<error-page>
-		<error-code>401</error-code>
-		<location>/html/40X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>402</error-code>
-		<location>/html/40X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>403</error-code>
-		<location>/html/40X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>404</error-code>
-		<location>/html/40X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>500</error-code>
-		<location>/html/50X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>501</error-code>
-		<location>/html/50X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>502</error-code>
-		<location>/html/50X.html</location>
-	</error-page>
-	<error-page>
-		<error-code>503</error-code>
-		<location>/html/50X.html</location>
-	</error-page>
-	<error-page>
-		<exception-type>java.lang.Exception</exception-type>
-		<location>/html/50X.html</location>
-	</error-page>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>401</error-code>
+        <location>/html/40X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>402</error-code>
+        <location>/html/40X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/html/40X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/html/40X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/html/50X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>501</error-code>
+        <location>/html/50X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>502</error-code>
+        <location>/html/50X.html</location>
+    </error-page>
+    <error-page>
+        <error-code>503</error-code>
+        <location>/html/50X.html</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/html/50X.html</location>
+    </error-page>
 
 </web-app>
