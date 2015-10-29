@@ -110,7 +110,7 @@ public class OfficialActivity {
     private Boolean onFlag;
 
     //删除标志位
-    private Boolean deleteFlag;
+    private Boolean deleteFlag = false;
 
     /**
      * 组织成员信息

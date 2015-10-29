@@ -79,7 +79,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
                 alert('请在备注中填写拒绝理由');
                 return;
             }
-            authenticationService.processUserPhotoApplication(true, application.remarks, application.applicationId).success(
+            authenticationService.processUserPhotoApplication(false, application.remarks, application.applicationId).success(
                 function (result) {
                     if (result && result.result == 0) {
                         alert('成功完成头像认证');

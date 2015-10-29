@@ -58,8 +58,7 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     @Indexed
     private Long createTime;
 
-
-    private Boolean deleteFlag;
+    private Boolean deleteFlag = false;
 
     @Transient
     private Double distance;
