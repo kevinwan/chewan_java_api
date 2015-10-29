@@ -428,6 +428,9 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("用户不存在");
         }
 
+        if (beViewedUserInfo.getAlbum() != null) {
+            Collections.sort(beViewedUserInfo.getAlbum());
+        }
         if (!viewUser.equals(beViewedUser)) {
             //表示不是自己查看自己，beViewedUser被别人看过,记录相册查看的历史信息
             AlbumViewHistory history = new AlbumViewHistory();

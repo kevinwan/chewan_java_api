@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Transient;
  * Created by licheng on 2015/9/19.
  * 用户上传的个人图片
  */
-public class Photo {
+public class Photo implements Comparable<Photo> {
     //photoId
     private String id;
     //photoUrl key
@@ -57,5 +57,10 @@ public class Photo {
 
     public void setUploadTime(Long uploadTime) {
         this.uploadTime = uploadTime;
+    }
+
+    @Override
+    public int compareTo(Photo o) {
+        return (int) (o.getUploadTime() - this.getUploadTime());
     }
 }
