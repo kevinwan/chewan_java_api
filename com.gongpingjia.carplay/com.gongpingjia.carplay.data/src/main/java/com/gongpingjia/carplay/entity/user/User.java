@@ -105,6 +105,9 @@ public class User {
     @Transient
     private UserAuthentication authentication;
 
+    @Transient
+    private int matchTimes = 0;
+
     /**
      * 刷新user相关的photo的URL地址
      *
@@ -400,6 +403,14 @@ public class User {
 
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
+    }
+
+    public int getMatchTimes() {
+        return matchTimes;
+    }
+
+    public void setMatchTimes(int matchTimes) {
+        this.matchTimes = matchTimes;
     }
 
     /**
