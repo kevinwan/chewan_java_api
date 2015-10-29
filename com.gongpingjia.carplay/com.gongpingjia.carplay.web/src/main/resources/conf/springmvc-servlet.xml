@@ -12,7 +12,10 @@
 
     <!-- 默认扫描的包路径 -->
     <context:component-scan
-            base-package="com.gongpingjia.carplay.controller, com.gongpingjia.carplay.common.exception, com.gongpingjia.carplay.official.controller"/>
+            base-package="com.gongpingjia.carplay.controller,
+                          com.gongpingjia.carplay.common.exception,
+                          com.gongpingjia.carplay.official.controller,
+                          com.gongpingjia.carplay.statistic.controller"/>
     <context:annotation-config/>
 
     <bean id="customObjectMapper" class="com.gongpingjia.carplay.common.util.CustomObjectMapper">
@@ -35,10 +38,10 @@
 
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/*" />
-            <mvc:exclude-mapping path="/static/**" />
-            <mvc:exclude-mapping path="/photos/**" />
-            <mvc:exclude-mapping path="/html/**" />
+            <mvc:mapping path="/*"/>
+            <mvc:exclude-mapping path="/static/**"/>
+            <mvc:exclude-mapping path="/photos/**"/>
+            <mvc:exclude-mapping path="/html/**"/>
             <bean class="com.gongpingjia.carplay.interceptor.CommonInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

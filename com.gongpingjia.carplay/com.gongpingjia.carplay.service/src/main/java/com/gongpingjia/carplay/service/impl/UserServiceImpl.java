@@ -30,7 +30,6 @@ import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
-import com.gongpingjia.carplay.service.util.FetchUtil;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -316,7 +315,7 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Begin check input parameters of register");
 
         Landmark landmark = user.getLandmark();
-        if (landmark == null || !user.getLandmark().isLandmarkCorrect()) {
+        if (landmark == null || !user.getLandmark().correct()) {
             LOG.warn("Input parameter landmark error, out of range, landmark:{}", landmark);
             throw new ApiException("输入参数错误");
         }
@@ -1175,6 +1174,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 获取某一个用户的发布的活动信息；
+     *
      * @param viewUserId
      * @param userId
      * @param limit
@@ -1267,8 +1267,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     *
      * 获取环信信息
+     *
      * @param emchatName 环信ID
      * @return
      * @throws ApiException
