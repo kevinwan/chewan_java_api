@@ -64,10 +64,10 @@ public class OfficialServiceImpl implements OfficialService {
     private CacheManager cacheManager;
 
     @Override
-    public ResponseDo getActivityInfo(String officialActivityId, String emchatGroupId, String userId) throws ApiException {
+    public ResponseDo getActivityInfo(String id, Integer idType, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-        OfficialActivity officialActivity = checkParameters(officialActivityId, emchatGroupId);
+        OfficialActivity officialActivity = checkParameters(id,idType);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -104,7 +104,7 @@ public class OfficialServiceImpl implements OfficialService {
             List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
 
             //获取分页成员的信息；
-            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivityId)
+            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
                     .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
                     .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
 
@@ -149,7 +149,7 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("参数异常 limit为正整数");
         }
 
-        OfficialActivity officialActivity = checkParameters(officialActivityId, null);
+        OfficialActivity officialActivity = checkParameters(officialActivityId, Constants.OfficialInfoIdType.TYPE_OFFICIAL);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -334,26 +334,24 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
 
-    private OfficialActivity checkParameters(String officialActivityId, String emchatGroupId) throws ApiException {
-        if (StringUtils.isEmpty(officialActivityId) && StringUtils.isEmpty(emchatGroupId)) {
-            LOG.warn("officialActivityId and emchatGroupId both empty");
-            throw new ApiException("officialActivityId 跟 emchatGroupId 不能同时为空");
+    private OfficialActivity checkParameters(String id, Integer idType) throws ApiException {
+        if (!Constants.OfficialInfoIdType.TYPE_LIST.contains(idType)) {
+            LOG.warn("idType is illegal idType is :{}", idType);
+            throw new ApiException(("idType 值非法"));
         }
         OfficialActivity officialActivity = null;
-        if (StringUtils.isEmpty(emchatGroupId)) {
-            //emchatGroupId 为空 根据officialActivityId 查找
-            officialActivity = officialActivityDao.findById(officialActivityId);
+        if (idType.equals(Constants.OfficialInfoIdType.TYPE_OFFICIAL)) {
+            officialActivity = officialActivityDao.findById(id);
         } else {
-            //根据 emchatGroupId 查找
-            officialActivity = officialActivityDao.findOne(Query.query(Criteria.where("emchatGroupId").is(emchatGroupId)));
+            officialActivity = officialActivityDao.findOne(Query.query(Criteria.where("emchatGroupId").is(idType)));
         }
         if (null == officialActivity) {
-            LOG.warn("Input officialActivityId:{} is not exist in the database", officialActivityId);
+            LOG.warn("Input idType:{} id:{} is not exist in the database", idType, id);
             throw new ApiException("输入参数有误");
         }
 
         if (officialActivity.getDeleteFlag()) {
-            LOG.warn("Official activity already deleted, _id:{}", officialActivityId);
+            LOG.warn("Official activity already deleted, _id:{}", officialActivity.getOfficialActivityId());
             throw new ApiException("活动信息不存在");
         }
 

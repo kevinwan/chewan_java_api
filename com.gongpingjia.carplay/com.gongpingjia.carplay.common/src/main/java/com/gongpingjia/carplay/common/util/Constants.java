@@ -336,4 +336,12 @@ public class Constants {
 
         List<String> TYPE_LIST = Arrays.asList(AA, TREAT_ME, MY_TREAT);
     }
+
+
+    public interface OfficialInfoIdType{
+        int TYPE_OFFICIAL = 0;
+        int TYPE_EMCHAT = 1;
+
+        List<Integer> TYPE_LIST =  Arrays.asList(TYPE_OFFICIAL,TYPE_EMCHAT);
+    }
 }

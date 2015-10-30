@@ -10,10 +10,9 @@ public interface OfficialService {
     /**
      * 获取活动详情
      *
-     * @param officialActivityId
      * @return
      */
-    ResponseDo getActivityInfo(String officialActivityId,String emchatGroupId, String userId) throws ApiException;
+    ResponseDo getActivityInfo(String id,Integer idType, String userId) throws ApiException;
 
 
     ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException;
