@@ -603,10 +603,10 @@ public class ActivityServiceImpl implements ActivityService {
 
         User user = userDao.findById(userId);
 
-        //接收了别人的请求，需要发送环信消息,只发送接收的
+        //接收了别人的请求，需要发送环信消息,只发送接受的
         if (acceptFlag) {
             String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.activity.state", "{0}{1}了您的{2}邀请"),
-                    user.getNickname(), Constants.AppointmentStatus.ACCEPT, appointment.getType());
+                    user.getNickname(), "接受", appointment.getType());
             chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                     applyUser.getEmchatName(), message);
         }
