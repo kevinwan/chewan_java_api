@@ -149,6 +149,8 @@ public class UserServiceImpl implements UserService {
         User data = userDao.findById(user.getUserId());
         data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         data.setToken(userToken.getToken());
+        data.setCompletion(computeCompletion(data));
+
         return ResponseDo.buildSuccessResponse(data);
     }
 
@@ -202,11 +204,6 @@ public class UserServiceImpl implements UserService {
         userData.setToken(refreshUserToken(userData.getUserId()));
 
         userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        // 查询用户车辆信息
-        if (userData.getCar() != null) {
-            userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
-        }
-
         userData.setCompletion(computeCompletion(userData));
 
         return ResponseDo.buildSuccessResponse(userData);
@@ -393,7 +390,7 @@ public class UserServiceImpl implements UserService {
             data.put("uid", user.getUid());
             data.put("nickname", user.getNickname());
             data.put("channel", user.getChannel());
-            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+            data.put("avatar", avatarId);
             return ResponseDo.buildSuccessResponse(data);
         } else {
             if (userData.isDeleteFlag()) {
@@ -405,6 +402,9 @@ public class UserServiceImpl implements UserService {
             LOG.debug("User is exist in the system, return login information");
             //刷新用户会话Token
             userData.setToken(refreshUserToken(userData.getUserId()));
+            userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
+            userData.setCompletion(computeCompletion(userData));
+
             return ResponseDo.buildSuccessResponse(userData);
         }
     }
@@ -1283,5 +1283,20 @@ public class UserServiceImpl implements UserService {
         data.put("gender", user.getGender());
         data.put("age", user.getAge());
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    @Override
+    public ResponseDo changePassword(String userId, String oldPwd, String newPwd) throws ApiException {
+        LOG.debug("Check user old password first");
+
+        User user = userDao.findById(userId);
+        if (!user.getPassword().equals(oldPwd)) {
+            LOG.warn("Input old password error");
+            throw new ApiException("密码错误");
+        }
+
+        LOG.debug("Old password is correct, change password in the database");
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("password", newPwd));
+        return ResponseDo.buildSuccessResponse();
     }
 }

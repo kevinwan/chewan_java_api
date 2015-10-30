@@ -10,6 +10,7 @@ public class StatisticConstants {
         String UNREGISTER_NEARBY_INVITED = "unRegisterNearbyInvited";// 未注册附近邀他事件
         String UNREGISTER_MATCH_INVITED = "unRegisterMatchInvited";// 未注册匹配邀请事件
         String USER_REGISTER = "userRegister";//用户注册事件
+        String USER_REGISTER_SUCCESS = "userRegisterSuccess";//用户注册事件
 
         String UNREGISTER_DYNAMIC_ACCEPT = "unRegisterDynamicAccept";// 未注册用户同意假数据
         String DYNAMIC_ACCEPT_REGISTER = "dynamicAcceptRegister";// 未注册用户同意后立即注册事件

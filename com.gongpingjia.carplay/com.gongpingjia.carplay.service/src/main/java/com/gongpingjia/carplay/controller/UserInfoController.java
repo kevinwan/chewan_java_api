@@ -457,4 +457,31 @@ public class UserInfoController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    /**
+     * 修改用户的密码
+     *
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/user/{userId}/password", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo changePassword(@PathVariable("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json) {
+        LOG.info("Begin change user password, userId:{}", userId);
+
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+
+            if (CommonUtil.isEmpty(json, Arrays.asList("new", "old"))) {
+                throw new ApiException("输入参数错误");
+            }
+
+            return userService.changePassword(userId, json.getString("old"), json.getString("new"));
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }
