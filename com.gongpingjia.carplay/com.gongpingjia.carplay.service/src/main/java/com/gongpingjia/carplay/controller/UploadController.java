@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.controller;
 
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.UploadService;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * 图片资源文件上传
@@ -114,6 +119,46 @@ public class UploadController {
                                        @RequestParam("userId") String userId) {
         LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
         try {
+            return service.uploadCoverPhoto(attach, userId, token);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 官方活动上传封面照片
+     *
+     * @param attach
+     * @param token
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/official/activity/cover/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
+    public ResponseDo uploadOfficialActivityCover(@RequestBody MultipartFile attach, @RequestParam("token") String token,
+                                                  @RequestParam("userId") String userId) {
+        LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
+        try {
+            long maxSize = Long.parseLong(PropertiesUtil.getProperty("official.activity.cover.maxSize", "200")) * 1024;
+            int maxWidth = Integer.parseInt(PropertiesUtil.getProperty("official.activity.cover.maxWidth","825"));
+            BufferedImage image = null;
+            try {
+                image = ImageIO.read(attach.getInputStream());
+                if (image.getWidth() != image.getHeight()) {
+                    throw new ApiException("图片的长宽必须相等");
+                }
+                if (image.getWidth() > maxWidth) {
+                    throw new ApiException("图像的最大像素是825*825");
+                }
+            } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
+                throw new ApiException("服务器转换图像时出错");
+            } finally {
+                image = null;
+            }
+            if (attach.getSize() > maxSize) {
+                throw new ApiException("图片大小超过200K");
+            }
             return service.uploadCoverPhoto(attach, userId, token);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);

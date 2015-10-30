@@ -13,7 +13,7 @@ public interface OfficialService {
      * @param officialActivityId
      * @return
      */
-    ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException;
+    ResponseDo getActivityInfo(String officialActivityId,String emchatGroupId, String userId) throws ApiException;
 
 
     ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException;

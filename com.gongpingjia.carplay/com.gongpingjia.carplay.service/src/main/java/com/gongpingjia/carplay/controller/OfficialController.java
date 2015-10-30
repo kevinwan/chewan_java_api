@@ -61,14 +61,14 @@ public class OfficialController {
      * @param token              用户会话Token
      * @return 返回结果信息
      */
-    @RequestMapping(value = "/official/activity/{officialActivityId}/info", method = RequestMethod.GET)
-    public ResponseDo getActivityInfo(@PathVariable("officialActivityId") String officialActivityId,
+    @RequestMapping(value = "/official/activity/info", method = RequestMethod.GET)
+    public ResponseDo getActivityInfo(@RequestParam(value = "officialActivityId", required = false, defaultValue = "") String officialActivityId, @RequestParam(value = "emchatGroupId", required = false, defaultValue = "") String emchatGroupId,
                                       @RequestParam("userId") String userId, @RequestParam("token") String token) {
 
         try {
             parameterChecker.checkUserInfo(userId, token);
 
-            return officialService.getActivityInfo(officialActivityId, userId);
+            return officialService.getActivityInfo(officialActivityId, emchatGroupId, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

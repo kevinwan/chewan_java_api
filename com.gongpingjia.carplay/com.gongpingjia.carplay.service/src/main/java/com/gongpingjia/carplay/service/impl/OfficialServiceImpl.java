@@ -64,10 +64,10 @@ public class OfficialServiceImpl implements OfficialService {
     private CacheManager cacheManager;
 
     @Override
-    public ResponseDo getActivityInfo(String officialActivityId, String userId) throws ApiException {
+    public ResponseDo getActivityInfo(String officialActivityId, String emchatGroupId, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-        OfficialActivity officialActivity = checkParameters(officialActivityId);
+        OfficialActivity officialActivity = checkParameters(officialActivityId, emchatGroupId);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -149,7 +149,7 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("参数异常 limit为正整数");
         }
 
-        OfficialActivity officialActivity = checkParameters(officialActivityId);
+        OfficialActivity officialActivity = checkParameters(officialActivityId, null);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -334,8 +334,19 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
 
-    private OfficialActivity checkParameters(String officialActivityId) throws ApiException {
-        OfficialActivity officialActivity = officialActivityDao.findById(officialActivityId);
+    private OfficialActivity checkParameters(String officialActivityId, String emchatGroupId) throws ApiException {
+        if (StringUtils.isEmpty(officialActivityId) && StringUtils.isEmpty(emchatGroupId)) {
+            LOG.warn("officialActivityId and emchatGroupId both empty");
+            throw new ApiException("officialActivityId 跟 emchatGroupId 不能同时为空");
+        }
+        OfficialActivity officialActivity = null;
+        if (StringUtils.isEmpty(emchatGroupId)) {
+            //emchatGroupId 为空 根据officialActivityId 查找
+            officialActivity = officialActivityDao.findById(officialActivityId);
+        } else {
+            //根据 emchatGroupId 查找
+            officialActivity = officialActivityDao.findOne(Query.query(Criteria.where("emchatGroupId").is(emchatGroupId)));
+        }
         if (null == officialActivity) {
             LOG.warn("Input officialActivityId:{} is not exist in the database", officialActivityId);
             throw new ApiException("输入参数有误");
