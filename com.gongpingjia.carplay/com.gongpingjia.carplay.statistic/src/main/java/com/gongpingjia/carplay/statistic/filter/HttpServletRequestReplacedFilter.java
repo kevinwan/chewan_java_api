@@ -18,9 +18,16 @@ public class HttpServletRequestReplacedFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+
         ServletRequest requestWrapper = null;
         if (servletRequest instanceof HttpServletRequest) {
-            requestWrapper = new MAPIHttpServletRequestWrapper((HttpServletRequest) servletRequest);
+            HttpServletRequest temp = (HttpServletRequest) servletRequest;
+            //只对POST方法进行包装
+            if (temp.getMethod().toUpperCase().equals("POST")) {
+                requestWrapper = new MAPIHttpServletRequestWrapper((HttpServletRequest) servletRequest);
+            }
+
         }
         if (requestWrapper == null) {
             filterChain.doFilter(servletRequest, servletResponse);
