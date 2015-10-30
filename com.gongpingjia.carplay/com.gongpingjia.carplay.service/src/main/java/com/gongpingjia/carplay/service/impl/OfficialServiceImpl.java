@@ -67,7 +67,7 @@ public class OfficialServiceImpl implements OfficialService {
     public ResponseDo getActivityInfo(String id, Integer idType, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
-        OfficialActivity officialActivity = checkParameters(id,idType);
+        OfficialActivity officialActivity = checkParameters(id, idType);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -85,71 +85,69 @@ public class OfficialServiceImpl implements OfficialService {
             jsonObject.put("isMember", false);
             jsonObject.put("members", new ArrayList<>(0));
         } else {
-
-
-            jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
-            //获取当前用户和成员信息
-            User queryUser = userDao.findById(userId);
             LOG.debug("Build members and organizer");
+            jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
 
-            //TODO
-            int ignore = 0, limit = 100;
-            //获取 分页段的 成员的用户id
-            if (ignore >= officialActivity.getMembers().size()) {
-                jsonObject.put("members", new ArrayList<>(0));
-                return ResponseDo.buildSuccessResponse(jsonObject);
-            }
-            int endIndex = ignore + limit;
-            endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
-            List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
-
-            //获取分页成员的信息；
-            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
-                    .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
-                    .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
-
-            Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
-            for (String item : pageMemberUserIds) {
-                userIdSet.add(item);
-            }
-            for (Appointment appointment : appointmentList) {
-                userIdSet.add(appointment.getApplyUserId());
-                userIdSet.add(appointment.getInvitedUserId());
-            }
-
-            //获取 分页成员的具体信息；
-            List<User> users = userDao.findByIds(userIdSet);
-            Map<String, User> userMap = new HashMap<>(users.size());
-            for (User user : users) {
-                userMap.put(user.getUserId(), user);
-            }
-            List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
-            for (String userItemId : pageMemberUserIds) {
-                Map<String, Object> map = new HashMap<>();
-                User user = userMap.get(userItemId);
-
-                buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
-
-                buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
-
-                members.add(map);
-            }
-            jsonObject.put("members", members);
+//            //TODO
+//            int ignore = 0, limit = 100;
+//            //获取 分页段的 成员的用户id
+//            if (ignore >= officialActivity.getMembers().size()) {
+//                jsonObject.put("members", new ArrayList<>(0));
+//                return ResponseDo.buildSuccessResponse(jsonObject);
+//            }
+//            int endIndex = ignore + limit;
+//            endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
+//            List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
+//
+//            //获取分页成员的信息；
+//            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
+//                    .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
+//                    .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
+//
+//            Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
+//            for (String item : pageMemberUserIds) {
+//                userIdSet.add(item);
+//            }
+//            for (Appointment appointment : appointmentList) {
+//                userIdSet.add(appointment.getApplyUserId());
+//                userIdSet.add(appointment.getInvitedUserId());
+//            }
+//
+//            //获取 分页成员的具体信息；
+//            List<User> users = userDao.findByIds(userIdSet);
+//            Map<String, User> userMap = new HashMap<>(users.size());
+//            for (User user : users) {
+//                userMap.put(user.getUserId(), user);
+//            }
+//            List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
+//            for (String userItemId : pageMemberUserIds) {
+//                Map<String, Object> map = new HashMap<>();
+//                User user = userMap.get(userItemId);
+//
+//                buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
+//
+//                buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
+//
+//                members.add(map);
+//            }
+//            jsonObject.put("members", members);
         }
 
         LOG.debug("Finished build data");
+        //去除掉members 信息；
+        jsonObject.remove("members");
         return ResponseDo.buildSuccessResponse(jsonObject);
     }
 
 
     @Override
-    public ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException {
+    public ResponseDo getActivityPageMemberInfo(String id,Integer idType, String userId, Integer ignore, Integer limit) throws ApiException {
         if (limit <= 0) {
             LOG.warn("limit is {}", limit);
             throw new ApiException("参数异常 limit为正整数");
         }
 
-        OfficialActivity officialActivity = checkParameters(officialActivityId, Constants.OfficialInfoIdType.TYPE_OFFICIAL);
+        OfficialActivity officialActivity = checkParameters(id, idType);
 
         String localServer = CommonUtil.getLocalPhotoServer();
         String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
@@ -162,14 +160,14 @@ public class OfficialServiceImpl implements OfficialService {
             return ResponseDo.buildSuccessResponse(jsonObject);
         } else {
             //获取当前用户和成员信息
-            User queryUser = userDao.findById(userId);
+            User queryUser = null;
+            if (!StringUtils.isEmpty(userId)) {
+                queryUser = userDao.findById(userId);
+            }
+
             LOG.debug("Build members and organizer");
 
-            if (officialActivity.getMembers().contains(queryUser.getUserId())) {
-                jsonObject.put("isMember", true);
-            } else {
-                jsonObject.put("isMember", false);
-            }
+            jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
 
             //获取 分页段的
             if (ignore >= officialActivity.getMembers().size()) {
@@ -181,7 +179,7 @@ public class OfficialServiceImpl implements OfficialService {
             List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
 
             //获取分页成员的信息；
-            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivityId)
+            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
                     .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
                     .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
 
@@ -279,6 +277,7 @@ public class OfficialServiceImpl implements OfficialService {
                     map.put("emchatName", user.getEmchatName());
                 }
             }
+
         }
         //没要邀请过
         if (!inviteFlag) {
@@ -320,8 +319,13 @@ public class OfficialServiceImpl implements OfficialService {
         map.put("gender", user.getGender());
         map.put("licenseAuthStatus", user.getLicenseAuthStatus());
         map.put("photoAuthStatus", user.getPhotoAuthStatus());
-        map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
-                user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+        if (null == queryUser) {
+            map.put("distance", "");
+        } else {
+            map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
+                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+        }
+
         if (user.getCar() != null) {
             user.getCar().setLogo(gpjServer + user.getCar().getLogo());
             map.put("car", user.getCar());
@@ -343,11 +347,11 @@ public class OfficialServiceImpl implements OfficialService {
         if (idType.equals(Constants.OfficialInfoIdType.TYPE_OFFICIAL)) {
             officialActivity = officialActivityDao.findById(id);
         } else {
-            officialActivity = officialActivityDao.findOne(Query.query(Criteria.where("emchatGroupId").is(idType)));
+            officialActivity = officialActivityDao.findOne(Query.query(Criteria.where("emchatGroupId").is(id)));
         }
         if (null == officialActivity) {
             LOG.warn("Input idType:{} id:{} is not exist in the database", idType, id);
-            throw new ApiException("输入参数有误");
+            throw new ApiException("活动信息不存在");
         }
 
         if (officialActivity.getDeleteFlag()) {

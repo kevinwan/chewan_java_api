@@ -7,6 +7,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,31 +58,35 @@ public class OfficialController {
      * 获取官方活动详细信息
      *
      * @param id
-     * @param userId             用户Id
-     * @param token              用户会话Token
+     * @param userId 用户Id
+     * @param token  用户会话Token
      * @return 返回结果信息
      */
     @RequestMapping(value = "/official/activity/{id}/info", method = RequestMethod.GET)
-    public ResponseDo getActivityInfo(@PathVariable("id")String id,@RequestParam(value = "idType",required = false,defaultValue = "0")Integer idType,
-                                      @RequestParam("userId") String userId, @RequestParam("token") String token) {
+    public ResponseDo getActivityInfo(@PathVariable("id") String id, @RequestParam(value = "idType", required = false, defaultValue = "0") Integer idType,
+                                      @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token) {
 
         try {
-            parameterChecker.checkUserInfo(userId, token);
-            return officialService.getActivityInfo(id,idType,userId);
+            if (StringUtils.isNotEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+            return officialService.getActivityInfo(id, idType, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
 
-    @RequestMapping(value = "/official/activity/{officialActivityId}/members", method = RequestMethod.GET)
-    public ResponseDo getActivityMembersInfo(@PathVariable("officialActivityId") String officialActivityId,
-                                             @RequestParam("userId") String userId, @RequestParam("token") String token,
+    @RequestMapping(value = "/official/activity/{id}/members", method = RequestMethod.GET)
+    public ResponseDo getActivityMembersInfo(@PathVariable("id") String id, @RequestParam(value = "idType", required = false, defaultValue = "0") Integer idType,
+                                             @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token,
                                              @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                              @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         try {
-            parameterChecker.checkUserInfo(userId, token);
-            return officialService.getActivityPageMemberInfo(officialActivityId, userId, ignore, limit);
+            if (StringUtils.isNotEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+            return officialService.getActivityPageMemberInfo(id, idType, userId, ignore, limit);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

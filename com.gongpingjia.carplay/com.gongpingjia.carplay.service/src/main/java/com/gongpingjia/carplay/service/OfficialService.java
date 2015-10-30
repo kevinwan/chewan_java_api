@@ -15,7 +15,7 @@ public interface OfficialService {
     ResponseDo getActivityInfo(String id,Integer idType, String userId) throws ApiException;
 
 
-    ResponseDo getActivityPageMemberInfo(String officialActivityId, String userId, Integer ignore, Integer limit) throws ApiException;
+    ResponseDo getActivityPageMemberInfo(String id,Integer idType, String userId, Integer ignore, Integer limit) throws ApiException;
 
 
     /**
