@@ -38,7 +38,7 @@
 
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/*"/>
+            <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/static/**"/>
             <mvc:exclude-mapping path="/photos/**"/>
             <mvc:exclude-mapping path="/html/**"/>
@@ -48,7 +48,7 @@
 
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/test/string" />
+            <mvc:mapping path="/test/string"/>
             <bean class="com.gongpingjia.carplay.statistic.interceptor.TestInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

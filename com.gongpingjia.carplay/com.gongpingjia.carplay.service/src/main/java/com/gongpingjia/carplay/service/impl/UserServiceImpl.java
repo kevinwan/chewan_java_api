@@ -1284,4 +1284,19 @@ public class UserServiceImpl implements UserService {
         data.put("age", user.getAge());
         return ResponseDo.buildSuccessResponse(data);
     }
+
+    @Override
+    public ResponseDo changePassword(String userId, String oldPwd, String newPwd) throws ApiException {
+        LOG.debug("Check user old password first");
+
+        User user = userDao.findById(userId);
+        if (!user.getPassword().equals(oldPwd)) {
+            LOG.warn("Input old password error");
+            throw new ApiException("密码错误");
+        }
+
+        LOG.debug("Old password is correct, change password in the database");
+        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("password", newPwd));
+        return ResponseDo.buildSuccessResponse();
+    }
 }

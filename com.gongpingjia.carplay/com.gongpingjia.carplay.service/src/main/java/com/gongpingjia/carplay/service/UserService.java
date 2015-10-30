@@ -133,4 +133,13 @@ public interface UserService {
      * @return 返回用户的聊天必须信息
      */
     ResponseDo getUserEmchatInfo(String emchatName) throws ApiException;
+
+    /**
+     * 用户修改密码接口
+     * @param userId
+     * @param old
+     * @param aNew
+     * @return
+     */
+    ResponseDo changePassword(String userId, String old, String aNew) throws ApiException;
 }
