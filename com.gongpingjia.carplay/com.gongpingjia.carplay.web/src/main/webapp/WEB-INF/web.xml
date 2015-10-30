@@ -37,6 +37,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--Ajax 跨域解决，注意配置请求的URL-->
     <filter>
         <filter-name>CrossDomain</filter-name>
         <filter-class>com.gongpingjia.carplay.filter.SimpleCORSFilter</filter-class>
@@ -46,6 +47,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--埋点包装器，解决request流读的问题-->
     <filter>
         <filter-name>RequestWrapperFilter</filter-name>
         <filter-class>com.gongpingjia.carplay.statistic.filter.HttpServletRequestReplacedFilter</filter-class>

@@ -123,8 +123,9 @@ public class User {
         }
 
         if (this.album != null) {
+            String thirdPostFix = CommonUtil.getThirdPhotoPostfix();
             for (Photo photo : album) {
-                photo.setUrl(remotePhotoServer + photo.getKey());
+                photo.setUrl(remotePhotoServer + photo.getKey() + thirdPostFix);
             }
         }
 
@@ -146,7 +147,11 @@ public class User {
             if (!StringUtils.isEmpty(latest.getUrl())) {
                 return latest.getUrl();
             }
-            return CommonUtil.getThirdPhotoServer() + latest.getKey();
+            StringBuilder builder = new StringBuilder();
+            builder.append(CommonUtil.getThirdPhotoServer());
+            builder.append(latest.getKey());
+            builder.append(CommonUtil.getThirdPhotoPostfix());
+            return builder.toString();
         }
 
         if (this.avatar.startsWith("http://")) {
