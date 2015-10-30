@@ -4,16 +4,6 @@
 gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonSer' +
 'vice', '$timeout', '$routeParams',
     function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, $timeout, $routeParams) {
-
-        //$scope.items = [
-        //    { id: 1, name: 'foo' },
-        //    { id: 2, name: 'bar' },
-        //    { id: 3, name: 'blah' }
-        //];
-        //
-        //$scope.selectedItem = 2;
-
-
         /**
          * Cancel button click handler
          */
@@ -47,26 +37,46 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
             }
         };
 
+
+        $scope.changeFree = function(){
+            if($scope.freeFlag) {
+                //免费 price
+                document.getElementById("price").disabled = true;
+                document.getElementById("subsidyPrice").disabled = true;
+
+                $scope.activity.price = 0;
+                $scope.activity.subsidyPrice = 0;
+            }else{
+                document.getElementById("price").disabled = false;
+                document.getElementById("subsidyPrice").disabled = false;
+            }
+        };
+
         $scope.initData = function () {
             var officialActivityId = $routeParams.id;
-            //var officialActivityId = $location.search()['id'];
             if (officialActivityId === undefined || officialActivityId === '') {
                 //增加
                 $scope.activity = {destination: {}};
                 $scope.activity.limitType = 0;
 
-                //$scope.startTime = {};
-                //$scope.startTime.time = new Date();
-                return;
+                $scope.freeFlag = false;
             } else {
                 $rootScope.loadingPromise = officialActivityService.getOfficialActivity(officialActivityId).success(function (result) {
                     //获取数据成功
                     if (result.result === 0) {
-                        //初始化时间
                         $scope.activity = result.data;
+
+                        //上下架
                         $scope.activity.onFlag = $scope.activity.onFlag ? 'true' : 'false';
 
-                        //初始化 人数限制类型
+                        //是否免费
+                        if($scope.activity.price == 0) {
+                            $scope.freeFlag = true;
+                        }else{
+                            $scope.freeFlag = false;
+                        }
+
+                        //人数限制类型
                         var limitType = $scope.activity.limitType;
                         document.getElementById("limitType-" + limitType).checked = true;
 
@@ -96,9 +106,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         //结束时间可能不存在
                         if ($scope.activity.end != undefined && $scope.activity.end != null && $scope.activity.end !== "") {
                             document.getElementById("endDate").value = commonService.transferLongToDateString($scope.activity.end);
-                            //document.getElementById("endTime").value = commonService.transferLongToTimeString($scope.activity.end);
                             $scope.endTime.date = commonService.transferLongToDateString($scope.activity.end);
-                            $scope.endTime.time = new Date($scope.activity.end);
                         }
                     }
                 });
@@ -119,35 +127,25 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("请选择开始时间");
                 return false;
             }
-            if (!commonService.isNull($scope.endTime)) {
-                //结束时间不是空
-                if (commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
-                    $window.alert("请选择合法的结束时间");
-                    return false;
-                }
 
-                if (!commonService.isStrEmpty($scope.endTime.date) && commonService.isStrEmpty($scope.endTime.time)) {
-                    $window.alert("请选择合法的结束时间");
-                    return false;
-                }
-            }
-
-
-            //注意 time 是一个 date 对象 日期等都含有;
-            //
 
             //初始化绑定参数时间
             var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours() + ":" + $scope.startTime.time.getMinutes();
             $scope.activity.start = new Date(startStr).getTime();
-            if($scope.activity.start < new Date().getTime()) {
+            if ($scope.activity.start < new Date().getTime()) {
                 $window.alert("开始时间必须大于当前时间");
                 return false;
             }
 
-            if (!commonService.isNull($scope.endTime) && !commonService.isStrEmpty($scope.endTime.date) && !commonService.isStrEmpty($scope.endTime.time)) {
-                var endStr = $scope.endTime.date + " " + $scope.endTime.time.getHours() + ":" + $scope.endTime.time.getMinutes();
-                $scope.activity.end = new Date(endStr).getTime();
-                if($scope.activity.end <= $scope.activity.start) {
+            if (!commonService.isNull($scope.endTime) && $scope.endTime.date !== undefined && $scope.endTime.date !== '') {
+                var endStr = $scope.endTime.date;
+                var tempTimeLong = new Date(endStr).getTime();
+                if(isNaN(tempTimeLong)){
+                    alert("请选择合法的结束时间");
+                    return false;
+                }
+                $scope.activity.end = tempTimeLong;
+                if ($scope.activity.end <= $scope.activity.start) {
                     $window.alert("结束时间必须大于开始时间");
                     return false;
                 }
@@ -171,7 +169,11 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
 
                 //高德bug
                 $scope.activity.destination.detail = document.getElementById('keyword').value;
-
+                if ($scope.activity.onFlag === true || $scope.activity.onFlag === 'true') {
+                    if (!confirm("上架以后活动信息将无法修改!请确定是否上架?")) {
+                        return;
+                    }
+                }
                 $rootScope.loadingPromise = officialActivityService.updateOfficialActivity($scope.activity.officialActivityId, $scope.activity).success(function (result) {
                     if (result.result == 0) {
                         $window.alert("更新成功");
@@ -180,6 +182,8 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         $window.alert("更新失败");
                         $location.path('/officialActivity/list');
                     }
+                }).error(function(result){
+                    alert("更新失败" + result.errmsg);
                 });
             }
         };
@@ -216,10 +220,11 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 data.femaleLimit = $scope.activity.femaleLimit;
             }
 
-            $rootScope.loadingPromise = officialActivityService.updateLimit($scope.activity.officialActivityId, data).success(function(result){
-                if(result.result ===0){
+            $rootScope.loadingPromise = officialActivityService.updateLimit($scope.activity.officialActivityId, data).success(function (result) {
+                if (result.result === 0) {
                     $window.alert("设置成功");
-                }else{
+                    $location.path('/officialActivity/list');
+                } else {
                     $window.alert("设置失败 " + result.errmsg);
                 }
             });
@@ -231,12 +236,13 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
          */
         $scope.register = function () {
             if (checkTime() && validateAll()) {
-
-
                 //高德数字bug
                 $scope.activity.destination.detail = document.getElementById('keyword').value;
-                //初始化 省份信息 angular上绑定的 provinceIndex 信息；
-                //$scope.activity.destination.province = $scope.provinceOptions[$scope.provinceIndex].province;
+                if ($scope.activity.onFlag === true || $scope.activity.onFlag === 'true') {
+                    if (!confirm("上架以后活动信息将无法修改!请确定是否上架?")) {
+                        return;
+                    }
+                }
                 $rootScope.loadingPromise = officialActivityService.saveOfficialActivity($scope.activity).success(function (data) {
                     if (data.result == 0) {
                         $window.alert("创建成功");
@@ -316,7 +322,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("活动标题不能为空");
                 return false;
             }
-            if($scope.activity.title.length > 36) {
+            if ($scope.activity.title.length > 36) {
                 $window.alert("标题不能超过36个字符");
                 return false;
             }

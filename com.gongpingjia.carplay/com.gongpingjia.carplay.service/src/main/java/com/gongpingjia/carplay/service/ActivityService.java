@@ -97,7 +97,7 @@ public interface ActivityService {
      * @param param 请求参数
      * @return 返回结果信息
      */
-    ResponseDo getNearByActivityList(ActivityQueryParam param);
+    ResponseDo getNearByActivityList(HttpServletRequest request,ActivityQueryParam param);
 
     /**
      * 随便看看接口

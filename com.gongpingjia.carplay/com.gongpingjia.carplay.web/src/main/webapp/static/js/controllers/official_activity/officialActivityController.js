@@ -102,6 +102,9 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
          * @param officialActivityId
          */
         $scope.sendOnFlag = function (officialActivityId) {
+            if(!confirm("上架以后活动信息将无法修改!请确定是否上架?")){
+                return;
+            }
             $rootScope.loadingPromise = officialActivityService.sendOnFlag(officialActivityId).success(function (result) {
                 if (result.result === 0) {
                     for (var index in $scope.officialActivities) {

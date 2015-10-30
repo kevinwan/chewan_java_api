@@ -90,11 +90,6 @@
             <tbody>
             <tr ng-repeat="item in officialActivities">
                 <td>
-                    <!--&&  -->
-                    <!--下架-->
-                    <!--<input ng-show="checkOnItemStatus(item.onFlag,item.end)  == 2 || checkOnItemStatus(item.onFlag,item.end) == 0"-->
-                    <!--type="checkbox" name="checkItem" onchange="angular.element(this).scope().checkItem(this)"-->
-                    <!--id="checkItem{{item.officialActivityId}}"/>-->
                     <input ng-show="checkOnItemStatus(item.onFlag,item.start)  == 2 || checkOnItemStatus(item.onFlag,item.start) == 0"
                            type="checkbox" name="checkItem" ng-model="item.checked" ng-change="checkItem(item)"/>
                 </td>
@@ -119,10 +114,13 @@
 
                 </td>
                 <td>{{item.destination.detail}}</td>
-                <td>{{item.price}}元</td>
+                <td>
+                    <span ng-show="item.price === undefined || item.price === null || item.price == 0">免费</span>
+                    <span ng-show="item.price !== undefined && item.price !== null && item.price != 0">{{item.price}}元</span>
+                </td>
                 <td>
                     <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice == 0">无</span>
-                    <span ng-show="item.subsidyPrice === undefined || item.subsidyPrice === null || item.subsidyPrice != 0">{{item.subsidyPrice}}元</span>
+                    <span ng-show="item.subsidyPrice !== undefined && item.subsidyPrice !== null && item.subsidyPrice != 0">{{item.subsidyPrice}}元</span>
                 </td>
                 <td>{{item.start | date:"yyyy-MM-dd HH:mm"}}</td>
                 <td>

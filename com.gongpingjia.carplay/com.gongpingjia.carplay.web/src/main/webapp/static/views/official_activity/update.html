@@ -175,18 +175,11 @@
             <label class="col-md-1 control-label"><span style="color:red">*</span>开始时间</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
-                <!--<div class="col-md-2 no-padding-left">-->
-                <!--<input type="text" class="pickDate" ng-model="startTime.date"-->
-                <!--data-autoclose="1"-->
-                <!--placeholder="请输入日期" id="startDate" bs-datepicker>-->
-                <!--</div>-->
                 <div class="col-md-2 no-padding-left">
                     <input type="text" id="startDate" ui-date ui-date-format="yy-mm-dd" ng-model="startTime.date"
                            placeholder="开始日期">
                 </div>
                 <div class="col-md-2 no-padding-left">
-                    <!--<input type="text" class="pickTime" ng-model="startTime.time" id="startTime"-->
-                           <!--data-time-type="number" data-autoclose="1" placeholder="开始时间" bs-timepicker>-->
                     <timepicker-pop class="input-group" input-time="startTime.time" ng-model="startTime.time" id="startTime" show-meridian="showMeridian"></timepicker-pop>
                 </div>
             </div>
@@ -196,18 +189,9 @@
             <label class="col-md-1 control-label">结束时间</label>
 
             <div class="col-md-9 no-padding-left" style="text-align:left">
-                <!--<div class="col-md-2 no-padding-left">-->
-                <!--<input type="text" size="10" class="pickDate" ng-model="endTime.date" data-autoclose="1"-->
-                <!--placeholder="请输入日期" id="endDate" bs-datepicker>-->
-                <!--</div>-->
                 <div class="col-md-2 no-padding-left">
                     <input type="text" id="endDate" ui-date ui-date-format="yy-mm-dd" ng-model="endTime.date"
                            placeholder="不限制">
-                </div>
-                <div class="col-md-2 no-padding-left">
-                    <!--<input type="text" size="4" class="pickTime" ng-model="endTime.time" id="endTime"-->
-                           <!--data-time-type="number" data-autoclose="1" placeholder="不限制" bs-timepicker>-->
-                    <timepicker-pop class="input-group" input-time="endTime.time" ng-model="endTime.time" id="endTime" show-meridian="showMeridian"></timepicker-pop>
                 </div>
             </div>
         </div>

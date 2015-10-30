@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 /**
@@ -39,7 +40,7 @@ public class ActivityController {
      * @param userId     <p/>
      *                   用户token
      * @param token      <p/>
-     *                   活动信息对应的json
+     *                   活动信息对应的jsonn
      * @param jsonObject
      */
     @RequestMapping(value = "/activity/register", method = RequestMethod.POST, headers = {
@@ -127,7 +128,8 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/activity/list", method = RequestMethod.GET)
-    public ResponseDo getNearByActivityList(@RequestParam(value = "userId", required = false) String userId,
+    public ResponseDo getNearByActivityList(HttpServletRequest request,
+                                            @RequestParam(value = "userId", required = false) String userId,
                                             @RequestParam(value = "token", required = false) String token,
                                             @RequestParam(value = "majorType", required = false) String majorType,
                                             @RequestParam(value = "type", required = false) String type,
@@ -163,7 +165,7 @@ public class ActivityController {
             if (!StringUtils.isEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
-            return activityService.getNearByActivityList(param);
+            return activityService.getNearByActivityList(request,param);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());

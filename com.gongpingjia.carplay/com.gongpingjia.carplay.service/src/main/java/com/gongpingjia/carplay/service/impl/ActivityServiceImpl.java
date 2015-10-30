@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.PushInfoDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
+import com.gongpingjia.carplay.dao.statistic.StatisticActivityMatchDao;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Activity;
@@ -18,6 +19,7 @@ import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
+import com.gongpingjia.carplay.entity.statistic.StatisticActivityMatch;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
@@ -71,6 +73,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private PushInfoDao pushInfoDao;
+
+    @Autowired
+    private StatisticActivityMatchDao statisticActivityMatchDao;
 
 
     /**
@@ -1025,13 +1030,22 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public ResponseDo getNearByActivityList(ActivityQueryParam param) {
+    public ResponseDo getNearByActivityList(HttpServletRequest request,ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
         if (activityList.isEmpty()) {
-            //如果没有找到活动，进行拓展查询
             LOG.info("No result find, begin expand query");
+
+
+            //TODO
+            //埋点统计        没有找到对应的活动 进行了扩展查询；
+            StatisticActivityMatch statisticActivityMatch = new StatisticActivityMatch();
+
+//            statisticActivityMatchDao.save();
+
+
+            //如果没有找到活动，进行拓展查询
             activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
         }
 
