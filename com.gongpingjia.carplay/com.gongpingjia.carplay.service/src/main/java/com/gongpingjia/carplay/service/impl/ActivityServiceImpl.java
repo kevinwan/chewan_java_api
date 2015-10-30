@@ -1182,6 +1182,12 @@ public class ActivityServiceImpl implements ActivityService {
         }
         //活动时间权重计算，都包含时间
         sortFactor += 0.05;
+
+        //权重修正，如果一个人匹配的活动较多的时候，需要进行权重减小，防止一个人刷屏, 第一次重复减0.1,第二次重复减0.2,第三次重复减0.4,0.8,1.6...
+        if (user.getMatchTimes() > 0) {
+            sortFactor -= 0.1 * Math.pow(2, user.getMatchTimes() - 1);
+        }
+        user.setMatchTimes(user.getMatchTimes() + 1);
         return sortFactor;
     }
 
