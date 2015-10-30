@@ -29,7 +29,7 @@ public class CommonInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object paramObject)
             throws Exception {
-        LOG.info("======Request URL: {}, ServletPath:{}", request.getRequestURL(), request.getServletPath());
+        LOG.info("======Request ServletPath:{}", request.getServletPath());
         LOG.info("======Request parameter:{}", request.getParameterMap().toString());
         return true;
     }

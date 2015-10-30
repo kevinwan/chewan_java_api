@@ -213,7 +213,7 @@ public class Constants {
         int LICENSE_AUTH_MSG = 2;
         //身份证认证
         int ID_CARD_AUTH_MSG = 3;
-        //约会信息认证
+        //活动邀约信息过期提醒
         int APPOINTMENT_EXPIRED_MSG = 4;
     }
 

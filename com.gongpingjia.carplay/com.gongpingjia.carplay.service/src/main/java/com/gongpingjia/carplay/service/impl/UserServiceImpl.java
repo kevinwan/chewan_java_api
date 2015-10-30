@@ -144,18 +144,11 @@ public class UserServiceImpl implements UserService {
 
         cacheManager.setUserToken(userToken);
 
-        Map<String, Object> data = new HashMap<String, Object>(2, 1);
-        data.put("userId", user.getUserId());
-        data.put("token", userToken.getToken());
-
-        if (StringUtils.isEmpty(user.getAvatar())) {
-            data.put("avatar", "");
-        } else {
-            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-        }
-
         pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
 
+        User data = userDao.findById(user.getUserId());
+        data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
+        data.setToken(userToken.getToken());
         return ResponseDo.buildSuccessResponse(data);
     }
 
@@ -400,7 +393,7 @@ public class UserServiceImpl implements UserService {
             data.put("uid", user.getUid());
             data.put("nickname", user.getNickname());
             data.put("channel", user.getChannel());
-            data.put("avatar", user.getAvatar());
+            data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
             return ResponseDo.buildSuccessResponse(data);
         } else {
             if (userData.isDeleteFlag()) {
