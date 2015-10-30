@@ -47,22 +47,28 @@ public class UserAdvice {
     @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.UserService.register(..))", returning = "returnValue")
     public void userRegisterSuccess(Object returnValue) {
         LOG.info("== userRegisterSuccess AOP");
-        if (returnValue instanceof ResponseDo) {
-            ResponseDo result = (ResponseDo) returnValue;
-            if (result.success()) {
-                LOG.debug("Record user register when success");
-                StatisticUserRegister userRegister = new StatisticUserRegister();
-                userRegister.setCount(1);
-                userRegister.recordTime(DateUtil.getTime());
-                userRegister.setEvent(StatisticConstants.UserStatistic.USER_REGISTER_SUCCESS);
-                userRegisterDao.save(userRegister);
-            }
+        if (!isReturnSuccess(returnValue)) {
+            LOG.debug("Return not success");
+            return;
         }
+
+        LOG.debug("Record user register when success");
+        StatisticUserRegister userRegister = new StatisticUserRegister();
+        userRegister.setCount(1);
+        userRegister.recordTime(DateUtil.getTime());
+        userRegister.setEvent(StatisticConstants.UserStatistic.USER_REGISTER_SUCCESS);
+        userRegisterDao.save(userRegister);
     }
 
 
-//    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.AunthenticationService.licenseAuthenticationApply(..)) && args(userId)", argNames = "userId", returning = "returnValue")
+//    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.AunthenticationService.licenseAuthenticationApply(..)) && args(json, token, userId)",
+//            argNames = "userId", returning = "returnValue")
 //    public void driverAuthentication(Object returnValue, String userId) {
+//        if (!isReturnSuccess(returnValue)) {
+//            LOG.debug("Return not success");
+//            return;
+//        }
+//
 //        LOG.info("== driverAuthentication AOP ");
 //        StatisticDriverAuth driverAuth = new StatisticDriverAuth();
 //        driverAuth.setCount(1);
