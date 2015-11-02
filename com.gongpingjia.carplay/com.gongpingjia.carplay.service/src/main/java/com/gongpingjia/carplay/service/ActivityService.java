@@ -32,12 +32,6 @@ public interface ActivityService {
 
 
     /**
-     * 获取周边的活动列表
-     */
-    public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException;
-
-
-    /**
      * “约她”申请加入活动
      */
     public ResponseDo sendAppointment(String activityId, String userId, Appointment appointment) throws ApiException;

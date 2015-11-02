@@ -13,6 +13,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticActivityMatch extends StatisticParent {
 
+
+    public static final String TYPE_MATCH = "activityTypeMatchCount";
+
+    public static final String TYPE_RE_MATCH = "activityTypeReMatchCount";
+
     //活动类型,吃饭，唱歌，KTV
     protected String type;
 

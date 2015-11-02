@@ -258,238 +258,6 @@ public class ActivityServiceImpl implements ActivityService {
         return ResponseDo.buildSuccessResponse(activity);
     }
 
-    /**
-     * 获取附近的活动；
-     *
-     * @param request
-     * @param userId
-     * @return
-     * @throws ApiException longitude latitude 经纬度信息       必填项；
-     *                      type 活动类型； 选填
-     *                      pay 付费类型    选填
-     *                      gender 性别 选填
-     *                      transfer 是否包接送   选填        true 查询 包接送项      false 查询所有
-     *                      <p/>
-     *                      limit ignore 信息     选填； 默认 ignore ： 0， limit： 10；
-     */
-    @Override
-    public ResponseDo getNearActivityList(HttpServletRequest request, String userId) throws ApiException {
-        LOG.debug("getNearActivityList");
-        String limitStr = request.getParameter("limit");
-        String ignoreStr = request.getParameter("ignore");
-        int limit = 10;
-        int ignore = 0;
-        if (StringUtils.isNotEmpty(ignoreStr)) {
-            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
-        }
-        if (StringUtils.isNotEmpty(limitStr)) {
-            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
-        }
-
-        AreaRangeInfo areaRangeInfo = new AreaRangeInfo();
-        areaRangeInfo.maxDistance = Double.parseDouble(PropertiesUtil.getProperty("activity.defaultMaxDistance", String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
-        areaRangeInfo.maxPubTime = Long.parseLong(PropertiesUtil.getProperty("activity.defaultMaxPubTime", String.valueOf(ActivityWeight.MAX_PUB_TIME)));
-
-        List<Activity> resultList = null;
-        int searchDepth = 0;
-        do {
-
-            resultList = buildResultList(request, userId, areaRangeInfo);
-            //不是取第一页的信息 跳出此判断
-            if (ignore != 0) {
-                break;
-            }
-            if (searchDepth > 4) {
-                break;
-            }
-            if (resultList == null || resultList.size() < limit) {
-                areaRangeInfo.maxDistance = areaRangeInfo.maxDistance * 10;
-                areaRangeInfo.maxPubTime = areaRangeInfo.maxPubTime * 10;
-                searchDepth++;
-            } else {
-                break;
-            }
-
-        } while (true);
-
-
-        //初始化返回数据
-        JSONArray rltArr = initResultMap(userId, resultList);
-
-
-        return ResponseDo.buildSuccessResponse(rltArr);
-    }
-
-    public List<Activity> buildResultList(HttpServletRequest request, String userId, AreaRangeInfo areaRangeInfo) throws ApiException {
-        SearchInfo searchInfo = initSearchInfo(request, userId, areaRangeInfo);
-
-        //获得所有的满足基础条件的活动；
-        List<Activity> allActivityList = activityDao.find(Query.query(searchInfo.criteria));
-        if (allActivityList.isEmpty()) {
-            LOG.warn("all Activity list is empty");
-            return null;
-        }
-        LOG.debug("allActivityList size is:" + allActivityList.size());
-
-        //获取出该用户所关注的 所有的 用户 id
-        List<String> subscriberIds = initSubscriberIds(userId);
-        //查询出Activity的 组织者，并初始化
-        initOrganizer(allActivityList, subscriberIds);
-
-        /**
-         *  对所有的基础条件活动进行权重打分，并且排序
-         * 此处是查询条件下的内存分页；现业务下没有更好的方式；需要全部排序 就需要将所有的数据读入到内存中进行计算；
-         * 优化方式可以 实用缓存方式 ，对于用户重复的请求可以缓存起来，利用version 更改机制 探讨一下；
-         */
-
-        //需要排除 的 activityId 集合
-        HashSet<String> removeActivityIdSet = initActivityRemoveSet(userId, searchInfo);
-
-        List<Activity> resultList = ActivityUtil.getSortResult(allActivityList, new Date(), searchInfo.landmark, searchInfo.maxDistance, searchInfo.maxPubTime, searchInfo.ignore, searchInfo.limit, searchInfo.genderType, removeActivityIdSet);
-
-        if (null == resultList || resultList.size() == 0) {
-            return null;
-        }
-        LOG.debug("resultList size is:" + resultList.size());
-        return resultList;
-    }
-
-    private HashSet<String> initActivityRemoveSet(String userId, SearchInfo searchInfo) {
-        HashSet<String> removeActivityIdSet = null;
-        //查出 最大发布时间内的 该用户已经申请过的 appointment  将 appointment中的      处于被拒绝 或者 已经接受的  activity 剔除掉；
-        if (StringUtils.isNotEmpty(userId)) {
-            Criteria appointCriteria = Criteria.where("applyUserId").is(userId);
-
-            appointCriteria.and("createTime").gte(DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) searchInfo.maxPubTime)));
-            //用户活动 非官方活动；
-            appointCriteria.and("activityCategory").is(Constants.ActivityCatalog.COMMON);
-
-            appointCriteria.and("status").ne(Constants.AppointmentStatus.APPLYING);
-
-            List<Appointment> appointmentList = appointmentDao.find(Query.query(appointCriteria));
-            if (null != appointmentList && !appointmentList.isEmpty()) {
-                removeActivityIdSet = new HashSet<>(appointmentList.size());
-                for (Appointment appointment : appointmentList) {
-                    removeActivityIdSet.add(appointment.getActivityId());
-                }
-            }
-        }
-        return removeActivityIdSet;
-    }
-
-    private List<String> initSubscriberIds(String userId) {
-        List<Subscriber> subscribers = null;
-        if (StringUtils.isEmpty(userId)) {
-            subscribers = new ArrayList<Subscriber>();
-        } else {
-            subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
-        }
-        List<String> subscriberIds = new ArrayList<>(subscribers.size());
-
-        for (Subscriber subscriber : subscribers) {
-            subscriberIds.add(subscriber.getToUser());
-        }
-        return subscriberIds;
-    }
-
-    private JSONArray initResultMap(String userId, List<Activity> resultList) throws ApiException {
-        JSONArray jsonArray = new JSONArray();
-        if (null == resultList || resultList.isEmpty()) {
-            return jsonArray;
-        }
-
-        //初始化 activity 的信息  并添加 activity 的 组织者 信息  以及 组织者 所对应的 car 的信息；
-        for (Activity activity : resultList) {
-            Map<String, Object> jsonItem = new HashMap<>();
-            jsonItem.put("type", activity.getType());
-            jsonItem.put("activityId", activity.getActivityId());
-            jsonItem.put("distance", activity.getDistance());
-            jsonItem.put("pay", activity.getPay());
-            jsonItem.put("transfer", activity.isTransfer());
-            jsonItem.put("destination", activity.getDestination());
-            List<String> applyIds = activity.getApplyIds();
-            if (StringUtils.isEmpty(userId)) {
-                jsonItem.put("applyFlag", false);
-            } else {
-                if (null == applyIds || applyIds.isEmpty()) {
-                    jsonItem.put("applyFlag", false);
-                } else {
-                    boolean applyFlag = false;
-                    for (String id : applyIds) {
-                        if (StringUtils.equals(id, userId)) {
-                            applyFlag = true;
-                        }
-                    }
-                    jsonItem.put("applyFlag", applyFlag);
-                }
-            }
-
-            Map<String, Object> itemOrganizer = new HashMap<>();
-            User organizer = activity.getOrganizer();
-            if (null == organizer) {
-                throw new ApiException("该活动没有组织者");
-            }
-            itemOrganizer.put("userId", organizer.getUserId());
-            itemOrganizer.put("nickname", organizer.getNickname());
-
-            // 对 avatar 信息添加了 服务器主机信息
-            itemOrganizer.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
-            itemOrganizer.put("gender", organizer.getGender());
-            itemOrganizer.put("age", organizer.getAge());
-
-            //初始化用户相册信息
-            initUserAlbumInfo(itemOrganizer, organizer);
-
-            //初始化 活动的组织者的 car 信息 Car 的 brand 品牌 和  logo 是一个 url
-            initUserCarInfo(activity, itemOrganizer);
-
-            itemOrganizer.put("photoAuthStatus", activity.getOrganizer().getPhotoAuthStatus());
-            itemOrganizer.put("subscribeFlag", activity.getOrganizer().getSubscribeFlag());
-            itemOrganizer.put("cover", activity.getOrganizer().getCover());//活动封面展示的URL图像
-            jsonItem.put("organizer", itemOrganizer);
-            jsonArray.add(jsonItem);
-        }
-
-//        rltMap.put("activityList", jsonArray);
-        return jsonArray;
-    }
-
-    private void initUserCarInfo(Activity activity, Map<String, Object> itemOrganizer) {
-        JSONObject carJson = new JSONObject();
-        Car car = activity.getOrganizer().getCar();
-        if (null != car) {
-            if (StringUtils.isNotEmpty(car.getBrand())) {
-                carJson.put("brand", car.getBrand());
-            }
-            //car 的 logo 需要添加 公平价的 服务器地址前缀
-            if (StringUtils.isNotEmpty(car.getLogo())) {
-                carJson.put("logo", CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
-            }
-        }
-        itemOrganizer.put("car", carJson);
-    }
-
-    private void initUserAlbumInfo(Map<String, Object> itemOrganizer, User organizer) {
-        if (null == organizer.getAlbum() || organizer.getAlbum().size() == 0) {
-            itemOrganizer.put("album", "[]");
-        } else {
-            //获取时间最近的一张;
-            long maxTime = 0L;
-            Photo tempPhoto = null;
-            Iterator<Photo> iterator = organizer.getAlbum().iterator();
-            while (iterator.hasNext()) {
-                Photo temp = iterator.next();
-                if (maxTime < temp.getUploadTime()) {
-                    maxTime = temp.getUploadTime();
-                    tempPhoto = temp;
-                }
-            }
-            tempPhoto.setUrl(CommonUtil.getThirdPhotoServer() + tempPhoto.getKey());
-            List<Photo> onePhoneAlbum = new ArrayList<>(1);
-            onePhoneAlbum.add(tempPhoto);
-            itemOrganizer.put("album", onePhoneAlbum);
-        }
-    }
 
     @Override
     public ResponseDo sendAppointment(String activityId, String userId, Appointment appointment) throws ApiException {
@@ -539,27 +307,6 @@ public class ActivityServiceImpl implements ActivityService {
                 organizer.getEmchatName(), message);
 
         return ResponseDo.buildSuccessResponse();
-    }
-
-
-    /**
-     * 根据活动信息创建聊天群
-     *
-     * @param activity 活动信息
-     * @throws ApiException 创建群聊失败时
-     */
-    private String createEmchatGroup(Activity activity) throws ApiException {
-        LOG.debug("Begin create chat group");
-        User owner = userDao.findById(activity.getUserId());
-        JSONObject json = chatThirdPartyService.createChatGroup(chatCommonService.getChatToken(),
-                owner.getNickname() + activity.getType(), activity.getActivityId(), owner.getEmchatName(), null);
-        if (json.isEmpty()) {
-            LOG.warn("Failed to create chat group");
-            throw new ApiException("创建聊天群组失败");
-        }
-        String groupId = json.getJSONObject("data").getString("groupid");
-        return groupId;
-
     }
 
     /**
@@ -904,124 +651,6 @@ public class ActivityServiceImpl implements ActivityService {
         return ResponseDo.buildSuccessResponse();
     }
 
-    private SearchInfo initSearchInfo(HttpServletRequest request, String userId, AreaRangeInfo areaRangeInfo) throws ApiException {
-        SearchInfo searchInfo = new SearchInfo();
-        //必填项
-        String longitude = request.getParameter("longitude");
-        String latitude = request.getParameter("latitude");
-        if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
-            LOG.error("longitude or latitude has not init");
-            throw new ApiException("经纬度信息没有提供");
-        }
-        Landmark landmark = new Landmark();
-        landmark.setLatitude(TypeConverUtil.convertToDouble("latitude", latitude, true));
-        landmark.setLongitude(TypeConverUtil.convertToDouble("longitude", longitude, true));
-        searchInfo.landmark = landmark;
-
-
-//        //选填项目
-//        String maxDistanceStr = request.getParameter("maxDistance");
-//        LOG.debug("maxDistanceStr is:{}", maxDistanceStr);
-        double maxDistance = areaRangeInfo.maxDistance;
-//        if (StringUtils.isNotEmpty(maxDistanceStr)) {
-//            maxDistance = TypeConverUtil.convertToDouble("maxDistance", maxDistanceStr, true);
-//        }
-        searchInfo.maxDistance = maxDistance;
-
-        String type = request.getParameter("type");
-        String pay = request.getParameter("pay");
-        String genderTypeStr = request.getParameter("gender");
-        String transferStr = request.getParameter("transfer");
-
-        //分页信息  可以不填
-        String limitStr = request.getParameter("limit");
-        String ignoreStr = request.getParameter("ignore");
-        int limit = 10;
-        //ignore是跳过的参数
-        int ignore = 0;
-        //默认的最大距离参数 如果没有传递最大距离 则实用默认的最大距离
-        if (StringUtils.isNotEmpty(limitStr)) {
-            limit = TypeConverUtil.convertToInteger("limit", limitStr, true);
-        }
-        if (StringUtils.isNotEmpty(ignoreStr)) {
-            ignore = TypeConverUtil.convertToInteger("ignore", ignoreStr, true);
-        }
-        searchInfo.limit = limit;
-        searchInfo.ignore = ignore;
-
-
-        LOG.debug("init Query");
-        Criteria criteria = new Criteria();
-
-        //查询创建在此时间之前的活动；
-        long maxPubTime = areaRangeInfo.maxPubTime;
-        searchInfo.maxPubTime = maxPubTime;
-        long gtTime = DateUtil.addTime(new Date(), Calendar.MINUTE, (0 - (int) maxPubTime));
-        criteria.and("createTime").gte(gtTime);
-
-        //查询在最大距离内的 活动；      此处的maxDistance 需要换算成 对应的 弧度
-        criteria.and("estabPoint").near(new Point(landmark.getLongitude(), landmark.getLatitude())).maxDistance(maxDistance * 180 / DistanceUtil.EARTH_RADIUS);
-
-        //非用户自己创建的活动
-        if (StringUtils.isNotEmpty(userId)) {
-            criteria.and("userId").ne(userId);
-        }
-
-        //deleteFlag 为 false 的活动；
-        criteria.and("deleteFlag").is(false);
-
-//        //剔除掉用户已经申请过该活动
-//        if (StringUtils.isNotEmpty(userId)) {
-//            criteria.and("applyIds").nin(userId);
-//        }
-
-        if (StringUtils.isNotEmpty(type)) {
-            criteria.and("type").is(type);
-        }
-        if (StringUtils.isNotEmpty(pay)) {
-            criteria.and("pay").is(pay);
-        }
-        if (StringUtils.isNotEmpty(transferStr)) {
-            boolean transfer = TypeConverUtil.convertToBoolean("transfer", transferStr, true);
-            //如果包接送
-            if (transfer) {
-                criteria.and("transfer").is(true);
-            }
-        }
-        searchInfo.criteria = criteria;
-
-        int genderType = -1;
-
-        if (StringUtils.isEmpty(genderTypeStr)) {
-            genderType = -1;
-        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.MALE)) {
-            genderType = 0;
-        } else if (StringUtils.equals(genderTypeStr, Constants.UserGender.FEMALE)) {
-            genderType = 1;
-        } else {
-            throw new ApiException("用户性别设置不正确");
-        }
-        searchInfo.genderType = genderType;
-
-        return searchInfo;
-    }
-
-    class SearchInfo {
-        Criteria criteria;
-        //landmark, maxDistance, maxPubTime, ignore, limit, genderType
-        public Landmark landmark;
-        public double maxDistance;
-        public long maxPubTime;
-        public int ignore;
-        public int limit;
-        public int genderType;
-    }
-
-    class AreaRangeInfo {
-        public long maxPubTime;
-        public double maxDistance;
-    }
-
 
     /**
      * 获取附近的匹配的活动列表
@@ -1032,18 +661,17 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
+
+        //埋点统计
+        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_MATCH);
+
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
         if (activityList.isEmpty()) {
             LOG.info("No result find, begin expand query");
 
-
-            //TODO
-            //埋点统计        没有找到对应的活动 进行了扩展查询；
-            StatisticActivityMatch statisticActivityMatch = new StatisticActivityMatch();
-
-//            statisticActivityMatchDao.save();
-
+            //埋点统计
+            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_RE_MATCH);  //没有找到对应的活动 进行了扩展查询；
 
             //如果没有找到活动，进行拓展查询
             activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
@@ -1077,6 +705,44 @@ public class ActivityServiceImpl implements ActivityService {
 
         //查询出Activity的 组织者，并初始化
         return ResponseDo.buildSuccessResponse(buildResponse(param.getUserId(), userMap, remainActivities, subscriberSet));
+    }
+
+    private void initAndSaveStatisticActivityReMatch(HttpServletRequest request, ActivityQueryParam param, String eventType) {
+        StatisticActivityMatch statisticActivityMatch = new StatisticActivityMatch();
+
+        statisticActivityMatch.setType(param.getType());
+        statisticActivityMatch.setMajorType(param.getMajorType());
+        statisticActivityMatch.setPay(param.getPay());
+        Address address = new Address();
+        address.setProvince(param.getProvince());
+        address.setCity(param.getCity());
+        address.setDistrict(param.getDistrict());
+        statisticActivityMatch.setDestination(address);
+
+        Landmark landmark = new Landmark();
+        landmark.setLongitude(param.getLongitude());
+        landmark.setLatitude(param.getLatitude());
+        statisticActivityMatch.setDestPoint(landmark);
+
+        statisticActivityMatch.setTransfer(param.getTransfer());
+        statisticActivityMatch.setUserId(param.getUserId());
+        statisticActivityMatch.setIp(IPFetchUtil.getIPAddress(request));
+
+//        statisticActivityMatch.setEvent(StatisticActivityMatch.TYPE_RE_MATCH);
+        statisticActivityMatch.setEvent(eventType);
+        statisticActivityMatch.setCount(1);
+
+
+        Date currentTime = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentTime);
+        statisticActivityMatch.setCreateTime(currentTime.getTime());
+        statisticActivityMatch.setYear(calendar.get(Calendar.YEAR));
+        statisticActivityMatch.setMonth(calendar.get(Calendar.MONTH) + 1);
+        statisticActivityMatch.setDay(calendar.get(Calendar.DAY_OF_MONTH) + 1);
+        statisticActivityMatch.setHour(calendar.get(Calendar.HOUR));
+        statisticActivityMatch.setMinute(calendar.get(Calendar.MINUTE));
+        statisticActivityMatchDao.save(statisticActivityMatch);
     }
 
     private boolean isApplied(String userId, List<String> applyIds) {
