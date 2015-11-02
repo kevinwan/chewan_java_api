@@ -1,17 +1,14 @@
 package com.gongpingjia.carplay.statistic.aop;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.statistic.StatisticDriverAuthDao;
 import com.gongpingjia.carplay.dao.statistic.StatisticUserRegisterDao;
 import com.gongpingjia.carplay.entity.statistic.StatisticDriverAuth;
 import com.gongpingjia.carplay.entity.statistic.StatisticUserRegister;
-import net.sf.json.JSONObject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +56,7 @@ public class UserAdvice {
         StatisticUserRegister userRegister = new StatisticUserRegister();
         userRegister.setCount(1);
         userRegister.recordTime(DateUtil.getTime());
-        userRegister.setEvent(StatisticConstants.UserStatistic.USER_REGISTER_SUCCESS);
+        userRegister.setEvent(StatisticUserRegister.USER_REGISTER_SUCCESS);
         userRegisterDao.save(userRegister);
     }
 
@@ -76,7 +73,7 @@ public class UserAdvice {
         StatisticDriverAuth driverAuth = new StatisticDriverAuth();
         driverAuth.setCount(1);
         driverAuth.recordTime(DateUtil.getTime());
-        driverAuth.setEvent(StatisticConstants.Authentication.AUTHENTICATION);
+        driverAuth.setEvent(StatisticDriverAuth.AUTHENTICATION);
 
         if (jp.getArgs().length == 3) {
             //第三个参数为userId
@@ -97,7 +94,7 @@ public class UserAdvice {
         StatisticDriverAuth drivingLicense = new StatisticDriverAuth();
         drivingLicense.setCount(1);
         drivingLicense.recordTime(DateUtil.getTime());
-        drivingLicense.setEvent(StatisticConstants.Authentication.DRIVING_LICENSE);
+        drivingLicense.setEvent(StatisticDriverAuth.DRIVING_LICENSE);
         if (jp.getArgs().length == 3) {
             //第一个参数为userId
             drivingLicense.setUserId(jp.getArgs()[0].toString());
@@ -117,7 +114,7 @@ public class UserAdvice {
         StatisticDriverAuth driverLicense = new StatisticDriverAuth();
         driverLicense.setCount(1);
         driverLicense.recordTime(DateUtil.getTime());
-        driverLicense.setEvent(StatisticConstants.Authentication.DRIVER_LICENSE);
+        driverLicense.setEvent(StatisticDriverAuth.DRIVER_LICENSE);
         if (jp.getArgs().length == 3) {
             //第一个参数为userId
             driverLicense.setUserId(jp.getArgs()[0].toString());

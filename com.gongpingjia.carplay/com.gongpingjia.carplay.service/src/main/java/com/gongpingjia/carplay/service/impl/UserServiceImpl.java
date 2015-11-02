@@ -511,6 +511,7 @@ public class UserServiceImpl implements UserService {
 
                 officialActivity.setCovers(new String[]{thirdServer + officialActivity.getCover().getKey()});
                 officialActivity.setActivityCategory(appointment.getActivityCategory());
+                officialActivity.setStatus(appointment.getStatus());
                 data.add(officialActivity);
             } else {
                 //邀他同去， 普通邀约
