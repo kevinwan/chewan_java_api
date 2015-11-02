@@ -385,6 +385,7 @@ public class OfficialServiceImpl implements OfficialService {
         }
         criteria.and("deleteFlag").is(false);//过滤已经删除了的官方活动
         criteria.and("onFlag").is(true);       //过滤 未上架的官方活动；
+        criteria.and("start").gt(DateUtil.getTime());  //过滤已下架的活动；start>当前时间
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime")));
