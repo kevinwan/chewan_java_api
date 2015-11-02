@@ -249,16 +249,7 @@ public class UploadServiceImpl implements UploadService {
 
         User user = userDao.findById(userId);
 
-        String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, CodeGenerator.generatorId());
-
-        ResponseDo responseDo = uploadLocalServer(userId, data, key);
-
-        if (responseDo.success()) {
-            userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("avatar", key));
-            localFileManager.delete(user.getAvatar());
-        }
-
-        return responseDo;
+        return uploadLocalServer(userId, data, user.getAvatar());
     }
 
     @Override

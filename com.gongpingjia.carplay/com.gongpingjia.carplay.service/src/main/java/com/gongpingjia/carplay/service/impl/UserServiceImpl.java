@@ -497,6 +497,7 @@ public class UserServiceImpl implements UserService {
             subscriberIdSet.add(subscriber.getToUser());
         }
 
+        User currentUser = userDao.findById(userId);
         LOG.debug("Begin build response data");
         List<Object> data = new ArrayList<>(appointments.size());
         String thirdServer = CommonUtil.getThirdPhotoServer();
@@ -518,16 +519,16 @@ public class UserServiceImpl implements UserService {
                 data.add(officialActivity);
             } else {
                 //邀他同去， 普通邀约
-                buildCommonAppointment(userId, users, subscriberIdSet, appointment);
+                buildCommonAppointment(currentUser, users, subscriberIdSet, appointment);
                 data.add(appointment);
             }
         }
         return data;
     }
 
-    private void buildCommonAppointment(String userId, Map<String, User> users, Set<String> subscriberIdSet, Appointment appointment) {
+    private void buildCommonAppointment(User currentUser, Map<String, User> users, Set<String> subscriberIdSet, Appointment appointment) {
         User userInfo = null;
-        if (userId.equals(appointment.getApplyUserId())) {
+        if (currentUser.getUserId().equals(appointment.getApplyUserId())) {
             userInfo = users.get(appointment.getInvitedUserId());
             appointment.setIsApplicant(true);
         } else {
@@ -549,6 +550,8 @@ public class UserServiceImpl implements UserService {
         //是否在subscriberIdSet中 即为 是否关注了该用户
         userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
         userMap.put("emchatName", userInfo.getEmchatName());
+        userMap.put("distance", DistanceUtil.getDistance(currentUser.getLandmark().getLongitude(), currentUser.getLandmark().getLatitude(),
+                userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
         appointment.setApplicant(userMap);
     }
 
