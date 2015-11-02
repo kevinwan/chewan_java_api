@@ -4,6 +4,8 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.common.Address;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface OfficialService {
 
 
@@ -12,7 +14,7 @@ public interface OfficialService {
      *
      * @return
      */
-    ResponseDo getActivityInfo(String id,Integer idType, String userId) throws ApiException;
+    ResponseDo getActivityInfo(HttpServletRequest request,String id,Integer idType, String userId) throws ApiException;
 
 
     ResponseDo getActivityPageMemberInfo(String id,Integer idType, String userId, Integer ignore, Integer limit) throws ApiException;

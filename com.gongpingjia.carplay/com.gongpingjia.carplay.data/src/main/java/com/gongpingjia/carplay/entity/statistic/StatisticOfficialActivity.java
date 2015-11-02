@@ -11,9 +11,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticOfficialActivity extends StatisticParent {
 
+    public static final String TYPE_JOIN = "officialActivityJoin";
+    public static final String TYPE_NO_JOIN_VIEW = "officialActivityNoJoinView";
+
     private String userId;
 
     private String officialActivityId;
+
+
+    private String ip;
 
     public String getUserId() {
         return userId;
@@ -29,5 +35,13 @@ public class StatisticOfficialActivity extends StatisticParent {
 
     public void setOfficialActivityId(String officialActivityId) {
         this.officialActivityId = officialActivityId;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

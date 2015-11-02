@@ -35,17 +35,13 @@ public class TestController {
 
     @RequestMapping(value = "/test/string", method = RequestMethod.GET)
     public ResponseDo testStr() {
-        User user = new User();
+
         Address address = new Address();
         address.setCity("NJ");
         address.setProvince("JS");
         address.setDistrict("qi xia");
-        user.setAddress(address);
-        user.setNickname("nick user");
-        user.setBirthday(new Date().getTime());
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        return ResponseDo.buildSuccessResponse(userList);
+
+        return ResponseDo.buildSuccessResponse(address);
     }
 
 

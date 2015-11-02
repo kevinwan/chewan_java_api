@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 
@@ -64,13 +65,13 @@ public class OfficialController {
      */
     @RequestMapping(value = "/official/activity/{id}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("id") String id, @RequestParam(value = "idType", required = false, defaultValue = "0") Integer idType,
-                                      @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token) {
+                                      @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token,HttpServletRequest request) {
 
         try {
             if (StringUtils.isNotEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
-            return officialService.getActivityInfo(id, idType, userId);
+            return officialService.getActivityInfo(request,id, idType, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

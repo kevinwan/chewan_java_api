@@ -31,6 +31,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -64,7 +65,7 @@ public class OfficialServiceImpl implements OfficialService {
     private CacheManager cacheManager;
 
     @Override
-    public ResponseDo getActivityInfo(String id, Integer idType, String userId) throws ApiException {
+    public ResponseDo getActivityInfo(HttpServletRequest request,String id, Integer idType, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
         OfficialActivity officialActivity = checkParameters(id, idType);
@@ -83,55 +84,15 @@ public class OfficialServiceImpl implements OfficialService {
         JSONObject jsonObject = JSONObject.fromObject(officialActivity);
         if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty()) {
             jsonObject.put("isMember", false);
+            jsonObject.put("memberSize", 0);
             jsonObject.put("members", new ArrayList<>(0));
         } else {
             LOG.debug("Build members and organizer");
             jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
-
-//            //TODO
-//            int ignore = 0, limit = 100;
-//            //获取 分页段的 成员的用户id
-//            if (ignore >= officialActivity.getMembers().size()) {
-//                jsonObject.put("members", new ArrayList<>(0));
-//                return ResponseDo.buildSuccessResponse(jsonObject);
-//            }
-//            int endIndex = ignore + limit;
-//            endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
-//            List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
-//
-//            //获取分页成员的信息；
-//            List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
-//                    .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
-//                    .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
-//
-//            Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
-//            for (String item : pageMemberUserIds) {
-//                userIdSet.add(item);
-//            }
-//            for (Appointment appointment : appointmentList) {
-//                userIdSet.add(appointment.getApplyUserId());
-//                userIdSet.add(appointment.getInvitedUserId());
-//            }
-//
-//            //获取 分页成员的具体信息；
-//            List<User> users = userDao.findByIds(userIdSet);
-//            Map<String, User> userMap = new HashMap<>(users.size());
-//            for (User user : users) {
-//                userMap.put(user.getUserId(), user);
-//            }
-//            List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
-//            for (String userItemId : pageMemberUserIds) {
-//                Map<String, Object> map = new HashMap<>();
-//                User user = userMap.get(userItemId);
-//
-//                buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
-//
-//                buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
-//
-//                members.add(map);
-//            }
-//            jsonObject.put("members", members);
+            jsonObject.put("memberSize", officialActivity.getMembers().size());
         }
+
+
 
         LOG.debug("Finished build data");
         //去除掉members 信息；
@@ -159,6 +120,7 @@ public class OfficialServiceImpl implements OfficialService {
 
         if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty()) {
             jsonObject.put("isMember", false);
+            jsonObject.put("memberSize", 0);
             jsonObject.put("members", new ArrayList<>(0));
             return ResponseDo.buildSuccessResponse(jsonObject);
         } else {
@@ -171,6 +133,7 @@ public class OfficialServiceImpl implements OfficialService {
             LOG.debug("Build members and organizer");
 
             jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
+            jsonObject.put("memberSize", officialActivity.getMembers().size());
 
             //获取 分页段的
             if (ignore >= officialActivity.getMembers().size()) {
