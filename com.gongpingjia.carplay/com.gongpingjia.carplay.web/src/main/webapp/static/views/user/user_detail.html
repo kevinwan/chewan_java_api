@@ -30,8 +30,8 @@
                     </div>
                     <div class="control-group col-md-6">
                         <div class="bolder ">生日：</div>
-                        <input type="text" id="birthday" ng-model="user.birthday" ng-disable="disableFields"
-                               readonly/>
+                        <input type="text" id="birthday" value="{{user.birthday | date:'yyyy-MM-dd'}}"
+                               ng-disable="disableFields" readonly/>
                     </div>
                 </div>
 
@@ -93,11 +93,12 @@
         <div><h4>用户相册</h4></div>
 
         <div class="col-md-12" style="margin-top:20px">
-            <ul id="albums" class="thumbnails" >
+            <ul id="albums" class="thumbnails">
                 <!--Add dynamic-->
-                <li class="col-md-3"  ng-repeat="photo in user.album" style="list-style: none">
+                <li class="col-md-3" ng-repeat="photo in user.album" style="list-style: none">
                     <div class="thumbnail" style="position: relative ;">
-                        <button ng-click="removePhoto(photo.id)" class="glyphicon glyphicon-remove" aria-hidden="true" style="position: absolute; right:0;top:0"></button>
+                        <button ng-click="removePhoto(photo.id)" class="glyphicon glyphicon-remove" aria-hidden="true"
+                                style="position: absolute; right:0;top:0"></button>
                         <img src="{{photo.url}}" alt="" width="100%" height="200px">
                     </div>
                 </li>
