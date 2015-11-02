@@ -157,7 +157,7 @@ public class PhoneServiceImpl implements PhoneService {
             phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
 
             phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
-                    PropertiesUtil.getProperty("message.effective.seconds", 7200)));
+                    PropertiesUtil.getProperty("message.effective.seconds", 1800)));
             phoneVerify.setSendTimes(0);
             phoneVerify.setModifyTime(DateUtil.getTime());
 
@@ -168,7 +168,7 @@ public class PhoneServiceImpl implements PhoneService {
                 LOG.debug("Exist phone verifyCode is out of date");
                 phoneVerify.setCode(CodeGenerator.generatorVerifyCode());
                 phoneVerify.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.SECOND,
-                        PropertiesUtil.getProperty("message.effective.seconds", 7200)));
+                        PropertiesUtil.getProperty("message.effective.seconds", 1800)));
                 phoneVerify.setModifyTime(DateUtil.getTime());
 
                 Update update = new Update();

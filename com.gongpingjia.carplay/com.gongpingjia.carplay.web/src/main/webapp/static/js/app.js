@@ -6,15 +6,15 @@
 
 var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'datatables', 'angularMoment',
     'ui.bootstrap', 'cgBusy', 'ngAnimate', 'angular-md5', 'angularCharts', 'notifications',
-    'ui.date', 'datatables.bootstrap','timepickerPop']);
+    'ui.date', 'datatables.bootstrap', 'timepickerPop']);
 
 
 gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
 gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
 gpjApp.constant('ChewanApiEndPoint', '/v2');
 
-//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
-//gpjApp.constant("ChewanApiProvider", "http://localhost:8080");
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
+//gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
 //gpjApp.constant("ChewanApiEndPoint", "");
 
 /**
@@ -64,6 +64,39 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
         templateUrl: 'views/official_activity/update_limit.html',
         controller: 'officialActivityEditController'
     });
+}]).config(['$httpProvider', function ($httpProvider) {
+
+    /**
+     * Combine query parameters in url
+     *
+     * @param data
+     * @returns {*}
+     */
+    $httpProvider.defaults.transformRequest = function (data) {
+        return (data === undefined) ? data : $.param(data);
+    };
+
+    /**
+     * Common error handler
+     */
+    //$httpProvider.responseInterceptors.push(['$q', '$window',  function ($q, $window) {
+    //    return function (promise) {
+    //        return promise.then(function (response) {
+    //            if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录')>=0) {
+    //                alert(response.data.errmsg);
+    //                //authService.setUser(undefined);
+    //                $window.location.href = '/login.html';
+    //                return $q.reject(response);
+    //            }
+    //            return response;
+    //
+    //        }, function (response) {
+    //            if (response.data.errmsg)
+    //                alert('网络访问错误');
+    //            return $q.reject(response);
+    //        });
+    //    };
+    //}]);
 }]);
 //    .config(function ($timepickerProvider) {
 //    angular.extend($timepickerProvider.defaults, {

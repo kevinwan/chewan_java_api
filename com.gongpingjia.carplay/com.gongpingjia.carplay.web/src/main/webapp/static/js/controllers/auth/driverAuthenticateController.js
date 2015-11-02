@@ -56,13 +56,6 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$loc
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            //var startTime = new Date();
-            //startTime.setHours(0, 0, 0, 0);
-            //startTime.setTime(startTime.getTime() - 1000 * 60 * 60 * 24 * 7);
-            //
-            //var endTime = new Date();
-            //endTime.setHours(0, 0, 0, 0);
-
             $scope.criteria = {
                 status: '',
                 startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),

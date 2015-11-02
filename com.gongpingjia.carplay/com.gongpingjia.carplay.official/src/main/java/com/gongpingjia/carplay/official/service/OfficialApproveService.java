@@ -20,7 +20,7 @@ public interface OfficialApproveService {
      */
     public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException;
 
-    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit);
+    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit, String phone);
 
     /**
      * 根据application的Id获取Application的信息

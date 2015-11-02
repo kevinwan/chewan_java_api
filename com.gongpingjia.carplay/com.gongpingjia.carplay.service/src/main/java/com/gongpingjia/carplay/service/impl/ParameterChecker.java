@@ -53,7 +53,7 @@ public class ParameterChecker {
 
         if (!userToken.getToken().equals(token)) {
             LOG.error("User token is not response to userId:{} in the system, token:{}", userId, token);
-            throw new ApiException("会话失效");
+            throw new ApiException("会话失效, 请重新登录");
         }
 
         if (userToken.getExpire() < DateUtil.getTime()) {

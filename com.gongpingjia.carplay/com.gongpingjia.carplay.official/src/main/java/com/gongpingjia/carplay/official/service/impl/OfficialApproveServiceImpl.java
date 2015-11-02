@@ -189,10 +189,21 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit) {
+    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit, String phone) {
         LOG.debug("getAuthApplicationList start");
 
-        Query query = buildQueryParam(type, status, start, end, ignore, limit);
+        String applyUserId = null;
+        if (StringUtils.isNotEmpty(phone)) {
+            User queryUser = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+            if (queryUser == null) {
+                LOG.debug("No auth applications with user phone:{}", phone);
+                return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
+            }
+            applyUserId = queryUser.getUserId();
+        }
+
+        Query query = buildQueryParam(type, status, start, end, ignore, limit, applyUserId);
+
         List<AuthApplication> authApplicationList = authApplicationDao.find(query);
 
         Map<String, User> userMap = buildUserMap(authApplicationList);
@@ -226,8 +237,11 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
      * @param limit
      * @return
      */
-    private Query buildQueryParam(String type, String status, Long start, Long end, int ignore, int limit) {
+    private Query buildQueryParam(String type, String status, Long start, Long end, int ignore, int limit, String applyUserId) {
         Criteria criteria = new Criteria();
+        if (!StringUtils.isEmpty(applyUserId)) {
+            criteria.and("applyUserId").is(applyUserId);
+        }
         if (StringUtils.isNotEmpty(type)) {
             criteria.and("type").is(type);
         }

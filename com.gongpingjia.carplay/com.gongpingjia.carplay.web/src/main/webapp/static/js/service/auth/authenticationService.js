@@ -14,6 +14,7 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                 getApplicationList: function (criteria) {
                     var param = "userId=" + authService.getUser().userId;
                     param += "&token=" + authService.getUser().token;
+                    param += (criteria.phone ? ("&phone=" + criteria.phone) : "")
                     param += (criteria.status ? ("&status=" + criteria.status) : "");
                     param += (criteria.type ? ("&type=" + criteria.type) : "");
                     param += (criteria.startDate ? ("&start=" + commonService.transferDateStringToLong(criteria.startDate)) : "");

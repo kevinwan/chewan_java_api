@@ -15,8 +15,8 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
 
             logIn: function (phone, password) {
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/admin/login', {
-                    phone: phone,
-                    password: password
+                    "phone": phone,
+                    "password": password
                 });
             },
 

@@ -74,6 +74,9 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
 
             $rootScope.loadingPromise = userService.listUsers($scope.criteria).success(function (result) {
                 $scope.users = (result.result === 0 ? result.data : undefined);
+                if(result !== 0){
+                    alert(result.errmsg);
+                }
             });
         };
 

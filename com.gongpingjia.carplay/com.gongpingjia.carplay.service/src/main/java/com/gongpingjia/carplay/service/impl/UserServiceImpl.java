@@ -458,7 +458,7 @@ public class UserServiceImpl implements UserService {
         LOG.info("getMyActivityAppointments userId {}", userId);
 
         checker.checkUserInfo(userId, token);
-        //我的活动不服恩，需要展示所有的历史活动信息
+        //我的活动，需要展示所有的历史活动信息
         Criteria criteria = new Criteria().orOperator(Criteria.where("invitedUserId").is(userId), Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
             criteria.andOperator(Criteria.where("status").in(Arrays.asList(status)));
