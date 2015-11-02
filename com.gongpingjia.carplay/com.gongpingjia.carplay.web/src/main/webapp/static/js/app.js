@@ -9,13 +9,13 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.date', 'datatables.bootstrap', 'timepickerPop']);
 
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
-gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
-gpjApp.constant('ChewanApiEndPoint', '/v2');
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+//gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
+//gpjApp.constant('ChewanApiEndPoint', '/v2');
 
-//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
-//gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
-//gpjApp.constant("ChewanApiEndPoint", "");
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
+gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
+gpjApp.constant("ChewanApiEndPoint", "");
 
 /**
  * Router configuration
@@ -79,24 +79,24 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     /**
      * Common error handler
      */
-    //$httpProvider.responseInterceptors.push(['$q', '$window',  function ($q, $window) {
-    //    return function (promise) {
-    //        return promise.then(function (response) {
-    //            if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录')>=0) {
-    //                alert(response.data.errmsg);
-    //                //authService.setUser(undefined);
-    //                $window.location.href = '/login.html';
-    //                return $q.reject(response);
-    //            }
-    //            return response;
-    //
-    //        }, function (response) {
-    //            if (response.data.errmsg)
-    //                alert('网络访问错误');
-    //            return $q.reject(response);
-    //        });
-    //    };
-    //}]);
+    $httpProvider.responseInterceptors.push(['$q', '$window',  function ($q, $window) {
+        return function (promise) {
+            return promise.then(function (response) {
+                if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录')>=0) {
+                    alert(response.data.errmsg);
+                    //authService.setUser(undefined);
+                    $window.location.href = '/login.html';
+                    return $q.reject(response);
+                }
+                return response;
+
+            }, function (response) {
+                if (response.data.errmsg)
+                    alert('网络访问错误');
+                return $q.reject(response);
+            });
+        };
+    }]);
 }]);
 //    .config(function ($timepickerProvider) {
 //    angular.extend($timepickerProvider.defaults, {
