@@ -125,6 +125,9 @@ public class OfficialActivity {
     @Transient
     private String activityCategory;
 
+    @Transient
+    private int status;
+
     /**
      * 封面信息
      */
@@ -369,5 +372,13 @@ public class OfficialActivity {
 
     public void setActivityCategory(String activityCategory) {
         this.activityCategory = activityCategory;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

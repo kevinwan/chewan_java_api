@@ -9,4 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticUserRegister extends StatisticParent {
 
+    public static final String USER_REGISTER_SUCCESS = "userRegisterSuccess";//用户注册事件
+
 }
