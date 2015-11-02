@@ -3,7 +3,7 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
-import com.gongpingjia.carplay.service.AunthenticationService;
+import com.gongpingjia.carplay.service.AuthenticationService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class AuthenticationController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
-    private AunthenticationService service;
+    private AuthenticationService service;
 
     /**
      * 车主认证申请

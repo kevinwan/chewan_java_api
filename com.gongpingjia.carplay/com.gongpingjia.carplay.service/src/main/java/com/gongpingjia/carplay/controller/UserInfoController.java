@@ -184,16 +184,33 @@ public class UserInfoController {
     }
 
     /**
-     * 获取我的约会信息
+     * 获取我的活动信息
      */
     @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
-    public ResponseDo getAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
+    public ResponseDo getMyActivityAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
                                       @RequestParam(value = "status", required = false) Integer[] status,
                                       @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                       @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
         try {
-            return userService.getAppointments(userId, token, status, limit, ignore);
+            return userService.getMyActivityAppointments(userId, token, status, limit, ignore);
+        } catch (Exception e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取动态--活动动态信息
+     */
+    @RequestMapping(value = "/user/{userId}/dynamic/appointments", method = RequestMethod.GET)
+    public ResponseDo getDynamicActivityAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                                @RequestParam(value = "status", required = false) Integer[] status,
+                                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+        LOG.debug("/user/{}/dynamic/appointments", userId);
+        try {
+            return userService.getDynamicActivityAppointments(userId, token, status, limit, ignore);
         } catch (Exception e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

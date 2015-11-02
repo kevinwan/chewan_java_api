@@ -450,12 +450,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo getAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
+    public ResponseDo getMyActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
 
-        LOG.info("getAppointments userId {}", userId);
+        LOG.info("getMyActivityAppointments userId {}", userId);
 
         checker.checkUserInfo(userId, token);
-
+        //我的活动不服恩，需要展示所有的历史活动信息
         Criteria criteria = new Criteria().orOperator(Criteria.where("invitedUserId").is(userId), Criteria.where("applyUserId").is(userId));
         if (status != null && status.length > 0) {
             criteria.andOperator(Criteria.where("status").in(Arrays.asList(status)));
@@ -463,6 +463,27 @@ public class UserServiceImpl implements UserService {
         List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
 
+        return ResponseDo.buildSuccessResponse(buildUserActivities(userId, appointments));
+    }
+
+    @Override
+    public ResponseDo getDynamicActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException {
+        LOG.info("getDynamicActivityAppointments userId:{}", userId);
+
+        checker.checkUserInfo(userId, token);
+        //活动动态只展示没有失效的活动信息
+        Criteria criteria = Criteria.where("deleteFlag").is(false)
+                .orOperator(Criteria.where("invitedUserId").is(userId), Criteria.where("applyUserId").is(userId));
+        if (status != null && status.length > 0) {
+            criteria.andOperator(Criteria.where("status").in(Arrays.asList(status)));
+        }
+        List<Appointment> appointments = appointmentDao.find(Query.query(criteria)
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "modifyTime"))).skip(ignore).limit(limit));
+
+        return ResponseDo.buildSuccessResponse(buildUserActivities(userId, appointments));
+    }
+
+    private List<Object> buildUserActivities(String userId, List<Appointment> appointments) {
         //获取所有的appointment 对应的 user 信息；
         Map<String, User> users = buildUsers(userId, appointments);
         Map<String, OfficialActivity> officialActivityMap = buildOfficialActivityMap(appointments);
@@ -497,8 +518,7 @@ public class UserServiceImpl implements UserService {
                 data.add(appointment);
             }
         }
-
-        return ResponseDo.buildSuccessResponse(data);
+        return data;
     }
 
     private void buildCommonAppointment(String userId, Map<String, User> users, Set<String> subscriberIdSet, Appointment appointment) {
@@ -1295,8 +1315,13 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("密码错误");
         }
 
+        // 更新环信用户的密码
+        LOG.debug("Old password is correct, change user password of huanxin");
+        chatThirdService.alterUserPassword(chatCommonService.getChatToken(), user.getEmchatName(), newPwd);
+
         LOG.debug("Old password is correct, change password in the database");
         userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("password", newPwd));
         return ResponseDo.buildSuccessResponse();
     }
+
 }

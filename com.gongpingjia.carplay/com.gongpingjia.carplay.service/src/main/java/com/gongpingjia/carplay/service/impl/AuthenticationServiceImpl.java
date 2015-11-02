@@ -16,7 +16,7 @@ import com.gongpingjia.carplay.entity.user.AuthApplication;
 import com.gongpingjia.carplay.entity.user.DrivingLicense;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserAuthentication;
-import com.gongpingjia.carplay.service.AunthenticationService;
+import com.gongpingjia.carplay.service.AuthenticationService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -34,7 +33,7 @@ import java.text.MessageFormat;
  * Created by licheng on 2015/9/23.
  */
 @Service
-public class AunthenticationServiceImpl implements AunthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 

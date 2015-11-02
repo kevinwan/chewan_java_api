@@ -1,11 +1,14 @@
 package com.gongpingjia.carplay.statistic.aop;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.statistic.StatisticDriverAuthDao;
 import com.gongpingjia.carplay.dao.statistic.StatisticUserRegisterDao;
 import com.gongpingjia.carplay.entity.statistic.StatisticDriverAuth;
 import com.gongpingjia.carplay.entity.statistic.StatisticUserRegister;
+import net.sf.json.JSONObject;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -61,21 +64,64 @@ public class UserAdvice {
     }
 
 
-//    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.AunthenticationService.licenseAuthenticationApply(..)) && args(json, token, userId)",
-//            argNames = "userId", returning = "returnValue")
-//    public void driverAuthentication(Object returnValue, String userId) {
-//        if (!isReturnSuccess(returnValue)) {
-//            LOG.debug("Return not success");
-//            return;
-//        }
-//
-//        LOG.info("== driverAuthentication AOP ");
-//        StatisticDriverAuth driverAuth = new StatisticDriverAuth();
-//        driverAuth.setCount(1);
-//        driverAuth.recordTime(DateUtil.getTime());
-//        driverAuth.setUserId(userId);
-//        statisticDriverAuthDao.save(driverAuth);
-//    }
+    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.AuthenticationService.licenseAuthenticationApply(..))",
+            returning = "returnValue")
+    public void driverAuthentication(JoinPoint jp, Object returnValue) {
+        if (!isReturnSuccess(returnValue)) {
+            LOG.debug("Return not success");
+            return;
+        }
 
+        LOG.info("== driverAuthentication AOP ");
+        StatisticDriverAuth driverAuth = new StatisticDriverAuth();
+        driverAuth.setCount(1);
+        driverAuth.recordTime(DateUtil.getTime());
+        driverAuth.setEvent(StatisticConstants.Authentication.AUTHENTICATION);
 
+        if (jp.getArgs().length == 3) {
+            //第三个参数为userId
+            driverAuth.setUserId(jp.getArgs()[2].toString());
+        }
+        statisticDriverAuthDao.save(driverAuth);
+    }
+
+    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.UploadService.uploadDrivingLicensePhoto(..))",
+            returning = "returnValue")
+    public void drivingLicenseAuth(JoinPoint jp, Object returnValue) {
+        if (!isReturnSuccess(returnValue)) {
+            LOG.debug("Return not success");
+            return;
+        }
+
+        LOG.debug("drivingLicenseAuth upload driving license");
+        StatisticDriverAuth drivingLicense = new StatisticDriverAuth();
+        drivingLicense.setCount(1);
+        drivingLicense.recordTime(DateUtil.getTime());
+        drivingLicense.setEvent(StatisticConstants.Authentication.DRIVING_LICENSE);
+        if (jp.getArgs().length == 3) {
+            //第一个参数为userId
+            drivingLicense.setUserId(jp.getArgs()[0].toString());
+        }
+        statisticDriverAuthDao.save(drivingLicense);
+    }
+
+    @AfterReturning(value = "execution(* com.gongpingjia.carplay.service.UploadService.uploadDriverLicensePhoto(..))",
+            returning = "returnValue")
+    public void driverLicenseAuth(JoinPoint jp, Object returnValue) {
+        if (!isReturnSuccess(returnValue)) {
+            LOG.debug("Return not success");
+            return;
+        }
+
+        LOG.debug("driverLicenseAuth upload driver license");
+        StatisticDriverAuth driverLicense = new StatisticDriverAuth();
+        driverLicense.setCount(1);
+        driverLicense.recordTime(DateUtil.getTime());
+        driverLicense.setEvent(StatisticConstants.Authentication.DRIVER_LICENSE);
+        if (jp.getArgs().length == 3) {
+            //第一个参数为userId
+            driverLicense.setUserId(jp.getArgs()[0].toString());
+        }
+        statisticDriverAuthDao.save(driverLicense);
+    }
 }

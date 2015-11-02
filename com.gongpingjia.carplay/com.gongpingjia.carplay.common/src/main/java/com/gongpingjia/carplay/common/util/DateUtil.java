@@ -84,8 +84,7 @@ public class DateUtil {
      */
     public static Long getExpiredLimitTime() {
         int expiredDays = Integer.valueOf(PropertiesUtil.getProperty("carplay.max.expired.days", 7));
-        Long expired = expiredDays * (1000 * 60 * 60 * 24L);
-        return DateUtil.getTime() - expired;
+        return DateUtil.getTime() - expiredDays * Constants.DAY_MILLISECONDS;
     }
 
     /**
