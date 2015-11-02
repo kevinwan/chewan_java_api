@@ -154,6 +154,9 @@ public class OfficialServiceImpl implements OfficialService {
 
         JSONObject jsonObject = new JSONObject();
 
+        jsonObject.put("officialActivityId", officialActivity.getOfficialActivityId());
+        jsonObject.put("emchatGroupId", officialActivity.getEmchatGroupId());
+
         if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty()) {
             jsonObject.put("isMember", false);
             jsonObject.put("members", new ArrayList<>(0));
