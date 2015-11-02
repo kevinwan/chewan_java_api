@@ -20,7 +20,6 @@ public class DateUtil {
     /**
      * 获取当前时间
      *
-     * @param 当前毫秒数
      * @return 返回当前时间
      */
     public static Date getDate(Long param) {
@@ -83,8 +82,8 @@ public class DateUtil {
      * @return
      */
     public static Long getExpiredLimitTime() {
-        int expiredDays = Integer.valueOf(PropertiesUtil.getProperty("carplay.max.expired.days", 7));
-        return DateUtil.getTime() - expiredDays * Constants.DAY_MILLISECONDS;
+        int expiredHours = Integer.valueOf(PropertiesUtil.getProperty("carplay.max.expired.hours", 7 * 24));
+        return DateUtil.getTime() - expiredHours * Constants.DAY_MILLISECONDS / 24;
     }
 
     /**
