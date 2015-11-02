@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.entity.activity;
 
+import com.gongpingjia.carplay.common.tool.ActivityTypeConvertTool;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
@@ -208,5 +209,11 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     @Override
     public int compareTo(Activity o) {
         return (int) ((this.sortFactor - o.sortFactor) * 100);
+    }
+
+
+    public void convertType() {
+        this.setMajorType(ActivityTypeConvertTool.getConvertType(this.getMajorType()));
+        this.setType(ActivityTypeConvertTool.getConvertType(this.getType()));
     }
 }

@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.tool.ActivityTypeConvertTool;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
@@ -255,6 +256,8 @@ public class ActivityServiceImpl implements ActivityService {
         }
         organizer.hideSecretInfo();
         activity.setOrganizer(organizer);
+        //类型转换
+        activity.convertType();
         return ResponseDo.buildSuccessResponse(activity);
     }
 
@@ -301,6 +304,8 @@ public class ActivityServiceImpl implements ActivityService {
         //发送环信推送消息
         User organizer = userDao.findById(activity.getUserId());
         User applier = userDao.findById(userId);
+        //转化活动显示类型
+        activity.convertType();
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.activity.invite", "{0}邀请您{1}"),
                 applier.getNickname(), activity.getType());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
@@ -687,8 +692,10 @@ public class ActivityServiceImpl implements ActivityService {
         //获取出该用户所关注的 所有的 用户 id
         List<Activity> activities = rebuildActivities(param, activityList, userMap);
 
-        //按照权重进行排序
-        Collections.sort(activities);
+        //排序
+        sortActivityList(userMap, activities);
+
+
         if (activities.size() < param.getIgnore()) {
             LOG.warn("No data exist after ignore:{}", param.getIgnore());
             return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
@@ -705,6 +712,23 @@ public class ActivityServiceImpl implements ActivityService {
 
         //查询出Activity的 组织者，并初始化
         return ResponseDo.buildSuccessResponse(buildResponse(param.getUserId(), userMap, remainActivities, subscriberSet));
+    }
+
+    private void sortActivityList(Map<String, User> userMap, List<Activity> activities) {
+        //按照权重进行排序
+        Collections.sort(activities);
+
+        for (Activity item : activities) {
+            User user = userMap.get(item.getUserId());
+
+            //权重修正，如果一个人匹配的活动较多的时候，需要进行权重减小，防止一个人刷屏, 第一次重复减0.1,第二次重复减0.2,第三次重复减0.4,0.8,1.6...
+            if (user.getMatchTimes() > 0) {
+                item.setSortFactor(item.getSortFactor() - 0.1 * Math.pow(2, user.getMatchTimes() - 1));
+            }
+            user.setMatchTimes(user.getMatchTimes() + 1);
+        }
+
+        Collections.sort(activities);
     }
 
     private void initAndSaveStatisticActivityReMatch(HttpServletRequest request, ActivityQueryParam param, String eventType) {
@@ -788,6 +812,9 @@ public class ActivityServiceImpl implements ActivityService {
             }
             map.put("organizer", organizer);
             map.put("pay", item.getPay());
+            //类型转化
+            item.convertType();
+            map.put("majorType", item.getMajorType());
             map.put("type", item.getType());
             map.put("destination", item.getDestination());
             result.add(map);
@@ -838,7 +865,7 @@ public class ActivityServiceImpl implements ActivityService {
     private double computeWeight(ActivityQueryParam param, Long current, Activity item, User user) {
         //距离权重计算
         item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(),
-                item.getEstabPoint().getLongitude(), item.getEstabPoint().getLatitude()));
+                user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
         double sortFactor = 0.2 * (1 - item.getDistance() / param.getMaxDistance());
 
         sortFactor += 0.1 * (1 - (current - item.getCreateTime()) / param.getMaxTimeLimit());
@@ -863,11 +890,6 @@ public class ActivityServiceImpl implements ActivityService {
         //活动时间权重计算，都包含时间
         sortFactor += 0.05;
 
-        //权重修正，如果一个人匹配的活动较多的时候，需要进行权重减小，防止一个人刷屏, 第一次重复减0.1,第二次重复减0.2,第三次重复减0.4,0.8,1.6...
-        if (user.getMatchTimes() > 0) {
-            sortFactor -= 0.1 * Math.pow(2, user.getMatchTimes() - 1);
-        }
-        user.setMatchTimes(user.getMatchTimes() + 1);
         return sortFactor;
     }
 

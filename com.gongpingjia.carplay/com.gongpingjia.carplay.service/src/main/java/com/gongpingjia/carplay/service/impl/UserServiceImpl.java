@@ -173,6 +173,9 @@ public class UserServiceImpl implements UserService {
         User organizer = userDao.findById(activity.getUserId());
         Map<String, Object> ext = new HashMap<>(1);
         ext.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
+
+        //转换类型
+        activity.convertType();
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"), organizer.getNickname(), activity.getType());
 
         JSONObject result = chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
@@ -687,6 +690,8 @@ public class UserServiceImpl implements UserService {
                 //用户创建活动
                 Activity activity = activityMap.get(message.getRelatedId());
 
+                activity.convertType();
+
                 interestMap.put("activityType", activity.getType());
                 interestMap.put("activityPay", activity.getPay());
                 interestMap.put("activityTransfer", activity.isTransfer());
@@ -694,7 +699,7 @@ public class UserServiceImpl implements UserService {
                 interestMap.put("photoCount", 0);
 
                 //该活动距离当前用户的距离
-                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), activity.getEstabPoint().getLongitude(), activity.getEstabPoint().getLatitude()));
+                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude()));
                 Appointment appointment = appointmentMap.get(activity.getActivityId());
                 if (null == appointment) {
                     //没有发送邀请;
@@ -1257,6 +1262,7 @@ public class UserServiceImpl implements UserService {
             itemMap.put("activityId", activity.getActivityId());
             itemMap.put("establish", activity.getEstablish());
             itemMap.put("estabPoint", activity.getEstabPoint());
+            activity.convertType();              //转换类型
             itemMap.put("type", activity.getType());
             itemMap.put("pay", activity.getPay());
             itemMap.put("transfer", activity.isTransfer());

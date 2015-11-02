@@ -50,11 +50,11 @@
     <!--埋点包装器，解决request流读的问题-->
     <filter>
         <filter-name>RequestWrapperFilter</filter-name>
-        <filter-class>com.gongpingjia.carplay.statistic.filter.HttpServletRequestReplacedFilter</filter-class>
+        <filter-class>com.gongpingjia.carplay.statistic.filter.ServletWrapFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>RequestWrapperFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/test/string</url-pattern>
     </filter-mapping>
 
     <listener>

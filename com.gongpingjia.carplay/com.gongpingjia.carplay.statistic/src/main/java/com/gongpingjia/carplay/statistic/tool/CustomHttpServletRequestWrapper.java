@@ -8,12 +8,12 @@ import java.io.*;
 /**
  * Created by Administrator on 2015/10/29 0029.
  */
-public class MAPIHttpServletRequestWrapper extends HttpServletRequestWrapper {
+public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
 
     private final byte[] body; // 报文
 
-    public MAPIHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
+    public CustomHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
 
         byte[] buffer = new byte[512];
@@ -24,7 +24,6 @@ public class MAPIHttpServletRequestWrapper extends HttpServletRequestWrapper {
             outputStream.write(buffer, 0, len);
         }
         outputStream.flush();
-
         body = outputStream.toByteArray();
     }
 

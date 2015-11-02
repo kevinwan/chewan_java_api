@@ -48,8 +48,7 @@ public class TestController {
     @RequestMapping(value = "/test/string", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo testPost(@RequestBody JSONObject jsonObject) {
-        System.out.println(jsonObject);
-        String data = jsonObject.getString("data");
-        return ResponseDo.buildSuccessResponse("");
+
+        return ResponseDo.buildSuccessResponse("123");
     }
 }
