@@ -59,32 +59,50 @@ public class AppointmentCleanTask extends QuartzJobBean {
         }
 
         Set<String> deleteAppointmentIds = new HashSet<>(officialAppointments.size());
+        Set<String> invalidAppointmentIds = new HashSet<>(officialAppointments.size());
         for (Appointment item : officialAppointments) {
             OfficialActivity officialActivity = officialActivityMap.get(item.getActivityId());
             if (officialActivity.getEnd() == null) {
                 //没有结束时间
                 if (officialActivity.getStart() <= expiredTime) {
-                    deleteAppointmentIds.add(item.getAppointmentId());
+                    if (item.getStatus() == Constants.AppointmentStatus.REJECT) {
+                        deleteAppointmentIds.add(item.getAppointmentId());
+                    } else {
+                        invalidAppointmentIds.add(item.getAppointmentId());
+                    }
                 }
             } else {
                 //有结束时间,如果结束实现小于当前时间，就删除
                 if (officialActivity.getEnd() <= current) {
-                    deleteAppointmentIds.add(item.getAppointmentId());
+                    if (item.getStatus() == Constants.AppointmentStatus.REJECT) {
+                        deleteAppointmentIds.add(item.getAppointmentId());
+                    } else {
+                        invalidAppointmentIds.add(item.getAppointmentId());
+                    }
                 }
             }
         }
+
         appointmentDao.update(Query.query(Criteria.where("appointmentId").in(deleteAppointmentIds)),
-                Update.update("deleteFlag", true).set("status", Constants.AppointmentStatus.INVALID));
+                Update.update("deleteFlag", true));
+        appointmentDao.update(Query.query(Criteria.where("appointmentId").in(invalidAppointmentIds)),
+                Update.update("status", Constants.AppointmentStatus.INVALID));
     }
 
     private void clearCommonActivity(Long expiredTime, AppointmentDao appointmentDao) {
         //清理普通活动
         LOG.debug("Clean common activity appointments");
-        Query query = Query.query(Criteria.where("deleteFlag").is(false)
+        Criteria criteriaInvalid = Criteria.where("deleteFlag").is(false)
+                .and("status").ne(Constants.AppointmentStatus.REJECT)
                 .and("activityCategory").is(Constants.ActivityCatalog.COMMON)
-                .and("modifyTime").lte(expiredTime));
-        List<Appointment> appointmentList = appointmentDao.find(query);
-        LOG.info("Clean appointments counts:{}", appointmentList.size());
-        appointmentDao.update(query, Update.update("deleteFlag", true).set("status", Constants.AppointmentStatus.INVALID));
+                .and("modifyTime").lte(expiredTime);
+        appointmentDao.update(Query.query(criteriaInvalid), Update.update("status", Constants.AppointmentStatus.INVALID));
+
+        //只针对非拒绝的状态改为失效的状态
+        Criteria criteriaDelete = Criteria.where("deleteFlag").is(false)
+                .and("status").is(Constants.AppointmentStatus.REJECT)
+                .and("activityCategory").is(Constants.ActivityCatalog.COMMON)
+                .and("modifyTime").lte(expiredTime);
+        appointmentDao.update(Query.query(criteriaDelete), Update.update("deleteFlag", true));
     }
 }

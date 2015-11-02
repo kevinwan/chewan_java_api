@@ -52,6 +52,7 @@ public class AppointmentExpiredRemindTask extends QuartzJobBean {
         LOG.debug("Remind official activities users");
         //1.获取官方活动参加列表和邀请同去列表
         Query officialQuery = Query.query(Criteria.where("deleteFlag").is(false)
+                .and("status").in(Constants.AppointmentStatus.APPLYING, Constants.AppointmentStatus.ACCEPT)
                 .and("activityCategory").in(Constants.ActivityCatalog.OFFICIAL, Constants.ActivityCatalog.TOGETHER));
         List<Appointment> appointmentList = appointmentDao.find(officialQuery);
 
@@ -153,7 +154,9 @@ public class AppointmentExpiredRemindTask extends QuartzJobBean {
         LOG.debug("Begin remind common activity users");
         Long expiredLimitTime = DateUtil.getExpiredLimitTime();
         Long remindTime = expiredLimitTime + Constants.DAY_MILLISECONDS;
-        Query query = Query.query(Criteria.where("deleteFlag").is(false).and("activityCategory").is(Constants.ActivityCatalog.COMMON)
+        Query query = Query.query(Criteria.where("deleteFlag").is(false)
+                .and("activityCategory").is(Constants.ActivityCatalog.COMMON)
+                .and("status").in(Constants.AppointmentStatus.APPLYING, Constants.AppointmentStatus.ACCEPT)
                 .and("modifyTime").gte(expiredLimitTime).lt(remindTime));
 
         List<Appointment> appointmentList = appointmentDao.find(query);
