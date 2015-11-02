@@ -589,7 +589,7 @@ public class ActivityServiceImpl implements ActivityService {
             //不同意
             status = Constants.AppointmentStatus.REJECT;
         }
-        appointmentDao.update(appointmentId, Update.update("status", status));
+        appointmentDao.update(appointmentId, Update.update("status", status).set("modifyTime", DateUtil.getTime()));
 
 //        //同意
 //        //添加到环信群组中；
@@ -1030,7 +1030,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public ResponseDo getNearByActivityList(HttpServletRequest request,ActivityQueryParam param) {
+    public ResponseDo getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));

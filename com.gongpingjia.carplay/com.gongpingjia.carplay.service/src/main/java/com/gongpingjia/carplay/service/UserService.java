@@ -73,13 +73,13 @@ public interface UserService {
     /**
      * 获取我的约会信息
      */
-    public ResponseDo getAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
+    ResponseDo getMyActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
 
 
     /**
      * 获取相册的查看信息；
      */
-    public ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException;
+    ResponseDo getViewHistory(String userId, String token, int limit, int ignore) throws ApiException;
 
     /**
      * 获取车玩官方认证的历史信息
@@ -142,4 +142,15 @@ public interface UserService {
      * @return
      */
     ResponseDo changePassword(String userId, String old, String aNew) throws ApiException;
+
+    /**
+     * 获取用户动态--活动动态信息
+     * @param userId
+     * @param token
+     * @param status
+     * @param limit
+     * @param ignore
+     * @return
+     */
+    ResponseDo getDynamicActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
 }

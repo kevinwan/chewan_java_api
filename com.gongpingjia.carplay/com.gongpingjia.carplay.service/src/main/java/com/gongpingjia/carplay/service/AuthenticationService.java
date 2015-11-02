@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 /**
  * Created by licheng on 2015/9/23.
  */
-public interface AunthenticationService {
+public interface AuthenticationService {
 
     /**
      * 驾驶证，行驶证认证申请

@@ -21,6 +21,11 @@ public class Constants {
     public static final int CHATGROUP_MAX_PHOTO_COUNT = 4;
 
     /**
+     * 一天的毫秒数
+     */
+    public static final Long DAY_MILLISECONDS = 1000 * 60 * 60 * 24L;
+
+    /**
      * 标志位
      */
     public interface Flag {
@@ -229,6 +234,8 @@ public class Constants {
         int ACCEPT = 2;
         //拒绝邀请
         int REJECT = 3;
+        //失效的
+        int INVALID = 4;
     }
 
     public interface Product {
@@ -338,10 +345,10 @@ public class Constants {
     }
 
 
-    public interface OfficialInfoIdType{
+    public interface OfficialInfoIdType {
         int TYPE_OFFICIAL = 0;
         int TYPE_EMCHAT = 1;
 
-        List<Integer> TYPE_LIST =  Arrays.asList(TYPE_OFFICIAL,TYPE_EMCHAT);
+        List<Integer> TYPE_LIST = Arrays.asList(TYPE_OFFICIAL, TYPE_EMCHAT);
     }
 }

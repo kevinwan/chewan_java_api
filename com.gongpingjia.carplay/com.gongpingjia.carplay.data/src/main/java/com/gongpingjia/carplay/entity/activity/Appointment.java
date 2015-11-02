@@ -50,6 +50,9 @@ public class Appointment extends ActivityIntention {
     @Transient
     private Boolean isApplicant;
 
+    //是否删除
+    private boolean deleteFlag = false;
+
     public String getAppointmentId() {
         return appointmentId;
     }
@@ -144,5 +147,13 @@ public class Appointment extends ActivityIntention {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 }
