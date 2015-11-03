@@ -702,7 +702,7 @@ public class UserServiceImpl implements UserService {
                 interestMap.put("photoCount", 0);
 
                 //该活动距离当前用户的距离
-                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude()));
+                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude(), userMap.get(activity.getUserId()).getLandmark().getLatitude()));
                 Appointment appointment = appointmentMap.get(activity.getActivityId());
                 if (null == appointment) {
                     //没有发送邀请;
