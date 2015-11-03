@@ -441,7 +441,7 @@ public class UserServiceImpl implements UserService {
             Subscriber subscriber = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(viewUser).and("toUser").is(beViewedUser)));
             beViewedUserInfo.setSubscribeFlag(subscriber != null ? true : false);
         } else {
-            UserAuthentication userAuthentication = userAuthenticationDao.findById("beViewedUser");
+            UserAuthentication userAuthentication = userAuthenticationDao.findById(beViewedUser);
             if (userAuthentication != null) {
                 String localServer = CommonUtil.getLocalPhotoServer();
                 beViewedUserInfo.setDriverLicense(localServer + userAuthentication.getDriverLicense());

@@ -9,13 +9,13 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.date', 'datatables.bootstrap', 'timepickerPop']);
 
 
-//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
-//gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
-//gpjApp.constant('ChewanApiEndPoint', '/v2');
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
+gpjApp.constant('ChewanApiEndPoint', '/v2');
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
-gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
-gpjApp.constant("ChewanApiEndPoint", "");
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
+//gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
+//gpjApp.constant("ChewanApiEndPoint", "");
 
 /**
  * Router configuration
