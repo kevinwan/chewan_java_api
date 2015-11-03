@@ -81,7 +81,7 @@ public class User {
     /**
      * 表示是否处于空闲装态，true表示空闲，false表示忙，默认空闲
      */
-    private Boolean idle;
+    private Boolean idle = false;
 
     private String deviceToken;
 
