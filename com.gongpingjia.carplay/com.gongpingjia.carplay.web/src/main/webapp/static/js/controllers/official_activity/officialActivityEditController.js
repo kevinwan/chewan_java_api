@@ -38,15 +38,15 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
         };
 
 
-        $scope.changeFree = function(){
-            if($scope.freeFlag) {
+        $scope.changeFree = function () {
+            if ($scope.freeFlag) {
                 //免费 price
                 document.getElementById("price").disabled = true;
                 document.getElementById("subsidyPrice").disabled = true;
 
                 $scope.activity.price = 0;
                 $scope.activity.subsidyPrice = 0;
-            }else{
+            } else {
                 document.getElementById("price").disabled = false;
                 document.getElementById("subsidyPrice").disabled = false;
             }
@@ -70,9 +70,9 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         $scope.activity.onFlag = $scope.activity.onFlag ? 'true' : 'false';
 
                         //是否免费
-                        if($scope.activity.price == 0) {
+                        if ($scope.activity.price == 0) {
                             $scope.freeFlag = true;
-                        }else{
+                        } else {
                             $scope.freeFlag = false;
                         }
 
@@ -107,6 +107,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         if ($scope.activity.end != undefined && $scope.activity.end != null && $scope.activity.end !== "") {
                             document.getElementById("endDate").value = commonService.transferLongToDateString($scope.activity.end);
                             $scope.endTime.date = commonService.transferLongToDateString($scope.activity.end);
+                            $scope.endTime.time = new Date($scope.activity.end);
                         }
                     }
                 });
@@ -134,18 +135,31 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("开始时间必须大于当前时间");
                 return false;
             }
-            if (!commonService.isNull($scope.endTime) && $scope.endTime.date !== undefined && $scope.endTime.date !== '') {
+            if (!commonService.isNull($scope.endTime) && $scope.endTime.date !== undefined && $scope.endTime.date !== null && $scope.endTime.date !== '') {
                 var endStr = $scope.endTime.date;
+                if ($scope.endTime.time === undefined || $scope.endTime.time === null) {
+                    var val = document.getElementById("endTime").childNodes[0].value;
+                    if (val !== undefined && val !== null && val !== '') {
+                        alert("请选择合法的结束时间");
+                        return false;
+                    }
+                }
+                if ($scope.endTime.time !== undefined && $scope.endTime.time !== null) {
+                    endStr = endStr + " " + $scope.endTime.time.getHours() + ":" + $scope.endTime.time.getMinutes();
+                } else {
+                    endStr = endStr + " " + "23" + ":" + "59";
+                }
                 var tempTimeLong = new Date(endStr).getTime();
-                if(isNaN(tempTimeLong)){
+                if (isNaN(tempTimeLong)) {
                     alert("请选择合法的结束时间");
                     return false;
                 }
                 $scope.activity.end = tempTimeLong;
-                if ($scope.activity.end + 24*60*60*1000  <= $scope.activity.start) {
+                if ($scope.activity.end <= $scope.activity.start) {
                     $window.alert("结束时间必须大于开始时间");
                     return false;
                 }
+
             } else {
                 $scope.activity.end = null;
             }
@@ -179,7 +193,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                         $window.alert("更新失败");
                         $location.path('/officialActivity/list');
                     }
-                }).error(function(result){
+                }).error(function (result) {
                     alert("更新失败" + result.errmsg);
                 });
             }

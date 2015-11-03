@@ -387,10 +387,6 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
         activity.setNowJoinNum(0);
         activity.setMaleNum(0);
         activity.setFemaleNum(0);
-        //
-        if (activity.getEnd() != null) {
-            activity.setEnd(activity.getEnd() + 24*60*60*1000 - 1);
-        }
         return activity;
     }
 
