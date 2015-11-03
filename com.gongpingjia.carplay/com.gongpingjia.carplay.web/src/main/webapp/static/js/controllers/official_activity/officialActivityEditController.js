@@ -127,8 +127,6 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("请选择开始时间");
                 return false;
             }
-
-
             //初始化绑定参数时间
             var startStr = $scope.startTime.date + " " + $scope.startTime.time.getHours() + ":" + $scope.startTime.time.getMinutes();
             $scope.activity.start = new Date(startStr).getTime();
@@ -136,7 +134,6 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                 $window.alert("开始时间必须大于当前时间");
                 return false;
             }
-
             if (!commonService.isNull($scope.endTime) && $scope.endTime.date !== undefined && $scope.endTime.date !== '') {
                 var endStr = $scope.endTime.date;
                 var tempTimeLong = new Date(endStr).getTime();

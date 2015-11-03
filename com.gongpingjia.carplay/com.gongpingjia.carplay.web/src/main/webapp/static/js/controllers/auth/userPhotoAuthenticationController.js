@@ -75,7 +75,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             authenticationService.processUserPhotoApplication(false, application.remarks, application.applicationId).success(
                 function (result) {
                     if (result && result.result == 0) {
-                        alert('成功完成头像认证');
+                        alert('拒绝头像认证成功');
                     } else {
                         alert(result.errmsg);
                     }

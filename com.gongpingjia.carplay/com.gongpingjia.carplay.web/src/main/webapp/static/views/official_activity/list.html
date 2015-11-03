@@ -74,8 +74,10 @@
                dt-columns="dtColumnDefs" class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th>全选 <input type="checkbox" id="checkItemAll" ng-model="allSelected"
-                              ng-change="selectAll(allSelected)"/></th>
+                <th style="width: 100px;">
+                    <span>全选</span>
+                    <input type="checkbox" id="checkItemAll" ng-model="allSelected" ng-change="selectAll(allSelected)" />
+                </th>
                 <th>活动标题</th>
                 <th>参与人数(男女)</th>
                 <th>目的地</th>
