@@ -55,7 +55,7 @@ public class OfficialActivityAdvice {
                 statisticOfficialActivity.setIp(ipAddress);
             }
             statisticOfficialActivity.setOfficialActivityId(id);
-            statisticOfficialActivity.setEvent(StatisticOfficialActivity.TYPE_NO_JOIN_VIEW);
+            statisticOfficialActivity.setEvent(StatisticOfficialActivity.OFFICIAL_ACTIVITY_COUNT);
             statisticOfficialActivity.setCount(1);
             statisticOfficialActivity.recordTime(DateUtil.getTime());
             statisticOfficialActivityDao.save(statisticOfficialActivity);
@@ -77,7 +77,7 @@ public class OfficialActivityAdvice {
             StatisticOfficialActivity statisticOfficialActivity = new StatisticOfficialActivity();
             statisticOfficialActivity.setUserId(userId);
             statisticOfficialActivity.setOfficialActivityId(officialActivityId);
-            statisticOfficialActivity.setEvent(StatisticOfficialActivity.TYPE_JOIN);
+            statisticOfficialActivity.setEvent(StatisticOfficialActivity.OFFICIAL_ACTIVITY_JOIN);
             statisticOfficialActivity.setCount(1);
             statisticOfficialActivity.recordTime(DateUtil.getTime());
             statisticOfficialActivityDao.save(statisticOfficialActivity);

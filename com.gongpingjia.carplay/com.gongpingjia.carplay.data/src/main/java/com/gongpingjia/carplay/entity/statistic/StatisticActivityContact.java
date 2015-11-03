@@ -9,7 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticActivityContact extends StatisticParent {
 
+    public static final String ACTIVITY_DYNAMIC_CALL = "activityDynamicCall";
+
+    public static final String ACTIVITY_DYNAMIC_CHAT = "activityDynamicChat";
+
     private String userId;
+
+    private String appointmentId;
 
     public String getUserId() {
         return userId;
@@ -17,5 +23,13 @@ public class StatisticActivityContact extends StatisticParent {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(String appointmentId) {
+        this.appointmentId = appointmentId;
     }
 }

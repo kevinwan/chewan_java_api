@@ -14,9 +14,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class StatisticActivityMatch extends StatisticParent {
 
 
-    public static final String TYPE_MATCH = "activityTypeMatchCount";
+    public static final String ACTIVITY_TYPE_MATCH_COUNT = "activityTypeMatchCount";
 
-    public static final String TYPE_RE_MATCH = "activityTypeReMatchCount";
+    public static final String ACTIVITY_TYPE_RE_MATCH_COUNT = "activityTypeReMatchCount";
+
+    public static final String ACTIVITY_MATCH_INVITED_COUNT = "activityMatchInvitedCount";
+
+    public static final String ACTIVITY_MATCH_COUNT = "activityMatchCount";
 
     //活动类型,吃饭，唱歌，KTV
     protected String type;
@@ -35,6 +39,9 @@ public class StatisticActivityMatch extends StatisticParent {
     protected boolean transfer;
 
     private String userId;
+
+
+    private String activityId;
 
     private String ip;
 
@@ -100,5 +107,13 @@ public class StatisticActivityMatch extends StatisticParent {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 }

@@ -11,8 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticOfficialActivity extends StatisticParent {
 
-    public static final String TYPE_JOIN = "officialActivityJoin";
-    public static final String TYPE_NO_JOIN_VIEW = "officialActivityNoJoinView";
+    public static final String OFFICIAL_ACTIVITY_JOIN = "officialActivityJoin";
+
+    public static final String OFFICIAL_ACTIVITY_COUNT = "officialActivityCount";
+
+    public static final String OFFICIAL_ACTIVITY_BUY_TICKET = "officialActivityBuyTicket";
+
+    public static final String OFFICIAL_ACTIVITY_CHAT_JOIN = "officialActivityChatJoin";
 
     private String userId;
 

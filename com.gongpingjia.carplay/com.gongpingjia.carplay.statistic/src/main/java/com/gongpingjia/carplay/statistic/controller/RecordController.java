@@ -1,9 +1,11 @@
 package com.gongpingjia.carplay.statistic.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.statistic.service.RecordService;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,12 @@ public class RecordController {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecordController.class);
 
+
+    @Autowired
+    private RecordService recordService;
+
+    //
+
     /**
      * 埋点记录数据上传接口
      *
@@ -27,6 +35,7 @@ public class RecordController {
     public ResponseDo recordUpload(@RequestParam HttpServletRequest request, @RequestParam("userId") String userId, @RequestBody JSONObject json) {
         LOG.info("Upload record begin, request body:{}", json);
 
+        recordService.recordAll(request, json);
 
         return ResponseDo.buildSuccessResponse();
     }

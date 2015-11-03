@@ -70,7 +70,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
             DTColumnDefBuilder.newColumnDef(2).withOption('data', null).renderWith(actionEstablish),
             DTColumnDefBuilder.newColumnDef(3).withOption('data', null).renderWith(actionDestination),
             DTColumnDefBuilder.newColumnDef(4).withOption('data', 'type'),
-            DTColumnDefBuilder.newColumnDef(5).withOption('data', 'pay'),
+            DTColumnDefBuilder.newColumnDef(5).withOption('data', null).renderWith(actionPay),
             DTColumnDefBuilder.newColumnDef(6).withOption('data', null).renderWith(actionTransfer).notSortable(),
             DTColumnDefBuilder.newColumnDef(7).withOption('data', null).renderWith(actionCreateTime),
             DTColumnDefBuilder.newColumnDef(8).withOption('data', null).renderWith(actionDeal).notSortable(),
@@ -111,6 +111,15 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                 '市/' + data.destination.district +
                 '/' + data.destination.street +
                 '</span>';
+        }
+
+        function actionPay(data, type, full, meta){
+            if(commonService.isNull(data.pay)){
+                return "";
+            }else{
+                return data.pay;
+            }
+
         }
 
         function actionTransfer(data, type, full, meta) {

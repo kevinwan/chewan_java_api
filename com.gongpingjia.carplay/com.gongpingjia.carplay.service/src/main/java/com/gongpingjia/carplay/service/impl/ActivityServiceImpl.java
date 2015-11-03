@@ -3,7 +3,6 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.tool.ActivityTypeConvertTool;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
@@ -16,9 +15,7 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.PushInfo;
 import com.gongpingjia.carplay.entity.common.Address;
-import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
-import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.statistic.StatisticActivityMatch;
 import com.gongpingjia.carplay.entity.user.Subscriber;
@@ -668,7 +665,7 @@ public class ActivityServiceImpl implements ActivityService {
         LOG.info("Query parameters:{}", param.toString());
 
         //埋点统计
-        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_MATCH);
+        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_MATCH_COUNT);
 
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
@@ -676,7 +673,7 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.info("No result find, begin expand query");
 
             //埋点统计
-            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_RE_MATCH);  //没有找到对应的活动 进行了扩展查询；
+            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_RE_MATCH_COUNT);  //没有找到对应的活动 进行了扩展查询；
 
             //如果没有找到活动，进行拓展查询
             activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
@@ -752,7 +749,6 @@ public class ActivityServiceImpl implements ActivityService {
         statisticActivityMatch.setUserId(param.getUserId());
         statisticActivityMatch.setIp(IPFetchUtil.getIPAddress(request));
 
-//        statisticActivityMatch.setEvent(StatisticActivityMatch.TYPE_RE_MATCH);
         statisticActivityMatch.setEvent(eventType);
         statisticActivityMatch.setCount(1);
 

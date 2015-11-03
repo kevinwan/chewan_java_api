@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface RecordService {
 
+
+    void recordAll(HttpServletRequest request,JSONObject jsonObject);
+
     /**
      * 未注册附近邀他事件
      * @param request
@@ -20,6 +23,20 @@ public interface RecordService {
      * @param request
      */
     void unRegisterMatchInvited(HttpServletRequest request, JSONObject jsonObject);
+
+
+    /**
+     * 未注册用户同意假数据
+     * @param request
+     */
+    void unRegisterDynamicAccept(HttpServletRequest request, JSONObject jsonObject);
+
+
+    /**
+     * 未注册用户同意后立即注册事件
+     * @param request
+     */
+    void dynamicAcceptRegister(HttpServletRequest request, JSONObject jsonObject);
 
     /**
      * 活动动态打电话事件
@@ -69,16 +86,5 @@ public interface RecordService {
      */
     void dynamicNearbyInvited(HttpServletRequest request, JSONObject jsonObject);
 
-    /**
-     * 未注册用户同意假数据
-     * @param request
-     */
-    void unRegisterDynamicAccept(HttpServletRequest request, JSONObject jsonObject);
-
-    /**
-     * 未注册用户同意后立即注册事件
-     * @param request
-     */
-    void dynamicAcceptRegister(HttpServletRequest request, JSONObject jsonObject);
 
 }

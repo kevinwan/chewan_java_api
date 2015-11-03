@@ -9,6 +9,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticDynamicNearby extends StatisticParent {
 
+    public static final String APP_OPEN_COUNT = "appOpenCount";
+
+    //TODO 服务端切面
+    public static final String DYNAMIC_NEARBY_CLICK = "dynamicNearbyClick";
+
+    public static final String DYNAMIC_NEARBY_INVITED = "dynamicNearbyInvited";
+
+
+
     private String userId;
 
     private String ip;

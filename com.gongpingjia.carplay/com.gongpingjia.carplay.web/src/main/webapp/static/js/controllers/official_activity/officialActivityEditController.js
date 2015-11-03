@@ -145,7 +145,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     return false;
                 }
                 $scope.activity.end = tempTimeLong;
-                if ($scope.activity.end <= $scope.activity.start) {
+                if ($scope.activity.end + 24*60*60*1000  <= $scope.activity.start) {
                     $window.alert("结束时间必须大于开始时间");
                     return false;
                 }

@@ -8,9 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 public class StatisticDriverAuth extends StatisticParent {
-    public static final String AUTHENTICATION = "driverAuthentication";// 车主认证点击事件
-    public static final String DRIVING_LICENSE = "drivingLicenseAuth";// 行驶证上传事件
-    public static final String DRIVER_LICENSE = "driverLicenseAuth";// 驾驶证上传事件
+    public static final String DRIVER_AUTHENTICATION = "driverAuthentication";// 车主认证点击事件
+    public static final String DRIVING_LICENSE_AUTH = "drivingLicenseAuth";// 行驶证上传事件
+    public static final String DRIVER_LICENSE_AUTH = "driverLicenseAuth";// 驾驶证上传事件
 
 
     private String userId;

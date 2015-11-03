@@ -3,9 +3,9 @@ package com.gongpingjia.carplay.statistic.aop;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.dao.statistic.StatisticDriverAuthDao;
-import com.gongpingjia.carplay.dao.statistic.StatisticUserRegisterDao;
+import com.gongpingjia.carplay.dao.statistic.StatisticUnRegisterDao;
 import com.gongpingjia.carplay.entity.statistic.StatisticDriverAuth;
-import com.gongpingjia.carplay.entity.statistic.StatisticUserRegister;
+import com.gongpingjia.carplay.entity.statistic.StatisticUnRegister;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,7 +25,7 @@ public class UserAdvice {
     private static final Logger LOG = LoggerFactory.getLogger(UserAdvice.class);
 
     @Autowired
-    private StatisticUserRegisterDao userRegisterDao;
+    private StatisticUnRegisterDao userRegisterDao;
 
     @Autowired
     private StatisticDriverAuthDao statisticDriverAuthDao;
@@ -53,10 +53,10 @@ public class UserAdvice {
         }
 
         LOG.debug("Record user register when success");
-        StatisticUserRegister userRegister = new StatisticUserRegister();
+        StatisticUnRegister userRegister = new StatisticUnRegister();
         userRegister.setCount(1);
         userRegister.recordTime(DateUtil.getTime());
-        userRegister.setEvent(StatisticUserRegister.USER_REGISTER_SUCCESS);
+        userRegister.setEvent(StatisticUnRegister.USER_REGISTER_SUCCESS);
         userRegisterDao.save(userRegister);
     }
 
@@ -73,7 +73,7 @@ public class UserAdvice {
         StatisticDriverAuth driverAuth = new StatisticDriverAuth();
         driverAuth.setCount(1);
         driverAuth.recordTime(DateUtil.getTime());
-        driverAuth.setEvent(StatisticDriverAuth.AUTHENTICATION);
+        driverAuth.setEvent(StatisticDriverAuth.DRIVER_AUTHENTICATION);
 
         if (jp.getArgs().length == 3) {
             //第三个参数为userId
@@ -94,7 +94,7 @@ public class UserAdvice {
         StatisticDriverAuth drivingLicense = new StatisticDriverAuth();
         drivingLicense.setCount(1);
         drivingLicense.recordTime(DateUtil.getTime());
-        drivingLicense.setEvent(StatisticDriverAuth.DRIVING_LICENSE);
+        drivingLicense.setEvent(StatisticDriverAuth.DRIVING_LICENSE_AUTH);
         if (jp.getArgs().length == 3) {
             //第一个参数为userId
             drivingLicense.setUserId(jp.getArgs()[0].toString());
@@ -114,7 +114,7 @@ public class UserAdvice {
         StatisticDriverAuth driverLicense = new StatisticDriverAuth();
         driverLicense.setCount(1);
         driverLicense.recordTime(DateUtil.getTime());
-        driverLicense.setEvent(StatisticDriverAuth.DRIVER_LICENSE);
+        driverLicense.setEvent(StatisticDriverAuth.DRIVER_LICENSE_AUTH);
         if (jp.getArgs().length == 3) {
             //第一个参数为userId
             driverLicense.setUserId(jp.getArgs()[0].toString());
