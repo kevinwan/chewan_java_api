@@ -174,8 +174,6 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> ext = new HashMap<>(1);
         ext.put("avatar", CommonUtil.getLocalPhotoServer() + organizer.getAvatar());
 
-        //转换类型
-        activity.convertType();
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"), organizer.getNickname(), activity.getType());
 
         JSONObject result = chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
@@ -692,9 +690,6 @@ public class UserServiceImpl implements UserService {
             if (message.getType() == InterestMessage.USER_ACTIVITY) {
                 //用户创建活动
                 Activity activity = activityMap.get(message.getRelatedId());
-
-                activity.convertType();
-
                 interestMap.put("activityType", activity.getType());
                 interestMap.put("activityPay", activity.getPay());
                 interestMap.put("activityTransfer", activity.isTransfer());
@@ -1265,7 +1260,6 @@ public class UserServiceImpl implements UserService {
             itemMap.put("activityId", activity.getActivityId());
             itemMap.put("establish", activity.getEstablish());
             itemMap.put("estabPoint", activity.getEstabPoint());
-            activity.convertType();              //转换类型
             itemMap.put("type", activity.getType());
             itemMap.put("pay", activity.getPay());
             itemMap.put("transfer", activity.isTransfer());

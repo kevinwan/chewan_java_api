@@ -253,8 +253,6 @@ public class ActivityServiceImpl implements ActivityService {
         }
         organizer.hideSecretInfo();
         activity.setOrganizer(organizer);
-        //类型转换
-        activity.convertType();
         return ResponseDo.buildSuccessResponse(activity);
     }
 
@@ -301,8 +299,6 @@ public class ActivityServiceImpl implements ActivityService {
         //发送环信推送消息
         User organizer = userDao.findById(activity.getUserId());
         User applier = userDao.findById(userId);
-        //转化活动显示类型
-        activity.convertType();
         String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.activity.invite", "{0}邀请您{1}"),
                 applier.getNickname(), activity.getType());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
@@ -823,8 +819,6 @@ public class ActivityServiceImpl implements ActivityService {
             }
             map.put("organizer", organizer);
             map.put("pay", item.getPay());
-            //类型转化
-            item.convertType();
             map.put("majorType", item.getMajorType());
             map.put("type", item.getType());
             map.put("destination", item.getDestination());

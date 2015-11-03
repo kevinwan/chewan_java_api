@@ -210,10 +210,4 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     public int compareTo(Activity o) {
         return (int) ((this.sortFactor - o.sortFactor) * 100);
     }
-
-
-    public void convertType() {
-        this.setMajorType(ActivityTypeConvertTool.getConvertType(this.getMajorType()));
-        this.setType(ActivityTypeConvertTool.getConvertType(this.getType()));
-    }
 }
