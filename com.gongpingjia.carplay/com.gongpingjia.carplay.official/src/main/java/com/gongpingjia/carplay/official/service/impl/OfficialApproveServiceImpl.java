@@ -72,7 +72,11 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
         Long current = DateUtil.getTime();
         Update update = Update.update("authUserId", userId).set("authTime", current);
-        update.set("remarks", remarks);
+        if (Constants.AuthStatus.ACCEPT.equals(status)) {
+            update.set("remarks", "");
+        } else {
+            update.set("remarks", remarks);
+        }
         update.set("status", status);
 
         updateUserAuthenticationInfo(json, application.getApplyUserId());
@@ -231,7 +235,8 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     private Map<String, List<AuthenticationHistory>> buildAuthHistory(Set<String> userIds, String type) {
-        if (Constants.AuthType.PHOTO_AUTH.equals(type)) {
+        if (!Constants.AuthType.PHOTO_AUTH.equals(type)) {
+            //针对非头像认证的，直接返回空的
             return new HashMap<>(0);
         }
         List<AuthenticationHistory> historyList = historyDao.find(Query.query(Criteria.where("applyUserId").in(userIds))
@@ -383,7 +388,12 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         update.set("authTime", current);
         update.set("authUserId", userId);
         update.set("status", status);
-        update.set("remarks", remarks);
+        if (Constants.AuthStatus.ACCEPT.equals(status)) {
+            update.set("remarks", "");
+        } else {
+            update.set("remarks", remarks);
+        }
+
         authApplicationDao.update(applicationId, update);
 
         userDao.update(application.getApplyUserId(), Update.update("photoAuthStatus", status));

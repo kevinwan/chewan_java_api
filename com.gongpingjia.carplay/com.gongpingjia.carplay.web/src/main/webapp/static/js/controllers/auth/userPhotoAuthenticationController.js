@@ -8,8 +8,8 @@
  *
  * @constructor
  */
-gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', '$window', 'DTColumnDefBuilder', 'authenticationService',
-    function ($scope, $rootScope, $window, DTColumnDefBuilder, authenticationService) {
+gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', '$window', '$modal', 'DTColumnDefBuilder', 'authenticationService',
+    function ($scope, $rootScope, $window, $modal, DTColumnDefBuilder, authenticationService) {
 
         var STATUS_PENDING = '认证中';
         var STATUS_ACCEPTED = '认证通过';
@@ -109,9 +109,16 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             })
         };
 
-
+        /**
+         * Show history detail information
+         * @param application
+         */
         $scope.showHistoryDetail = function(application){
-
+            authenticationService.setAuthHistorys(application.authHistorys);
+            var modalInstance = $modal.open({
+                templateUrl: 'views/auth/history_detail.html',
+                controller: 'authHistoryDetailController'
+            });
         }
         /**
          * Initialize component status

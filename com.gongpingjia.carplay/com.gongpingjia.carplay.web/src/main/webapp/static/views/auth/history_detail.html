@@ -1,11 +1,11 @@
-<div class="page-header">
-    <h1>头像认证申请</h1>
-</div>
 <!-- /.page-header -->
-<form class="form-horizontal" role="form">
-    <ul class="col-md-12" ng-repeat="history in authHistorys">
-        <span class="col-md-2">{{history.authTime | date:"yyyy-MM-dd HH:mm"}}</span>
-        <span class="col-md-2">{{history.status}}</span>
-        <span class="col-md-8">备注：{{history.remark}}</span>
-    </ul>
-</form>
+<div class="">
+    <div style="height: 500px;">
+        <h1>审核详细信息</h1>
+        <ul class="col-md-12" ng-repeat="history in authHistorys">
+            <span class="col-md-2">{{history.authTime | date:"yyyy-MM-dd HH:mm"}}</span>
+            <span class="col-md-2">{{history.status}}</span>
+            <span class="col-md-8">备注：{{history.remark}}</span>
+        </ul>
+    </div>
+</div>

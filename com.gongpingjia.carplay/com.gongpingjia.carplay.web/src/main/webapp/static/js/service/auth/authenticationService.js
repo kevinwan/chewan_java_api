@@ -121,6 +121,10 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                         }))
                 },
 
+                setAuthHistorys: function (aAuthHistorys) {
+                    authHistorys = aAuthHistorys;
+                },
+
                 getAuthHistorys: function () {
                     return authHistorys;
                 }

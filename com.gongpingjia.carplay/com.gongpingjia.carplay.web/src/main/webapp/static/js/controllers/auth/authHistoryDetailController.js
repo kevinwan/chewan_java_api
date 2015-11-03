@@ -14,7 +14,8 @@ gpjApp.controller('authHistoryDetailController', ['$scope', '$rootScope', '$wind
         var authHistorys;
 
         $rootScope.loadingPromise = function () {
-            $scope.authHistorys = authenticationService.getAuthHistorys();
+            authHistorys = authenticationService.getAuthHistorys();
         };
 
+        $scope.loadingPromise();
     }]);

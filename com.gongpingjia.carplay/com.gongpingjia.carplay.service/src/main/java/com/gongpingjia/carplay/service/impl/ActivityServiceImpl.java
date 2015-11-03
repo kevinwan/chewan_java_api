@@ -836,13 +836,13 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
-        Set<String> appointmentIds = buildUserAppointments(param);
+        Set<String> appointmentActivityIds = buildUserAppointmentActivityIds(param);
 
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
-            if (appointmentIds.contains(item)) {
+            if (appointmentActivityIds.contains(item.getActivityId())) {
                 continue;
             }
             User user = userMap.get(item.getUserId());
@@ -863,19 +863,19 @@ public class ActivityServiceImpl implements ActivityService {
         return activities;
     }
 
-    private Set<String> buildUserAppointments(ActivityQueryParam param) {
+    private Set<String> buildUserAppointmentActivityIds(ActivityQueryParam param) {
         LOG.debug("Check user is already appointment or not, filter the activity");
         List<Appointment> appointmentList = new ArrayList<>(0);
         if (StringUtils.isNotEmpty(param.getUserId())) {
             appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId())
                     .and("status").in(Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT)));
         }
-        Set<String> appointmentIds = new HashSet<>(appointmentList.size());
+        Set<String> activityIds = new HashSet<>(appointmentList.size());
         for (Appointment item : appointmentList) {
             //计算用户的活动处于接收或者拒绝的状态
-            appointmentIds.add(item.getActivityId());
+            activityIds.add(item.getActivityId());
         }
-        return appointmentIds;
+        return activityIds;
     }
 
     /**
@@ -1009,7 +1009,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo getActivityPushInfos(HttpServletRequest request,String userId) {
+    public ResponseDo getActivityPushInfos(HttpServletRequest request, String userId) {
         LOG.debug("Query user pushInfo, userId:{}", userId);
         List<PushInfo> pushInfoList = pushInfoDao.find(Query.query(Criteria.where("receivedUserId").is(userId).and("deleteFlag").is(false)));
 
