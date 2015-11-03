@@ -1,9 +1,12 @@
 package com.gongpingjia.carplay.entity.user;
 
+import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * Created by licheng on 2015/9/22.
@@ -39,6 +42,9 @@ public class AuthApplication {
 
     @Transient
     private UserAuthentication authentication;
+
+    @Transient
+    private List<AuthenticationHistory> authHistorys;
 
     public String getApplicationId() {
         return applicationId;
@@ -118,5 +124,13 @@ public class AuthApplication {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public List<AuthenticationHistory> getAuthHistorys() {
+        return authHistorys;
+    }
+
+    public void setAuthHistorys(List<AuthenticationHistory> authHistorys) {
+        this.authHistorys = authHistorys;
     }
 }

@@ -109,6 +109,10 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             })
         };
 
+
+        $scope.showHistoryDetail = function(application){
+
+        }
         /**
          * Initialize component status
          */

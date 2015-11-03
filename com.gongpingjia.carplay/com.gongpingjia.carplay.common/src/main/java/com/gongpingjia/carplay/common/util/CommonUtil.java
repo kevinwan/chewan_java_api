@@ -98,7 +98,7 @@ public class CommonUtil {
      * @return 返回后缀配置信息
      */
     public static String getThirdPhotoPostfix() {
-        return PropertiesUtil.getProperty("qiniu.server.photo.postfix", "?imageView2/1/w/200");
+        return PropertiesUtil.getProperty("qiniu.server.photo.postfix", "");
     }
 
     /**

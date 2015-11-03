@@ -20,6 +20,7 @@
                 <select id="status" ng-init="criteria.status=''"
                         data-ng-model="criteria.status" style="width:100%;">
                     <option value="">全部</option>
+                    <option value="未认证">未认证</option>
                     <option value="认证中">认证中</option>
                     <option value="认证通过">认证通过</option>
                     <option value="认证未通过">认证未通过</option>
@@ -99,9 +100,20 @@
                     </button>
                 </td>
                 <td class="center" ng-show="{{application.status != '认证中'}}"> 已审核</td>
-                <td ng-show="{{application.status === '认证中'}}"><input type="text" id="remarks" style="width:95%;"
-                                                                      ng-model="application.remarks"/></td>
-                <td ng-show="{{application.status != '认证中'}}">{{application.remarks}}</td>
+                <td ng-show="{{application.status === '认证中'}}">
+                    <div class="col-md-10">
+                        <input type="text" id="remarks" style="width:95%;" ng-model="application.remarks"/>
+                    </div>
+                    <div class="col-md-2">
+                        <img ng-src="images/detail.gif" ng-click="showHistoryDetail(application)"/>
+                    </div>
+                </td>
+                <td ng-show="{{application.status != '认证中'}}">
+                    <div class="col-md-10">{{application.remarks}}</div>
+                    <div class="col-md-2">
+                        <img ng-src="images/detail.gif" ng-click="showHistoryDetail(application)"/>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -116,6 +128,12 @@
     <!--</thead>-->
     <!--</table>-->
 </form>
+
+<!--<script>-->
+<!--var showHistoryDetail = function (index, application) {-->
+<!--alert('hi');-->
+<!--};-->
+<!--</script>-->
 
 
 
