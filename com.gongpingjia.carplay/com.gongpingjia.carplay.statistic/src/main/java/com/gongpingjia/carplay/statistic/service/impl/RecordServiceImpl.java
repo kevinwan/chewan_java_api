@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Created by Administrator on 2015/11/3 0003.
  */
-@Service
+@Service("recordService")
 public class RecordServiceImpl implements RecordService {
 
 
