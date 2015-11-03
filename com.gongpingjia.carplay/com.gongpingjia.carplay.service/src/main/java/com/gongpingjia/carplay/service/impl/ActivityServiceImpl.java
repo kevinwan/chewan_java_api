@@ -665,19 +665,35 @@ public class ActivityServiceImpl implements ActivityService {
         LOG.info("Query parameters:{}", param.toString());
 
         //埋点统计
-        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_MATCH_COUNT);
+//<<<<<<< HEAD
+//        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_MATCH_COUNT);
+//
+//        //获取所有的活动列表
+//        List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
+//        if (activityList.isEmpty()) {
+//            LOG.info("No result find, begin expand query");
+//
+//            //埋点统计
+//            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_RE_MATCH_COUNT);  //没有找到对应的活动 进行了扩展查询；
+//
+//            //如果没有找到活动，进行拓展查询
+//            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
+//        }
+//=======
+//        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_MATCH);
 
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
-        if (activityList.isEmpty()) {
-            LOG.info("No result find, begin expand query");
-
-            //埋点统计
-            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_RE_MATCH_COUNT);  //没有找到对应的活动 进行了扩展查询；
-
-            //如果没有找到活动，进行拓展查询
-            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
-        }
+//        if (activityList.isEmpty()) {
+//            LOG.info("No result find, begin expand query");
+//
+//            //埋点统计
+//            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_RE_MATCH);  //没有找到对应的活动 进行了扩展查询；
+//
+//            //如果没有找到活动，进行拓展查询
+//            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
+//        }
+//>>>>>>> 3aa0764... commit by fixed bugs
 
         if (activityList.isEmpty()) {
             LOG.warn("No activity result found fron database");
@@ -691,7 +707,6 @@ public class ActivityServiceImpl implements ActivityService {
 
         //排序
         sortActivityList(userMap, activities);
-
 
         if (activities.size() < param.getIgnore()) {
             LOG.warn("No data exist after ignore:{}", param.getIgnore());
@@ -827,10 +842,15 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
+        Set<String> appointmentIds = buildUserAppointments(param);
+
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
+            if (appointmentIds.contains(item)) {
+                continue;
+            }
             User user = userMap.get(item.getUserId());
             if (param.isCommonQuery()) {
                 if (StringUtils.isNotEmpty(param.getGender())) {
@@ -840,13 +860,28 @@ public class ActivityServiceImpl implements ActivityService {
                     }
                 }
             }
-            if (user != null || user.getIdle()) {
+            if (user != null && user.getIdle()) {
                 //只有当用户空闲的情况下才参与排序计算
                 item.setSortFactor(computeWeight(param, current, item, user));
                 activities.add(item);
             }
         }
         return activities;
+    }
+
+    private Set<String> buildUserAppointments(ActivityQueryParam param) {
+        LOG.debug("Check user is already appointment or not, filter the activity");
+        List<Appointment> appointmentList = new ArrayList<>(0);
+        if (StringUtils.isNotEmpty(param.getUserId())) {
+            appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId())
+                    .and("status").in(Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT)));
+        }
+        Set<String> appointmentIds = new HashSet<>(appointmentList.size());
+        for (Appointment item : appointmentList) {
+            //计算用户的活动处于接收或者拒绝的状态
+            appointmentIds.add(item.getActivityId());
+        }
+        return appointmentIds;
     }
 
     /**

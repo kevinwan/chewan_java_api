@@ -140,7 +140,7 @@ public class ActivityController {
             if (!StringUtils.isEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
-            return activityService.getNearByActivityList(request,param);
+            return activityService.getNearByActivityList(request, param);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -241,7 +241,7 @@ public class ActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo sendAppointment(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId,
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
-        LOG.debug("activity/ {} /join begin", activityId);
+        LOG.debug("activity/ {} /join begin, json:{}", activityId, json);
         try {
             //TODO validator
             parameterChecker.checkUserInfo(userId, token);

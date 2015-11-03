@@ -33,6 +33,9 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/photoAuthentication/list', {
         templateUrl: 'views/auth/user_photo_authentication.html',
         controller: 'userPhotoAuthenticationController'
+    }).when({
+        templateUrl: 'views/auth/history_detail.html',
+        controller: 'authHistoryDetailController'
     }).when('/user/list', {
         templateUrl: 'views/user/user.html',
         controller: 'userController'
@@ -85,7 +88,7 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
                 if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录')>=0) {
                     alert(response.data.errmsg);
                     //authService.setUser(undefined);
-                    $window.location.href = '/login.html';
+                    $window.location.href = '/v2/login.html';
                     return $q.reject(response);
                 }
                 return response;

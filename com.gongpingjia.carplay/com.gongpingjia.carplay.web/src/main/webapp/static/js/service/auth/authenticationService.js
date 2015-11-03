@@ -9,6 +9,7 @@
 gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'ChewanOfficialApiEndPoint', 'commonService',
         function (restProxyService, authService, ChewanOfficialApiEndPoint, commonService) {
             var applicationId;
+            var authHistorys;
 
             return {
                 getApplicationList: function (criteria) {
@@ -118,6 +119,10 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                             accept: accept,
                             remarks: remarks
                         }))
+                },
+
+                getAuthHistorys: function () {
+                    return authHistorys;
                 }
             }
         }]
