@@ -980,7 +980,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo getActivityPushInfos(String userId) {
+    public ResponseDo getActivityPushInfos(HttpServletRequest request,String userId) {
         LOG.debug("Query user pushInfo, userId:{}", userId);
         List<PushInfo> pushInfoList = pushInfoDao.find(Query.query(Criteria.where("receivedUserId").is(userId).and("deleteFlag").is(false)));
 

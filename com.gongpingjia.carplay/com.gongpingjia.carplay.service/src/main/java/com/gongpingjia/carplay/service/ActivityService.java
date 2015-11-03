@@ -114,5 +114,5 @@ public interface ActivityService {
      * @param userId
      * @return
      */
-    ResponseDo getActivityPushInfos(String userId);
+    ResponseDo getActivityPushInfos(HttpServletRequest request,String userId);
 }
