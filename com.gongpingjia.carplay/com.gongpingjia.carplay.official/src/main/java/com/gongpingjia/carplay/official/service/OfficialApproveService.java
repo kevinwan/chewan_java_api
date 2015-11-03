@@ -2,8 +2,11 @@ package com.gongpingjia.carplay.official.service;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.UserAuthentication;
 import net.sf.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Created by licheng on 2015/9/28.
@@ -18,9 +21,16 @@ public interface OfficialApproveService {
      * @param json
      * @return
      */
-    public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException;
+    ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException;
 
-    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit, String phone);
+    ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit, String phone);
+
+    /**
+     * 根据申请ID获取申请对应的历史信息
+     * @param applicationId
+     * @return
+     */
+    List<AuthenticationHistory> buildAuthHistory(String applicationId);
 
     /**
      * 根据application的Id获取Application的信息

@@ -12,10 +12,7 @@ import com.gongpingjia.carplay.dao.activity.PushInfoDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
-import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
-import com.gongpingjia.carplay.dao.user.SubscriberDao;
-import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.dao.user.*;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
@@ -27,6 +24,7 @@ import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.entity.user.UserAuthentication;
 import com.gongpingjia.carplay.entity.user.UserToken;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
@@ -107,6 +105,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PushInfoDao pushInfoDao;
+    @Autowired
+    private UserAuthenticationDao userAuthenticationDao;
 
     @Override
     public ResponseDo register(User user) throws ApiException {
@@ -440,12 +440,18 @@ public class UserServiceImpl implements UserService {
 
             Subscriber subscriber = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(viewUser).and("toUser").is(beViewedUser)));
             beViewedUserInfo.setSubscribeFlag(subscriber != null ? true : false);
+        } else {
+            UserAuthentication userAuthentication = userAuthenticationDao.findById("beViewedUser");
+            if (userAuthentication != null) {
+                String localServer = CommonUtil.getLocalPhotoServer();
+                beViewedUserInfo.setDriverLicense(localServer + userAuthentication.getDriverLicense());
+                beViewedUserInfo.setDrivingLicense(localServer + userAuthentication.getDrivingLicense());
+            }
         }
 
         beViewedUserInfo.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
         beViewedUserInfo.setCompletion(computeCompletion(beViewedUserInfo));
         beViewedUserInfo.hideSecretInfo();
-
 
         return ResponseDo.buildSuccessResponse(beViewedUserInfo);
     }

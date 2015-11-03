@@ -114,7 +114,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
          * @param application
          */
         $scope.showHistoryDetail = function(application){
-            authenticationService.setAuthHistorys(application.authHistorys);
+            authenticationService.setApplication(application.applicationId);
             var modalInstance = $modal.open({
                 templateUrl: 'views/auth/history_detail.html',
                 controller: 'authHistoryDetailController'

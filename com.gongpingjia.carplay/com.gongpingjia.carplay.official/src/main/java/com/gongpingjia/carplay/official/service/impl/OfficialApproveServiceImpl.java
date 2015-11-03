@@ -213,8 +213,6 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
         Map<String, User> userMap = buildUserMap(authApplicationList);
 
-        Map<String, List<AuthenticationHistory>> historyMap = buildAuthHistory(userMap.keySet(), type);
-
         LOG.debug("Query apply user information");
         for (AuthApplication application : authApplicationList) {
             User applyUser = userMap.get(application.getApplyUserId());
@@ -228,30 +226,16 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
             applyUser.hideSecretInfo();
             application.setApplyUser(applyUser);
-            application.setAuthHistorys(historyMap.get(application.getApplyUserId()));
         }
 
         return ResponseDo.buildSuccessResponse(authApplicationList);
     }
 
-    private Map<String, List<AuthenticationHistory>> buildAuthHistory(Set<String> userIds, String type) {
-        if (!Constants.AuthType.PHOTO_AUTH.equals(type)) {
-            //针对非头像认证的，直接返回空的
-            return new HashMap<>(0);
-        }
-        List<AuthenticationHistory> historyList = historyDao.find(Query.query(Criteria.where("applyUserId").in(userIds))
+    @Override
+    public List<AuthenticationHistory> buildAuthHistory(String applicationId) {
+        LOG.debug("ApplicationId:{}", applicationId);
+        return historyDao.find(Query.query(Criteria.where("applicationId").is(applicationId))
                 .with(new Sort(new Sort.Order(Sort.Direction.DESC, "authTime"))));
-        Map<String, List<AuthenticationHistory>> map = new HashMap<>(userIds.size(), 1);
-        for (AuthenticationHistory item : historyList) {
-            List<AuthenticationHistory> histories = map.get(item.getApplyUserId());
-            if (histories == null) {
-                histories = new ArrayList<>();
-                map.put(item.getApplyUserId(), histories);
-            }
-            histories.add(item);
-        }
-
-        return map;
     }
 
     /**
@@ -337,8 +321,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         }
         application.setAuthentication(userAuthentication);
 
-        application.setAuthHistorys(historyDao.find(Query.query(Criteria.where("applicationId").is(applicationId))
-                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "authTime")))));
+        application.setAuthHistorys(buildAuthHistory(applicationId));
 
         return ResponseDo.buildSuccessResponse(application);
     }

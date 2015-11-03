@@ -9,7 +9,6 @@
 gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'ChewanOfficialApiEndPoint', 'commonService',
         function (restProxyService, authService, ChewanOfficialApiEndPoint, commonService) {
             var applicationId;
-            var authHistorys;
 
             return {
                 getApplicationList: function (criteria) {
@@ -121,12 +120,9 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                         }))
                 },
 
-                setAuthHistorys: function (aAuthHistorys) {
-                    authHistorys = aAuthHistorys;
-                },
-
                 getAuthHistorys: function () {
-                    return authHistorys;
+                    return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/authentication/" + applicationId + "/historys?userId="
+                    + authService.getUser().userId + '&token=' + authService.getUser().token);
                 }
             }
         }]

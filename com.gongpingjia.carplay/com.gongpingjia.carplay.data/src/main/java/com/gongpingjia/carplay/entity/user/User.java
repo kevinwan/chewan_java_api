@@ -108,6 +108,12 @@ public class User {
     @Transient
     private int matchTimes = 0;
 
+    @Transient
+    private String driverLicense;
+
+    @Transient
+    private String drivingLicense;
+
     /**
      * 刷新user相关的photo的URL地址
      *
@@ -416,6 +422,22 @@ public class User {
 
     public void setMatchTimes(int matchTimes) {
         this.matchTimes = matchTimes;
+    }
+
+    public String getDriverLicense() {
+        return driverLicense;
+    }
+
+    public void setDriverLicense(String driverLicense) {
+        this.driverLicense = driverLicense;
+    }
+
+    public String getDrivingLicense() {
+        return drivingLicense;
+    }
+
+    public void setDrivingLicense(String drivingLicense) {
+        this.drivingLicense = drivingLicense;
     }
 
     /**

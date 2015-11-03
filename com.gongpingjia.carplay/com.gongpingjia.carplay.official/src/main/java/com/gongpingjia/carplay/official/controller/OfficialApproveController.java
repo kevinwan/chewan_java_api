@@ -135,7 +135,8 @@ public class OfficialApproveController {
      * @param json
      * @return
      */
-    @RequestMapping(value = "/authentication/{authenticationId}/update")
+    @RequestMapping(value = "/authentication/{authenticationId}/update", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo updateUserAuthenticationInfo(@PathVariable("authenticationId") String authenticationId,
                                                    @RequestParam("userId") String userId, @RequestParam("token") String token,
                                                    @RequestBody JSONObject json) {
@@ -169,6 +170,29 @@ public class OfficialApproveController {
             parameterChecker.checkAdminUserInfo(userId, token);
 
             return officialApproveService.approveUserPhotoAuthentication(userId, json);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取用户的认证申请里的审核历史信息
+     *
+     * @param authenticationId
+     * @param userId
+     * @param token
+     * @return
+     */
+    @RequestMapping(value = "/authentication/{authenticationId}/historys", method = RequestMethod.GET)
+    public ResponseDo getAuthHistory(@PathVariable("authenticationId") String authenticationId,
+                                     @RequestParam("userId") String userId, @RequestParam("token") String token) {
+        LOG.debug("Update user authentication infomation, authenticationId:{}", authenticationId);
+
+        try {
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            return ResponseDo.buildSuccessResponse(officialApproveService.buildAuthHistory(authenticationId));
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
