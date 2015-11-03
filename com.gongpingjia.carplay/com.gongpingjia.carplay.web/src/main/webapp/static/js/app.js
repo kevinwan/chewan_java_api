@@ -9,13 +9,13 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.date', 'datatables.bootstrap', 'timepickerPop']);
 
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
-gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
-gpjApp.constant('ChewanApiEndPoint', '/v2');
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+//gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
+//gpjApp.constant('ChewanApiEndPoint', '/v2');
 
-//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
-//gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
-//gpjApp.constant("ChewanApiEndPoint", "");
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8000');
+gpjApp.constant("ChewanApiProvider", "http://localhost:8000");
+gpjApp.constant("ChewanApiEndPoint", "");
 
 /**
  * Router configuration
@@ -33,7 +33,7 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/photoAuthentication/list', {
         templateUrl: 'views/auth/user_photo_authentication.html',
         controller: 'userPhotoAuthenticationController'
-    }).when({
+    }).when('/auth/history/detail', {
         templateUrl: 'views/auth/history_detail.html',
         controller: 'authHistoryDetailController'
     }).when('/user/list', {

@@ -11,11 +11,13 @@
 gpjApp.controller('authHistoryDetailController', ['$scope', '$rootScope', '$window', 'authenticationService',
     function ($scope, $rootScope, $window, authenticationService) {
 
-        var authHistorys;
-
         $rootScope.loadingPromise = function () {
-            authHistorys = authenticationService.getAuthHistorys();
+            $scope.authHistorys = authenticationService.getAuthHistorys();
         };
 
-        $scope.loadingPromise();
+        //$rootScope.loadingPromise = authenticationService.getAuthHistorys().success(function(result){
+        //    $scope.authHistorys = result;
+        //});
+
+        //$scope.loadingPromise();
     }]);
