@@ -32,7 +32,7 @@ public class RecordController {
      */
     @RequestMapping(value = "/record/upload", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo recordUpload(@RequestParam HttpServletRequest request, @RequestParam("userId") String userId, @RequestBody JSONObject json) {
+    public ResponseDo recordUpload(@RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestBody JSONObject json,HttpServletRequest request) {
         LOG.info("Upload record begin, request body:{}", json);
 
         recordService.recordAll(request, json);
