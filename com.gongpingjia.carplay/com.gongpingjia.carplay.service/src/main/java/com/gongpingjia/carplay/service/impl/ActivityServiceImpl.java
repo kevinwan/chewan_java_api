@@ -889,8 +889,7 @@ public class ActivityServiceImpl implements ActivityService {
      */
     private double computeWeight(ActivityQueryParam param, Long current, Activity item, User user) {
         //距离权重计算
-        item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(),
-                user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+        item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(), item.getEstabPoint().getLongitude(),item.getEstabPoint().getLatitude()));
         double sortFactor = 0.2 * (1 - item.getDistance() / param.getMaxDistance());
 
         sortFactor += 0.1 * (1 - (current - item.getCreateTime()) / param.getMaxTimeLimit());
