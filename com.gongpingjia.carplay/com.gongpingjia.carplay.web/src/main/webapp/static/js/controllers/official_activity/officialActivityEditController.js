@@ -283,13 +283,7 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     $scope.activity.cover = cover;
                     $scope.photoUrl = cover.photoUrl;
                 }else{
-                    cover.id = null;
-                    cover.photoUrl = null;
-                    cover.key = null;
-                    $scope.activity.cover = null;
-                    $scope.photoUrl = "";
                     alert("上传图片失败" + result.errmsg);
-
                 }
             });
         };
