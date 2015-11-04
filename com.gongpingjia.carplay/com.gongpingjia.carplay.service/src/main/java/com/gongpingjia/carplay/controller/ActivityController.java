@@ -85,12 +85,15 @@ public class ActivityController {
      * @param token
      */
     @RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
-    public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId, @RequestParam("userId") String userId, @RequestParam("token") String token) {
+    public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
+                                      @RequestParam(value = "userId", required = false) String userId,
+                                      @RequestParam(value = "token", required = false) String token) {
         LOG.debug("activity/{activityId}/info begin");
         try {
-            parameterChecker.checkUserInfo(userId, token);
-            ResponseDo responseDo = activityService.getActivityInfo(userId, activityId);
-            return responseDo;
+            if (StringUtils.isNotEmpty(userId)) {
+                parameterChecker.checkUserInfo(userId, token);
+            }
+            return activityService.getActivityInfo(userId, activityId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -288,12 +291,12 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/activity/pushInfo", method = RequestMethod.GET)
-    public ResponseDo getPushActivities(@RequestParam("userId") String userId, @RequestParam("token") String token,HttpServletRequest request) {
+    public ResponseDo getPushActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
         LOG.debug("/activity/pushInfo, userId:{}", userId);
         try {
             parameterChecker.checkUserInfo(userId, token);
 
-            return activityService.getActivityPushInfos(request,userId);
+            return activityService.getActivityPushInfos(request, userId);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

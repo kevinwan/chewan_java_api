@@ -16,6 +16,7 @@ import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.PushInfo;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.statistic.StatisticActivityMatch;
 import com.gongpingjia.carplay.entity.user.Subscriber;
@@ -252,6 +253,9 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("该活动找不到对应的 User");
         }
         organizer.hideSecretInfo();
+        organizer.setAlbum(new ArrayList<Photo>(0));
+        organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
+        
         activity.setOrganizer(organizer);
         return ResponseDo.buildSuccessResponse(activity);
     }
@@ -665,7 +669,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public ResponseDo   getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
+    public ResponseDo getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
 
         //获取所有的活动列表
