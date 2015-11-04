@@ -203,10 +203,14 @@ public class OfficialServiceImpl implements OfficialService {
             if (appointment.getInvitedUserId().equals(user.getUserId())) {
                 //别人邀请他的
                 invitedCount++;
-            } else if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
-                //他邀请别人的；并且别人接受了
-                acceptList.add(appointment.getInvitedUserId());
+                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                    acceptList.add(appointment.getInvitedUserId());
+                }
             }
+//            else if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+//                //他邀请别人的；并且别人接受了
+//                acceptList.add(appointment.getInvitedUserId());
+//            }
 
             //我 邀请 该用户
             if (appointment.getApplyUserId().equals(userId) && appointment.getInvitedUserId().equals(user.getUserId())) {
