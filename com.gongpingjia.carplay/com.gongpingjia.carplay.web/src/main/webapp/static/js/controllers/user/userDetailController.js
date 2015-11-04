@@ -34,10 +34,10 @@ gpjApp.controller('userDetailController', function ($scope, $rootScope, $locatio
 
         $rootScope.loadingPromise = userService.updateUserInfo($scope.user).success(function(result){
             if (result && result.result == 0) {
-                alert("更新用户信息成功");
+                alert("保存用户信息成功");
                 $location.path("/user/list");
             } else {
-                alert("更新用户信息失败");
+                alert("保存用户信息失败");
             }
         });
     };

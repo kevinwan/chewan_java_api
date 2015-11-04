@@ -39,7 +39,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
         else {
             $rootScope.loadingPromise = authenticationService.processApplication(true, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
-                    alert('成功完成车主认证');
+                    alert('认证成功');
                     $location.path('/driverAuthentication/list');
                 } else {
                     alert(result.errmsg);
@@ -57,7 +57,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
         else {
             $rootScope.loadingPromise = authenticationService.processApplication(false, $scope.application).success(function (result) {
                 if (result && result.result == 0) {
-                    alert('已拒绝审核');
+                    alert('认证成功');
                     $location.path('/driverAuthentication/list');
                 } else {
                     alert(result.errmsg);
@@ -76,7 +76,7 @@ gpjApp.controller('driverAuthenticateDetailController', function ($scope, $rootS
             $rootScope.loadingPromise = authenticationService.updateUserLicense($scope.application.applyUserId, $scope.application.authentication)
                 .success(function (result) {
                     if (result && result.result == 0) {
-                        alert('信息更新成功');
+                        alert('保存成功');
                         $location.path('/driverAuthentication/list');
                     } else {
                         alert(result.errmsg);
