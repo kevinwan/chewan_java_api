@@ -243,7 +243,6 @@ public class ActivityController {
                                       @RequestParam("token") String token, @RequestBody JSONObject json) {
         LOG.debug("activity/ {} /join begin, json:{}", activityId, json);
         try {
-            //TODO validator
             parameterChecker.checkUserInfo(userId, token);
             Appointment appointment = (Appointment) JSONObject.toBean(json, Appointment.class);
             return activityService.sendAppointment(activityId, userId, appointment);

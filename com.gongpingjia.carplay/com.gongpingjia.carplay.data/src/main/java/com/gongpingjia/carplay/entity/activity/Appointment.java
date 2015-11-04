@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.entity.activity;
 
+import com.gongpingjia.carplay.entity.common.Landmark;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.IndexDirection;
@@ -41,6 +42,12 @@ public class Appointment extends ActivityIntention {
 
     @Indexed(direction = IndexDirection.DESCENDING)
     private Long modifyTime;
+
+
+    private Landmark estabPoint;
+
+
+    private Double distance;
 
     //申请人员信息
     @Transient
@@ -123,6 +130,22 @@ public class Appointment extends ActivityIntention {
 
     public void setModifyTime(Long modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public Landmark getEstabPoint() {
+        return estabPoint;
+    }
+
+    public void setEstabPoint(Landmark estabPoint) {
+        this.estabPoint = estabPoint;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
     }
 
     public Object getApplicant() {

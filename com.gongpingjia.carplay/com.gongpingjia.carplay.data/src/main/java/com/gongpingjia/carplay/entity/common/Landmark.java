@@ -29,6 +29,16 @@ public class Landmark {
         this.latitude = latitude;
     }
 
+
+    public Landmark(){
+
+    }
+
+    public Landmark(double longitude, double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
     /**
      * 检查经纬度信息是否正确
      *

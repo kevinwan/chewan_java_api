@@ -182,8 +182,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             map.put("gender", user.getGender());
             map.put("age", user.getAge());
             map.put("avatar", localServer + user.getAvatar());
-            map.put("distance", DistanceUtil.getDistance(myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude(),
-                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+            map.put("distance", DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
             map.put("cover", user.getCover());
             map.put("subscribeTime", item.getSubscribeTime());
             data.add(map);
@@ -202,8 +201,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         for (User user : mySubscribeUsers) {
             user.hideSecretInfo();
             user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            user.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    myself.getLandmark().getLongitude(), myself.getLandmark().getLatitude()));
+            user.setDistance(DistanceUtil.getDistance(user.getLandmark(), myself.getLandmark()));
         }
     }
 

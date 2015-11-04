@@ -554,8 +554,7 @@ public class UserServiceImpl implements UserService {
         //是否在subscriberIdSet中 即为 是否关注了该用户
         userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
         userMap.put("emchatName", userInfo.getEmchatName());
-        userMap.put("distance", DistanceUtil.getDistance(currentUser.getLandmark().getLongitude(), currentUser.getLandmark().getLatitude(),
-                userInfo.getLandmark().getLongitude(), userInfo.getLandmark().getLatitude()));
+//        userMap.put("distance", DistanceUtil.getDistance(currentUser.getLandmark(), userInfo.getLandmark()));
         appointment.setApplicant(userMap);
     }
 
@@ -593,8 +592,7 @@ public class UserServiceImpl implements UserService {
         for (User item : userList) {
             item.hideSecretInfo();
             item.refreshPhotoInfo(localServer, remoteServer, gpjServer);
-            item.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    item.getLandmark().getLongitude(), item.getLandmark().getLatitude()));
+            item.setDistance(DistanceUtil.getDistance(user.getLandmark(), item.getLandmark()));
             users.put(item.getUserId(), item);
         }
 
@@ -703,7 +701,7 @@ public class UserServiceImpl implements UserService {
                 interestMap.put("photoCount", 0);
 
                 //该活动距离当前用户的距离
-                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark().getLongitude(), ownUser.getLandmark().getLatitude(), userMap.get(activity.getUserId()).getLandmark().getLongitude(), userMap.get(activity.getUserId()).getLandmark().getLatitude()));
+                interestMap.put("distance", DistanceUtil.getDistance(ownUser.getLandmark(), userMap.get(activity.getUserId()).getLandmark()));
                 Appointment appointment = appointmentMap.get(activity.getActivityId());
                 if (null == appointment) {
                     //没有发送邀请;
@@ -1144,8 +1142,7 @@ public class UserServiceImpl implements UserService {
             map.put("gender", user.getGender());
             map.put("age", user.getAge());
             map.put("avatar", localServer + user.getAvatar());
-            map.put("distance", DistanceUtil.getDistance(nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude(),
-                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+            map.put("distance", DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
             map.put("viewTime", item.getViewTime());
             map.put("cover", user.getCover());
             users.add(map);
@@ -1255,8 +1252,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> resultMap = new HashMap<>();
         //被查看用户的照片
         resultMap.put("cover", viewUser.getCover());
-        //被查看的用户与我的距离
-        resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark().getLongitude(), viewUser.getLandmark().getLatitude(), nowUser.getLandmark().getLongitude(), nowUser.getLandmark().getLatitude()));
+//        resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark(), nowUser.getLandmark()));
 
         //被查看用户的活动信息：基本信息+我申请该活动的状态
         ArrayList<Map<String, Object>> activityInfoList = new ArrayList<>(activityList.size());
@@ -1272,6 +1268,7 @@ public class UserServiceImpl implements UserService {
             itemMap.put("destination", activity.getDestination());
             itemMap.put("destPoint", activity.getDestPoint());
             itemMap.put("createTime", activity.getCreateTime());
+            itemMap.put("distance", DistanceUtil.getDistance(nowUser.getLandmark(), activity.getEstabPoint()));
 
             //获取该活动 该用户申请状态 0 未申请 1 申请中 3 已经同意 4 已被拒绝
             int applyStatus = Constants.AppointmentStatus.INITIAL;

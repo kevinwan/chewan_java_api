@@ -281,6 +281,8 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("该活动已处于申请中，请勿重复申请");
         }
 
+        User user = userDao.findById(userId);
+
         Long current = DateUtil.getTime();
         appointment.setActivityId(activity.getActivityId());
         appointment.setApplyUserId(userId);
@@ -289,6 +291,12 @@ public class ActivityServiceImpl implements ActivityService {
         appointment.setStatus(Constants.AppointmentStatus.APPLYING);
         appointment.setModifyTime(current);
         appointment.setActivityCategory(Constants.ActivityCatalog.COMMON);
+        //appointment的 destination为 activity的 destination  destPoint 为 活动的 estabPoint
+        //appointment 的 estabPoint 为 applyUserId 当前的 landmark
+        appointment.setDestPoint(activity.getEstabPoint());
+        appointment.setDestination(activity.getDestination());
+        appointment.setEstabPoint(user.getLandmark());
+        appointment.setDistance(DistanceUtil.getDistance(appointment.getEstabPoint(), appointment.getDestPoint()));
         appointmentDao.save(appointment);
 
         //将当前用户ID加入到申请人列表中
@@ -657,7 +665,7 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     @Override
-    public ResponseDo getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
+    public ResponseDo   getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
 
         //埋点统计
@@ -889,7 +897,9 @@ public class ActivityServiceImpl implements ActivityService {
      */
     private double computeWeight(ActivityQueryParam param, Long current, Activity item, User user) {
         //距离权重计算
-        item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(), item.getEstabPoint().getLongitude(),item.getEstabPoint().getLatitude()));
+//        item.setDistance(DistanceUtil.getDistance(param.getLongitude(), param.getLatitude(), item.getEstabPoint().getLongitude(), item.getEstabPoint().getLatitude()));
+        item.setDistance(DistanceUtil.getDistance(new Landmark(param.getLongitude(), param.getLatitude()), item.getEstabPoint()));
+
         double sortFactor = 0.2 * (1 - item.getDistance() / param.getMaxDistance());
 
         sortFactor += 0.1 * (1 - (current - item.getCreateTime()) / param.getMaxTimeLimit());
@@ -1027,8 +1037,7 @@ public class ActivityServiceImpl implements ActivityService {
         User user = userDao.findById(userId);
         for (Activity item : activityList) {
             User organizer = userMap.get(item.getUserId());
-            item.setDistance(DistanceUtil.getDistance(user.getLandmark().getLongitude(), user.getLandmark().getLatitude(),
-                    organizer.getLandmark().getLongitude(), organizer.getLandmark().getLatitude()));
+            item.setDistance(DistanceUtil.getDistance(user.getLandmark(), organizer.getLandmark()));
         }
 
         LOG.debug("Finished query data, begin build response");

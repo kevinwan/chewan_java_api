@@ -65,7 +65,7 @@ public class OfficialServiceImpl implements OfficialService {
     private CacheManager cacheManager;
 
     @Override
-    public ResponseDo getActivityInfo(HttpServletRequest request,String id, Integer idType, String userId) throws ApiException {
+    public ResponseDo getActivityInfo(HttpServletRequest request, String id, Integer idType, String userId) throws ApiException {
         LOG.debug("getActivityInfo");
 
         OfficialActivity officialActivity = checkParameters(id, idType);
@@ -93,7 +93,6 @@ public class OfficialServiceImpl implements OfficialService {
         }
 
 
-
         LOG.debug("Finished build data");
         //去除掉members 信息；
         jsonObject.remove("members");
@@ -102,7 +101,7 @@ public class OfficialServiceImpl implements OfficialService {
 
 
     @Override
-    public ResponseDo getActivityPageMemberInfo(String id,Integer idType, String userId, Integer ignore, Integer limit) throws ApiException {
+    public ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit) throws ApiException {
         if (limit <= 0) {
             LOG.warn("limit is {}", limit);
             throw new ApiException("参数异常 limit为正整数");
@@ -214,6 +213,7 @@ public class OfficialServiceImpl implements OfficialService {
                 //邀请过该用户
                 inviteFlag = true;
                 map.put("inviteStatus", appointment.getStatus());
+                map.put("inviteTime", appointment.getModifyTime());
                 if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
                     //jackjson 不允许有null 存在
                     if (user.getPhone() == null) {
@@ -231,6 +231,7 @@ public class OfficialServiceImpl implements OfficialService {
             if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getInvitedUserId().equals(userId)) {
                 beInvitedFlag = true;
                 map.put("beInvitedStatus", appointment.getStatus());
+                map.put("beInvitedTime", appointment.getModifyTime());
                 if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
                     //jackjson 不允许有null 存在
                     if (user.getPhone() == null) {
@@ -248,10 +249,12 @@ public class OfficialServiceImpl implements OfficialService {
         //没要邀请过
         if (!inviteFlag) {
             map.put("inviteStatus", Constants.AppointmentStatus.INITIAL);
+            map.put("inviteTime", 0);
         }
         //没有被邀请过
         if (!beInvitedFlag) {
             map.put("beInvitedStatus", Constants.AppointmentStatus.INITIAL);
+            map.put("beInvitedTime", 0);
         }
 
 
@@ -288,8 +291,7 @@ public class OfficialServiceImpl implements OfficialService {
         if (null == queryUser) {
             map.put("distance", "");
         } else {
-            map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark().getLongitude(), queryUser.getLandmark().getLatitude(),
-                    user.getLandmark().getLongitude(), user.getLandmark().getLatitude()));
+            map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
         }
 
         if (user.getCar() != null) {
@@ -514,9 +516,16 @@ public class OfficialServiceImpl implements OfficialService {
         Appointment toFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
                 .and("applyUserId").is(fromUserId).and("invitedUserId").is(toUserId)
                 .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
+        Appointment revertFind = appointmentDao.findOne(Query.query(Criteria.where("activityId").is(activityId)
+                .and("invitedUserId").is(fromUserId).and("applyUserId").is(toUserId)
+                .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
         if (null != toFind) {
             LOG.warn("User already has bean invited by each other");
             throw new ApiException("已经邀请过此用户");
+        }
+        if (null != revertFind) {
+            LOG.warn("User already has bean invited by each other");
+            throw new ApiException("该用户已经邀请过你");
         }
 
         //校验 只能 参加了该活动的人 能够邀请 和 被邀请
@@ -564,6 +573,8 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
     private void saveAppointment(String activityId, String fromUserId, String toUserId, boolean transfer, int status, String category, String message) {
+        User fromUser = userDao.findById(fromUserId);
+        User toUser = userDao.findById(toUserId);
         OfficialActivity activity = officialActivityDao.findById(activityId);
         Long current = DateUtil.getTime();
 
@@ -578,6 +589,8 @@ public class OfficialServiceImpl implements OfficialService {
         appointment.setTransfer(transfer);
         appointment.setMessage(message);
 
+        appointment.setEstabPoint(fromUser.getLandmark());
+        appointment.setDistance(DistanceUtil.getDistance(fromUser.getLandmark(), toUser.getLandmark()));
         appointment.setDestination(activity.getDestination());
         appointment.setType(activity.getTitle());
         appointmentDao.save(appointment);
