@@ -59,6 +59,10 @@ public class UserServiceImpl implements UserService {
     private PhotoService localFileManager;
 
     @Autowired
+    @Qualifier("thirdPhotoManager")
+    private PhotoService thirdPhotoManager;
+
+    @Autowired
     private ParameterChecker checker;
 
     @Autowired
@@ -111,13 +115,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseDo register(User user) throws ApiException {
         LOG.debug("Save register data begin");
-
         // 注册用户
         user.setRegisterTime(DateUtil.getTime());
         user.setRole(Constants.UserCatalog.COMMON);
         user.setPhotoAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
         user.setLicenseAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
         userDao.save(user);
+
+        //将用户的图片上传到用户的相册中
+        uploadAvatarToRemoteServer(user);
 
         // 注册环信用户
         LOG.debug("Register emchat user by call remote service");
@@ -152,6 +158,32 @@ public class UserServiceImpl implements UserService {
         data.setCompletion(computeCompletion(data));
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    /**
+     * 将用户的图片上传到用户的相册中
+     *
+     * @param user
+     * @return
+     */
+    private void uploadAvatarToRemoteServer(User user) {
+        LOG.debug("upload user avatar to user album before register");
+        byte[] avatarBytes = FileUtil.buildFileBytes(PropertiesUtil.getProperty("photo.static.path", "") + user.getAvatar());
+
+        try {
+            String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, user.getUserId(), CodeGenerator.generatorId());
+            Map<String, String> result = thirdPhotoManager.upload(avatarBytes, key, true);
+            if (Constants.Result.SUCCESS.equals(result.get("result"))) {
+                Update update = new Update();
+                update.addToSet("album", key);
+                userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
+
+                LOG.info("Upload user avatar album key:{}", key);
+            }
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+        }
+        LOG.debug("Finished upload user avatar to user album");
     }
 
     public void pushNearbyActivity(String receivedUserId, String emchatName, Landmark landmark) throws ApiException {
