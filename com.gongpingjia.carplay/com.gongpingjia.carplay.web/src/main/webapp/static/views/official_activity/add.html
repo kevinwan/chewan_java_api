@@ -140,7 +140,7 @@
                            placeholder="开始日期">
                 </div>
                 <div class="col-md-2 no-padding-left">
-                    <timepicker-pop id="startTime" class="input-group" input-time="startTime.time" ng-model="startTime.time" id="startTime" show-meridian="showMeridian"></timepicker-pop>
+                    <timepicker-pop id="startTime" class="input-group" input-time="startTime.time" ng-model="startTime.time" show-meridian="showMeridian"></timepicker-pop>
                 </div>
             </div>
         </div>
@@ -151,6 +151,9 @@
                 <div class="col-md-2 no-padding-left">
                     <input type="text" id="endDate" ui-date ui-date-format="yy-mm-dd" ng-model="endTime.date"
                            placeholder="不限制">
+                </div>
+                <div class="col-md-2 no-padding-left">
+                    <timepicker-pop id="endTime" class="input-group" input-time="endTime.time" ng-model="endTime.time"  show-meridian="showMeridian"></timepicker-pop>
                 </div>
             </div>
         </div>
