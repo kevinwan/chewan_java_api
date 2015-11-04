@@ -668,39 +668,12 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseDo   getNearByActivityList(HttpServletRequest request, ActivityQueryParam param) {
         LOG.info("Query parameters:{}", param.toString());
 
-        //埋点统计
-//<<<<<<< HEAD
-//        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_MATCH_COUNT);
-//
-//        //获取所有的活动列表
-//        List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
-//        if (activityList.isEmpty()) {
-//            LOG.info("No result find, begin expand query");
-//
-//            //埋点统计
-//            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.ACTIVITY_TYPE_RE_MATCH_COUNT);  //没有找到对应的活动 进行了扩展查询；
-//
-//            //如果没有找到活动，进行拓展查询
-//            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
-//        }
-//=======
-//        initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_MATCH);
-
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
-//        if (activityList.isEmpty()) {
-//            LOG.info("No result find, begin expand query");
-//
-//            //埋点统计
-//            initAndSaveStatisticActivityReMatch(request, param, StatisticActivityMatch.TYPE_RE_MATCH);  //没有找到对应的活动 进行了扩展查询；
-//
-//            //如果没有找到活动，进行拓展查询
-//            activityList = activityDao.find(Query.query(param.buildExpandQueryParam()));
-//        }
-//>>>>>>> 3aa0764... commit by fixed bugs
+
 
         if (activityList.isEmpty()) {
-            LOG.warn("No activity result found fron database");
+            LOG.warn("No activity result found from database");
             return ResponseDo.buildSuccessResponse(activityList);
         }
 
