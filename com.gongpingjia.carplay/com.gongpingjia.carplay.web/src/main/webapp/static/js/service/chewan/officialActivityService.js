@@ -42,7 +42,7 @@ gpjApp.factory('officialActivityService', ['$http','restProxyService', 'authServ
             uploadFile: function(data) {
                 return $http({
                     method: 'POST',
-                    url: ChewanOfficialApiEndPoint + '/activity/cover/upload?userId=' + USER_ID
+                    url: ChewanOfficialApiEndPoint + '/official/activity/cover/upload?userId=' + USER_ID
                     + '&token=' + USER_TOKEN,
                     data: data,
                     headers: {'Content-Type': undefined},

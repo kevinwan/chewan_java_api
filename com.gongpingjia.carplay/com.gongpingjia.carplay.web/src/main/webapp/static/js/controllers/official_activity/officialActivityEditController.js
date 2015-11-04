@@ -282,6 +282,8 @@ gpjApp.controller('officialActivityEditController', ['$scope', '$rootScope', '$l
                     cover.key = result.data.photoKey;
                     $scope.activity.cover = cover;
                     $scope.photoUrl = cover.photoUrl;
+                }else{
+                    alert("上传图片失败" + result.errmsg);
                 }
             });
         };
