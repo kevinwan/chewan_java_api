@@ -171,11 +171,17 @@ public class UserServiceImpl implements UserService {
         byte[] avatarBytes = FileUtil.buildFileBytes(PropertiesUtil.getProperty("photo.static.path", "") + user.getAvatar());
 
         try {
-            String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, user.getUserId(), CodeGenerator.generatorId());
+            String id = CodeGenerator.generatorId();
+            String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, user.getUserId(), id);
             Map<String, String> result = thirdPhotoManager.upload(avatarBytes, key, true);
             if (Constants.Result.SUCCESS.equals(result.get("result"))) {
+                Photo photo = new Photo();
+                photo.setId(id);
+                photo.setUploadTime(DateUtil.getTime());
+                photo.setKey(key);
+
                 Update update = new Update();
-                update.addToSet("album", key);
+                update.addToSet("album", photo);
                 userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
 
                 LOG.info("Upload user avatar album key:{}", key);
