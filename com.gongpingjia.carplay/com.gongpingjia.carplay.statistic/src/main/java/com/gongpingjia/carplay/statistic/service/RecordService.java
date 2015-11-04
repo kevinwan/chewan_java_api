@@ -24,6 +24,8 @@ public interface RecordService {
      */
     void unRegisterMatchInvited(HttpServletRequest request, JSONObject jsonObject);
 
+    void userRegister(HttpServletRequest request, JSONObject jsonObject);
+
 
     /**
      * 未注册用户同意假数据
@@ -49,6 +51,13 @@ public interface RecordService {
      * @param request
      */
     void activityDynamicChat(HttpServletRequest request, JSONObject jsonObject);
+
+    /**
+     * 活动类型点击次数
+     * @param request
+     * @param jsonObject
+     */
+    void activityTypeClick(HttpServletRequest request, JSONObject jsonObject);
 
     /**
      * 活动匹配邀他事件

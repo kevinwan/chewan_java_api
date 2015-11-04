@@ -15,6 +15,8 @@ public class StatisticUnRegister extends StatisticParent {
 
     public static final String UN_REGISTER_MATCH_INVITED = "unRegisterMatchInvited";
 
+    public static final String USER_REGISTER = "userRegister";
+
     //埋点7
     public static final String UN_REGISTER_DYNAMIC_ACCEPT = "unRegisterDynamicAccept";
 

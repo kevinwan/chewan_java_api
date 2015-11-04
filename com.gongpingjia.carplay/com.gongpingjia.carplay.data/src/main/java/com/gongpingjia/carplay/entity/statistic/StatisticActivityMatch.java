@@ -22,6 +22,8 @@ public class StatisticActivityMatch extends StatisticParent {
 
     public static final String ACTIVITY_MATCH_COUNT = "activityMatchCount";
 
+    public static final String ACTIVITY_TYPE_CLICK = "activityTypeClick";
+
     //活动类型,吃饭，唱歌，KTV
     protected String type;
 
