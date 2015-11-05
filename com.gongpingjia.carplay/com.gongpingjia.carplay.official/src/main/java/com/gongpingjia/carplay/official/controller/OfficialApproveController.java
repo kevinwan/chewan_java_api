@@ -4,7 +4,7 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
-import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
+import com.gongpingjia.carplay.service.impl.OfficialParameterChecker;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,7 +3,8 @@ package com.gongpingjia.carplay.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.service.VersionService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VersionController {
 
-    private static Logger LOG = Logger.getLogger(VersionController.class);
+    private static Logger LOG = LoggerFactory.getLogger(VersionController.class);
 
     @Autowired
     private VersionService versionService;
@@ -30,8 +31,8 @@ public class VersionController {
      * @return 返回版本信息
      */
     @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public ResponseDo getVersion(@RequestParam("product") String product) {
-        LOG.debug("getVersion start");
+    public ResponseDo getVersion(@RequestParam(value = "product", defaultValue = "android") String product) {
+        LOG.debug("getVersion start, request param product:{}", product);
 
         try {
             return versionService.getVersion(product);

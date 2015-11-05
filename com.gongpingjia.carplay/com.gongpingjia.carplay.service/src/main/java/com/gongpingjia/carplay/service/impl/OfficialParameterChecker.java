@@ -1,10 +1,9 @@
-package com.gongpingjia.carplay.official.service.impl;
+package com.gongpingjia.carplay.service.impl;
 
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
