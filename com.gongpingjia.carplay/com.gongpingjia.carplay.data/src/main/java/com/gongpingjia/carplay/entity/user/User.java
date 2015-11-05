@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -62,21 +63,16 @@ public class User {
     private String licenseAuthStatus;
 
     /**
-     * 用户第三方登录信息
-     */
-    @Indexed
-    private String uid;
-    /**
-     * 第三方登录渠道:qq/wechat/sinaWeibo
-     */
-    private String channel;
-
-    /**
      * 用户只有一个相册，存放多张相片
      */
     private List<Photo> album;
 
     private Car car;
+
+    /**
+     * 三方登录
+     */
+    private List<SnsChannel> snsChannels;
 
     /**
      * 表示是否处于空闲装态，true表示空闲，false表示忙，默认空闲
@@ -319,22 +315,6 @@ public class User {
         this.avatar = avatar;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
-    }
-
     public List<Photo> getAlbum() {
         return album;
     }
@@ -440,6 +420,14 @@ public class User {
         this.drivingLicense = drivingLicense;
     }
 
+    public List<SnsChannel> getSnsChannels() {
+        return snsChannels;
+    }
+
+    public void setSnsChannels(List<SnsChannel> snsChannels) {
+        this.snsChannels = snsChannels;
+    }
+
     /**
      * 隐藏用户的隐私信息
      */
@@ -447,6 +435,7 @@ public class User {
         this.token = null;
         this.password = null;
         this.deviceToken = null;
+        this.snsChannels = new ArrayList<>(0);
         return this;
     }
 }

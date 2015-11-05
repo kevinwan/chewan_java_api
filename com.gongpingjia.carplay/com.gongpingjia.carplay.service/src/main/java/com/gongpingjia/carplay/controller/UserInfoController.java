@@ -41,14 +41,10 @@ public class UserInfoController {
         LOG.debug("register is called, request parameter produce:");
         try {
             // 检查必须参数是否为空
-            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "birthday", "avatar", "landmark"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("nickname", "gender", "password", "birthday", "avatar", "landmark", "phone", "code"))) {
                 throw new ApiException("输入参数错误");
             }
 
-            if (!json.containsKey("landmark")) {
-                LOG.warn("Input parameter landmark is not exist");
-                throw new ApiException("输入参数错误");
-            }
             JSONObject jsonObject = json.getJSONObject("landmark");
             if (CommonUtil.isEmpty(jsonObject, Arrays.asList("longitude", "latitude"))) {
                 throw new ApiException("输入参数错误");
@@ -58,7 +54,7 @@ public class UserInfoController {
 
             userService.checkRegisterParameters(user, json);
 
-            return userService.register(user);
+            return userService.register(user, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -172,9 +168,8 @@ public class UserInfoController {
                 throw new ApiException("输入参数有误");
             }
 
-            User user = (User) JSONObject.toBean(json, User.class);
-
-            return userService.snsLogin(user);
+            return userService.snsLogin(json.getString("uid"), json.getString("nickname"), json.getString("avatar"),
+                    json.getString("channel"), json.getString("password"));
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -207,9 +202,9 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/appointment/list", method = RequestMethod.GET)
     public ResponseDo getMyActivityAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
-                                      @RequestParam(value = "status", required = false) Integer[] status,
-                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                      @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+                                                @RequestParam(value = "status", required = false) Integer[] status,
+                                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/appointment", userId);
         try {
             return userService.getMyActivityAppointments(userId, token, status, limit, ignore);
@@ -224,9 +219,9 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/user/{userId}/dynamic/appointments", method = RequestMethod.GET)
     public ResponseDo getDynamicActivityAppointments(@PathVariable("userId") String userId, @RequestParam("token") String token,
-                                                @RequestParam(value = "status", required = false) Integer[] status,
-                                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                                @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+                                                     @RequestParam(value = "status", required = false) Integer[] status,
+                                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                     @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/user/{}/dynamic/appointments", userId);
         try {
             return userService.getDynamicActivityAppointments(userId, token, status, limit, ignore);

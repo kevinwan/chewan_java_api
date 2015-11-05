@@ -22,10 +22,7 @@ import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
-import com.gongpingjia.carplay.entity.user.Subscriber;
-import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.entity.user.UserAuthentication;
-import com.gongpingjia.carplay.entity.user.UserToken;
+import com.gongpingjia.carplay.entity.user.*;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONObject;
@@ -113,48 +110,79 @@ public class UserServiceImpl implements UserService {
     private UserAuthenticationDao userAuthenticationDao;
 
     @Override
-    public ResponseDo register(User user) throws ApiException {
-        LOG.debug("Save register data begin");
-        // 注册用户
-        user.setRegisterTime(DateUtil.getTime());
-        user.setRole(Constants.UserCatalog.COMMON);
-        user.setPhotoAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
-        user.setLicenseAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
-        userDao.save(user);
+    public ResponseDo register(User user, JSONObject json) throws ApiException {
+        LOG.debug("Save register data begin, first check user is exist or not with phone:{}", user.getPhone());
+        User phoneUser = userDao.findOne(Query.query(Criteria.where("phone").is(json.getString("phone"))));
 
-        //将用户的图片上传到用户的相册中
-        uploadAvatarToRemoteServer(user);
+        String userId = "";
+        if (phoneUser != null) {
+            //第三方登录绑定用户的手机号
+            SnsChannel channel = new SnsChannel();
+            channel.setChannel(json.getString("channel"));
+            channel.setUid(json.getString("uid"));
+            channel.setPassword(json.getString("snsPassword"));
 
-        // 注册环信用户
-        LOG.debug("Register emchat user by call remote service");
-        Map<String, String> chatUser = new HashMap<>(2, 1);
-        chatUser.put("username", chatCommonService.getUsernameByUserid(user.getUserId()));
-        chatUser.put("password", user.getPassword());
+            User snsUser = userDao.findOne(Query.query(Criteria.where("snsChannels.uid").is(channel.getUid())
+                    .and("snsChannels.channel").is(channel.getChannel())));
+            if (snsUser != null) {
+                LOG.warn("User with channel:{} is already bind by other users", channel.toString());
+                throw new ApiException("三方登录请勿重复绑定");
+            }
 
-        JSONObject result = chatThirdService.registerChatUser(chatCommonService.getChatToken(), chatUser);
-        if (result.isEmpty()) {
-            //创建环信用户失败，需要回滚数据库
-            userDao.deleteById(user.getUserId());
-            LOG.warn("Create emchat user failure");
-            throw new ApiException("未能成功创建环信用户");
+            Update update = new Update();
+            update.addToSet("snsChannels", channel);
+            userDao.update(phoneUser.getUserId(), update);
+
+            userId = phoneUser.getUserId();
+            LOG.debug("Finished bingding user phone and sns login");
+        } else {
+            LOG.debug("User is not exist with phone number, register one now");
+            // 注册用户
+            user.setRegisterTime(DateUtil.getTime());
+            user.setRole(Constants.UserCatalog.COMMON);
+            user.setPhotoAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
+            user.setLicenseAuthStatus(Constants.AuthStatus.UNAUTHORIZED);
+            userDao.save(user);
+
+            //将用户的图片上传到用户的相册中
+            uploadAvatarToRemoteServer(user);
+
+            // 注册环信用户
+            LOG.debug("Register emchat user by call remote service");
+            Map<String, String> chatUser = new HashMap<>(2, 1);
+            chatUser.put("username", chatCommonService.getUsernameByUserid(user.getUserId()));
+            chatUser.put("password", user.getPassword());
+
+            JSONObject result = chatThirdService.registerChatUser(chatCommonService.getChatToken(), chatUser);
+            if (result.isEmpty()) {
+                //创建环信用户失败，需要回滚数据库
+                userDao.deleteById(user.getUserId());
+                LOG.warn("Create emchat user failure");
+                throw new ApiException("未能成功创建环信用户");
+            }
+
+            String emchatName = chatCommonService.getUsernameByUserid(user.getUserId());
+            userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), Update.update("emchatName", emchatName));
+
+            UserToken userToken = new UserToken();
+            userToken.setUserId(user.getUserId());
+            userToken.setToken(CodeGenerator.generatorId());
+            int tokenOverDays = PropertiesUtil.getProperty("carplay.token.over.date", 7);
+            userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, tokenOverDays));
+            userTokenDao.save(userToken);
+
+            cacheManager.setUserToken(userToken);
+
+            pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
+
+            userId = user.getUserId();
         }
 
-        String emchatName = chatCommonService.getUsernameByUserid(user.getUserId());
-        userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), Update.update("emchatName", emchatName));
-
-        UserToken userToken = new UserToken();
-        userToken.setUserId(user.getUserId());
-        userToken.setToken(CodeGenerator.generatorId());
-        userToken.setExpire(DateUtil.addTime(DateUtil.getDate(), Calendar.DATE, 7));
-        userTokenDao.save(userToken);
-
-        cacheManager.setUserToken(userToken);
-
-        pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
-
-        User data = userDao.findById(user.getUserId());
+        LOG.debug("Build response data");
+        User data = userDao.findById(userId);
+        UserToken token = userTokenDao.findOne(Query.query(Criteria.where("userId").is(data.getUserId())));
         data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        data.setToken(userToken.getToken());
+        data.setToken(token.getToken());
         data.setCompletion(computeCompletion(data));
 
         return ResponseDo.buildSuccessResponse(data);
@@ -221,17 +249,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDo loginUser(User user) throws ApiException {
-        // 验证参数
-        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
-            LOG.warn("Invalid params, phone:{}", user.getPhone());
-            return ResponseDo.buildFailureResponse("输入参数有误");
-        }
+        // 验证参数, 暂时屏蔽只有手机号才能登录的功能
+//        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+//            LOG.warn("Invalid params, phone:{}", user.getPhone());
+//            return ResponseDo.buildFailureResponse("输入参数有误");
+//        }
 
         // 查找用户
         User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
         if (userData == null) {
-            LOG.warn("Fail to find user");
+            LOG.warn("Fail to find user, phone:{}", user.getPhone());
             return ResponseDo.buildFailureResponse("用户不存在，请注册后登录");
+        }
+
+        if (userData.isDeleteFlag()) {
+            LOG.warn("User is already forbid by administrator, userId:{}", userData.getUserId());
+            return ResponseDo.buildFailureResponse("用户已被禁用");
         }
 
         if (!user.getPassword().equals(userData.getPassword())) {
@@ -380,6 +413,35 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("输入参数错误");
         }
 
+        String phone = json.getString("phone");
+        User phoneUser = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+        if (phoneUser != null) {
+            //已有的用户绑定手机号
+            LOG.info("User already exist by phone:{}", user.getPhone());
+
+            checker.checkPhoneVerifyCode(phone, json.getString("code"));
+
+            //检查是否存在uid和channel
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "snsPassword"))) {
+                LOG.info("Binding user phone to sns login should contain uid, channel and snsPassword");
+                throw new ApiException("输入参数错误");
+            }
+
+            if (!Constants.Channel.CHANNEL_LIST.contains(json.getString("channel"))) {
+                LOG.info("Input channel:{} is not in channel list", json.getString("channel"));
+                throw new ApiException("输入参数错误");
+            }
+
+            String snsPassword = buildSnsPassword(json.getString("uid"), json.getString("channel"));
+            if (!snsPassword.equals(json.getString("snsPassword"))) {
+                LOG.warn("Input user with banding sns loging password error");
+                throw new ApiException("输入参数错误");
+            }
+
+            return;
+        }
+
+        //手机号对应的用户不存在，就为注册，保留之前的逻辑
         if (!StringUtils.isEmpty(user.getAvatar())) {
             user.setAvatar(MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, user.getAvatar()));
             // 判断图片是否存在
@@ -440,32 +502,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDo snsLogin(User user) throws ApiException {
-        checkSnsLoginParameters(user.getUid(), user.getChannel(), user.getPassword());
-
-        LOG.debug("Save data begin");
-        User userData = userDao.findOne(Query.query(Criteria.where("uid").is(user.getUid())));
-
+    public ResponseDo snsLogin(String uid, String nickname, String avatar, String channel, String password) throws ApiException {
+        LOG.debug("Query begin, channel:{}, uid:{}", channel, uid);
+        User userData = userDao.findOne(Query.query(Criteria.where("snsChannels.uid").is(uid).and("snsChannels.channel").is(channel)));
         if (userData == null) {
             // 没有找到对应的已经存在的用户，注册新用户, 由客户端调用注册接口，这里只完成图片上传
             LOG.debug("No exist user in the system, register new user by client call register interface");
 
+            checkSnsLoginParameters(uid, channel, password);
+
             // 头像ID
             String avatarId = CodeGenerator.generatorId();
             String key = MessageFormat.format(Constants.PhotoKey.AVATAR_KEY, avatarId);
+            uploadPhotoToServer(avatar, key);
 
-            uploadPhotoToServer(user.getAvatar(), key);
-            user.setAvatar(avatarId);
             Map<String, Object> data = new HashMap<>(4, 1);
-            data.put("uid", user.getUid());
-            data.put("nickname", user.getNickname());
-            data.put("channel", user.getChannel());
+            data.put("uid", uid);
+            data.put("nickname", nickname);
+            data.put("channel", channel);
             data.put("avatar", avatarId);
             return ResponseDo.buildSuccessResponse(data);
         } else {
+            LOG.debug("User already exist by uid:{}, channel:{}", uid, channel);
             if (userData.isDeleteFlag()) {
-                LOG.warn("User is already deleted by administrator, cannot login again");
-                throw new ApiException("用户不存在");
+                LOG.warn("User is already forbid by administrator, cannot login again");
+                throw new ApiException("用户已被禁用");
+            }
+
+            SnsChannel snsChannel = null;
+            for (SnsChannel item : userData.getSnsChannels()) {
+                if (uid.equals(item.getUid()) && channel.equals(item.getChannel())) {
+                    snsChannel = item;
+                    break;
+                }
+            }
+
+            if (snsChannel == null || !password.equals(snsChannel.getPassword())) {
+                LOG.warn("Input user password incorrect, channel:{}, uid:{}", channel, uid);
+                throw new ApiException("输入参数错误");
             }
 
             // 用户已经存在于系统中
@@ -1114,18 +1188,28 @@ public class UserServiceImpl implements UserService {
     private void refreshUserBySnsRegister(User user, boolean snsRegister, JSONObject json) {
         if (snsRegister) {
             // SNS注册 刷新用户信息
-            String snsChannel = json.getString("channel");
-            String uid = json.getString("uid");
-            LOG.debug("Register user by sns way, channel:{}", snsChannel);
-
-            // 设置第三方登录密码
-            StringBuilder builder = new StringBuilder();
-            builder.append(uid);
-            builder.append(snsChannel);
-            builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
-
-            user.setPassword(EncoderHandler.encodeByMD5(builder.toString()));
+            SnsChannel channel = new SnsChannel();
+            channel.setChannel(json.getString("channel"));
+            channel.setUid(json.getString("uid"));
+            LOG.debug("Register user by sns way, channel:{}", channel.getChannel());
+            channel.setPassword(buildSnsPassword(channel.getUid(), channel.getChannel()));
+            List<SnsChannel> channelList = user.getSnsChannels();
+            if (channelList == null) {
+                channelList = new ArrayList<>(1);
+            }
+            channelList.add(channel);
+            user.setSnsChannels(channelList);
         }
+    }
+
+    private String buildSnsPassword(String uid, String channel) {
+        // 设置第三方登录密码
+        StringBuilder builder = new StringBuilder();
+        builder.append(uid);
+        builder.append(channel);
+        builder.append(PropertiesUtil.getProperty("user.password.bundle.id", ""));
+
+        return EncoderHandler.encodeByMD5(builder.toString());
     }
 
     /**
