@@ -21,9 +21,12 @@ public class StatisticDriverAuthDaoImpl extends BaseDaoImpl<StatisticDriverAuth,
 
     @Override
     public List<Map> statisticDriverAuth(Long start, Long end, int unit) {
+
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("createTime").gte(start).lt(end)),
                 DaoUtil.buildGroupOperation(unit), Aggregation.sort(new Sort(DaoUtil.buildSortOrder(unit))));
+
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, "pushInfo", Map.class);
+
         return results.getMappedResults();
     }
 

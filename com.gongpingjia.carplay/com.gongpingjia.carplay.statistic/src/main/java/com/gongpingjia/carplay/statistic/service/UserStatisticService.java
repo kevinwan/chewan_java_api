@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.statistic.service;
 import com.gongpingjia.carplay.entity.statistic.StatisticDriverAuth;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/11/5.
@@ -16,5 +17,5 @@ public interface UserStatisticService {
      * @param unit
      * @return
      */
-    List<StatisticDriverAuth> getUserLicenseAuthenticationStatistic(Long start, Long end, int unit);
+    List<Map> getUserLicenseAuthenticationStatistic(Long start, Long end, int unit);
 }
