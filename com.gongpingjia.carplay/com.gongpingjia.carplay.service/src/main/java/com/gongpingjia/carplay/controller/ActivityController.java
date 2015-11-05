@@ -47,7 +47,7 @@ public class ActivityController {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo registerActivity(@RequestParam(value = "userId") String userId, @RequestParam(value = "token") String token,
                                        @RequestBody JSONObject jsonObject) {
-        LOG.debug("activity/register begin");
+        LOG.debug("activity/register begin, parameter:{}", jsonObject);
         try {
             if (CommonUtil.isEmpty(jsonObject, Arrays.asList("majorType", "type", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
