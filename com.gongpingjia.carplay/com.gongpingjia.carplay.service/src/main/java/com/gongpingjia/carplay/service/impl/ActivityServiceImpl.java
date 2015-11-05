@@ -792,6 +792,9 @@ public class ActivityServiceImpl implements ActivityService {
             Map<String, Object> organizer = new HashMap<>(9, 1);
             if (user != null) {
                 organizer.put("userId", user.getUserId());
+                if (null != user.getCar()) {
+                    user.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
+                }
                 organizer.put("car", user.getCar());
                 organizer.put("subscribeFlag", subscriberSet.contains(item.getUserId()));
                 organizer.put("nickname", user.getNickname());

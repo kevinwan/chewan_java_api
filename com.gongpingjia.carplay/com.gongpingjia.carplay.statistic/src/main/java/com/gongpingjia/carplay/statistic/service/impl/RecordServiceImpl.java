@@ -68,12 +68,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void unRegisterNearbyInvited(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("unRegisterNearbyInvited --------");
-        if(!jsonObject.containsKey("unRegisterNearbyInvited")) return;
 
-        int count = jsonObject.getInt("unRegisterNearbyInvited");
+        if (!jsonObject.containsKey("unRegisterNearbyInvited") || jsonObject.getInt("unRegisterNearbyInvited") <= 0)
+            return;
+
         StatisticUnRegister statisticUnRegister = new StatisticUnRegister();
         statisticUnRegister.setEvent(StatisticUnRegister.UN_REGISTER_NEARBY_INVITED);
-        statisticUnRegister.setCount(count);
+        statisticUnRegister.setCount(jsonObject.getInt("unRegisterNearbyInvited"));
         statisticUnRegister.recordTime(DateUtil.getTime());
         statisticUnRegister.setIp(IPFetchUtil.getIPAddress(request));
 
@@ -83,12 +84,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void unRegisterMatchInvited(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("unRegisterMatchInvited --------");
-        if(!jsonObject.containsKey("unRegisterMatchInvited")) return;
 
-        int count = jsonObject.getInt("unRegisterMatchInvited");
+        if (!jsonObject.containsKey("unRegisterMatchInvited") || jsonObject.getInt("unRegisterMatchInvited") <= 0)
+            return;
+
         StatisticUnRegister statisticUnRegister = new StatisticUnRegister();
         statisticUnRegister.setEvent(StatisticUnRegister.UN_REGISTER_MATCH_INVITED);
-        statisticUnRegister.setCount(count);
+        statisticUnRegister.setCount(jsonObject.getInt("unRegisterMatchInvited"));
         statisticUnRegister.recordTime(DateUtil.getTime());
         statisticUnRegister.setIp(IPFetchUtil.getIPAddress(request));
 
@@ -98,12 +100,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void userRegister(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("userRegister --------");
-        if(!jsonObject.containsKey("userRegister")) return;
 
-        int count = jsonObject.getInt("userRegister");
+        if (!jsonObject.containsKey("userRegister") || jsonObject.getInt("userRegister") <= 0)
+            return;
+
         StatisticUnRegister statisticUnRegister = new StatisticUnRegister();
         statisticUnRegister.setEvent(StatisticUnRegister.USER_REGISTER);
-        statisticUnRegister.setCount(count);
+        statisticUnRegister.setCount(jsonObject.getInt("userRegister"));
         statisticUnRegister.recordTime(DateUtil.getTime());
         statisticUnRegister.setIp(IPFetchUtil.getIPAddress(request));
 
@@ -115,12 +118,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void unRegisterDynamicAccept(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("unRegisterDynamicAccept --------");
-        if(!jsonObject.containsKey("unRegisterDynamicAccept")) return;
 
-        int count = jsonObject.getInt("unRegisterDynamicAccept");
+        if (!jsonObject.containsKey("unRegisterDynamicAccept") || jsonObject.getInt("unRegisterDynamicAccept") <= 0)
+            return;
+
         StatisticUnRegister statisticUnRegister = new StatisticUnRegister();
         statisticUnRegister.setEvent(StatisticUnRegister.UN_REGISTER_DYNAMIC_ACCEPT);
-        statisticUnRegister.setCount(count);
+        statisticUnRegister.setCount(jsonObject.getInt("unRegisterDynamicAccept"));
         statisticUnRegister.recordTime(DateUtil.getTime());
         statisticUnRegister.setIp(IPFetchUtil.getIPAddress(request));
 
@@ -131,12 +135,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void dynamicAcceptRegister(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("dynamicAcceptRegister --------");
-        if(!jsonObject.containsKey("dynamicAcceptRegister")) return;
 
-        int count = jsonObject.getInt("dynamicAcceptRegister");
+        if (!jsonObject.containsKey("dynamicAcceptRegister") || jsonObject.getInt("dynamicAcceptRegister") <= 0)
+            return;
+
         StatisticUnRegister statisticUnRegister = new StatisticUnRegister();
         statisticUnRegister.setEvent(StatisticUnRegister.DYNAMIC_ACCEPT_REGISTER);
-        statisticUnRegister.setCount(count);
+        statisticUnRegister.setCount(jsonObject.getInt("dynamicAcceptRegister"));
         statisticUnRegister.recordTime(DateUtil.getTime());
         statisticUnRegister.setIp(IPFetchUtil.getIPAddress(request));
 
@@ -153,8 +158,9 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void appOpenCount(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("appOpenCount --------");
-        if(!jsonObject.containsKey("appOpenCount")) return;
 
+        if (!jsonObject.containsKey("appOpenCount") || jsonObject.getInt("appOpenCount") <= 0)
+            return;
 
         StatisticDynamicNearby statisticDynamicNearby = new StatisticDynamicNearby();
         statisticDynamicNearby.setIp(IPFetchUtil.getIPAddress(request));
@@ -168,11 +174,13 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public void dynamicNearbyInvited(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("dynamicNearbyInvited --------");
-        if(!jsonObject.containsKey("dynamicNearbyInvited")) return;
 
-
+        if (!jsonObject.containsKey("dynamicNearbyInvited"))
+            return;
         JSONArray jsonArray = getJsonArray(jsonObject, "dynamicNearbyInvited");
-        if (jsonArray == null) return;
+        if (jsonArray == null || jsonArray.isEmpty())
+            return;
+
         String userId = getUserId(request);
         String ip = IPFetchUtil.getIPAddress(request);
         Long nowTime = DateUtil.getTime();
@@ -197,12 +205,15 @@ public class RecordServiceImpl implements RecordService {
     public void activityDynamicCall(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("activityDynamicCall --------");
 
-        if(!jsonObject.containsKey("activityDynamicCall")) return;
-
+        if (!jsonObject.containsKey("activityDynamicCall"))
+            return;
         String userId = getUserId(request);
-        if (null == userId) return;
+        if (null == userId)
+            return;
         JSONArray appointmentIdArr = getJsonArray(jsonObject, "activityDynamicCall");
-        if (null == appointmentIdArr || appointmentIdArr.isEmpty()) return;
+        if (null == appointmentIdArr || appointmentIdArr.isEmpty())
+            return;
+
         Map<String, Integer> callCountMap = buildCountMap(appointmentIdArr);
         Long nowTime = DateUtil.getTime();
         for (Map.Entry<String, Integer> countItem : callCountMap.entrySet()) {
@@ -221,13 +232,15 @@ public class RecordServiceImpl implements RecordService {
     public void activityDynamicChat(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("activityDynamicCall --------");
 
-        if(!jsonObject.containsKey("activityDynamicChat")) return;
-
-
+        if (!jsonObject.containsKey("activityDynamicChat"))
+            return;
         String userId = getUserId(request);
-        if (null == userId) return;
+        if (null == userId)
+            return;
         JSONArray appointmentIdArr = getJsonArray(jsonObject, "activityDynamicChat");
-        if (null == appointmentIdArr || appointmentIdArr.isEmpty()) return;
+        if (null == appointmentIdArr || appointmentIdArr.isEmpty())
+            return;
+
         Map<String, Integer> callCountMap = buildCountMap(appointmentIdArr);
         Long nowTime = DateUtil.getTime();
         for (Map.Entry<String, Integer> countItem : callCountMap.entrySet()) {
@@ -246,13 +259,16 @@ public class RecordServiceImpl implements RecordService {
     public void activityTypeClick(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("activityTypeClick --------");
 
-        if(!jsonObject.containsKey("activityTypeClick")) return;
+        if (!jsonObject.containsKey("activityTypeClick"))
+            return;
+        JSONArray typeArr = getJsonArray(jsonObject, "activityTypeClick");
+        if (null == typeArr || typeArr.isEmpty())
+            return;
 
         String userId = getUserId(request);
         String ip = IPFetchUtil.getIPAddress(request);
         Long nowTime = DateUtil.getTime();
-        JSONArray typeArr = getJsonArray(jsonObject, "activityTypeClick");
-        if (null == typeArr || typeArr.isEmpty()) return;
+
         Map<String, Integer> countMap = buildCountMap(typeArr);
         for (Map.Entry<String, Integer> countItem : countMap.entrySet()) {
             StatisticActivityMatch statisticActivityMatch = new StatisticActivityMatch();
@@ -274,13 +290,16 @@ public class RecordServiceImpl implements RecordService {
     public void activityMatchInvitedCount(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("activityMatchInvitedCount --------");
 
-        if(!jsonObject.containsKey("activityDynamicChat")) return;
+        if (!jsonObject.containsKey("activityDynamicChat"))
+            return;
+        JSONArray activityIdArr = getJsonArray(jsonObject, "activityDynamicChat");
+        if (null == activityIdArr || activityIdArr.isEmpty())
+            return;
 
         String userId = getUserId(request);
         String ip = IPFetchUtil.getIPAddress(request);
         Long nowTime = DateUtil.getTime();
-        JSONArray activityIdArr = getJsonArray(jsonObject, "activityDynamicChat");
-        if (null == activityIdArr || activityIdArr.isEmpty()) return;
+
         Map<String, Integer> countMap = buildCountMap(activityIdArr);
         for (Map.Entry<String, Integer> countItem : countMap.entrySet()) {
             StatisticActivityMatch statisticActivityMatch = new StatisticActivityMatch();
@@ -298,12 +317,12 @@ public class RecordServiceImpl implements RecordService {
     }
 
 
-
     @Override
     public void activityMatchCount(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("activityMatchCount --------");
 
-        if(!jsonObject.containsKey("activityMatchCount")) return;
+        if (!jsonObject.containsKey("activityMatchCount") || jsonObject.getInt("activityMatchCount") <= 0)
+            return;
 
         String userId = getUserId(request);
         String ip = IPFetchUtil.getIPAddress(request);
@@ -322,12 +341,15 @@ public class RecordServiceImpl implements RecordService {
     public void officialActivityBuyTicket(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("officialActivityBuyTicket --------");
 
-        if(!jsonObject.containsKey("officialActivityBuyTicket")) return;
-
+        if (!jsonObject.containsKey("officialActivityBuyTicket"))
+            return;
         String userId = getUserId(request);
-        if (null == userId) return;
+        if (null == userId)
+            return;
         JSONArray jsonArray = getJsonArray(jsonObject, "officialActivityBuyTicket");
-        if (null == jsonArray || jsonArray.isEmpty()) return;
+        if (null == jsonArray || jsonArray.isEmpty())
+            return;
+
         String ip = IPFetchUtil.getIPAddress(request);
         Map<String, Integer> officialActivityIdCountMap = buildCountMap(jsonArray);
         Long nowTime = DateUtil.getTime();
@@ -348,12 +370,15 @@ public class RecordServiceImpl implements RecordService {
     public void officialActivityChatJoin(HttpServletRequest request, JSONObject jsonObject) {
         LOG.info("officialActivityChatJoin --------");
 
-        if(!jsonObject.containsKey("officialActivityChatJoin")) return;
-
+        if (!jsonObject.containsKey("officialActivityChatJoin"))
+            return;
         String userId = getUserId(request);
-        if (null == userId) return;
+        if (null == userId)
+            return;
         JSONArray jsonArray = getJsonArray(jsonObject, "officialActivityChatJoin");
-        if (null == jsonArray || jsonArray.isEmpty()) return;
+        if (null == jsonArray || jsonArray.isEmpty())
+            return;
+
         String ip = IPFetchUtil.getIPAddress(request);
         Map<String, Integer> officialActivityIdCountMap = buildCountMap(jsonArray);
         Long nowTime = DateUtil.getTime();
