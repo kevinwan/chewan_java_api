@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by licheng on 2015/9/21.
  */
 @Document
-public class Version {
+public class ProductVersion {
 
     @Id
     private String id;
@@ -64,7 +64,7 @@ public class Version {
 
     @Override
     public String toString() {
-        return "Version{" +
+        return "ProductVersion{" +
                 "id='" + id + '\'' +
                 ", product='" + product + '\'' +
                 ", url='" + url + '\'' +

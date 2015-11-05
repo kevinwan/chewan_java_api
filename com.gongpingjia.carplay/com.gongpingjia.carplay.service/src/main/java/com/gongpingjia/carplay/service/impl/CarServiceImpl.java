@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -61,8 +62,7 @@ public class CarServiceImpl implements CarService {
             dataJson = json.getJSONArray("brand");
 
             for (int i = 0; i < dataJson.size(); i++) {
-                dataJson.getJSONObject(i).put("logo_img",
-                        PropertiesUtil.getProperty("gongpingjia.brand.logo.url", "") + dataJson.getJSONObject(i).remove("logo_img"));
+                dataJson.getJSONObject(i).put("logo_img", CommonUtil.getGPJBrandLogoPrefix() + dataJson.getJSONObject(i).getString("slug") + ".png");
             }
 
             LOG.debug("Refresh brand info in cache server");

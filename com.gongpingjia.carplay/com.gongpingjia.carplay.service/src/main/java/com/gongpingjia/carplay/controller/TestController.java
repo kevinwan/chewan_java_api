@@ -1,20 +1,14 @@
 package com.gongpingjia.carplay.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.util.BeanUtil;
-import com.gongpingjia.carplay.dao.activity.PushInfoDao;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
-import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
-import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
-import com.gongpingjia.carplay.entity.user.User;
 import net.sf.json.JSONObject;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 /**
  * Created by Administrator on 2015/9/25.
@@ -50,5 +44,19 @@ public class TestController {
     public ResponseDo testPost(@RequestBody JSONObject jsonObject) {
 
         return ResponseDo.buildSuccessResponse("123");
+    }
+
+    public static void main(String[] args){
+        ProductVersion version = new ProductVersion();
+        version.setForceUpdate(1);
+        version.setProduct("android");
+        version.setUrl("");
+        version.setRemarks("车玩版本介绍\n" +
+                "推荐活动：官方精选的靠谱的活动，活跃度高，安全有保障\n" +
+                "附近活动：附近的Ta发布活动了，唱歌、吃饭、购物，还包接送\n" +
+                "匹配活动：想去嗨皮？不用发完活动干等着，分分钟找到附近和你一起想去嗨皮的小伙伴\n" +
+                "车主认证：百分百车主官方认证，交友出行100%有保障\n");
+        JSONObject jsonObject = JSONObject.fromObject(version);
+        System.out.println(jsonObject);
     }
 }
