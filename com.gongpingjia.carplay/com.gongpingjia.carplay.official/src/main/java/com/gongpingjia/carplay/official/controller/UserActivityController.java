@@ -2,9 +2,8 @@ package com.gongpingjia.carplay.official.controller;
 
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
+import com.gongpingjia.carplay.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.ActivityService;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * 官方后台查看用户发布的活动信息

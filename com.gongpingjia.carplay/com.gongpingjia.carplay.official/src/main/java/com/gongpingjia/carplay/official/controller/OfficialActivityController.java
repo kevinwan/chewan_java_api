@@ -3,7 +3,7 @@ package com.gongpingjia.carplay.official.controller;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.official.service.OfficialActivityService;
-import com.gongpingjia.carplay.official.service.impl.OfficialParameterChecker;
+import com.gongpingjia.carplay.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.impl.ParameterChecker;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;

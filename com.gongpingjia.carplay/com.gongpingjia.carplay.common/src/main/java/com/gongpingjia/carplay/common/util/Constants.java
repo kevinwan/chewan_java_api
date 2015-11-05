@@ -351,4 +351,30 @@ public class Constants {
 
         List<Integer> TYPE_LIST = Arrays.asList(TYPE_OFFICIAL, TYPE_EMCHAT);
     }
+
+
+    /**
+     * 统计单位，年月日时分
+     */
+    public interface StatisticUnit {
+        int YEAR = 0;
+        int MONTH = 1;
+        int DAY = 2;
+        int HOUR = 3;
+        int MINUTE = 4;
+    }
+
+    /**
+     * 统计单位字符串
+     */
+    public interface StatisticUnitString {
+        String YEAR = "year";
+        String MONTH = "month";
+        String DAY = "day";
+        String HOUR = "hour";
+        String MINUTE = "minute";
+
+        List<String> STATISTIC_UNIT_LIST = Arrays.asList(YEAR, MONTH, DAY, HOUR, MINUTE);
+    }
+
 }
