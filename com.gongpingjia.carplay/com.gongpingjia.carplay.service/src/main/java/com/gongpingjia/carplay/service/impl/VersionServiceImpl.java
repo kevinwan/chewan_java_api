@@ -3,7 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.dao.common.VersionDao;
-import com.gongpingjia.carplay.entity.common.Version;
+import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.service.VersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class VersionServiceImpl implements VersionService {
     public ResponseDo getVersion(String product) throws ApiException {
         LOG.debug("getVersion start, product:{}", product);
 
-        Version version = versionDao.findOne(Query.query(Criteria.where("product").is(product)));
+        ProductVersion version = versionDao.findOne(Query.query(Criteria.where("product").is(product)));
 
         return ResponseDo.buildSuccessResponse(version);
     }
