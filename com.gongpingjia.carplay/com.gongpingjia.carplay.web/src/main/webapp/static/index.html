@@ -85,12 +85,10 @@
 						</span> <i class="icon-caret-down"></i>
                 </a>
 
-                    <ul
-                            class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                    <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
                         <li class="divider"></li>
-
-                        <li><a ng-click="logout()"> <i class="icon-off"></i> 退出登录
-                        </a></li>
+                        <li><a ng-click="logout()"> <i class="icon-off"></i> 退出登录</a></li>
+                        <li><a ng-click="changePsw()"><i class="icon-lock"></i> 修改密码</a></li>
                     </ul>
                 </li>
             </ul>
@@ -316,8 +314,8 @@
 <script src="js/controllers/activity/activityViewController.js"></script>
 <script src="js/controllers/activity/activityUpdateController.js"></script>
 
-<!--test-->
-<!--<script src="js/controllers/test/testController.js"></script>-->
+<!--change password-->
+<script src="js/controllers/user/changePasswordController.js"></script>
 
 <!-- ace scripts -->
 <script src="js/lib/ace/ace-elements.min.js"></script>

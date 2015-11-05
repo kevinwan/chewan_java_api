@@ -30,7 +30,23 @@ public interface UserService {
     ResponseDo loginUser(User user) throws ApiException;
 
 
+    /**
+     * 管理员用户登录
+     * @param user
+     * @return
+     * @throws ApiException
+     */
     ResponseDo loginAdminUser(User user)throws ApiException;
+
+
+    /**
+     * 更改管理员用户密码
+     * @param userId
+     * @param json
+     * @return
+     * @throws ApiException
+     */
+    ResponseDo changeAdminPsw(String userId,JSONObject json) throws  ApiException;
 
 
     /**
