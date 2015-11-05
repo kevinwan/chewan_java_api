@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
             SnsChannel channel = new SnsChannel();
             channel.setChannel(json.getString("channel"));
             channel.setUid(json.getString("uid"));
-            channel.setPassword(json.getString("password"));
+            channel.setPassword(json.getString("snsPassword"));
 
             User snsUser = userDao.findOne(Query.query(Criteria.where("snsChannels.uid").is(channel.getUid())
                     .and("snsChannels.channel").is(channel.getChannel())));
@@ -422,8 +422,8 @@ public class UserServiceImpl implements UserService {
             checker.checkPhoneVerifyCode(phone, json.getString("code"));
 
             //检查是否存在uid和channel
-            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel"))) {
-                LOG.info("Binding user phone to sns login should contain uid and channel");
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "snsPassword"))) {
+                LOG.info("Binding user phone to sns login should contain uid, channel and snsPassword");
                 throw new ApiException("输入参数错误");
             }
 
@@ -433,7 +433,7 @@ public class UserServiceImpl implements UserService {
             }
 
             String snsPassword = buildSnsPassword(json.getString("uid"), json.getString("channel"));
-            if (!snsPassword.equals(user.getPassword())) {
+            if (!snsPassword.equals(json.getString("snsPassword"))) {
                 LOG.warn("Input user with banding sns loging password error");
                 throw new ApiException("输入参数错误");
             }
