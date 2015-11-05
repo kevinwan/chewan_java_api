@@ -204,7 +204,7 @@ public class OfficialServiceImpl implements OfficialService {
                 //别人邀请他的
                 invitedCount++;
                 if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
-                    acceptList.add(appointment.getInvitedUserId());
+                    acceptList.add(appointment.getApplyUserId());
                 }
             }
 //            else if (appointment.getApplyUserId().equals(user.getUserId()) && appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
