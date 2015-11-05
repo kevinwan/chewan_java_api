@@ -528,8 +528,13 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("已经邀请过此用户");
         }
         if (null != revertFind) {
-            LOG.warn("User already has bean invited by each other");
-            throw new ApiException("该用户已经邀请过你");
+            if (revertFind.getStatus() == Constants.AppointmentStatus.APPLYING) {
+                LOG.warn("the other user is invited the current user");
+                throw new ApiException("该用户正在邀请你，请在动态中查看");
+            }
+            if (revertFind.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+                throw new ApiException("你已经同意了该用户的同去邀请");
+            }
         }
 
         //校验 只能 参加了该活动的人 能够邀请 和 被邀请
