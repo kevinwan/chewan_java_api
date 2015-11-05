@@ -8,5 +8,10 @@ import net.sf.json.JSONObject;
  */
 public interface StatisticViewService {
 
+    /**
+     * 埋点1 统计信息 4组数据
+     * @param jsonObject
+     * @return
+     */
     public ResponseDo getUnRegisterInfo(JSONObject jsonObject);
 }

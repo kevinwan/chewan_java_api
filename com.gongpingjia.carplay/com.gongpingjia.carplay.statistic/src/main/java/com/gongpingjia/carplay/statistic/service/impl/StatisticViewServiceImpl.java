@@ -26,6 +26,12 @@ public class StatisticViewServiceImpl implements StatisticViewService {
 
     private Logger logger = LoggerFactory.getLogger(StatisticViewService.class);
 
+    /**
+     * 埋点1 统计数据
+     *
+     * @param jsonObject
+     * @return
+     */
     public ResponseDo getUnRegisterInfo(JSONObject jsonObject) {
         try {
             String startStr = jsonObject.getString("startTime");
@@ -42,10 +48,10 @@ public class StatisticViewServiceImpl implements StatisticViewService {
             for (String itemDate : betweenStrList) {
                 Map<String, Object> dataMap = new HashMap();
                 dataMap.put("x", itemDate);
-                int successCount = successMap.get(itemDate) == null ? 0 : successMap.get(itemDate);
-                int nearByCount = nearByMap.get(itemDate) == null ? 0 : nearByMap.get(itemDate);
-                int matchCount = matchMap.get(itemDate) == null ? 0 : matchMap.get(itemDate);
-                int unRegisterCount = unRegisterMap.get(itemDate) == null ? 0 : unRegisterMap.get(itemDate);
+                int successCount = transferNullToZero(successMap, itemDate);
+                int nearByCount = transferNullToZero(nearByMap, itemDate);
+                int matchCount = transferNullToZero(matchMap, itemDate);
+                int unRegisterCount = transferNullToZero(unRegisterMap, itemDate);
                 dataMap.put("y", Arrays.asList(successCount, nearByCount, matchCount, unRegisterCount));
                 countList.add(dataMap);
             }
@@ -56,4 +62,11 @@ public class StatisticViewServiceImpl implements StatisticViewService {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+
+    private int transferNullToZero(Map<String, Integer> sourceMap, String itemName) {
+        return sourceMap.get(itemName) == null ? 0 : sourceMap.get(itemName);
+    }
+
+
 }

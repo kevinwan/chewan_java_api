@@ -42,6 +42,7 @@ public class CountServiceImpl implements CountService {
         Long endTime = null;
         try {
             startTime = dateFormat.parse(startStr).getTime();
+            //endTime + 1天的时间     当天的数据也需要返回
             endTime = DateUtil.addTime(dateFormat.parse(endStr), Calendar.DATE, 1);
         } catch (ParseException e) {
             logger.error(e.getMessage(), e);
@@ -57,12 +58,11 @@ public class CountServiceImpl implements CountService {
         Map<String, Integer> countMap = new HashMap<>(mappedResults.size());
         for (Map item : mappedResults) {
             StringBuilder timeStr = new StringBuilder();
-
-            String month = String.valueOf((Integer) item.get("month"));
+            String month = String.valueOf(item.get("month"));
             if (month.length() == 1) {
                 month = "0" + month;
             }
-            String day = String.valueOf((Integer) item.get("day"));
+            String day = String.valueOf(item.get("day"));
             if (day.length() == 1) {
                 day = "0" + day;
             }
