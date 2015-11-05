@@ -14,10 +14,11 @@ public interface UserService {
      * 注册用户
      *
      * @param user 用户信息
+     * @param json
      * @return 注册结果
      * @throws ApiException
      */
-    ResponseDo register(User user) throws ApiException;
+    ResponseDo register(User user, JSONObject json) throws ApiException;
 
 
     /**
@@ -74,7 +75,7 @@ public interface UserService {
      * @return 返回登录结果
      * @throws ApiException
      */
-    public ResponseDo snsLogin(User user) throws ApiException;
+    public ResponseDo snsLogin(String uid, String nickname, String avatar, String channel, String password) throws ApiException;
 
     /**
      * 查看用户详细信息
@@ -127,24 +128,25 @@ public interface UserService {
     /**
      * 记录用户本次上传了照片的数量
      *
-     *
      * @param userId
      * @param token
-     *@param count 上传的照片的数量  @return 返回处理结果
+     * @param count  上传的照片的数量  @return 返回处理结果
      */
     ResponseDo recordUploadPhotoCount(String userId, String token, Integer count) throws ApiException;
 
 
     /**
      * 获取某个用户的所有的活动
+     *
      * @param viewUserId
      * @return
      * @throws ApiException
      */
-    ResponseDo getUserActivityList(String viewUserId,String userId,int limit,int ignore)throws ApiException;
+    ResponseDo getUserActivityList(String viewUserId, String userId, int limit, int ignore) throws ApiException;
 
     /**
      * 根据用户的环信ID，获取用户的聊天信息
+     *
      * @param emchatName 环信ID
      * @return 返回用户的聊天必须信息
      */
@@ -152,6 +154,7 @@ public interface UserService {
 
     /**
      * 用户修改密码接口
+     *
      * @param userId
      * @param old
      * @param aNew
@@ -161,6 +164,7 @@ public interface UserService {
 
     /**
      * 获取用户动态--活动动态信息
+     *
      * @param userId
      * @param token
      * @param status
