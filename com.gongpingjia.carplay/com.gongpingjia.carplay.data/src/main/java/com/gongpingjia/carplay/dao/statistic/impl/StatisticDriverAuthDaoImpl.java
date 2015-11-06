@@ -25,7 +25,7 @@ public class StatisticDriverAuthDaoImpl extends BaseDaoImpl<StatisticDriverAuth,
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("createTime").gte(start).lt(end)),
                 DaoUtil.buildGroupOperation(unit), Aggregation.sort(new Sort(DaoUtil.buildSortOrder(unit))));
 
-        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, "pushInfo", Map.class);
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, "statisticDriverAuth", Map.class);
 
         return results.getMappedResults();
     }

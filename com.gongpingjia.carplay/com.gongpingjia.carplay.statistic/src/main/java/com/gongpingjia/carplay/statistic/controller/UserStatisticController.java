@@ -7,6 +7,8 @@ import com.gongpingjia.carplay.statistic.service.UserStatisticService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +38,7 @@ public class UserStatisticController {
      * @param end
      * @return
      */
+    @RequestMapping(value = "/statistic/license/auth", method = RequestMethod.GET)
     public ResponseDo getUserLicenseAuthenticationStatistic(@RequestParam("userId") String userId, @RequestParam("token") String token,
                                                             @RequestParam("start") Long start, @RequestParam("end") Long end,
                                                             @RequestParam(value = "unit", defaultValue = "3") int unit) {

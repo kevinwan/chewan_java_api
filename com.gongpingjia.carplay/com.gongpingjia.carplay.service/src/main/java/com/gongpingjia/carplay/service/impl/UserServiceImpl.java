@@ -17,6 +17,7 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.activity.PushInfo;
+import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
@@ -822,7 +823,11 @@ public class UserServiceImpl implements UserService {
             userInfo.put("age", user.getAge());
             userInfo.put("photoAuthStatus", user.getPhotoAuthStatus());
             userInfo.put("licenseAuthStatus", user.getLicenseAuthStatus());
-            userInfo.put("car", user.getCar());
+            Car car = user.getCar();
+            if (car != null) {
+                car.refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
+            }
+            userInfo.put("car", car);
             userInfo.put("avatar", localServer + user.getAvatar());
             userInfo.put("cover", user.getCover());
             userInfo.put("subscribeFlag", true);
