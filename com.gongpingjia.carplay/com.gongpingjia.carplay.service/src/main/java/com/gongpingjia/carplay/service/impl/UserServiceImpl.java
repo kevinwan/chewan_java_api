@@ -1157,7 +1157,7 @@ public class UserServiceImpl implements UserService {
             LOG.debug("Register user by sns way, channel:{}", channel.getChannel());
             channel.setPassword(buildSnsPassword(channel.getUid(), channel.getChannel()));
 
-            if (channel.getPassword().equals(json.getString("snsPassword"))) {
+            if (!channel.getPassword().equals(json.getString("snsPassword"))) {
                 LOG.debug("Input parameter snsPassword is not correct");
                 throw new ApiException("输入参数错误");
             }
