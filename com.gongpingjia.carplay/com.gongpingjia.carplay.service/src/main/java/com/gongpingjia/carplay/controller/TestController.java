@@ -50,7 +50,9 @@ public class TestController {
         ProductVersion version = new ProductVersion();
         version.setForceUpdate(1);
         version.setProduct("android");
+        version.setVersion("2.0");
         version.setUrl("");
+
         version.setRemarks("车玩版本介绍\n" +
                 "推荐活动：官方精选的靠谱的活动，活跃度高，安全有保障\n" +
                 "附近活动：附近的Ta发布活动了，唱歌、吃饭、购物，还包接送\n" +

@@ -113,14 +113,14 @@ public class UserInfoController {
      */
     @RequestMapping(value = "/admin/changePsw", method = RequestMethod.POST, headers = {
             "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo loginAdminChangePsw(@RequestParam String userId,@RequestParam String token,@RequestBody JSONObject json){
+    public ResponseDo loginAdminChangePsw(@RequestParam String userId, @RequestParam String token, @RequestBody JSONObject json) {
         LOG.debug("admin login starts");
         try {
-            if (CommonUtil.isEmpty(json, Arrays.asList("password","newPsw"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("password", "newPsw"))) {
                 throw new ApiException("输入参数错误");
             }
-            parameterChecker.checkUserInfo(userId,token);
-            return userService.changeAdminPsw(userId,json);
+            parameterChecker.checkUserInfo(userId, token);
+            return userService.changeAdminPsw(userId, json);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -390,26 +390,38 @@ public class UserInfoController {
     /**
      * 用户绑定手机号，通过三方登录，参加活动时，需要绑定手机号码
      *
-     * @param userId 用户Id
-     * @param token  用户会话Token
-     * @param json   请求Body
+     * @param json 请求Body
      * @return 返回处理结果
      */
-    @RequestMapping(value = "/user/{userId}/binding", method = RequestMethod.POST,
+    @RequestMapping(value = "/user/phone/binding", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo bindingPhone(@PathVariable("userId") String userId, @RequestParam("token") String token,
-                                   @RequestBody JSONObject json) {
+    public ResponseDo bindingSnsLoginPhone(@RequestBody JSONObject json) {
         try {
-            LOG.debug("Begin user binding phone,user:{}", userId);
-            if (CommonUtil.isEmpty(json, Arrays.asList("phone", "code"))) {
+            LOG.debug("Begin user binding phone, param:{}", json);
+            if (CommonUtil.isEmpty(json, Arrays.asList("uid", "channel", "snsPassword", "phone", "code"))) {
                 throw new ApiException("输入参数有误");
             }
-            String phone = json.getString("phone");
-            String code = json.getString("code");
 
-            return userService.bindingPhone(userId, token, phone, code);
+            return userService.bindingPhone(json.getString("uid"), json.getString("channel"), json.getString("snsPassword"),
+                    json.getString("phone"), json.getString("code"));
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * 检测手机号是否已经注册
+     *
+     * @return
+     */
+    @RequestMapping(value = "/user/{phone}/register", method = RequestMethod.GET)
+    public ResponseDo checkPhoneAlreadyRegister(@PathVariable("phone") String phone) {
+        LOG.debug("check user phone already register or not, phone:{}", phone);
+        try {
+            return userService.checkPhoneAlreadyRegister(phone);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }

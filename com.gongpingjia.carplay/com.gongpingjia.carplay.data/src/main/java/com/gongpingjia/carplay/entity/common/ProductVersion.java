@@ -18,6 +18,8 @@ public class ProductVersion {
 
     private String url;
 
+    private String version;
+
     private Integer forceUpdate;
 
     private String remarks;
@@ -62,14 +64,12 @@ public class ProductVersion {
         this.remarks = remarks;
     }
 
-    @Override
-    public String toString() {
-        return "ProductVersion{" +
-                "id='" + id + '\'' +
-                ", product='" + product + '\'' +
-                ", url='" + url + '\'' +
-                ", forceUpdate=" + forceUpdate +
-                ", remarks='" + remarks + '\'' +
-                '}';
+    public String getVersion() {
+        return version;
     }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
 }

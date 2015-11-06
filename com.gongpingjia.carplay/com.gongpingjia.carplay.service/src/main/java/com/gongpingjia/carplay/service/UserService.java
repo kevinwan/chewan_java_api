@@ -33,21 +33,23 @@ public interface UserService {
 
     /**
      * 管理员用户登录
+     *
      * @param user
      * @return
      * @throws ApiException
      */
-    ResponseDo loginAdminUser(User user)throws ApiException;
+    ResponseDo loginAdminUser(User user) throws ApiException;
 
 
     /**
      * 更改管理员用户密码
+     *
      * @param userId
      * @param json
      * @return
      * @throws ApiException
      */
-    ResponseDo changeAdminPsw(String userId,JSONObject json) throws  ApiException;
+    ResponseDo changeAdminPsw(String userId, JSONObject json) throws ApiException;
 
 
     /**
@@ -121,7 +123,19 @@ public interface UserService {
 
     ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException;
 
-    ResponseDo bindingPhone(String userId, String token, String phone, String code) throws ApiException;
+    /**
+     * 三方登录绑定手机号
+     *
+     * @throws ApiException
+     */
+    ResponseDo bindingPhone(String uid, String channel, String snsPassword, String phone, String code) throws ApiException;
+
+    /**
+     * 检查手机号是否已经注册
+     * @param phone
+     * @return
+     */
+    ResponseDo checkPhoneAlreadyRegister(String phone) throws ApiException;
 
     ResponseDo getAuthenticationHistory(String userId, String token) throws ApiException;
 
