@@ -9,13 +9,13 @@ var gpjApp = angular.module('gpjApp', ['ngRoute', 'ngResource', 'ngSanitize', 'd
     'ui.date', 'datatables.bootstrap', 'timepickerPop']);
 
 
-//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
-//gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
-//gpjApp.constant('ChewanApiEndPoint', '/v2');
+gpjApp.constant('ChewanOfficialApiEndPoint', 'http://cwapi.gongpingjia.com:8080/v2');
+gpjApp.constant('ChewanApiProvider', 'http://cwapi.gongpingjia.com:8080');
+gpjApp.constant('ChewanApiEndPoint', '/v2');
 
-gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
-gpjApp.constant("ChewanApiProvider", "http://localhost:8080");
-gpjApp.constant("ChewanApiEndPoint", "");
+//gpjApp.constant('ChewanOfficialApiEndPoint', 'http://localhost:8080');
+//gpjApp.constant("ChewanApiProvider", "http://localhost:8080");
+//gpjApp.constant("ChewanApiEndPoint", "");
 
 /**
  * Router configuration
@@ -69,6 +69,9 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/statistic/test',{
         templateUrl: 'views/statistic/test.html',
         controller: 'testController'
+    }).when('/statistic/common/:type',{
+        templateUrl: 'views/statistic/statistic_common.html',
+        controller: 'statisticCommonController'
     });
 }]).config(['$httpProvider', function ($httpProvider) {
 

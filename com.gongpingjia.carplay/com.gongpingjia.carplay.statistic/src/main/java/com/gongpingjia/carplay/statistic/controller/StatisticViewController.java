@@ -37,4 +37,16 @@ public class StatisticViewController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    @RequestMapping(value = "/statistic/commonInfo", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo getCommonInfo(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestParam("type") Integer type, @RequestBody JSONObject json) {
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+            return statisticViewService.dispatchAllInfo(json, type);
+        } catch (ApiException e) {
+            logger.info(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }

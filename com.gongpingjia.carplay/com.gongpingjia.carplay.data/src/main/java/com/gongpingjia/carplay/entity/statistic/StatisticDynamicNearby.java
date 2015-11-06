@@ -11,7 +11,6 @@ public class StatisticDynamicNearby extends StatisticParent {
 
     public static final String APP_OPEN_COUNT = "appOpenCount";
 
-    //TODO 服务端切面
     public static final String DYNAMIC_NEARBY_CLICK = "dynamicNearbyClick";        //查看附近的活动的推送信息
 
     public static final String DYNAMIC_NEARBY_INVITED = "dynamicNearbyInvited";

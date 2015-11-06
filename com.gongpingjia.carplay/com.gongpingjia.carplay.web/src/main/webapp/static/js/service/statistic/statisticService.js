@@ -15,7 +15,11 @@ gpjApp.factory('statisticService', ['authService', 'restProxyService', 'ChewanOf
         return {
             getUnRegisterInfo: function (data) {
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/statistic/unRegisterInfo?userId="
-                + userId+ "&token=" + token,data);
+                + userId + "&token=" + token, data);
+            },
+            getCommonInfo: function (data, type) {
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/statistic/commonInfo?userId="
+                + userId + "&token=" + token + "&type=" + type, data);
             }
         }
     }]);

@@ -36,11 +36,25 @@
     </div>
 </div>
 <div class="col-md-2">
-    <label class="control-label bolder blue" for="type">样式选择</label>
+    <label class="control-label bolder blue" for="type">业务选择</label>
+    <div class="controls">
+        <select id="type" ng-init="type='1'" ng-change="search()"
+                data-ng-model="type" style="width:100%;">
+            <option value="1">用户注册统计信息</option>
+            <option value="2">动态统计信息</option>
+            <option value="3">活动操作统计信息</option>
+            <option value="4">官方活动统计信息</option>
+            <option value="5">动态附近统计信息</option>
+            <option value="6">用户审核统计信息</option>
+        </select>
+    </div>
+</div>
+<div class="col-md-2">
+    <label class="control-label bolder blue" for="viewType">样式选择</label>
 
     <div class="controls">
-        <select id="type" ng-init="type='bar'"
-                data-ng-model="type" style="width:100%;">
+        <select id="viewType" ng-init="viewType='bar'"
+                data-ng-model="viewType" style="width:100%;">
             <option value="bar">柱状图</option>
             <option value="line">折线图</option>
         </select>
@@ -50,7 +64,7 @@
 <div class="form-inline col-md-12">
     <div class="clearfix visible‐xs‐block"></div>
     <div class="control-group pull-right">
-        <button type="button" class="btn btn-info" ng-disabled="" ng-hide=""
+        <button type="button" class="btn btn-info"
                 ng-click="search()">查询
         </button>
         <button type="button" class="btn" ng-click="resetCriteria()">清除</button>
@@ -58,6 +72,6 @@
 </div>
 
 <div title="活动匹配" style="height:500px;" bs-pane>
-    <div ac-chart="type" ac-data="data" ac-config="config"
+    <div ac-chart="viewType" ac-data="data" ac-config="config"
          style="margin-left: 10px;"></div>
 </div>

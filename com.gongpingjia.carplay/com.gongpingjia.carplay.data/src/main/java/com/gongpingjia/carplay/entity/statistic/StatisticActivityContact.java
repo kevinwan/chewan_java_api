@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class StatisticActivityContact extends StatisticParent {
 
+
     public static final String ACTIVITY_DYNAMIC_CALL = "activityDynamicCall";
 
     public static final String ACTIVITY_DYNAMIC_CHAT = "activityDynamicChat";

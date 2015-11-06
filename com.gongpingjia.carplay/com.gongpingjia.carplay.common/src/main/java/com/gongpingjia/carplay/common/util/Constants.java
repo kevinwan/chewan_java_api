@@ -2,6 +2,7 @@ package com.gongpingjia.carplay.common.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 常量类
@@ -375,6 +376,19 @@ public class Constants {
         String MINUTE = "minute";
 
         List<String> STATISTIC_UNIT_LIST = Arrays.asList(YEAR, MONTH, DAY, HOUR, MINUTE);
+    }
+
+
+    public interface BuriedPointType {
+        int StatisticActivityContact = 2;
+        int StatisticActivityMatch = 3;
+        int StatisticDriverAuth = 6;
+        int StatisticDynamicNearby = 5;
+        int StatisticOfficialActivity = 4;
+        int StatisticUnRegister = 1;
+        int StatisticUnRegisterDynamic = 7;
+
+        List<Integer> TYPE_LIST = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
     }
 
 }

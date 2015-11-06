@@ -15,12 +15,18 @@ gpjApp.controller('testController', ['$scope', '$rootScope', '$location', 'offic
         };
 
         $scope.criteria = {
-            startTime: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+            startTime: moment().subtract(6, 'day').format('YYYY-MM-DD'),
             endTime: moment().format('YYYY-MM-DD')
         };
+        $scope.type = 1;
+        $scope.viewType = 'bar';
 
         $scope.search = function () {
-            $rootScope.loadingPromise = statisticService.getUnRegisterInfo($scope.criteria).success(function (res) {
+            if($scope.criteria.endTime < $scope.criteria.startTime) {
+                alert("结束时间必须大于开始时间");
+                return;
+            }
+            $rootScope.loadingPromise = statisticService.getCommonInfo($scope.criteria,$scope.type).success(function (res) {
                 if (res.result === 0) {
                     $scope.data = res.data;
                 } else {
@@ -31,7 +37,7 @@ gpjApp.controller('testController', ['$scope', '$rootScope', '$location', 'offic
 
         $scope.resetCriteria = function () {
             $scope.criteria = {
-                startTime: moment().subtract(7, 'day').format('YYYY-MM-DD'),
+                startTime: moment().subtract(6, 'day').format('YYYY-MM-DD'),
                 endTime: moment().format('YYYY-MM-DD')
             };
         };
