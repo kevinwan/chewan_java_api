@@ -158,13 +158,16 @@ public class UserServiceImpl implements UserService {
 
         pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
 
+        return ResponseDo.buildSuccessResponse(buildResponseUser(user, userToken.getToken()));
+    }
+
+    private User buildResponseUser(User user, String token) {
         LOG.debug("Build response data");
         User data = userDao.findById(user.getUserId());
         data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        data.setToken(userToken.getToken());
+        data.setToken(token);
         data.setCompletion(computeCompletion(data));
-
-        return ResponseDo.buildSuccessResponse(data);
+        return data;
     }
 
     /**
@@ -495,12 +498,7 @@ public class UserServiceImpl implements UserService {
 
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login information");
-            //刷新用户会话Token
-            userData.setToken(refreshUserToken(userData.getUserId()));
-            userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            userData.setCompletion(computeCompletion(userData));
-
-            return ResponseDo.buildSuccessResponse(userData);
+            return ResponseDo.buildSuccessResponse(buildResponseUser(userData, refreshUserToken(userData.getUserId())));
         }
     }
 
@@ -931,7 +929,9 @@ public class UserServiceImpl implements UserService {
         snsChannel.setPassword(snsPassword);
         userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), new Update().addToSet("snsChannels", snsChannel));
 
-        return ResponseDo.buildSuccessResponse();
+        User responseUser = userDao.findById(user.getUserId());
+        UserToken userToken = userTokenDao.findOne(Query.query(Criteria.where("userId").is(user.getUserId())));
+        return ResponseDo.buildSuccessResponse(buildResponseUser(responseUser, userToken.getToken()));
     }
 
     @Override
