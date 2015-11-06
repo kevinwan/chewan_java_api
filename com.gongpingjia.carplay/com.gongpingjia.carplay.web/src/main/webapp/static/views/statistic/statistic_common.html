@@ -1,0 +1,63 @@
+<div class="page-header">
+    <h1>运营数据</h1>
+</div>
+
+<style type="text/css">
+    [ac-chart] {
+        float: left;
+        width: 100%;
+        height: 400px;
+        margin: 0 1%;
+    }
+
+    .ac-tooltip {
+        color: black;
+        border: 2px solid rgba(200, 200, 0, 0.8);
+        background-color: rgba(200, 200, 0, 0.5);
+        z-index: 1600;
+    }
+</style>
+<!-- /.page-header -->
+
+<div class="col-md-2">
+    <label class="control-label bolder blue" for="fromDate">开始时间</label>
+
+    <div class="">
+        <input type="text" id="fromDate" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.startTime"
+               placeholder="开始时间">
+    </div>
+</div>
+<div class="col-md-2">
+    <label class="control-label bolder blue" for="toDate">结束时间</label>
+
+    <div class="">
+        <input type="text" id="toDate" ui-date ui-date-format="yy-mm-dd" ng-model="criteria.endTime"
+               placeholder="结束时间">
+    </div>
+</div>
+<div class="col-md-2">
+    <label class="control-label bolder blue" for="viewType">样式选择</label>
+
+    <div class="controls">
+        <select id="viewType" ng-init="viewType='bar'"
+                data-ng-model="viewType" style="width:100%;">
+            <option value="bar">柱状图</option>
+            <option value="line">折线图</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-inline col-md-12">
+    <div class="clearfix visible‐xs‐block"></div>
+    <div class="control-group pull-right">
+        <button type="button" class="btn btn-info"
+                ng-click="search()">查询
+        </button>
+        <button type="button" class="btn" ng-click="resetCriteria()">清除</button>
+    </div>
+</div>
+
+<div title="活动匹配" style="height:500px;" bs-pane>
+    <div ac-chart="viewType" ac-data="data" ac-config="config"
+         style="margin-left: 10px;"></div>
+</div>
