@@ -109,25 +109,6 @@ public class UserInfoController {
     }
 
     /**
-     * 后台管理员修改密码
-     */
-    @RequestMapping(value = "/admin/changePsw", method = RequestMethod.POST, headers = {
-            "Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo loginAdminChangePsw(@RequestParam String userId, @RequestParam String token, @RequestBody JSONObject json) {
-        LOG.debug("admin login starts");
-        try {
-            if (CommonUtil.isEmpty(json, Arrays.asList("password", "newPsw"))) {
-                throw new ApiException("输入参数错误");
-            }
-            parameterChecker.checkUserInfo(userId, token);
-            return userService.changeAdminPsw(userId, json);
-        } catch (ApiException e) {
-            LOG.warn(e.getMessage(), e);
-            return ResponseDo.buildFailureResponse(e.getMessage());
-        }
-    }
-
-    /**
      * 忘记密码
      *
      * @param json 参数列表

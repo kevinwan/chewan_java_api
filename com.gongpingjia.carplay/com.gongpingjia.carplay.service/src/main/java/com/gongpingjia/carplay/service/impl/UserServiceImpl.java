@@ -312,36 +312,6 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * 更改管理员用户密码
-     *
-     * @param userId
-     * @param json
-     * @return
-     * @throws ApiException
-     */
-    @Override
-    public ResponseDo changeAdminPsw(String userId, JSONObject json) throws ApiException {
-        User user = userDao.findById(userId);
-        if (null == user) {
-            LOG.warn("user not exist userId is :{}", userId);
-            throw new ApiException("用户不存在");
-        }
-        if (!Constants.UserCatalog.ADMIN.equals(user.getRole())) {
-            LOG.warn("Query user is not administrator");
-            throw new ApiException("操作用户不是管理员");
-        }
-        String password = json.getString("password");
-        String newPsw = json.getString("newPsw");
-        if (!user.getPassword().equals(password)) {
-            LOG.warn("password not match userId is :{}", userId);
-            throw new ApiException("原始密码不匹配");
-        }
-        Update update = Update.update("password", newPsw);
-        userDao.update(user.getUserId(), update);
-        return ResponseDo.buildSuccessResponse();
-    }
-
-    /**
      * 计算用户的信息的完善程度
      *
      * @param user

@@ -17,7 +17,7 @@ gpjApp.controller('changePasswordController', ['$scope', '$rootScope', '$window'
                 return;
             }
 
-            $rootScope.loadingPromise = userService.changeAdminPsw({password: md5.createHash($scope.password), newPsw: md5.createHash($scope.newPsw)}).success(function(result){
+            $rootScope.loadingPromise = userService.changePassword({old: md5.createHash($scope.password), new: md5.createHash($scope.newPsw)}).success(function(result){
                 if(result.result === 0) {
                     alert("修改成功");
                     $modalInstance.dismiss('close');
