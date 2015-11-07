@@ -273,11 +273,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ResponseDo loginAdminUser(User user) throws ApiException {
-        // 验证参数
-        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
-            LOG.warn("Invalid params, phone:{}", user.getPhone());
-            return ResponseDo.buildFailureResponse("输入参数有误");
-        }
+//        // 验证参数
+//        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+//            LOG.warn("Invalid params, phone:{}", user.getPhone());
+//            return ResponseDo.buildFailureResponse("输入参数有误");
+//        }
 
         // 查找用户
         User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
@@ -884,6 +884,17 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             LOG.warn("User with phone number:{} is not exit in the system", phone);
             throw new ApiException("手机号对应用户不存在");
+        }
+
+        //检查改手机号下面是否已经包含该Channel，如果已经包含了，就不能重复绑定
+        List<SnsChannel> channelList = user.getSnsChannels();
+        if (channelList != null) {
+            for (SnsChannel item : channelList) {
+                if (channel.equals(item.getChannel())) {
+                    LOG.warn("User phone:{} has already bingding to an exist channel:{}", phone, channel);
+                    throw new ApiException("手机号不能与多个账号绑定");
+                }
+            }
         }
 
         User snsUser = userDao.findOne(Query.query(Criteria.where("snsChannels.uid").is(uid).and("snsChannels.channel").is(channel)));

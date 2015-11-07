@@ -293,12 +293,14 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/activity/pushInfo", method = RequestMethod.GET)
-    public ResponseDo getPushActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request) {
+    public ResponseDo getPushActivities(@RequestParam("userId") String userId, @RequestParam("token") String token, HttpServletRequest request,
+                                        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                        @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         LOG.debug("/activity/pushInfo, userId:{}", userId);
         try {
             parameterChecker.checkUserInfo(userId, token);
 
-            return activityService.getActivityPushInfos(request, userId);
+            return activityService.getActivityPushInfos(request, userId, limit, ignore);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

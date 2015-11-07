@@ -84,8 +84,9 @@ public class ActivityQueryParam {
 //            criteria.and("gender").is(gender);
 //        }
 
-        if (transfer != null && transfer) {
-            //只有选择包接送才会执行这个
+//        if (transfer != null && transfer) {//只有选择包接送才会执行这个
+        if (transfer != null) {
+            //经过同产品确认，包接送transfer为true，不包接送transfer为false(增加理解：如果不限制的话，transfer不用传参数)
             criteria.and("transfer").is(transfer);
         }
 
