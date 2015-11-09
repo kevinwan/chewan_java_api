@@ -141,9 +141,11 @@ public class UploadController {
         try {
             long maxSize = Long.parseLong(PropertiesUtil.getProperty("official.activity.cover.maxSize", "200")) * 1024;
             int maxWidth = Integer.parseInt(PropertiesUtil.getProperty("official.activity.cover.maxWidth","825"));
+            LOG.info("maxSize is :{} maxWidth:{}",maxSize,maxWidth);
             BufferedImage image = null;
             try {
                 image = ImageIO.read(attach.getInputStream());
+                LOG.info("image width :{} height:{}", image.getWidth(), image.getHeight());
                 if (image.getWidth() != image.getHeight()) {
                     throw new ApiException("图片的长宽必须相等");
                 }
@@ -159,6 +161,7 @@ public class UploadController {
             if (attach.getSize() > maxSize) {
                 throw new ApiException("图片大小超过200K");
             }
+            LOG.info("ready enter to uploadCoverPhoto");
             return service.uploadCoverPhoto(attach, userId, token);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
