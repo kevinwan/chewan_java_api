@@ -6,6 +6,7 @@ import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
 import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TestController {
 
+    @Autowired
     private PhoneVerificationDao phoneVerificationDao;
 
     @RequestMapping(value = "/test/{phone}", method = RequestMethod.GET)
