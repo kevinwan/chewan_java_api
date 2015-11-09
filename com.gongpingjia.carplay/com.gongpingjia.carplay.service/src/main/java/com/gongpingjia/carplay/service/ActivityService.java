@@ -112,7 +112,8 @@ public interface ActivityService {
     /**
      * 获取当前用户的附近的推送消息
      * @param userId
-     * @return
+     * @param limit
+     *@param ignore @return
      */
-    ResponseDo getActivityPushInfos(HttpServletRequest request,String userId);
+    ResponseDo getActivityPushInfos(HttpServletRequest request, String userId, Integer limit, Integer ignore);
 }

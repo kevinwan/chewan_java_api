@@ -24,9 +24,9 @@ gpjApp.factory('userService', ['authService', 'restProxyService', 'ChewanOfficia
                 authService.setUser(undefined);
             },
 
-            changeAdminPsw:function(data){
-                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/admin/changePsw?userId="
-                + authService.getUser().userId + "&token=" + authService.getUser().token,data);
+            changePassword: function (data) {
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/user/" + authService.getUser().userId
+                + "/password?token=" + authService.getUser().token, data);
             },
 
             setUser: function (aUserId) {

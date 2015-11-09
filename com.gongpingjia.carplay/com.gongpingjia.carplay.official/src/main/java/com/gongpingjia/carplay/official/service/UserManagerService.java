@@ -15,7 +15,7 @@ public interface UserManagerService {
      * @return
      */
     ResponseDo listUsers(String phone, String nickname, String licenseAuthStatus, String photoAuthStatus,
-                         Long start, Long end, Integer limit, Integer ignore);
+                         Long start, Long end);
 
 
     /**

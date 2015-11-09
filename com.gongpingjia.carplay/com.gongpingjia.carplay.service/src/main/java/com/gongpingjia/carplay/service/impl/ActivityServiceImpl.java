@@ -255,7 +255,7 @@ public class ActivityServiceImpl implements ActivityService {
         organizer.hideSecretInfo();
         organizer.setAlbum(new ArrayList<Photo>(0));
         organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        
+
         activity.setOrganizer(organizer);
         return ResponseDo.buildSuccessResponse(activity);
     }
@@ -998,9 +998,10 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo getActivityPushInfos(HttpServletRequest request, String userId) {
+    public ResponseDo getActivityPushInfos(HttpServletRequest request, String userId, Integer limit, Integer ignore) {
         LOG.debug("Query user pushInfo, userId:{}", userId);
-        List<PushInfo> pushInfoList = pushInfoDao.find(Query.query(Criteria.where("receivedUserId").is(userId).and("deleteFlag").is(false)));
+        List<PushInfo> pushInfoList = pushInfoDao.find(Query.query(Criteria.where("receivedUserId").is(userId).and("deleteFlag").is(false))
+                .limit(limit).skip(ignore));
 
         Set<String> activityIds = new HashSet<>(pushInfoList.size(), 1);
         for (PushInfo item : pushInfoList) {

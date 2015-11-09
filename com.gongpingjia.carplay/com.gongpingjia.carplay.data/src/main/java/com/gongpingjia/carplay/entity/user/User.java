@@ -145,7 +145,13 @@ public class User {
      */
     public String getCover() {
         if (this.album != null && !this.album.isEmpty()) {
-            Photo latest = this.album.get(this.album.size() - 1);
+            Photo latest = this.album.get(0);
+            for (Photo item : album) {
+                if (item.getUploadTime() > latest.getUploadTime()) {
+                    latest = item;
+                }
+            }
+
             if (!StringUtils.isEmpty(latest.getUrl())) {
                 return latest.getUrl();
             }

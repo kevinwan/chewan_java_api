@@ -36,8 +36,6 @@ public class UserManagerController {
      * @param photoAuthStatus   头像认证状态
      * @param start             启动时间
      * @param end               结束时间
-     * @param limit             查询限制行数
-     * @param ignore            查询忽略行数
      * @return 返回查询结果
      */
     @RequestMapping(value = "/user/list", method = RequestMethod.GET)
@@ -46,14 +44,13 @@ public class UserManagerController {
                                 @RequestParam(value = "nickname", required = false) String nickname,
                                 @RequestParam(value = "licenseAuthStatus", required = false) String licenseAuthStatus,
                                 @RequestParam(value = "photoAuthStatus", required = false) String photoAuthStatus,
-                                @RequestParam("start") Long start, @RequestParam("end") Long end,
-                                @RequestParam(value = "limit", defaultValue = "10") Integer limit, @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
+                                @RequestParam("start") Long start, @RequestParam("end") Long end) {
         LOG.info("listUsers was called");
 
         try {
             parameterChecker.checkAdminUserInfo(userId, token);
 
-            return service.listUsers(phone, nickname, licenseAuthStatus, photoAuthStatus, start, end, limit, ignore);
+            return service.listUsers(phone, nickname, licenseAuthStatus, photoAuthStatus, start, end);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());

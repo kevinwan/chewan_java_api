@@ -40,18 +40,6 @@ public interface UserService {
      */
     ResponseDo loginAdminUser(User user) throws ApiException;
 
-
-    /**
-     * 更改管理员用户密码
-     *
-     * @param userId
-     * @param json
-     * @return
-     * @throws ApiException
-     */
-    ResponseDo changeAdminPsw(String userId, JSONObject json) throws ApiException;
-
-
     /**
      * 检查注册用户的参数是否正确
      *

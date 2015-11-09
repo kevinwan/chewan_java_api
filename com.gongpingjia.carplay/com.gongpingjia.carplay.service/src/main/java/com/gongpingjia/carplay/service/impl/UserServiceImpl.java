@@ -158,13 +158,16 @@ public class UserServiceImpl implements UserService {
 
         pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
 
+        return ResponseDo.buildSuccessResponse(buildResponseUser(user, userToken.getToken()));
+    }
+
+    private User buildResponseUser(User user, String token) {
         LOG.debug("Build response data");
         User data = userDao.findById(user.getUserId());
         data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        data.setToken(userToken.getToken());
+        data.setToken(token);
         data.setCompletion(computeCompletion(data));
-
-        return ResponseDo.buildSuccessResponse(data);
+        return data;
     }
 
     /**
@@ -270,11 +273,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ResponseDo loginAdminUser(User user) throws ApiException {
-        // 验证参数
-        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
-            LOG.warn("Invalid params, phone:{}", user.getPhone());
-            return ResponseDo.buildFailureResponse("输入参数有误");
-        }
+//        // 验证参数
+//        if (!CommonUtil.isPhoneNumber(user.getPhone())) {
+//            LOG.warn("Invalid params, phone:{}", user.getPhone());
+//            return ResponseDo.buildFailureResponse("输入参数有误");
+//        }
 
         // 查找用户
         User userData = userDao.findOne(Query.query(Criteria.where("phone").is(user.getPhone())));
@@ -307,36 +310,6 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse(userData);
     }
 
-
-    /**
-     * 更改管理员用户密码
-     *
-     * @param userId
-     * @param json
-     * @return
-     * @throws ApiException
-     */
-    @Override
-    public ResponseDo changeAdminPsw(String userId, JSONObject json) throws ApiException {
-        User user = userDao.findById(userId);
-        if (null == user) {
-            LOG.warn("user not exist userId is :{}", userId);
-            throw new ApiException("用户不存在");
-        }
-        if (!Constants.UserCatalog.ADMIN.equals(user.getRole())) {
-            LOG.warn("Query user is not administrator");
-            throw new ApiException("操作用户不是管理员");
-        }
-        String password = json.getString("password");
-        String newPsw = json.getString("newPsw");
-        if (!user.getPassword().equals(password)) {
-            LOG.warn("password not match userId is :{}", userId);
-            throw new ApiException("原始密码不匹配");
-        }
-        Update update = Update.update("password", newPsw);
-        userDao.update(user.getUserId(), update);
-        return ResponseDo.buildSuccessResponse();
-    }
 
     /**
      * 计算用户的信息的完善程度
@@ -495,12 +468,7 @@ public class UserServiceImpl implements UserService {
 
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login information");
-            //刷新用户会话Token
-            userData.setToken(refreshUserToken(userData.getUserId()));
-            userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            userData.setCompletion(computeCompletion(userData));
-
-            return ResponseDo.buildSuccessResponse(userData);
+            return ResponseDo.buildSuccessResponse(buildResponseUser(userData, refreshUserToken(userData.getUserId())));
         }
     }
 
@@ -918,6 +886,17 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("手机号对应用户不存在");
         }
 
+        //检查改手机号下面是否已经包含该Channel，如果已经包含了，就不能重复绑定
+        List<SnsChannel> channelList = user.getSnsChannels();
+        if (channelList != null) {
+            for (SnsChannel item : channelList) {
+                if (channel.equals(item.getChannel())) {
+                    LOG.warn("User phone:{} has already bingding to an exist channel:{}", phone, channel);
+                    throw new ApiException("手机号不能与多个账号绑定");
+                }
+            }
+        }
+
         User snsUser = userDao.findOne(Query.query(Criteria.where("snsChannels.uid").is(uid).and("snsChannels.channel").is(channel)));
         if (snsUser != null) {
             LOG.warn("uid:{} and channel:{} is already bind by other user");
@@ -931,7 +910,9 @@ public class UserServiceImpl implements UserService {
         snsChannel.setPassword(snsPassword);
         userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), new Update().addToSet("snsChannels", snsChannel));
 
-        return ResponseDo.buildSuccessResponse();
+        User responseUser = userDao.findById(user.getUserId());
+        UserToken userToken = userTokenDao.findOne(Query.query(Criteria.where("userId").is(user.getUserId())));
+        return ResponseDo.buildSuccessResponse(buildResponseUser(responseUser, userToken.getToken()));
     }
 
     @Override
@@ -1187,7 +1168,7 @@ public class UserServiceImpl implements UserService {
             LOG.debug("Register user by sns way, channel:{}", channel.getChannel());
             channel.setPassword(buildSnsPassword(channel.getUid(), channel.getChannel()));
 
-            if (channel.getPassword().equals(json.getString("snsPassword"))) {
+            if (!channel.getPassword().equals(json.getString("snsPassword"))) {
                 LOG.debug("Input parameter snsPassword is not correct");
                 throw new ApiException("输入参数错误");
             }
