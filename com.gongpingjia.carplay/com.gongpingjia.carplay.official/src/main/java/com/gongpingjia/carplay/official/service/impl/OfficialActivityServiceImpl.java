@@ -89,7 +89,7 @@ public class OfficialActivityServiceImpl implements OfficialActivityService {
 
         JSONObject jsonResult = chatThirdPartyService.createChatGroup(chatCommonService.getChatToken(), activity.getTitle(),
                 "", user.getEmchatName(), null);
-        if (json.isEmpty()) {
+        if (jsonResult.isEmpty()) {
             LOG.warn("Failed to create chat group");
             activityDao.deleteById(activity.getOfficialActivityId());
             throw new ApiException("创建聊天群组失败");
