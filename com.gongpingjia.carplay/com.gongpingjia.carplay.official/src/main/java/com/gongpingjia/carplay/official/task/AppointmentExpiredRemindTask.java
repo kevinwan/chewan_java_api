@@ -210,14 +210,14 @@ public class AppointmentExpiredRemindTask extends QuartzJobBean {
             if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
                 //发给活动申请人
                 String invitedUserMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
-                        "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), applier.getNickname(), activity.getType());
+                        "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), invitedUser.getNickname(), activity.getType());
                 ext.put("userId", invitedUser.getUserId());
                 chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
                         Arrays.asList(applier.getEmchatName()), invitedUserMessage, ext);
 
                 //发给活动接收人(被邀请人员)
                 String applierMessage = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.expired",
-                        "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), invitedUser.getNickname(), activity.getType());
+                        "{0}和你的{1}活动明天将失效，如想继续联系，可互相关注"), applier.getNickname(), activity.getType());
                 ext.put("userId", applier.getUserId());
                 chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
                         Arrays.asList(invitedUser.getEmchatName()), applierMessage, ext);
