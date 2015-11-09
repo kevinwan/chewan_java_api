@@ -152,7 +152,7 @@ public class UploadController {
                 if (image.getWidth() > maxWidth) {
                     throw new ApiException("图像的最大像素是825*825");
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
                 throw new ApiException("服务器转换图像时出错");
             } finally {
