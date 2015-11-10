@@ -27,7 +27,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -194,7 +193,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
     }
 
     @Override
-    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, int ignore, int limit, String phone) {
+    public ResponseDo getAuthApplicationList(String userId, String type, String status, Long start, Long end, String phone) {
         LOG.debug("getAuthApplicationList start");
 
         String applyUserId = null;
@@ -207,7 +206,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             applyUserId = queryUser.getUserId();
         }
 
-        Query query = buildQueryParam(type, status, start, end, ignore, limit, applyUserId);
+        Query query = buildQueryParam(type, status, start, end, applyUserId);
 
         List<AuthApplication> authApplicationList = authApplicationDao.find(query);
 
@@ -245,11 +244,9 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
      * @param status
      * @param start
      * @param end
-     * @param ignore
-     * @param limit
      * @return
      */
-    private Query buildQueryParam(String type, String status, Long start, Long end, int ignore, int limit, String applyUserId) {
+    private Query buildQueryParam(String type, String status, Long start, Long end, String applyUserId) {
         Criteria criteria = new Criteria();
         if (!StringUtils.isEmpty(applyUserId)) {
             criteria.and("applyUserId").is(applyUserId);
@@ -270,10 +267,6 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
         Query query = Query.query(criteria);
         query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "applyTime")));
-        query.limit(limit);
-        if (ignore != 0) {
-            query.skip(ignore);
-        }
         return query;
     }
 
