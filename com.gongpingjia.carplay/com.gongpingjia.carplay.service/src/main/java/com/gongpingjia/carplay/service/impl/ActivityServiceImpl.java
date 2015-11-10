@@ -93,33 +93,9 @@ public class ActivityServiceImpl implements ActivityService {
 
         Long current = DateUtil.getTime();
 
-        activity.setActivityId(null);
-        //设置活动的创建人ID
-        activity.setUserId(userId);
-        List<String> memberIds = new ArrayList<String>(1);
-        //创建人默认加入到活动成员列表中
-        memberIds.add(userId);
-        activity.setMembers(memberIds);
-        activity.setCreateTime(current);
-        activity.setDeleteFlag(false);
+        saveUserActivity(userId, activity, current);
 
-        activityDao.save(activity);
-//        try {
-//            String groupId = createEmchatGroup(activity);
-//            activityDao.update(Query.query(Criteria.where("_id").is(activity.getActivityId())), Update.update("emchatGroupId", groupId));
-//        } catch (ApiException e) {
-//            //创建环信群组失败的时候，需要删除mongodb中的对应的群组；
-//            activityDao.deleteById(activity.getActivityId());
-//            LOG.error(e.getMessage(), e);
-//            throw new ApiException("创建环信群组失败");
-//        }
-
-        InterestMessage interestMessage = new InterestMessage();
-        interestMessage.setUserId(userId);
-        interestMessage.setType(InterestMessage.USER_ACTIVITY);
-        interestMessage.setRelatedId(activity.getActivityId());
-        interestMessage.setCreateTime(current);
-        interestMessageDao.save(interestMessage);
+        saveInterestMessage(userId, activity, current);
 
         //向关注我的人发送感兴趣的信息
         Map<String, Object> ext = new HashMap<>(1);
@@ -133,6 +109,58 @@ public class ActivityServiceImpl implements ActivityService {
                 buildNearByUsers(user, activity.getActivityId()), message, ext);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private void saveInterestMessage(String userId, Activity activity, Long current) {
+        InterestMessage oldMessage = interestMessageDao.findOne(Query.query(Criteria.where("relatedId").is(activity.getActivityId())));
+        if (oldMessage == null) {
+            LOG.debug("Old message is not exist, with activityId:{}", oldMessage.getRelatedId());
+            InterestMessage interestMessage = new InterestMessage();
+            interestMessage.setUserId(userId);
+            interestMessage.setType(InterestMessage.USER_ACTIVITY);
+            interestMessage.setRelatedId(activity.getActivityId());
+            interestMessage.setCreateTime(current);
+            interestMessageDao.save(interestMessage);
+        } else {
+            LOG.debug("Old message is exist, with activityId:{}, update create time", oldMessage.getRelatedId());
+            interestMessageDao.update(Query.query(Criteria.where("relatedId").is(activity.getActivityId())), Update.update("createTime", current));
+        }
+    }
+
+    private void saveUserActivity(String userId, Activity activity, Long current) {
+        Activity oldActivity = activityDao.findOne(Query.query(Criteria.where("userId").is(userId).and("deleteFlag").is(false)
+                .and("majorType").is(activity.getMajorType()).and("type").is(activity.getType()))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))));
+
+        if (oldActivity == null) {
+            LOG.debug("Old activity is not exist, create a new");
+            //如果对应的人员的活动不存在，则重新建立活动
+            activity.setActivityId(null);
+            //设置活动的创建人ID
+            activity.setUserId(userId);
+            List<String> memberIds = new ArrayList<String>(1);
+            //创建人默认加入到活动成员列表中
+            memberIds.add(userId);
+            activity.setMembers(memberIds);
+            activity.setCreateTime(current);
+            activity.setDeleteFlag(false);
+
+            activityDao.save(activity);
+        } else {
+            LOG.debug("Old activity is exist, update activity info, activityId:{}", activity.getActivityId());
+            //如果对应的人员的活动已经存在，仅更新新的信息
+            Update update = new Update();
+            update.set("pay", activity.getPay());
+            update.set("destPoint", activity.getDestPoint());
+            update.set("destination", activity.getDestination());
+            update.set("estabPoint", activity.getEstabPoint());
+            update.set("establish", activity.getEstablish());
+            update.set("transfer", activity.isTransfer());
+            update.set("createTime", current);
+            activityDao.update(Query.query(Criteria.where("activityId").is(oldActivity.getActivityId())), update);
+
+            activity.setActivityId(oldActivity.getActivityId());
+        }
     }
 
     private List<String> buildNearByUsers(User user, String activityId) {
