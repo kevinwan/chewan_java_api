@@ -114,7 +114,7 @@ public class ActivityServiceImpl implements ActivityService {
     private void saveInterestMessage(String userId, Activity activity, Long current) {
         InterestMessage oldMessage = interestMessageDao.findOne(Query.query(Criteria.where("relatedId").is(activity.getActivityId())));
         if (oldMessage == null) {
-            LOG.debug("Old message is not exist, with activityId:{}", oldMessage.getRelatedId());
+            LOG.debug("Old message is not exist, with activityId:{}", activity.getActivityId());
             InterestMessage interestMessage = new InterestMessage();
             interestMessage.setUserId(userId);
             interestMessage.setType(InterestMessage.USER_ACTIVITY);
@@ -122,7 +122,7 @@ public class ActivityServiceImpl implements ActivityService {
             interestMessage.setCreateTime(current);
             interestMessageDao.save(interestMessage);
         } else {
-            LOG.debug("Old message is exist, with activityId:{}, update create time", oldMessage.getRelatedId());
+            LOG.debug("Old message is exist, with activityId:{}, update create time", activity.getActivityId());
             interestMessageDao.update(Query.query(Criteria.where("relatedId").is(activity.getActivityId())), Update.update("createTime", current));
         }
     }
