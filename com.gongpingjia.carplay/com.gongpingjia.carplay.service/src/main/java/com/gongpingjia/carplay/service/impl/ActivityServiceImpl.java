@@ -93,33 +93,9 @@ public class ActivityServiceImpl implements ActivityService {
 
         Long current = DateUtil.getTime();
 
-        activity.setActivityId(null);
-        //设置活动的创建人ID
-        activity.setUserId(userId);
-        List<String> memberIds = new ArrayList<String>(1);
-        //创建人默认加入到活动成员列表中
-        memberIds.add(userId);
-        activity.setMembers(memberIds);
-        activity.setCreateTime(current);
-        activity.setDeleteFlag(false);
+        saveUserActivity(userId, activity, current);
 
-        activityDao.save(activity);
-//        try {
-//            String groupId = createEmchatGroup(activity);
-//            activityDao.update(Query.query(Criteria.where("_id").is(activity.getActivityId())), Update.update("emchatGroupId", groupId));
-//        } catch (ApiException e) {
-//            //创建环信群组失败的时候，需要删除mongodb中的对应的群组；
-//            activityDao.deleteById(activity.getActivityId());
-//            LOG.error(e.getMessage(), e);
-//            throw new ApiException("创建环信群组失败");
-//        }
-
-        InterestMessage interestMessage = new InterestMessage();
-        interestMessage.setUserId(userId);
-        interestMessage.setType(InterestMessage.USER_ACTIVITY);
-        interestMessage.setRelatedId(activity.getActivityId());
-        interestMessage.setCreateTime(current);
-        interestMessageDao.save(interestMessage);
+        saveInterestMessage(userId, activity, current);
 
         //向关注我的人发送感兴趣的信息
         Map<String, Object> ext = new HashMap<>(1);
@@ -133,6 +109,59 @@ public class ActivityServiceImpl implements ActivityService {
                 buildNearByUsers(user, activity.getActivityId()), message, ext);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    private void saveInterestMessage(String userId, Activity activity, Long current) {
+        InterestMessage oldMessage = interestMessageDao.findOne(Query.query(Criteria.where("relatedId").is(activity.getActivityId())));
+        if (oldMessage == null) {
+            LOG.debug("Old message is not exist, with activityId:{}", activity.getActivityId());
+            InterestMessage interestMessage = new InterestMessage();
+            interestMessage.setUserId(userId);
+            interestMessage.setType(InterestMessage.USER_ACTIVITY);
+            interestMessage.setRelatedId(activity.getActivityId());
+            interestMessage.setCreateTime(current);
+            interestMessageDao.save(interestMessage);
+        } else {
+            LOG.debug("Old message is exist, with activityId:{}, update create time", activity.getActivityId());
+            interestMessageDao.update(Query.query(Criteria.where("relatedId").is(activity.getActivityId())), Update.update("createTime", current));
+        }
+    }
+
+    private void saveUserActivity(String userId, Activity activity, Long current) {
+        Activity oldActivity = activityDao.findOne(Query.query(Criteria.where("userId").is(userId).and("deleteFlag").is(false)
+                .and("majorType").is(activity.getMajorType()).and("type").is(activity.getType()))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "createTime"))));
+
+        if (oldActivity == null) {
+            LOG.debug("Old activity is not exist, create a new");
+            //如果对应的人员的活动不存在，则重新建立活动
+            activity.setActivityId(null);
+            //设置活动的创建人ID
+            activity.setUserId(userId);
+            List<String> memberIds = new ArrayList<String>(1);
+            //创建人默认加入到活动成员列表中
+            memberIds.add(userId);
+            activity.setMembers(memberIds);
+            activity.setCreateTime(current);
+            activity.setDeleteFlag(false);
+
+            activityDao.save(activity);
+        } else {
+            LOG.debug("Old activity is exist, update activity info, activityId:{}", activity.getActivityId());
+            //如果对应的人员的活动已经存在，仅更新新的信息
+            Update update = new Update();
+            update.set("pay", activity.getPay());
+            update.set("destPoint", activity.getDestPoint());
+            update.set("destination", activity.getDestination());
+            update.set("estabPoint", activity.getEstabPoint());
+            update.set("establish", activity.getEstablish());
+            update.set("transfer", activity.isTransfer());
+            update.set("createTime", current);
+            update.set("applyIds", new ArrayList<>(0));
+            activityDao.update(Query.query(Criteria.where("activityId").is(oldActivity.getActivityId())), update);
+
+            activity.setActivityId(oldActivity.getActivityId());
+        }
     }
 
     private List<String> buildNearByUsers(User user, String activityId) {
@@ -824,15 +853,22 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
-        Set<String> appointmentActivityIds = buildUserAppointmentActivityIds(param);
+        Map<String, Appointment> appointmentActivityMap = buildUserAppointmentActivityIds(param);
 
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
-            if (appointmentActivityIds.contains(item.getActivityId())) {
-                continue;
+            if (StringUtils.isNotEmpty(param.getUserId())) {
+                //用户Id存在，过滤掉所有的已经邀约的活动
+                //检查当前用户邀约的活动是否存在，如果已经拒绝了或者邀请了就不展示
+                Appointment appointment = appointmentActivityMap.get(item.getActivityId());
+                if (appointment != null && appointment.getCreateTime() > item.getCreateTime()) {
+                    //说明当前的活动用户已经报名参加了，并且遭到拒绝或者接受
+                    continue;
+                }
             }
+
             User user = userMap.get(item.getUserId());
             if (param.isCommonQuery()) {
                 if (StringUtils.isNotEmpty(param.getGender())) {
@@ -851,19 +887,36 @@ public class ActivityServiceImpl implements ActivityService {
         return activities;
     }
 
-    private Set<String> buildUserAppointmentActivityIds(ActivityQueryParam param) {
+    /**
+     * 获取用户的邀约的信息
+     *
+     * @param param
+     * @return
+     */
+    private Map<String, Appointment> buildUserAppointmentActivityIds(ActivityQueryParam param) {
         LOG.debug("Check user is already appointment or not, filter the activity");
         List<Appointment> appointmentList = new ArrayList<>(0);
         if (StringUtils.isNotEmpty(param.getUserId())) {
-            appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId())
+            appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId()).and("deleteFlag").is(false)
                     .and("status").in(Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT)));
         }
-        Set<String> activityIds = new HashSet<>(appointmentList.size());
+
+        Map<String, Appointment> activityAppointmentMap = new HashMap<>();
         for (Appointment item : appointmentList) {
             //计算用户的活动处于接收或者拒绝的状态
-            activityIds.add(item.getActivityId());
+            Appointment appointment = activityAppointmentMap.get(item.getActivityId());
+            if (appointment == null) {
+                //存在邀约，添加到map中
+                activityAppointmentMap.put(item.getActivityId(), item);
+                continue;
+            }
+
+            if (item.getCreateTime() > appointment.getCreateTime()) {
+                //当前的邀约更新，取最新的
+                activityAppointmentMap.put(item.getActivityId(), item);
+            }
         }
-        return activityIds;
+        return activityAppointmentMap;
     }
 
     /**

@@ -39,7 +39,7 @@ public class ActivityQueryParam {
                 String.valueOf(ActivityWeight.DEFAULT_MAX_DISTANCE)));
         this.maxTimeLimit = Long.parseLong(PropertiesUtil.getProperty("activity.defaultMaxPubTime",
                 String.valueOf(ActivityWeight.MAX_PUB_TIME))) * 60 * 1000;
-        this.transfer = false;
+//        this.transfer = false;
     }
 
     /**

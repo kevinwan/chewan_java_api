@@ -18,6 +18,10 @@ public class FeedBack {
 
     private String userId;
 
+    private String name;
+
+    private String phone;
+
     private List<Photo> photos;
 
     private String content;
@@ -65,14 +69,21 @@ public class FeedBack {
         this.createTime = createTime;
     }
 
-    @Override
-    public String toString() {
-        return "FeedBack{" +
-                "id='" + id + '\'' +
-                ", userId='" + userId + '\'' +
-                ", photos=" + photos +
-                ", content='" + content + '\'' +
-                ", createTime=" + createTime +
-                '}';
+    public String getName() {
+        return name;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+
 }

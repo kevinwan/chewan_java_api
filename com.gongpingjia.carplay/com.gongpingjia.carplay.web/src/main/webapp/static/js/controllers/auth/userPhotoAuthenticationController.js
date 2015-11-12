@@ -8,8 +8,8 @@
  *
  * @constructor
  */
-gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', '$window', '$modal', 'DTColumnDefBuilder', 'authenticationService',
-    function ($scope, $rootScope, $window, $modal, DTColumnDefBuilder, authenticationService) {
+gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', '$window', '$modal', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'authenticationService',
+    function ($scope, $rootScope, $window, $modal, DTOptionsBuilder, DTColumnDefBuilder, authenticationService) {
 
         var STATUS_PENDING = '认证中';
         var STATUS_ACCEPTED = '认证通过';
@@ -30,13 +30,15 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
             DTColumnDefBuilder.newColumnDef(9),
             DTColumnDefBuilder.newColumnDef(10)];
 
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withBootstrap().withOption('displayLength', 100);
+
 
         /**
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
             $scope.criteria = {
-                status: '',
+                status: '认证中',
                 startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
                 endDate: moment().add('days', 1).subtract('month').format('YYYY-MM-DD'),
                 type: '头像认证'
@@ -113,7 +115,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
          * Show history detail information
          * @param application
          */
-        $scope.showHistoryDetail = function(application){
+        $scope.showHistoryDetail = function (application) {
             authenticationService.setApplication(application.applicationId);
             var modalInstance = $modal.open({
                 templateUrl: 'views/auth/history_detail.html',

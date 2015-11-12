@@ -64,8 +64,6 @@ public class OfficialApproveController {
      */
     @RequestMapping(value = "/official/authentication/list", method = RequestMethod.GET)
     public ResponseDo approveList(@RequestParam("userId") String userId, @RequestParam("token") String token,
-                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-                                  @RequestParam(value = "ignore", defaultValue = "0") Integer ignore,
                                   @RequestParam(value = "type") String type,
                                   @RequestParam(value = "phone", defaultValue = "") String phone,
                                   @RequestParam(value = "status", required = false) String status,
@@ -76,7 +74,7 @@ public class OfficialApproveController {
             LOG.info("Begin obtian approve list");
             parameterChecker.checkAdminUserInfo(userId, token);
 
-            return officialApproveService.getAuthApplicationList(userId, type, status, start, end, ignore, limit, phone);
+            return officialApproveService.getAuthApplicationList(userId, type, status, start, end, phone);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
