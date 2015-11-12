@@ -82,5 +82,4 @@ public class ActivityTest extends BaseTest {
         activity.setMembers(members);
         activityDao.save(activity);
     }
-
 }

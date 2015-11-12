@@ -219,7 +219,12 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
         function createdRow(row, data, dataIndex) {
             // Recompiling so we can bind Angular directive to the DT
             $compile(angular.element(row).contents())($scope);
-        }
+        };
+
+
+        $scope.addActivity = function(){
+            $location.path("/activity/add");
+        };
 
 
         $scope.updateActivity = function (activityId) {

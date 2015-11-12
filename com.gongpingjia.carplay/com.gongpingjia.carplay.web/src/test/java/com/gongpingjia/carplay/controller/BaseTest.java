@@ -1,5 +1,6 @@
 package com.gongpingjia.carplay.controller;
 
+import com.gongpingjia.carplay.controller.junit.JUnit4ClassRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(JUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextHierarchy({ @ContextConfiguration(name = "parent", locations = "classpath*:META-INF/spring/*.service.xml"),
 		@ContextConfiguration(name = "child", locations = "classpath:conf/springmvc-servlet.xml") })

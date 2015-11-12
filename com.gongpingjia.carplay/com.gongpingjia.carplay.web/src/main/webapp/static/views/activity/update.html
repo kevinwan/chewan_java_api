@@ -26,63 +26,55 @@
             </div>
         </div>
 
-        <!--<div ng-show=" activity.organizer.channel == undefined || activity.organizer.channel == null && activity.organizer.channel == '' "-->
-             <!--class="form-inline col-md-12" style="margin-top: 10px;">-->
-            <!--<div class="col-6">-->
-                <!--<span>手机号码:</span>-->
-            <!--</div>-->
-            <!--<div class="col-6">-->
-                <!--<span>{{activity.organizer.phone}}</span>-->
-            <!--</div>-->
-        <!--</div>-->
-
-
-
-        <!--<div ng-show=" activity.organizer.channel != undefined && activity.organizer.channel != null && activity.organizer.channel != '' "-->
-             <!--class="form-inline col-md-12" style="margin-top: 10px;">-->
-            <!--<div class="col-6">-->
-                <!--<span>第三方登录:</span>-->
-            <!--</div>-->
-            <!--<div class="col-6">-->
-                <!--<span>{{activity.organizer.channel}} 用户 id: {{activity.organizer.uid}}</span>-->
-            <!--</div>-->
-        <!--</div>-->
-
         <div class="form-inline col-md-12" style="margin-top: 20px;">
             <span><h5><strong>活动信息:</strong></h5></span>
         </div>
 
         <div class="form-inline col-md-12" style="margin-top: 30px;">
+            <label class="col-md-2 control-label" for="majorType"> <span style="color:red">*</span>活动类型</label>
+
+            <div class="col-md-4 no-padding-left">
+                <select id="majorType" ng-model="activity.majorType">
+                    <option value="吃饭">吃饭</option>
+                    <option value="唱歌">唱歌</option>
+                    <option value="电影">电影</option>
+                    <option value="遛狗">遛狗</option>
+                    <option value="运动">运动</option>
+                    <option value="夜店">夜店</option>
+                    <option value="购物">购物</option>
+                    <option value="咖啡">咖啡</option>
+                    <option value="喝酒">喝酒</option>
+                </select>
+            </div>
             <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>活动类型</label>
 
             <div class="col-md-4 no-padding-left">
                 <select id="type" ng-model="activity.type">
                     <option value="吃饭">吃饭</option>
                     <option value="唱歌">唱歌</option>
-                    <option value="购物">购物</option>
-                    <option value="夜店">夜店</option>
-                    <option value="看电影">看电影</option>
+                    <option value="电影">电影</option>
                     <option value="遛狗">遛狗</option>
-                    <option value="咖啡">咖啡</option>
                     <option value="运动">运动</option>
+                    <option value="夜店">夜店</option>
+                    <option value="购物">购物</option>
+                    <option value="咖啡">咖啡</option>
                     <option value="喝酒">喝酒</option>
-                    <option value="夜宵">夜宵</option>
                 </select>
             </div>
-            <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>活动支付方式</label>
 
+        </div>
+
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>活动支付方式</label>
             <div class="col-md-4 no-padding-left">
                 <select id="pay" ng-model="activity.pay">
-                    <option value="AA制">AA制</option>
+                    <option value="AA">AA</option>
                     <option value="请我吧">请我吧</option>
                     <option value="我请客">我请客</option>
                 </select>
             </div>
-        </div>
 
-        <div class="form-inline col-md-12" style="margin-top: 10px;">
             <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>包接送</label>
-
             <div class="col-md-4 no-padding-left">
                 <select id="transfer" ng-model="activity.transfer">
                     <option value="true">是</option>
@@ -135,25 +127,26 @@
         </div>
 
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label no-padding-right">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>活动经纬度
             </label>
-
-            <label class="col-md-1 control-label no-padding-right">
+        </div>
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>经度
             </label>
 
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="destPoint.longitude" ng-model="activity.destPoint.longitude"
                        placeholder="活动经度"/>
             </div>
 
-            <label class="col-md-1 control-label no-padding-right">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>纬度
             </label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="destPoint.latitude" ng-model="activity.destPoint.latitude"
                        placeholder="活动纬度"/>
             </div>
@@ -163,18 +156,18 @@
             <span>活动建立地详情</span>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label" for="estabProvince"> <span style="color:red">*</span>省</label>
+            <label class="col-md-2 control-label" for="estabProvince"> <span style="color:red">*</span>省</label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <select id="estabProvince" ng-model="estabProvince"
                         ng-options=" item as item.name for item in provinceOptions"
-                        ng-change="initChildArea(estabProvince.code,'destCityOptions')">
+                        ng-change="initChildArea(estabProvince.code,'estabCityOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
-            <label class="col-md-1 control-label" for="estabCity"> <span style="color:red">*</span>市</label>
+            <label class="col-md-2 control-label" for="estabCity"> <span style="color:red">*</span>市</label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <select id="estabCity" ng-model="estabCity"
                         ng-options=" item as item.name for item in estabCityOptions"
                         ng-change="initChildArea(estabCity.code,'estabDistrictOptions')">
@@ -183,18 +176,18 @@
             </div>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label" for="estabDistrict"> <span style="color:red">*</span>区</label>
+            <label class="col-md-2 control-label" for="estabDistrict"> <span style="color:red">*</span>区</label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <select id="estabDistrict" ng-model="estabDistrict"
                         ng-options=" item as item.name for item in estabDistrictOptions"
                         ng-change="initChildArea(estabDistrict.code,'estabStreetOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
-            <label class="col-md-1 control-label" for="estabStreet"> <span style="color:red">*</span>街道</label>
+            <label class="col-md-2 control-label" for="estabStreet"> <span style="color:red">*</span>街道</label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <select id="estabStreet" ng-model="estabStreet"
                         ng-options=" item as item.name for item in estabStreetOptions">
                     <option value="">全部</option>
@@ -202,26 +195,26 @@
             </div>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-1 control-label no-padding-right">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>创建经纬度
             </label>
-
-            <label class="col-md-1 control-label no-padding-right">
+        </div>
+        <div class="form-inline col-md-12" style="margin-top: 10px;">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>经度
             </label>
 
-
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="estabPoint.longitude"
                        ng-model="activity.estabPoint.longitude"
                        placeholder="活动经度"/>
             </div>
 
-            <label class="col-md-1 control-label no-padding-right">
+            <label class="col-md-2 control-label no-padding-right">
                 <span style="color:red">*</span>纬度
             </label>
 
-            <div class="col-md-3 no-padding-left">
+            <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="estabPoint.latitude" ng-model="activity.estabPoint.latitude"
                        placeholder="活动纬度"/>
             </div>

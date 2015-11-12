@@ -48,6 +48,9 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/activity/view', {
         templateUrl: 'views/activity/view.html',
         controller: 'activityViewController'
+    }).when('/activity/add',{
+        templateUrl: 'views/activity/add.html',
+        controller: 'activityAddController'
     }).when('/activity/update/:id', {
         templateUrl: 'views/activity/update.html',
         controller: 'activityUpdateController'

@@ -630,6 +630,8 @@ public class ActivityServiceImpl implements ActivityService {
             update.set("destPoint", destPoint);
             Landmark estabPoint = (Landmark) JSONObject.toBean(json.getJSONObject("estabPoint"), Landmark.class);
             update.set("estabPoint", estabPoint);
+            String majorType = json.getString("majorType");
+            update.set("majorType", majorType);
             String type = json.getString("type");
             update.set("type", type);
             String pay = json.getString("pay");
