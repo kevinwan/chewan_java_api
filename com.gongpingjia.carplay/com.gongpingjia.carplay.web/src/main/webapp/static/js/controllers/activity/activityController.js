@@ -203,7 +203,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
             })
             .withOption('bFilter', false)
             .withDataProp('data')
-            .withOption('displayLength', 10)
+            .withOption('displayLength', 100)
             .withOption('serverSide', true)
             .withPaginationType('full_numbers')
             .withOption('createdRow', createdRow)

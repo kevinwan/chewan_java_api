@@ -41,16 +41,7 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$loc
         /**
          * Define data table options
          */
-        $scope.dtOptions = DTOptionsBuilder.newOptions().withBootstrap().withOption('rowCallback',
-            function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                $('td', nRow).unbind('click');
-                $('td', nRow).bind('click', function () {
-                    $scope.$apply(function () {
-                        rowClickHandler(aData);
-                    });
-                });
-                return nRow;
-            }).withOption('order', [0, 'desc']);
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withBootstrap().withOption('displayLength', 100);
 
         /**
          * Reset search criteria
