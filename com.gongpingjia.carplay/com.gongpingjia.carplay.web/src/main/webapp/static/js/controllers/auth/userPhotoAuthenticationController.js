@@ -38,7 +38,7 @@ gpjApp.controller('userPhotoAuthenticationController', ['$scope', '$rootScope', 
          */
         $scope.resetCriteria = function () {
             $scope.criteria = {
-                status: '',
+                status: '认证中',
                 startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
                 endDate: moment().add('days', 1).subtract('month').format('YYYY-MM-DD'),
                 type: '头像认证'

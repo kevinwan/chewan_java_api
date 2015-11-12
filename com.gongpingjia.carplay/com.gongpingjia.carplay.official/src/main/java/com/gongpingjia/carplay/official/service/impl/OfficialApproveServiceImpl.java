@@ -266,7 +266,8 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         }
 
         Query query = Query.query(criteria);
-        query.with(new Sort(new Sort.Order(Sort.Direction.DESC, "applyTime")));
+//        query.with(new Sort(new Sort.Order(Sort.Direction.ASC, "status")));
+        query.with(new Sort(new Sort.Order(Sort.Direction.ASC, "applyTime")));
         return query;
     }
 
