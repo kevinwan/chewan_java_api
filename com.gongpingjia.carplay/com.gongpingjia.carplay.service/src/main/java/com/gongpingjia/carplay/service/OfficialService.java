@@ -45,4 +45,10 @@ public interface OfficialService {
      * @return
      */
     ResponseDo getAreaList(Integer parentId);
+
+
+    /**
+     * 获取街道的区域经纬度范围
+     */
+    ResponseDo getAreaRangeInfo(Integer code) throws ApiException;
 }

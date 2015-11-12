@@ -92,6 +92,11 @@
             <version>3.3.1</version>
             <scope>${test.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.7</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>com.gongpingjia.carplay.web</finalName>

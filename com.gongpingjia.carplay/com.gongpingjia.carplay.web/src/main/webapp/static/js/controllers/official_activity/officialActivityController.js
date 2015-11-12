@@ -12,7 +12,7 @@ gpjApp.controller('officialActivityController', ['$scope', '$rootScope', '$locat
         $scope.createActivity = function () {
             officialActivityService.setOfficialActivityId("");
             $location.path("/officialActivity/add");
-        }
+        };
 
         $scope.viewOfficialActivity = function (officialActivityId) {
             //officialActivityService.setOfficialActivityId(officialActivityId);

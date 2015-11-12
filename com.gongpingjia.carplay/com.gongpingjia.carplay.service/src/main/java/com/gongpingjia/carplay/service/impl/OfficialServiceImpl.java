@@ -10,11 +10,13 @@ import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.common.AreaDao;
+import com.gongpingjia.carplay.dao.common.AreaRangeDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Area;
+import com.gongpingjia.carplay.entity.common.AreaRange;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
@@ -63,6 +65,9 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private AreaRangeDao areaRangeDao;
 
     @Override
     public ResponseDo getActivityInfo(HttpServletRequest request, String id, Integer idType, String userId) throws ApiException {
@@ -642,5 +647,15 @@ public class OfficialServiceImpl implements OfficialService {
             }
         }
         return validAreas;
+    }
+
+
+    @Override
+    public ResponseDo getAreaRangeInfo(Integer code) throws ApiException {
+        AreaRange areaRange = areaRangeDao.findOne(Query.query(Criteria.where("code").is(code)));
+        if (null == areaRange) {
+            throw new ApiException("未找到区域信息");
+        }
+        return ResponseDo.buildSuccessResponse(areaRange);
     }
 }

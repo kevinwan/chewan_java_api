@@ -9,7 +9,7 @@
  * @constructor
  */
 
-gpjApp.factory('commonService', ['restProxyService', function (restProxyService) {
+gpjApp.factory('commonService', ['restProxyService','ChewanOfficialApiEndPoint', function (restProxyService,ChewanOfficialApiEndPoint) {
 
     return {
         transferLongToDateString: function (longTime) {
@@ -44,11 +44,11 @@ gpjApp.factory('commonService', ['restProxyService', function (restProxyService)
             date.setTime(longTime);
             //format  YYYY-MM-DD HH24:MM
             var hourStr = date.getHours();
-            if(hourStr < 10) {
-                hourStr = "0"+hourStr;
+            if (hourStr < 10) {
+                hourStr = "0" + hourStr;
             }
             var minuteStr = date.getMinutes();
-            if(minuteStr < 10) {
+            if (minuteStr < 10) {
                 minuteStr = "0" + minuteStr;
             }
             return hourStr + ":" + minuteStr;
@@ -81,21 +81,27 @@ gpjApp.factory('commonService', ['restProxyService', function (restProxyService)
         getCities: function () {
             return restProxyService.sendHttpGet('resource/cities.json', '');
         },
+        getActivityTypes: function () {
+            return restProxyService.sendHttpGet('resource/type.json', '');
+        },
         isDefined: function (str) {
             return (str && (str !== 'undefined'));
         },
-        isNull:function(source) {
+        isNull: function (source) {
             return (source === undefined || source === null);
         },
-        isStrEmpty:function(str) {
+        isStrEmpty: function (str) {
             return (str === undefined || str === null || str === "");
         },
-        transferIllegalToEmpty:function(str) {
-            if(str === undefined || str === null) {
+        transferIllegalToEmpty: function (str) {
+            if (str === undefined || str === null) {
                 return "";
-            }else{
+            } else {
                 return str;
             }
+        },
+        getAreaRangeInfo:function(code){
+            return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/areaRange/info?code=' + code)
         }
     }
 }]);

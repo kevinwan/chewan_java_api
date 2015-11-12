@@ -10,13 +10,9 @@ gpjApp.factory('activityService', ['$http', 'restProxyService', 'authService', '
     function ($http, restProxyService, authService, ChewanOfficialApiEndPoint) {
         var USER_ID = authService.getUser().userId;
         var USER_TOKEN = authService.getUser().token;
-        var activityId = "";
         return {
-            setActivityId: function (id) {
-                activityId = id;
-            },
-            getActivityId: function () {
-                return activityId;
+            saveActivity:function(data){
+                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/userActivity/register?token=' + USER_TOKEN + "&userId=" + USER_ID, data);
             },
             getActivityList: function (criteria) {
                 return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/official/userActivity/list?token=' + USER_TOKEN + "&userId=" + USER_ID, criteria);

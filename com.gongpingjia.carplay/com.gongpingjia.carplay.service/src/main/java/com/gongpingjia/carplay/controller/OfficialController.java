@@ -176,4 +176,16 @@ public class OfficialController {
 
         return officialService.getAreaList(parentId);
     }
+
+    @RequestMapping(value = "/areaRange/info", method = RequestMethod.GET)
+    public ResponseDo getAreaRangeInfo(@RequestParam Integer code) {
+        LOG.info("get area range info");
+
+        try {
+            return officialService.getAreaRangeInfo(code);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }
