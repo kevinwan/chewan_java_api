@@ -852,15 +852,22 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     private List<Activity> rebuildActivities(ActivityQueryParam param, List<Activity> activityList, Map<String, User> userMap) {
-        Set<String> appointmentActivityIds = buildUserAppointmentActivityIds(param);
+        Map<String, Appointment> appointmentActivityMap = buildUserAppointmentActivityIds(param);
 
         LOG.debug("Filter user by idle status and compute weight");
         Long current = DateUtil.getTime();
         List<Activity> activities = new ArrayList<>(activityList.size());
         for (Activity item : activityList) {
-            if (appointmentActivityIds.contains(item.getActivityId())) {
-                continue;
+            if (StringUtils.isNotEmpty(param.getUserId())) {
+                //用户Id存在，过滤掉所有的已经邀约的活动
+                //检查当前用户邀约的活动是否存在，如果已经拒绝了或者邀请了就不展示
+                Appointment appointment = appointmentActivityMap.get(item.getActivityId());
+                if (appointment != null && appointment.getCreateTime() > item.getCreateTime()) {
+                    //说明当前的活动用户已经报名参加了，并且遭到拒绝或者接受
+                    continue;
+                }
             }
+
             User user = userMap.get(item.getUserId());
             if (param.isCommonQuery()) {
                 if (StringUtils.isNotEmpty(param.getGender())) {
@@ -879,19 +886,36 @@ public class ActivityServiceImpl implements ActivityService {
         return activities;
     }
 
-    private Set<String> buildUserAppointmentActivityIds(ActivityQueryParam param) {
+    /**
+     * 获取用户的邀约的信息
+     *
+     * @param param
+     * @return
+     */
+    private Map<String, Appointment> buildUserAppointmentActivityIds(ActivityQueryParam param) {
         LOG.debug("Check user is already appointment or not, filter the activity");
         List<Appointment> appointmentList = new ArrayList<>(0);
         if (StringUtils.isNotEmpty(param.getUserId())) {
-            appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId())
+            appointmentList = appointmentDao.find(Query.query(Criteria.where("applyUserId").is(param.getUserId()).and("deleteFlag").is(false)
                     .and("status").in(Constants.AppointmentStatus.ACCEPT, Constants.AppointmentStatus.REJECT)));
         }
-        Set<String> activityIds = new HashSet<>(appointmentList.size());
+
+        Map<String, Appointment> activityAppointmentMap = new HashMap<>();
         for (Appointment item : appointmentList) {
             //计算用户的活动处于接收或者拒绝的状态
-            activityIds.add(item.getActivityId());
+            Appointment appointment = activityAppointmentMap.get(item.getActivityId());
+            if (appointment == null) {
+                //存在邀约，添加到map中
+                activityAppointmentMap.put(item.getActivityId(), item);
+                continue;
+            }
+
+            if (item.getCreateTime() > appointment.getCreateTime()) {
+                //当前的邀约更新，取最新的
+                activityAppointmentMap.put(item.getActivityId(), item);
+            }
         }
-        return activityIds;
+        return activityAppointmentMap;
     }
 
     /**
