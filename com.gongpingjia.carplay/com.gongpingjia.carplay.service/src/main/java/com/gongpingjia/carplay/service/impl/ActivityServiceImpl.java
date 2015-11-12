@@ -157,6 +157,7 @@ public class ActivityServiceImpl implements ActivityService {
             update.set("establish", activity.getEstablish());
             update.set("transfer", activity.isTransfer());
             update.set("createTime", current);
+            update.set("applyIds", new ArrayList<>(0));
             activityDao.update(Query.query(Criteria.where("activityId").is(oldActivity.getActivityId())), update);
 
             activity.setActivityId(oldActivity.getActivityId());
