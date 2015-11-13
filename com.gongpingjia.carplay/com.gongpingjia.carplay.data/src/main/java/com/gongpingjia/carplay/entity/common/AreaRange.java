@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by Administrator on 2015/11/11.
  */
 @Document
-public class AreaRange {
+public class AreaRange implements Comparable<AreaRange> {
 
     @Id
     private String id;
@@ -71,5 +71,15 @@ public class AreaRange {
 
     public void setMinLatitude(Double minLatitude) {
         this.minLatitude = minLatitude;
+    }
+
+
+    @Override
+    public int compareTo(AreaRange o) {
+        if (o.getCode() > this.getCode()) {
+            return  -1;
+        }else {
+            return  1;
+        }
     }
 }

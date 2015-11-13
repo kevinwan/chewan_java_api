@@ -131,11 +131,46 @@ public class AreaInfoTest extends BaseTest {
 
             initAreaRangeInfo(areaRangeMap, longitudeInfoList, latitudeInfoList);
 
+
             //存贮
-            saveAreaRangeInfo(areaRangeMap);
+            saveAreaRangeToJson(areaRangeMap);
+//            saveAreaRangeInfo(areaRangeMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void saveAreaRangeToJson(Map<Integer, AreaRange> areaRangeMap) {
+        System.out.println(areaRangeMap.size());
+        List<AreaRange> areaRangeList = new ArrayList<AreaRange>(areaRangeMap.size());
+        for (Map.Entry<Integer, AreaRange> entry : areaRangeMap.entrySet()) {
+            areaRangeList.add(entry.getValue());
+        }
+        Collections.sort(areaRangeList);
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
+        try {
+            fileWriter  = new FileWriter("E://areaRange.json");
+            bufferedWriter = new BufferedWriter(fileWriter);
+            for (AreaRange areaRange : areaRangeList) {
+                bufferedWriter.write(JSONObject.toJSONString(areaRange)+"\n");
+            }
+            bufferedWriter.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if (null != bufferedWriter) {
+                    bufferedWriter.close();
+                }
+                if (null != fileWriter) {
+                    fileWriter.close();
+
+                }
+            } catch (Exception e) {
+            }
+        }
+
     }
 
 
@@ -160,7 +195,7 @@ public class AreaInfoTest extends BaseTest {
                 areaRangeList.add(value);
             }
             System.out.println(listSize);
-            pool.execute(new AreaRangeInfoThread(areaRangeList,areaRangeDao));
+            pool.execute(new AreaRangeInfoThread(areaRangeList, areaRangeDao));
         }
         pool.shutdown();
         Thread.sleep(2000);
