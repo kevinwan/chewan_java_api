@@ -13,10 +13,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by licheng on 2015/9/19.
@@ -67,6 +64,17 @@ public class User {
      */
     private List<Photo> album;
 
+    /**
+     * 相册审核的状态, 0-待审核, 1-审核完成
+     */
+    private int albumStatus;
+
+    /**
+     * 相册修改的时间
+     */
+    @Indexed(direction = IndexDirection.ASCENDING)
+    private Long albumModifyTime;
+
     private Car car;
 
     /**
@@ -80,6 +88,7 @@ public class User {
     private Boolean idle = true;
 
     private String deviceToken;
+
 
     //用户信息完善程度，运行时计算
     @Transient
@@ -434,6 +443,22 @@ public class User {
         this.snsChannels = snsChannels;
     }
 
+    public int getAlbumStatus() {
+        return albumStatus;
+    }
+
+    public void setAlbumStatus(int albumStatus) {
+        this.albumStatus = albumStatus;
+    }
+
+    public Long getAlbumModifyTime() {
+        return albumModifyTime;
+    }
+
+    public void setAlbumModifyTime(Long albumModifyTime) {
+        this.albumModifyTime = albumModifyTime;
+    }
+
     /**
      * 隐藏用户的隐私信息
      */
@@ -444,4 +469,21 @@ public class User {
         this.snsChannels = new ArrayList<>(0);
         return this;
     }
+
+    /**
+     * 构造用户的基本信息的Map
+     *
+     * @return
+     */
+    public Map<String, Object> buildBaseUserMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("nickname", nickname);
+        map.put("gender", gender);
+        map.put("birthday", birthday);
+        map.put("phone", phone);
+        return map;
+    }
+
+
 }

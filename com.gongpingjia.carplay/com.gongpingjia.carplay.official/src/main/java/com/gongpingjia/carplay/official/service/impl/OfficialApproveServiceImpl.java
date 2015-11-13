@@ -3,23 +3,29 @@ package com.gongpingjia.carplay.official.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.dao.history.AlbumAuthHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
 import com.gongpingjia.carplay.dao.user.UserAuthenticationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.common.Photo;
+import com.gongpingjia.carplay.entity.history.AlbumAuthHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.user.*;
 import com.gongpingjia.carplay.official.service.OfficialApproveService;
 import com.gongpingjia.carplay.service.impl.ChatCommonService;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -54,6 +60,13 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
     @Autowired
     private ChatCommonService chatCommonService;
+
+    @Autowired
+    @Qualifier("thirdPhotoManager")
+    private PhotoService thirdPhotoService;
+
+    @Autowired
+    private AlbumAuthHistoryDao albumAuthHistoryDao;
 
     @Override
     public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException {
@@ -380,6 +393,61 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         sendEmchatMessage(userId, application, status, remarks, Constants.MessageType.PHOTO_AUTH_MSG);
 
         LOG.debug("Finished approved user photo authentication apply");
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo authUserAlbum(String userId, JSONObject json) throws ApiException {
+        LOG.debug("Auth user album and check user info");
+        User applyUser = userDao.findById(json.getString("userId"));
+        if (applyUser == null) {
+            LOG.warn("auth user:{} is not exist in the system", json.getString("userId"));
+            throw new ApiException("输入参数错误");
+        }
+        if (applyUser.getAlbum() == null || applyUser.getAlbum().isEmpty()) {
+            LOG.warn("auth user album is empty");
+            return ResponseDo.buildSuccessResponse();
+        }
+
+        JSONArray photoIds = json.getJSONArray("photoIds");
+        if (photoIds.isEmpty()) {
+            userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())),
+                    Update.update("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED));
+            return ResponseDo.buildSuccessResponse();
+        }
+
+        List<Photo> deletePhotos = new ArrayList<>(applyUser.getAlbum().size());
+        List<Photo> leftPhotos = new ArrayList<>(applyUser.getAlbum().size());
+        for (Photo item : applyUser.getAlbum()) {
+            if (photoIds.contains(item.getId())) {
+                deletePhotos.add(item);
+            } else {
+                leftPhotos.add(item);
+            }
+        }
+
+        LOG.debug("Update user data first and remove photo on the server later");
+        Update update = new Update();
+        update.set("album", leftPhotos);
+        update.set("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED);  //相册审核完成
+        userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())), update);
+        for (Photo item : deletePhotos) {
+            thirdPhotoService.delete(item.getKey());
+        }
+
+        AlbumAuthHistory history = new AlbumAuthHistory();
+        history.setApplyUserId(applyUser.getUserId());
+        history.setAuthUserId(userId);
+        history.setAuthTime(DateUtil.getTime());
+        history.setApplyTime(applyUser.getAlbumModifyTime());
+        history.setRemark(json.containsKey("remark") ? json.getString("remark") : "");
+        history.setPhotos(deletePhotos);
+        albumAuthHistoryDao.save(history);
+
+        LOG.debug("Update user data finished and send emcahat message");
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
+                applyUser.getEmchatName(), "你的相册照片违反车玩规定，已经给予删除。");
+
         return ResponseDo.buildSuccessResponse();
     }
 }

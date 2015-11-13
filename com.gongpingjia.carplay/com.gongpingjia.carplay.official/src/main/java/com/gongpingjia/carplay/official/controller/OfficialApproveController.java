@@ -196,4 +196,25 @@ public class OfficialApproveController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+
+    @RequestMapping(value = "/authentication/album", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo authUserAlbum(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                    @RequestBody JSONObject json) {
+        LOG.debug("authUserAlbum called, authUserId:{}", userId);
+
+        try {
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            if (CommonUtil.isEmpty(json, Arrays.asList("userId", "photoIds"))) {
+                throw new ApiException("输入参数有误");
+            }
+
+            return officialApproveService.authUserAlbum(userId, json);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }

@@ -488,14 +488,20 @@ public class UserServiceImpl implements UserService {
         }
         if (!viewUser.equals(beViewedUser)) {
             //表示不是自己查看自己，beViewedUser被别人看过,记录相册查看的历史信息
-            AlbumViewHistory history = new AlbumViewHistory();
-            history.setViewTime(DateUtil.getTime());
-            history.setViewUserId(viewUser);
-            history.setUserId(beViewedUser);
-            historyDao.save(history);
+            Query query = Query.query(Criteria.where("userId").is(beViewedUser).and("viewUserId").is(viewUser));
+            AlbumViewHistory history = historyDao.findOne(query);
+            if (history == null) {
+                //第一次查看他的信息，需要推送一下，后续再看 不需要推送
+                history.setViewTime(DateUtil.getTime());
+                history.setViewUserId(viewUser);
+                history.setUserId(beViewedUser);
+                historyDao.save(history);
+            } else {
+                historyDao.update(query, Update.update("viewTime", DateUtil.getTime()));
+            }
 
             User viewUserInfo = userDao.findById(viewUser);
-            String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.view", "{0}看过了我的相册"),
+            String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.view", "{0}看过了我"),
                     viewUserInfo.getNickname());
             chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.USER_VIEW,
                     beViewedUserInfo.getEmchatName(), message);
