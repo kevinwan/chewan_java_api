@@ -1,21 +1,37 @@
 package com.gongpingjia.carplay.controller;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
+import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.util.BeanUtil;
+import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
+import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
+import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.service.UserService;
+import com.gongpingjia.carplay.service.impl.ChatCommonService;
+import com.gongpingjia.carplay.service.impl.UserServiceImpl;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2015/9/25.
  */
 @RestController
 public class TestController {
+    private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
     @Autowired
     private PhoneVerificationDao phoneVerificationDao;
@@ -48,7 +64,7 @@ public class TestController {
         return ResponseDo.buildSuccessResponse("123");
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         ProductVersion version = new ProductVersion();
         version.setForceUpdate(1);
         version.setProduct("android");
@@ -63,4 +79,62 @@ public class TestController {
         JSONObject jsonObject = JSONObject.fromObject(version);
         System.out.println(jsonObject);
     }
+
+
+//    @RequestMapping(value = "/test/emchatgroup", method = RequestMethod.GET)
+//    public ResponseDo createActivityEmchatGroup() throws ApiException {
+//        OfficialActivityDao officialActivityDao = BeanUtil.getBean(OfficialActivityDao.class);
+//        UserDao userDao = BeanUtil.getBean(UserDao.class);
+//        ChatCommonService chatCommonService = BeanUtil.getBean(ChatCommonService.class);
+//        ChatThirdPartyService chatThirdPartyService = BeanUtil.getBean(ChatThirdPartyService.class);
+//
+//        List<OfficialActivity> activitys = officialActivityDao.find(Query.query(Criteria.where("userId").is("56260e760cf21390f134cf2b")));
+//        for (OfficialActivity activity : activitys) {
+//            User user = userDao.findById(activity.getUserId());
+//
+//            try {
+//                JSONObject jsonResult = chatThirdPartyService.createChatGroup(chatCommonService.getChatToken(), activity.getTitle(),
+//                        "", user.getEmchatName(), null);
+//                LOG.info(jsonResult.toString());
+//                if (jsonResult.isEmpty()) {
+//                    LOG.warn("Failed to create chat group");
+//                    throw new ApiException("创建聊天群组失败");
+//                }
+//
+//                officialActivityDao.update(Query.query(Criteria.where("officialActivityId").is(activity.getOfficialActivityId())),
+//                        Update.update("emchatGroupId", jsonResult.getJSONObject("data").getString("groupid")));
+//            } catch (ApiException e) {
+//                e.printStackTrace();
+//            }
+//
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return ResponseDo.buildSuccessResponse();
+//    }
+
+//    @RequestMapping(value = "/test/batchpassword", method = RequestMethod.GET)
+//    public ResponseDo batchChangeUserPassword() {
+//        long start = 10012340001l;
+//        long end = 10012340020l;
+//
+//        UserService userService = BeanUtil.getBean(UserService.class);
+//        UserDao userDao = BeanUtil.getBean(UserDao.class);
+//
+//        String newPassword = "bfd59291e825b5f2bbf1eb76569f8fe7";
+//
+//        for (long phone = start; phone <= end; phone++) {
+//            User user = userDao.findOne(Query.query(Criteria.where("phone").is(String.valueOf(phone))));
+//            try {
+//                ResponseDo responseDo = userService.changePassword(user.getUserId(), user.getPassword(), newPassword);
+//                LOG.debug(responseDo.toString());
+//            } catch (ApiException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return ResponseDo.buildSuccessResponse();
+//    }
 }

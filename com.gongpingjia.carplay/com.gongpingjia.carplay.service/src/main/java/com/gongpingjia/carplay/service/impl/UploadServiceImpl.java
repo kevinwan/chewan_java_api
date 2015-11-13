@@ -141,7 +141,6 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, String token) throws ApiException {
-
         // 1.参数校验
         checker.checkUserInfo(userId, token);
 
@@ -165,7 +164,10 @@ public class UploadServiceImpl implements UploadService {
 
         if (response.success()) {
             Update update = new Update();
-            update.addToSet("album", new Photo(photoId, key, DateUtil.getTime()));
+            Long current = DateUtil.getTime();
+            update.addToSet("album", new Photo(photoId, key, current));
+            update.set("albumStatus", Constants.UserAlbumAtuhStatus.PENDING);  //发起相册审核
+            update.set("albumModifyTime", current);
 
             userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
         }

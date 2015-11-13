@@ -391,4 +391,14 @@ public class Constants {
         List<Integer> TYPE_LIST = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
     }
 
+    /**
+     * 用户相册审核
+     */
+    public interface UserAlbumAtuhStatus {
+        //待认证
+        int PENDING = 0;
+
+        //已认证
+        int AUTHENTICATED = 1;
+    }
 }

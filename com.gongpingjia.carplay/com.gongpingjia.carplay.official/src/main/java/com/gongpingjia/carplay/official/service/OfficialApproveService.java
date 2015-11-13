@@ -67,4 +67,14 @@ public interface OfficialApproveService {
      * @return 返回审批结果
      */
     ResponseDo approveUserPhotoAuthentication(String userId, JSONObject json) throws ApiException;
+
+
+    /**
+     * 用户相册审核
+     * @param userId
+     * @param json
+     * @return
+     * @throws ApiException
+     */
+    ResponseDo authUserAlbum(String userId, JSONObject json) throws ApiException;
 }

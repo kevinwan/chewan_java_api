@@ -26,9 +26,6 @@ public class OfficialActivityController {
     private OfficialActivityService officialActivityService;
 
     @Autowired
-    private ParameterChecker checker;
-
-    @Autowired
     private OfficialParameterChecker officialParameterChecker;
 
     /**
