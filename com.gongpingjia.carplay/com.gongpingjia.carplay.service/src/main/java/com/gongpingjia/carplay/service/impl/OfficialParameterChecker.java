@@ -13,12 +13,15 @@ import org.springframework.stereotype.Service;
  * Created by 123 on 2015/10/10.
  */
 @Service
-public class OfficialParameterChecker extends ParameterChecker {
+public class OfficialParameterChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(OfficialParameterChecker.class);
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ParameterChecker checker;
 
     /**
      * 检查用户是否为管理员，官方操作只能为管理员
@@ -45,7 +48,7 @@ public class OfficialParameterChecker extends ParameterChecker {
      * @throws ApiException
      */
     public void checkAdminUserInfo(String userId, String toke) throws ApiException {
-        checkUserInfo(userId, toke);
+        checker.checkUserInfo(userId, toke);
 
         checkAdministrator(userId);
     }
