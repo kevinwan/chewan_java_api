@@ -47,7 +47,7 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
                     tempAreaList.push(item);
                     $scope[type] = tempAreaList;
                     deferred.resolve();
-                    return deferred;
+                    return deferred.promise;
                 }
             }
             $rootScope.loadingPromise = activityService.getAreaInfo(item.code).success(function (result) {

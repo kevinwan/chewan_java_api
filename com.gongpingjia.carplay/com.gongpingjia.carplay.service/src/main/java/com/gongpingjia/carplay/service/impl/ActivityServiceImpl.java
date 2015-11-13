@@ -622,22 +622,19 @@ public class ActivityServiceImpl implements ActivityService {
 
         Update update = new Update();
         try {
-            Address destination = (Address) JSONObject.toBean(json.getJSONObject("destination"), Address.class);
-            update.set("destination", destination);
-            Address establish = (Address) JSONObject.toBean(json.getJSONObject("establish"), Address.class);
-            update.set("establish", establish);
-            Landmark destPoint = (Landmark) JSONObject.toBean(json.getJSONObject("destPoint"), Landmark.class);
-            update.set("destPoint", destPoint);
-            Landmark estabPoint = (Landmark) JSONObject.toBean(json.getJSONObject("estabPoint"), Landmark.class);
-            update.set("estabPoint", estabPoint);
-            String majorType = json.getString("majorType");
-            update.set("majorType", majorType);
-            String type = json.getString("type");
-            update.set("type", type);
-            String pay = json.getString("pay");
-            update.set("pay", pay);
-            boolean transfer = json.getBoolean("transfer");
-            update.set("transfer", transfer);
+
+            if (json.containsKey("destination") && StringUtils.isNotEmpty(json.getString("destination"))) {
+                update.set("destination", JSONObject.toBean(json.getJSONObject("establish"), Address.class));
+            }
+            if (json.containsKey("destPoint") && StringUtils.isNotEmpty(json.getString("destination"))) {
+                update.set("destPoint", JSONObject.toBean(json.getJSONObject("destPoint"), Landmark.class));
+            }
+            update.set("establish",JSONObject.toBean(json.getJSONObject("establish"),Address.class));
+            update.set("estabPoint", JSONObject.toBean(json.getJSONObject("estabPoint"),Landmark.class));
+            update.set("majorType", json.getString("majorType"));
+            update.set("type", json.getString("type"));
+            update.set("pay", json.getString("pay"));
+            update.set("transfer", json.getBoolean("transfer"));
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             throw new ApiException("活动转换时出错");

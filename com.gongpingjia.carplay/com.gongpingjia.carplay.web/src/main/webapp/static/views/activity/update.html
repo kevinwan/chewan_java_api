@@ -12,11 +12,13 @@
                 <span>昵称:</span>
                 <span style="margin-left:20px;">{{activity.organizer.nickname}}</span>
             </div>
-            <div ng-show=" activity.organizer.channel == undefined || activity.organizer.channel == null || activity.organizer.channel == '' " class="col-md-6">
+            <div ng-show=" activity.organizer.channel == undefined || activity.organizer.channel == null || activity.organizer.channel == '' "
+                 class="col-md-6">
                 <span>手机号码:</span>
                 <span style="margin-left:20px;">{{activity.organizer.phone}}</span>
             </div>
-            <div ng-show=" activity.organizer.channel != undefined && activity.organizer.channel != null && activity.organizer.channel != '' " class="col-md-6">
+            <div ng-show=" activity.organizer.channel != undefined && activity.organizer.channel != null && activity.organizer.channel != '' "
+                 class="col-md-6">
                 <span>
                     <span>第三方登录:</span>
                 </span>
@@ -34,31 +36,17 @@
             <label class="col-md-2 control-label" for="majorType"> <span style="color:red">*</span>活动类型</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="majorType" ng-model="activity.majorType">
-                    <option value="吃饭">吃饭</option>
-                    <option value="唱歌">唱歌</option>
-                    <option value="电影">电影</option>
-                    <option value="遛狗">遛狗</option>
-                    <option value="运动">运动</option>
-                    <option value="夜店">夜店</option>
-                    <option value="购物">购物</option>
-                    <option value="咖啡">咖啡</option>
-                    <option value="喝酒">喝酒</option>
+                <select id="majorType" ng-model="activity.majorType"
+                        ng-options=" item.majorType as item.majorType for item in allTypeOptions"
+                        ng-change="changeMajorType(activity.majorType)">
+                    <option value="">全部</option>
                 </select>
             </div>
             <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>活动类型</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="type" ng-model="activity.type">
-                    <option value="吃饭">吃饭</option>
-                    <option value="唱歌">唱歌</option>
-                    <option value="电影">电影</option>
-                    <option value="遛狗">遛狗</option>
-                    <option value="运动">运动</option>
-                    <option value="夜店">夜店</option>
-                    <option value="购物">购物</option>
-                    <option value="咖啡">咖啡</option>
-                    <option value="喝酒">喝酒</option>
+                <select id="type" ng-model="activity.type" ng-options="item as item for item in typeOptions">
+                    <option value="">全部</option>
                 </select>
             </div>
 
@@ -66,6 +54,7 @@
 
         <div class="form-inline col-md-12" style="margin-top: 10px;">
             <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>活动支付方式</label>
+
             <div class="col-md-4 no-padding-left">
                 <select id="pay" ng-model="activity.pay">
                     <option value="AA">AA</option>
@@ -75,6 +64,7 @@
             </div>
 
             <label class="col-md-2 control-label" for="type"> <span style="color:red">*</span>包接送</label>
+
             <div class="col-md-4 no-padding-left">
                 <select id="transfer" ng-model="activity.transfer">
                     <option value="true">是</option>
@@ -87,39 +77,40 @@
             <span>活动目的地详情</span>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 20px;">
-            <label class="col-md-2 control-label" for="province"> <span style="color:red">*</span>省</label>
+            <label class="col-md-2 control-label" for="province">省</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="province" ng-model="destProvince"
+                <select id="province" ng-model="destination.province"
                         ng-options=" item  as item.name for item in provinceOptions"
-                        ng-change="initChildArea(destProvince.code,'destCityOptions')">
+                        ng-change="initChildArea(destination.province,'destCityOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
-            <label class="col-md-2 control-label" for="city"> <span style="color:red">*</span>市</label>
+            <label class="col-md-2 control-label" for="city">市</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="city" ng-model="destCity"
+                <select id="city" ng-model="destination.city"
                         ng-options=" item as item.name for item in destCityOptions"
-                        ng-change=" initChildArea(destCity.code,'destDistrictOptions')">
+                        ng-change=" initChildArea(destination.city,'destDistrictOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 10px;">
-            <label class="col-md-2 control-label" for="district"> <span style="color:red">*</span>区</label>
+            <label class="col-md-2 control-label" for="district">区</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="district" ng-model="destDistrict"
+                <select id="district" ng-model="destination.district"
                         ng-options=" item as item.name for item in destDistrictOptions"
-                        ng-change="initChildArea(destDistrict.code,'destStreetOptions')">
+                        ng-change="initChildArea(destination.district,'destStreetOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
-            <label class="col-md-2 control-label" for="city"> <span style="color:red">*</span>街道</label>
+            <label class="col-md-2 control-label" for="city">街道</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="street" ng-model="destStreet"
+                <select id="street" ng-model="destination.street"
+                        ng-change="randomPoint(destination.street.code,'destination')"
                         ng-options=" item as item.name for item in destStreetOptions">
                     <option value="">全部</option>
                 </select>
@@ -128,24 +119,20 @@
 
         <div class="form-inline col-md-12" style="margin-top: 10px;">
             <label class="col-md-2 control-label no-padding-right">
-                <span style="color:red">*</span>活动经纬度
+                活动经纬度
             </label>
         </div>
         <div class="form-inline col-md-12" style="margin-top: 10px;">
             <label class="col-md-2 control-label no-padding-right">
-                <span style="color:red">*</span>经度
+                经度
             </label>
-
-
             <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="destPoint.longitude" ng-model="activity.destPoint.longitude"
                        placeholder="活动经度"/>
             </div>
-
             <label class="col-md-2 control-label no-padding-right">
-                <span style="color:red">*</span>纬度
+                纬度
             </label>
-
             <div class="col-md-4 no-padding-left">
                 <input type="text" class="form-control" id="destPoint.latitude" ng-model="activity.destPoint.latitude"
                        placeholder="活动纬度"/>
@@ -159,18 +146,19 @@
             <label class="col-md-2 control-label" for="estabProvince"> <span style="color:red">*</span>省</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="estabProvince" ng-model="estabProvince"
+                <select id="estabProvince" ng-model="establish.province"
                         ng-options=" item as item.name for item in provinceOptions"
-                        ng-change="initChildArea(estabProvince.code,'estabCityOptions')">
+                        ng-change="initChildArea(establish.province,'estabCityOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
+
             <label class="col-md-2 control-label" for="estabCity"> <span style="color:red">*</span>市</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="estabCity" ng-model="estabCity"
+                <select id="estabCity" ng-model="establish.city"
                         ng-options=" item as item.name for item in estabCityOptions"
-                        ng-change="initChildArea(estabCity.code,'estabDistrictOptions')">
+                        ng-change="initChildArea(establish.city,'estabDistrictOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
@@ -179,16 +167,17 @@
             <label class="col-md-2 control-label" for="estabDistrict"> <span style="color:red">*</span>区</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="estabDistrict" ng-model="estabDistrict"
+                <select id="estabDistrict" ng-model="establish.district"
                         ng-options=" item as item.name for item in estabDistrictOptions"
-                        ng-change="initChildArea(estabDistrict.code,'estabStreetOptions')">
+                        ng-change="initChildArea(establish.district,'estabStreetOptions')">
                     <option value="">全部</option>
                 </select>
             </div>
             <label class="col-md-2 control-label" for="estabStreet"> <span style="color:red">*</span>街道</label>
 
             <div class="col-md-4 no-padding-left">
-                <select id="estabStreet" ng-model="estabStreet"
+                <select id="estabStreet" ng-model="establish.street"
+                        ng-change="randomPoint(establish.street.code,'establish')"
                         ng-options=" item as item.name for item in estabStreetOptions">
                     <option value="">全部</option>
                 </select>
@@ -239,8 +228,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <!-- button -->

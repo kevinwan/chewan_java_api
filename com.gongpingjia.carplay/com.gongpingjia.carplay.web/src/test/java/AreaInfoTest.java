@@ -1,6 +1,4 @@
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.HttpClientUtil;
 import com.gongpingjia.carplay.controller.BaseTest;
 import com.gongpingjia.carplay.controller.tool.AreaLocationThread;
@@ -8,7 +6,7 @@ import com.gongpingjia.carplay.controller.tool.AreaRangeInfoThread;
 import com.gongpingjia.carplay.controller.tool.SnTool;
 import com.gongpingjia.carplay.dao.common.AreaDao;
 import com.gongpingjia.carplay.dao.common.AreaRangeDao;
-import com.gongpingjia.carplay.dao.test.TestInfoDao;
+
 import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.common.AreaRange;
 import com.gongpingjia.carplay.entity.test.TestInfo;
@@ -17,9 +15,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 
 import java.io.*;
 import java.net.URLEncoder;
