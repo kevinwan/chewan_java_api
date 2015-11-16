@@ -14,10 +14,10 @@ public interface OfficialService {
      *
      * @return
      */
-    ResponseDo getActivityInfo(HttpServletRequest request,String id,Integer idType, String userId) throws ApiException;
+    ResponseDo getActivityInfo(HttpServletRequest request, String id, Integer idType, String userId) throws ApiException;
 
 
-    ResponseDo getActivityPageMemberInfo(String id,Integer idType, String userId, Integer ignore, Integer limit) throws ApiException;
+    ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit) throws ApiException;
 
 
     /**
@@ -36,7 +36,7 @@ public interface OfficialService {
     ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
 
 
-    ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer,String message) throws ApiException;
+    ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer, String message) throws ApiException;
 
     /**
      * 获取区域信息
@@ -51,4 +51,12 @@ public interface OfficialService {
      * 获取街道的区域经纬度范围
      */
     ResponseDo getAreaRangeInfo(Integer code) throws ApiException;
+
+    /**
+     * 未注册用户，报名参加官方活动，记录用户的手机号码
+     *
+     * @param phone
+     * @return
+     */
+    ResponseDo unregisterRecordUserPhone(String officialActivityId, String phone);
 }
