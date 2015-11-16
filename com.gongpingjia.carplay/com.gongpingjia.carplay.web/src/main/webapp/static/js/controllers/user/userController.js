@@ -8,6 +8,7 @@
 gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'userService',
     function ($scope, $rootScope, $http, $location, DTOptionsBuilder, DTColumnDefBuilder, userService) {
 
+
         /**
          * Define data table columns
          */
@@ -20,7 +21,7 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
             DTColumnDefBuilder.newColumnDef(6),
             DTColumnDefBuilder.newColumnDef(7),
             DTColumnDefBuilder.newColumnDef(8),
-            DTColumnDefBuilder.newColumnDef(9).notSortable(),
+            DTColumnDefBuilder.newColumnDef(9),
             DTColumnDefBuilder.newColumnDef(10)];
 
         /**
@@ -32,7 +33,8 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
         /**
          * Define data table options
          */
-        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('displayLength', 100);
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('displayLength', 100)
+            .withOption('order', [0, 'desc']);
 
         /**
          * Reset search criteria
