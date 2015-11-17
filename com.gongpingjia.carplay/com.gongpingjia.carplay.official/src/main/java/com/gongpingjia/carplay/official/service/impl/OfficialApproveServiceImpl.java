@@ -270,10 +270,11 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         if (StringUtils.isNotEmpty(status)) {
             criteria.and("status").is(status);
         }
+
         if (start != null && end != null) {
-            criteria.and("applyTime").gte(start).lt(end);
+            criteria.and("applyTime").gte(start).lt(end + Constants.DAY_MILLISECONDS);
         } else if (end != null) {
-            criteria.and("applyTime").lt(end);
+            criteria.and("applyTime").lt(end + Constants.DAY_MILLISECONDS);
         } else if (start != null) {
             criteria.and("applyTime").gte(start);
         }

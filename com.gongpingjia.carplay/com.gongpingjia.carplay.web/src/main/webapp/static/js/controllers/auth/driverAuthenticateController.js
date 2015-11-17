@@ -49,8 +49,8 @@ gpjApp.controller('driverAuthenticateController', ['$scope', '$rootScope', '$loc
         $scope.resetCriteria = function () {
             $scope.criteria = {
                 status: '认证中',
-                startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
-                endDate: moment().add('days', 1).subtract('month').format('YYYY-MM-DD'),
+                startDate: moment().subtract(6, 'day').format('YYYY-MM-DD'),
+                endDate: moment().format('YYYY-MM-DD'),
                 type: '车主认证'
             };
         };

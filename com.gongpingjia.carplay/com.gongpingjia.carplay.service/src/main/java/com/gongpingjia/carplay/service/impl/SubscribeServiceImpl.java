@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.SubscribeService;
@@ -173,6 +174,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
         LOG.debug("Build response data");
         String localServer = CommonUtil.getLocalPhotoServer();
+        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
         List<Map<String, Object>> data = new ArrayList<>(beSubscribed.size());
         for (Subscriber item : beSubscribed) {
             Map<String, Object> map = new HashMap<>(8, 1);
@@ -185,6 +187,13 @@ public class SubscribeServiceImpl implements SubscribeService {
             map.put("distance", DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
             map.put("cover", user.getCover());
             map.put("subscribeTime", item.getSubscribeTime());
+            map.put("photoAuthStatus", user.getPhotoAuthStatus());
+            map.put("licenseAuthStatus", user.getLicenseAuthStatus());
+            Car car = user.getCar();
+            if (car != null) {
+                car.setLogo(gpjServer + car.getLogo());
+            }
+            map.put("car", car);
             data.add(map);
         }
 

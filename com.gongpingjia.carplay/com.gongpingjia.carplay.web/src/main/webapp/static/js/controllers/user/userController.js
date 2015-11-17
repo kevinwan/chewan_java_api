@@ -40,19 +40,12 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            var start = new Date();
-            start.setHours(0, 0, 0, 0);
-            start.setTime(start.getTime() - 1000 * 60 * 60 * 24 * 7);
-
-            var end = new Date();
-            end.setHours(0, 0, 0, 0);
-
             $scope.criteria = {
                 phone: '',
                 nickname: '',
                 licenseAuthStatus: '',
                 photoAuthStatus: '',
-                startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+                startDate: moment().subtract(6, 'day').format('YYYY-MM-DD'),
                 endDate: moment().format('YYYY-MM-DD')
             };
         };

@@ -48,8 +48,7 @@ public class UserManagerServiceImpl implements UserManagerService {
 //        Criteria criteria = Criteria.where("registerTime").gte(start).lt(end);
         Criteria criteria = new Criteria();
         if (null != end && null != start) {
-            end = end + 24 * 60 * 60 * 1000;
-            criteria.and("registerTime").gte(start).lte(end);
+            criteria.and("registerTime").gte(start).lte(end + Constants.DAY_MILLISECONDS);
         }
 
         if (!StringUtils.isEmpty(phone)) {
