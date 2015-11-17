@@ -1,27 +1,24 @@
 package com.gongpingjia.carplay.service.impl;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.gongpingjia.carplay.cache.CacheService;
+import com.gongpingjia.carplay.cache.util.CacheUtil;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.dao.user.EmchatTokenDao;
+import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
+import com.gongpingjia.carplay.dao.user.UserTokenDao;
+import com.gongpingjia.carplay.entity.user.EmchatToken;
+import com.gongpingjia.carplay.entity.user.UserToken;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
-import com.gongpingjia.carplay.cache.CacheService;
-import com.gongpingjia.carplay.cache.util.CacheUtil;
-import com.gongpingjia.carplay.common.util.PropertiesUtil;
-import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
-import com.gongpingjia.carplay.dao.user.UserTokenDao;
-import com.gongpingjia.carplay.dao.user.EmchatTokenDao;
-import com.gongpingjia.carplay.entity.user.UserToken;
-import com.gongpingjia.carplay.entity.user.EmchatToken;
 import org.springframework.util.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 对业务缓存的统一处理

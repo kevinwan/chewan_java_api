@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/9/22.
@@ -38,7 +39,7 @@ public class AuthApplication {
     private String remarks;
 
     @Transient
-    private User applyUser;
+    private Map<String, Object> applyUser;
 
     @Transient
     private UserAuthentication authentication;
@@ -102,11 +103,11 @@ public class AuthApplication {
         this.authTime = authTime;
     }
 
-    public User getApplyUser() {
+    public Map<String, Object> getApplyUser() {
         return applyUser;
     }
 
-    public void setApplyUser(User applyUser) {
+    public void setApplyUser(Map<String, Object> applyUser) {
         this.applyUser = applyUser;
     }
 

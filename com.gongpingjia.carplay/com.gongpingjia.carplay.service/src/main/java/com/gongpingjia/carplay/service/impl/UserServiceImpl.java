@@ -9,6 +9,7 @@ import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.activity.PushInfoDao;
+import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
@@ -17,7 +18,6 @@ import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.activity.PushInfo;
-import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
@@ -110,6 +110,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserAuthenticationDao userAuthenticationDao;
 
+    @Autowired
+    private PhotoDao photoDao;
+
     @Override
     public ResponseDo register(User user, JSONObject json) throws ApiException {
         LOG.debug("Save register data begin, first check user is exist or not with phone:{}", user.getPhone());
@@ -158,16 +161,10 @@ public class UserServiceImpl implements UserService {
 
         pushNearbyActivity(user.getUserId(), emchatName, user.getLandmark());
 
-        return ResponseDo.buildSuccessResponse(buildResponseUser(user, userToken.getToken()));
-    }
-
-    private User buildResponseUser(User user, String token) {
-        LOG.debug("Build response data");
-        User data = userDao.findById(user.getUserId());
-        data.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        data.setToken(token);
-        data.setCompletion(computeCompletion(data));
-        return data;
+        Map<String, Object> map = user.buildFullUserMap();
+        user.appendCompute(map, photoDao.getUserAlbumCount(user.getUserId()));
+        user.appendToken(map, userToken.getToken());
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     /**
@@ -186,14 +183,11 @@ public class UserServiceImpl implements UserService {
             Map<String, String> result = thirdPhotoManager.upload(avatarBytes, key, true);
             if (Constants.Result.SUCCESS.equals(result.get("result"))) {
                 Photo photo = new Photo();
-                photo.setId(id);
                 photo.setUploadTime(DateUtil.getTime());
                 photo.setKey(key);
-
-                Update update = new Update();
-                update.addToSet("album", photo);
-                userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
-
+                photo.setUserId(user.getUserId());
+                photo.setType(Constants.PhotoType.USER_ALBUM);
+                photoDao.save(photo);
                 LOG.info("Upload user avatar album key:{}", key);
             }
         } catch (ApiException e) {
@@ -254,15 +248,13 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("密码不正确，请核对后重新登录");
         }
 
-        //刷新用户Token
-        userData.setToken(refreshUserToken(userData.getUserId()));
+        Map<String, Object> map = userData.buildFullUserMap();
+        User.appendAlbum(map, photoDao.getUserAlbum(userData.getUserId()));
+        User.appendToken(map, refreshUserToken(userData.getUserId()));
+        userData.appendCompute(map, photoDao.getUserAlbumCount(userData.getUserId()));
 
-        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        userData.setCompletion(computeCompletion(userData));
-
-        return ResponseDo.buildSuccessResponse(userData);
+        return ResponseDo.buildSuccessResponse(map);
     }
-
 
     /**
      * 后台管理员用户登录
@@ -296,64 +288,11 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("无权限");
         }
 
-        //刷新用户Token
-        userData.setToken(refreshUserToken(userData.getUserId()));
-
-        userData.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        // 查询用户车辆信息
-        if (userData.getCar() != null) {
-            userData.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
-        }
-
-        userData.setCompletion(computeCompletion(userData));
-
-        return ResponseDo.buildSuccessResponse(userData);
+        Map<String, Object> map = userData.buildFullUserMap();
+        userData.appendToken(map, refreshUserToken(userData.getUserId()));
+        return ResponseDo.buildSuccessResponse(map);
     }
 
-
-    /**
-     * 计算用户的信息的完善程度
-     *
-     * @param user
-     * @return
-     */
-    private Integer computeCompletion(User user) {
-        int completion = 0;
-        if (Constants.AuthStatus.ACCEPT.equals(user.getLicenseAuthStatus())) {
-            completion += 20;
-        }
-        if (Constants.AuthStatus.ACCEPT.equals(user.getPhotoAuthStatus())) {
-            completion += 20;
-        }
-
-        final int total = 6;  //总共需要填写6项
-        int has = 0;
-        if (!StringUtils.isEmpty(user.getNickname())) {
-            has++;
-        }
-        if (user.getBirthday() != null) {
-            has++;
-        }
-        if (!StringUtils.isEmpty(user.getGender())) {
-            has++;
-        }
-        if (!StringUtils.isEmpty(user.getAvatar())) {
-            has++;
-        }
-        if (!StringUtils.isEmpty(user.getPhone())) {
-            has++;
-        }
-        if (user.getAlbum() != null && user.getAlbum().size() > 0) {
-            has++;
-        }
-
-        if (has == total) {
-            completion += 60;
-        } else {
-            completion += (has * 60) / total;
-        }
-        return completion;
-    }
 
     @Override
     public void checkRegisterParameters(User user, JSONObject json) throws ApiException {
@@ -417,12 +356,11 @@ public class UserServiceImpl implements UserService {
 
         userDao.update(Query.query(Criteria.where("userId").is(userData.getUserId())), Update.update("password", user.getPassword()));
 
-        Map<String, Object> data = new HashMap<String, Object>(2, 1);
-        // 获取用户授权信息
-        data.put("userId", userData.getUserId());
-        data.put("token", refreshUserToken(userData.getUserId()));
+        Map<String, Object> map = userData.buildFullUserMap();
+        User.appendToken(map, refreshUserToken(userData.getUserId()));
+        User.appendAlbum(map, photoDao.getUserAlbum(userData.getUserId()));
 
-        return ResponseDo.buildSuccessResponse(data);
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     @Override
@@ -468,7 +406,10 @@ public class UserServiceImpl implements UserService {
 
             // 用户已经存在于系统中
             LOG.debug("User is exist in the system, return login information");
-            return ResponseDo.buildSuccessResponse(buildResponseUser(userData, refreshUserToken(userData.getUserId())));
+            Map<String, Object> map = userData.buildFullUserMap();
+            User.appendAlbum(map, photoDao.getUserAlbum(userData.getUserId()));
+            User.appendToken(map, refreshUserToken(userData.getUserId()));
+            return ResponseDo.buildSuccessResponse(map);
         }
     }
 
@@ -483,9 +424,12 @@ public class UserServiceImpl implements UserService {
             return ResponseDo.buildFailureResponse("用户不存在");
         }
 
-        if (beViewedUserInfo.getAlbum() != null) {
-            Collections.sort(beViewedUserInfo.getAlbum());
-        }
+        //获取用户的相册
+        List<Photo> userAlbum = photoDao.getUserAlbum(beViewedUser);
+        Collections.sort(userAlbum);
+
+        Map<String, Object> map = beViewedUserInfo.buildCommonUserMap();
+        User.appendSubscribeFlag(map, false);
         if (!viewUser.equals(beViewedUser)) {
             //表示不是自己查看自己，beViewedUser被别人看过,记录相册查看的历史信息
             Query query = Query.query(Criteria.where("userId").is(beViewedUser).and("viewUserId").is(viewUser));
@@ -508,21 +452,18 @@ public class UserServiceImpl implements UserService {
                     beViewedUserInfo.getEmchatName(), message);
 
             Subscriber subscriber = subscriberDao.findOne(Query.query(Criteria.where("fromUser").is(viewUser).and("toUser").is(beViewedUser)));
-            beViewedUserInfo.setSubscribeFlag(subscriber != null ? true : false);
+            User.appendSubscribeFlag(map, subscriber != null);
         } else {
             UserAuthentication userAuthentication = userAuthenticationDao.findById(beViewedUser);
             if (userAuthentication != null) {
-                String localServer = CommonUtil.getLocalPhotoServer();
-                beViewedUserInfo.setDriverLicense(localServer + userAuthentication.getDriverLicense());
-                beViewedUserInfo.setDrivingLicense(localServer + userAuthentication.getDrivingLicense());
+                User.appendDriverLicense(map, userAuthentication.getDriverLicense());
+                User.appendDrivingLicense(map, userAuthentication.getDrivingLicense());
             }
         }
+        beViewedUserInfo.appendCompute(map, photoDao.getUserAlbumCount(beViewedUserInfo.getUserId()));
+        User.appendAlbum(map, photoDao.getUserAlbum(beViewedUserInfo.getUserId()));
 
-        beViewedUserInfo.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        beViewedUserInfo.setCompletion(computeCompletion(beViewedUserInfo));
-        beViewedUserInfo.hideSecretInfo();
-
-        return ResponseDo.buildSuccessResponse(beViewedUserInfo);
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     @Override
@@ -561,7 +502,7 @@ public class UserServiceImpl implements UserService {
 
     private List<Object> buildUserActivities(String userId, List<Appointment> appointments) {
         //获取所有的appointment 对应的 user 信息；
-        Map<String, User> users = buildUsers(userId, appointments);
+        Map<String, Map<String, Object>> users = buildUsers(userId, appointments);
         Map<String, OfficialActivity> officialActivityMap = buildOfficialActivityMap(appointments);
 
         List<Subscriber> subscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId)));
@@ -578,13 +519,7 @@ public class UserServiceImpl implements UserService {
             if (Constants.ActivityCatalog.OFFICIAL.equals(appointment.getActivityCategory())) {
                 //官方活动
                 OfficialActivity officialActivity = officialActivityMap.get(appointment.getActivityId());
-                User user = users.get(appointment.getInvitedUserId());
-
-                Map<String, Object> organizer = new HashMap<>(4, 1);
-                organizer.put("nickname", user.getNickname());
-                organizer.put("avatar", user.getAvatar());
-                organizer.put("emchatName", user.getEmchatName());
-                officialActivity.setOrganizer(organizer);
+                officialActivity.setOrganizer(users.get(appointment.getInvitedUserId()));
 
                 officialActivity.setCovers(new String[]{thirdServer + officialActivity.getCover().getKey()});
                 officialActivity.setActivityCategory(appointment.getActivityCategory());
@@ -599,8 +534,8 @@ public class UserServiceImpl implements UserService {
         return data;
     }
 
-    private void buildCommonAppointment(User currentUser, Map<String, User> users, Set<String> subscriberIdSet, Appointment appointment) {
-        User userInfo = null;
+    private void buildCommonAppointment(User currentUser, Map<String, Map<String, Object>> users, Set<String> subscriberIdSet, Appointment appointment) {
+        Map<String, Object> userInfo = null;
         if (currentUser.getUserId().equals(appointment.getApplyUserId())) {
             userInfo = users.get(appointment.getInvitedUserId());
             appointment.setIsApplicant(true);
@@ -608,23 +543,9 @@ public class UserServiceImpl implements UserService {
             userInfo = users.get(appointment.getApplyUserId());
             appointment.setIsApplicant(false);
         }
-        Map<String, Object> userMap = new HashMap<>(16, 1);
-        userMap.put("userId", userInfo.getUserId());
-        userMap.put("nickname", userInfo.getNickname());
-        userMap.put("gender", userInfo.getGender());
-        userMap.put("age", userInfo.getAge());
-        userMap.put("role", userInfo.getRole());
-        userMap.put("avatar", userInfo.getAvatar());
-        userMap.put("drivingYears", userInfo.getDrivingYears());
-        userMap.put("photoAuthStatus", userInfo.getPhotoAuthStatus());
-        userMap.put("licenseAuthStatus", userInfo.getLicenseAuthStatus());
-        userMap.put("cover", userInfo.getCover());
-        userMap.put("car", userInfo.getCar());
-        //是否在subscriberIdSet中 即为 是否关注了该用户
-        userMap.put("subscribeFlag", subscriberIdSet.contains(userInfo.getUserId()));
-        userMap.put("emchatName", userInfo.getEmchatName());
-//        userMap.put("distance", DistanceUtil.getDistance(currentUser.getLandmark(), userInfo.getLandmark()));
-        appointment.setApplicant(userMap);
+
+        User.appendCover(userInfo, userDao.getCover(String.valueOf(userInfo.get("userId"))));
+        appointment.setApplicant(userInfo);
     }
 
     private Map<String, OfficialActivity> buildOfficialActivityMap(List<Appointment> appointments) {
@@ -643,29 +564,24 @@ public class UserServiceImpl implements UserService {
         return officialActivityMap;
     }
 
-    private Map<String, User> buildUsers(String userId, List<Appointment> appointments) {
+    private Map<String, Map<String, Object>> buildUsers(String userId, List<Appointment> appointments) {
         User user = userDao.findById(userId);
 
-        String localServer = CommonUtil.getLocalPhotoServer();
-        String remoteServer = CommonUtil.getThirdPhotoServer();
-        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
-
         LOG.debug("build users and hide user info");
-        Map<String, User> users = new HashMap<>(appointments.size());
+        Map<String, Map<String, Object>> userMap = new HashMap<>(appointments.size(), 1);
         for (Appointment appointment : appointments) {
-            users.put(appointment.getApplyUserId(), null);
-            users.put(appointment.getInvitedUserId(), null);
+            userMap.put(appointment.getApplyUserId(), null);
+            userMap.put(appointment.getInvitedUserId(), null);
         }
 
-        List<User> userList = userDao.findByIds(users.keySet());
+        List<User> userList = userDao.findByIds(userMap.keySet());
         for (User item : userList) {
-            item.hideSecretInfo();
-            item.refreshPhotoInfo(localServer, remoteServer, gpjServer);
-            item.setDistance(DistanceUtil.getDistance(user.getLandmark(), item.getLandmark()));
-            users.put(item.getUserId(), item);
+            Map<String, Object> map = item.buildBaseUserMap();
+            User.appendDistance(map, DistanceUtil.getDistance(user.getLandmark(), item.getLandmark()));
+            userMap.put(item.getUserId(), map);
         }
 
-        return users;
+        return userMap;
     }
 
     @Override
@@ -750,8 +666,6 @@ public class UserServiceImpl implements UserService {
         User ownUser = userDao.findById(userId);
 
         //注意 appointmentMap中 key 存放的是 activityId  即为 从 activityId 找找到对应的 appoint 因为 只会出查找  该用户对此活动申请的 appointment 所以 是唯一对应关系；
-
-        String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> interests = new ArrayList<>(interestMessages.size());
         for (int index = 0; index < interestMessages.size(); index++) {
             InterestMessage message = interestMessages.get(index);
@@ -791,24 +705,9 @@ public class UserServiceImpl implements UserService {
             }
 
             User user = userMap.get(message.getUserId());
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("userId", user.getUserId());
-            userInfo.put("nickname", user.getNickname());
-            userInfo.put("gender", user.getGender());
-            userInfo.put("age", user.getAge());
-            userInfo.put("photoAuthStatus", user.getPhotoAuthStatus());
-            userInfo.put("licenseAuthStatus", user.getLicenseAuthStatus());
-            Car car = user.getCar();
-            if (car != null) {
-                car.refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
-            }
-            userInfo.put("car", car);
-            userInfo.put("avatar", localServer + user.getAvatar());
-            userInfo.put("cover", user.getCover());
-            userInfo.put("subscribeFlag", true);
-
-            interestMap.put("user", userInfo);
-
+            Map<String, Object> userInfo = user.buildCommonUserMap();
+            User.appendCover(userInfo, userDao.getCover(user.getUserId()));
+            User.appendSubscribeFlag(userInfo, true);
             interests.add(interestMap);
         }
         return interests;
@@ -838,30 +737,18 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("输入参数有误");
         }
         String[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
-        User user = userDao.findById(userId);
-        List<Photo> userPhotos = user.getAlbum();
-        //待存入数据库的数据
-        List<Photo> newAlbum = userPhotos;
-        LOG.debug("check photos is exit or not");
-        for (int photosIndex = 0; photosIndex < photos.length; photosIndex++) {
-            for (int userPhotosIndex = 0; userPhotosIndex < userPhotos.size(); userPhotosIndex++) {
-                if (photos[photosIndex].equals(userPhotos.get(userPhotosIndex).getId())) {
-                    newAlbum.remove(userPhotosIndex);
-                    break;
-                }
-                if (userPhotosIndex == userPhotos.size() - 1) {
-                    LOG.warn("The photo is not exit! photo:{}", photos[photosIndex]);
-                    throw new ApiException("有相片不存在");
-                }
-            }
-        }
 
-        LOG.debug("delete photo in qiniu");
-        for (String photo : photos) {
-            photoService.delete(MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photo));
+        LOG.debug("delete photos in database");
+        Query query = Query.query(Criteria.where("id").in(photos)
+                .and("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM));
+        photoDao.delete(query);
+
+        List<Photo> photoList = photoDao.find(query);
+        LOG.debug("delete photo in qiniu server");
+        for (Photo item : photoList) {
+            photoService.delete(item.getKey());
         }
-        LOG.debug("delete photo in DB");
-        userDao.update(Query.query(Criteria.where("userId").is(userId)), Update.update("album", newAlbum));
+        LOG.debug("Finished delete photo in database and qiniu server");
 
         return ResponseDo.buildSuccessResponse(photos);
     }
@@ -919,7 +806,10 @@ public class UserServiceImpl implements UserService {
 
         User responseUser = userDao.findById(user.getUserId());
         UserToken userToken = userTokenDao.findOne(Query.query(Criteria.where("userId").is(user.getUserId())));
-        return ResponseDo.buildSuccessResponse(buildResponseUser(responseUser, userToken.getToken()));
+
+        Map<String, Object> map = responseUser.buildFullUserMap();
+        User.appendToken(map, userToken.getToken());
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     @Override
@@ -957,11 +847,8 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Input map parameter");
         List<Map<String, Object>> data = new ArrayList<>(authenticationHistories.size());
         for (AuthenticationHistory authenticationHistory : authenticationHistories) {
-            Map<String, Object> history = new HashMap<>();
             User user = authUserMap.get(authenticationHistory.getAuthId());
-            history.put("userId", user.getUserId());
-            history.put("nickname", user.getNickname());
-            history.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+            Map<String, Object> history = user.buildBaseUserMap();
             history.put("authTime", authenticationHistory.getAuthTime());
             history.put("type", authenticationHistory.getType());
             history.put("status", authenticationHistory.getStatus());
@@ -979,13 +866,14 @@ public class UserServiceImpl implements UserService {
         checker.checkUserInfo(userId, token);
 
         User user = userDao.findById(userId);
-        if (user.getAlbum() == null || user.getAlbum().isEmpty()) {
+        List<Photo> album = photoDao.getUserAlbum(userId);
+        if (album.isEmpty()) {
             LOG.warn("User:{} album count is empty", userId);
             throw new ApiException("输入参数错误");
         }
 
-        if (count <= 0 || count > user.getAlbum().size()) {
-            LOG.warn("Input parameter count:{} is over album size:{}", count, user.getAlbum().size());
+        if (count <= 0 || count > album.size()) {
+            LOG.warn("Input parameter count:{} is over album size:{}", count, album.size());
             throw new ApiException("输入参数有误");
         }
 
@@ -1272,19 +1160,12 @@ public class UserServiceImpl implements UserService {
         //获取当前的用户信息；
         User nowUser = userDao.findById(userId);
 
-        String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> users = new ArrayList<>(userIdSet.size());
         for (AlbumViewHistory item : viewHistoryList) {
             User user = userMap.get(item.getViewUserId());
-            Map<String, Object> map = new HashMap<>(8, 1);
-            map.put("userId", user.getUserId());
-            map.put("nickname", user.getNickname());
-            map.put("gender", user.getGender());
-            map.put("age", user.getAge());
-            map.put("avatar", localServer + user.getAvatar());
-            map.put("distance", DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
-            map.put("viewTime", item.getViewTime());
-            map.put("cover", user.getCover());
+            Map<String, Object> map = user.buildCommonUserMap();
+            User.appendDistance(map, DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
+            User.appendCover(map, userDao.getCover(user.getUserId()));
             users.add(map);
         }
         return ResponseDo.buildSuccessResponse(users);
@@ -1391,7 +1272,7 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> resultMap = new HashMap<>();
         //被查看用户的照片
-        resultMap.put("cover", viewUser.getCover());
+        resultMap.put("cover", userDao.getCover(viewUser.getUserId()));
 //        resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark(), nowUser.getLandmark()));
 
         //被查看用户的活动信息：基本信息+我申请该活动的状态
@@ -1442,14 +1323,7 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("用户不存在");
         }
 
-        Map<String, Object> data = new HashMap<>(8, 1);
-        data.put("userId", user.getUserId());
-        data.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
-        data.put("nickname", user.getNickname());
-        data.put("emchatName", user.getEmchatName());
-        data.put("gender", user.getGender());
-        data.put("age", user.getAge());
-        return ResponseDo.buildSuccessResponse(data);
+        return ResponseDo.buildSuccessResponse(user.buildBaseUserMap());
     }
 
     @Override

@@ -1,14 +1,21 @@
 package com.gongpingjia.carplay.entity.common;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by licheng on 2015/9/19.
  * 用户上传的个人图片
  */
+@Document
 public class Photo implements Comparable<Photo> {
     //photoId
+    @Id
     private String id;
+
     //photoUrl key
     private String key;
 
@@ -16,7 +23,13 @@ public class Photo implements Comparable<Photo> {
     @Transient
     private String url;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long uploadTime;
+
+    @Indexed
+    private String userId;
+
+    private int type;
 
     public Photo() {
     }
@@ -62,5 +75,21 @@ public class Photo implements Comparable<Photo> {
     @Override
     public int compareTo(Photo o) {
         return (int) (o.getUploadTime() - this.getUploadTime());
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

@@ -4,11 +4,14 @@ import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.BeanUtil;
+import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
+import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
 import com.gongpingjia.carplay.entity.user.User;
@@ -116,7 +119,7 @@ public class TestController {
 //        return ResponseDo.buildSuccessResponse();
 //    }
 
-//    @RequestMapping(value = "/test/batchpassword", method = RequestMethod.GET)
+    //    @RequestMapping(value = "/test/batchpassword", method = RequestMethod.GET)
 //    public ResponseDo batchChangeUserPassword() {
 //        long start = 10012340001l;
 //        long end = 10012340020l;
@@ -137,4 +140,25 @@ public class TestController {
 //        }
 //        return ResponseDo.buildSuccessResponse();
 //    }
+    @RequestMapping(value = "/test/photo", method = RequestMethod.GET)
+    public ResponseDo batchCreatePhoto() {
+        UserDao userDao = BeanUtil.getBean(UserDao.class);
+        PhotoDao photoDao = BeanUtil.getBean(PhotoDao.class);
+        List<User> allusers = userDao.find(new Query());
+        LOG.debug("User size:{}", allusers.size());
+        for (User item : allusers) {
+            if (item.getAlbum() == null || item.getAlbum().isEmpty()) {
+                continue;
+            }
+            for (Photo photo : item.getAlbum()) {
+                photo.setId(null);
+                photo.setType(Constants.PhotoType.USER_ALBUM);
+                photo.setUserId(item.getUserId());
+                photoDao.save(photo);
+            }
+        }
+        LOG.debug("Finished build photo");
+        return ResponseDo.buildSuccessResponse();
+    }
+
 }

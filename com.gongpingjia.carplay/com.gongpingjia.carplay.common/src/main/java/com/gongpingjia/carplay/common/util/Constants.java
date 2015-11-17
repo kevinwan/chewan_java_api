@@ -401,4 +401,22 @@ public class Constants {
         //已认证
         int AUTHENTICATED = 1;
     }
+
+    /**
+     * 照片类型
+     */
+    public interface PhotoType {
+        /**
+         * 用户相册照片
+         */
+        int USER_ALBUM = 0;
+        /**
+         * 用户个人活动照片,预留
+         */
+        int ACTIVITY = 1;
+        /**
+         * 官方活动照片，预留
+         */
+        int OFFICIAL = 2;
+    }
 }

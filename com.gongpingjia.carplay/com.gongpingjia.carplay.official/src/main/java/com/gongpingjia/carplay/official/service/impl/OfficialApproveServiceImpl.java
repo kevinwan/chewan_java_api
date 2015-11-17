@@ -8,6 +8,7 @@ import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
+import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.history.AlbumAuthHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.user.AuthApplicationDao;
@@ -67,6 +68,9 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
     @Autowired
     private AlbumAuthHistoryDao albumAuthHistoryDao;
+
+    @Autowired
+    private PhotoDao photoDao;
 
     @Override
     public ResponseDo approveUserDrivingAuthentication(String userId, JSONObject json) throws ApiException {
@@ -231,13 +235,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             if (applyUser == null) {
                 continue;
             }
-            applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            if (applyUser.getCar() != null) {
-                applyUser.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
-            }
-
-            applyUser.hideSecretInfo();
-            application.setApplyUser(applyUser);
+            application.setApplyUser(applyUser.buildCommonUserMap());
         }
 
         return ResponseDo.buildSuccessResponse(authApplicationList);
@@ -319,9 +317,7 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             LOG.warn("Input application user is not exist");
             throw new ApiException("输入参数有误");
         }
-        applyUser.hideSecretInfo();
-        applyUser.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        application.setApplyUser(applyUser);
+        application.setApplyUser(applyUser.buildCommonUserMap());
 
         UserAuthentication userAuthentication = userAuthenticationDao.findById(application.getApplyUserId());
         if (userAuthentication != null) {
@@ -345,11 +341,11 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
         }
 
         UserAuthentication userAuthentication = userAuthenticationDao.findById(authenticationId);
-        userAuth.setAuthentication(userAuthentication);
 
-        userAuth.hideSecretInfo();
+        Map<String, Object> map = userAuth.buildCommonUserMap();
+        User.appendAuthentication(map, userAuthentication);
 
-        return ResponseDo.buildSuccessResponse(userAuth);
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     @Override
@@ -405,7 +401,8 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             LOG.warn("auth user:{} is not exist in the system", json.getString("userId"));
             throw new ApiException("输入参数错误");
         }
-        if (applyUser.getAlbum() == null || applyUser.getAlbum().isEmpty()) {
+        List<Photo> userAlbum = photoDao.getUserAlbum(applyUser.getUserId());
+        if (userAlbum.isEmpty()) {
             LOG.warn("auth user album is empty");
             return ResponseDo.buildSuccessResponse();
         }
@@ -417,33 +414,33 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
             return ResponseDo.buildSuccessResponse();
         }
 
-        List<Photo> deletePhotos = new ArrayList<>(applyUser.getAlbum().size());
-        List<Photo> leftPhotos = new ArrayList<>(applyUser.getAlbum().size());
-        for (Photo item : applyUser.getAlbum()) {
-            if (photoIds.contains(item.getId())) {
-                deletePhotos.add(item);
-            } else {
-                leftPhotos.add(item);
-            }
-        }
+//        List<Photo> deletePhotos = new ArrayList<>(applyUser.getAlbum().size());
+//        List<Photo> leftPhotos = new ArrayList<>(applyUser.getAlbum().size());
+//        for (Photo item : applyUser.getAlbum()) {
+//            if (photoIds.contains(item.getId())) {
+//                deletePhotos.add(item);
+//            } else {
+//                leftPhotos.add(item);
+//            }
+//        }
 
-        LOG.debug("Update user data first and remove photo on the server later");
-        Update update = new Update();
-        update.set("album", leftPhotos);
-        update.set("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED);  //相册审核完成
-        userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())), update);
-        for (Photo item : deletePhotos) {
-            thirdPhotoService.delete(item.getKey());
-        }
+//        LOG.debug("Update user data first and remove photo on the server later");
+//        Update update = new Update();
+//        update.set("album", leftPhotos);
+//        update.set("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED);  //相册审核完成
+//        userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())), update);
+//        for (Photo item : deletePhotos) {
+//            thirdPhotoService.delete(item.getKey());
+//        }
 
-        AlbumAuthHistory history = new AlbumAuthHistory();
-        history.setApplyUserId(applyUser.getUserId());
-        history.setAuthUserId(userId);
-        history.setAuthTime(DateUtil.getTime());
-        history.setApplyTime(applyUser.getAlbumModifyTime());
-        history.setRemark(json.containsKey("remark") ? json.getString("remark") : "");
-        history.setPhotos(deletePhotos);
-        albumAuthHistoryDao.save(history);
+//        AlbumAuthHistory history = new AlbumAuthHistory();
+//        history.setApplyUserId(applyUser.getUserId());
+//        history.setAuthUserId(userId);
+//        history.setAuthTime(DateUtil.getTime());
+//        history.setApplyTime(applyUser.getAlbumModifyTime());
+//        history.setRemark(json.containsKey("remark") ? json.getString("remark") : "");
+//        history.setPhotos(deletePhotos);
+//        albumAuthHistoryDao.save(history);
 
         LOG.debug("Update user data finished and send emcahat message");
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,

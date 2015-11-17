@@ -25,7 +25,6 @@ import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,11 +174,14 @@ public class OfficialServiceImpl implements OfficialService {
             }
             List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
             for (String userItemId : pageMemberUserIds) {
-                Map<String, Object> map = new HashMap<>();
+
                 User user = userMap.get(userItemId);
-
-                buildUserBaseInfo(localServer, gpjServer, queryUser, user, map);
-
+                Map<String, Object> map = user.buildCommonUserMap();
+                if (queryUser == null) {
+                    User.appendDistance(map, null);
+                } else {
+                    User.appendDistance(map, DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
+                }
                 buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
 
                 members.add(map);
@@ -292,33 +294,6 @@ public class OfficialServiceImpl implements OfficialService {
         }
         map.put("acceptMembers", acceptMembers);
     }
-
-    //构造用户的基本信息
-    private void buildUserBaseInfo(String localServer, String gpjServer, User queryUser, User user, Map<String, Object> map) {
-        map.put("userId", user.getUserId());
-        map.put("nickname", user.getNickname());
-        map.put("age", user.getAge());
-        map.put("avatar", localServer + user.getAvatar());
-        map.put("gender", user.getGender());
-        map.put("licenseAuthStatus", user.getLicenseAuthStatus());
-        map.put("photoAuthStatus", user.getPhotoAuthStatus());
-        if (null == queryUser) {
-            map.put("distance", "");
-        } else {
-            map.put("distance", DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
-        }
-
-        if (user.getCar() != null) {
-            user.getCar().setLogo(gpjServer + user.getCar().getLogo());
-            map.put("car", user.getCar());
-        } else {
-            map.put("car", "");
-        }
-
-        map.put("phone", "");
-        map.put("emchatName", "");
-    }
-
 
     private OfficialActivity checkParameters(String id, Integer idType) throws ApiException {
         if (!Constants.OfficialInfoIdType.TYPE_LIST.contains(idType)) {
