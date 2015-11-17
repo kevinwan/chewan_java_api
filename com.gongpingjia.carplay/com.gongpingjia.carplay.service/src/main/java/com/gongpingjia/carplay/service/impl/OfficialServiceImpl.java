@@ -12,12 +12,14 @@ import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
 import com.gongpingjia.carplay.dao.common.AreaDao;
 import com.gongpingjia.carplay.dao.common.AreaRangeDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
+import com.gongpingjia.carplay.dao.user.UserShareJoinDao;
 import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.common.AreaRange;
 import com.gongpingjia.carplay.entity.user.User;
+import com.gongpingjia.carplay.entity.user.UserShareJoin;
 import com.gongpingjia.carplay.service.OfficialService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
@@ -68,6 +70,9 @@ public class OfficialServiceImpl implements OfficialService {
 
     @Autowired
     private AreaRangeDao areaRangeDao;
+
+    @Autowired
+    private UserShareJoinDao userShareJoinDao;
 
     @Override
     public ResponseDo getActivityInfo(HttpServletRequest request, String id, Integer idType, String userId) throws ApiException {
@@ -657,5 +662,27 @@ public class OfficialServiceImpl implements OfficialService {
             throw new ApiException("未找到区域信息");
         }
         return ResponseDo.buildSuccessResponse(areaRange);
+    }
+
+    @Override
+    public ResponseDo unregisterRecordUserPhone(String officialActivityId, String phone) {
+        LOG.debug("Check inpur param officialActivityId:{}", officialActivityId);
+        OfficialActivity officialActivity = officialActivityDao.findById(officialActivityId);
+        if (officialActivity == null) {
+            LOG.warn("Input parameter officialActivityId:{} is no activity exist", officialActivityId);
+            return ResponseDo.buildFailureResponse("输入参数有误");
+        }
+
+        UserShareJoin shareJoin = userShareJoinDao.findOne(phone, officialActivityId, Constants.ActivityCatalog.OFFICIAL);
+        if (shareJoin == null) {
+            LOG.debug("Record user join info");
+            shareJoin = new UserShareJoin();
+            shareJoin.setActivityId(officialActivityId);
+            shareJoin.setPhone(phone);
+            shareJoin.setActivityType(Constants.ActivityCatalog.OFFICIAL);
+            shareJoin.setCreateTime(DateUtil.getTime());
+            userShareJoinDao.save(shareJoin);
+        }
+        return ResponseDo.buildSuccessResponse();
     }
 }

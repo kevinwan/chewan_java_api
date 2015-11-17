@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -47,8 +48,7 @@ public class UserManagerServiceImpl implements UserManagerService {
 //        Criteria criteria = Criteria.where("registerTime").gte(start).lt(end);
         Criteria criteria = new Criteria();
         if (null != end && null != start) {
-            end = end + 24 * 60 * 60 * 1000;
-            criteria.and("registerTime").gte(start).lte(end);
+            criteria.and("registerTime").gte(start).lte(end + Constants.DAY_MILLISECONDS);
         }
 
         if (!StringUtils.isEmpty(phone)) {
@@ -65,7 +65,7 @@ public class UserManagerServiceImpl implements UserManagerService {
         }
 
         LOG.debug("query users by criteria and refresh user info");
-        List<User> userList = userDao.find(Query.query(criteria));
+        List<User> userList = userDao.find(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "registerTime"))));
         for (User user : userList) {
             user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
             user.hideSecretInfo();

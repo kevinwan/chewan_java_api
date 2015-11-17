@@ -94,8 +94,8 @@
                 <th>车主认证</th>
                 <th>头像认证</th>
                 <th>角色</th>
-                <th>驾龄</th>
-                <th>状态</th>
+                <th>空闲状态</th>
+                <th>禁用状态</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -109,7 +109,7 @@
                 <td>{{ user.licenseAuthStatus }}</td>
                 <td>{{ user.photoAuthStatus }}</td>
                 <td>{{ (user.role == "ADMIN") ? "管理员" : user.role }}</td>
-                <td>{{ user.drivingYears}}</td>
+                <td>{{ user.idle ? "有空" : "没空" }}</td>
                 <td>{{ user.deleteFlag ? "已禁用" : "活跃"}}</td>
                 <td class="center">
                     <button type="button" ng-click="viewUser(user.userId)"

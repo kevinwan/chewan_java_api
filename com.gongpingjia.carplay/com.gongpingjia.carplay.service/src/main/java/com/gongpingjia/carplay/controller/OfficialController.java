@@ -65,13 +65,13 @@ public class OfficialController {
      */
     @RequestMapping(value = "/official/activity/{id}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("id") String id, @RequestParam(value = "idType", required = false, defaultValue = "0") Integer idType,
-                                      @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token,HttpServletRequest request) {
+                                      @RequestParam(value = "userId", required = false, defaultValue = "") String userId, @RequestParam(value = "token", required = false) String token, HttpServletRequest request) {
 
         try {
             if (StringUtils.isNotEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
-            return officialService.getActivityInfo(request,id, idType, userId);
+            return officialService.getActivityInfo(request, id, idType, userId);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
@@ -80,7 +80,7 @@ public class OfficialController {
 
     @RequestMapping(value = "/official/activity/{id}/members", method = RequestMethod.GET)
     public ResponseDo getActivityMembersInfo(@PathVariable("id") String id, @RequestParam(value = "idType", required = false, defaultValue = "0") Integer idType,
-                                             @RequestParam(value = "userId",required = false,defaultValue = "") String userId, @RequestParam(value = "token",required = false) String token,
+                                             @RequestParam(value = "userId", required = false, defaultValue = "") String userId, @RequestParam(value = "token", required = false) String token,
                                              @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                              @RequestParam(value = "ignore", defaultValue = "0") Integer ignore) {
         try {
@@ -187,5 +187,23 @@ public class OfficialController {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
+    }
+
+
+    @RequestMapping(value = "/official/activity/{activityId}/unregisterJoin", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo unregisterJoin(@PathVariable("activityId") String activityId, @RequestBody JSONObject json) {
+        LOG.info("/official/activity/{}/unregisterJoin was called", activityId);
+        if (CommonUtil.isEmpty(json, "phone")) {
+            LOG.warn("User input phone number is empty, ignore");
+            return ResponseDo.buildFailureResponse("请输入手机号");
+        }
+
+        String phone = json.getString("phone");
+        if (!CommonUtil.isPhoneNumber(phone)) {
+            LOG.warn("input phone number:{} is error", phone);
+            return ResponseDo.buildFailureResponse("请输入正确的手机号码");
+        }
+        return officialService.unregisterRecordUserPhone(activityId, phone);
     }
 }

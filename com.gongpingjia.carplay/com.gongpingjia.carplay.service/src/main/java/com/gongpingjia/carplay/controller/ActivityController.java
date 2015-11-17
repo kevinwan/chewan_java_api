@@ -89,13 +89,19 @@ public class ActivityController {
     @RequestMapping(value = "/activity/{activityId}/info", method = RequestMethod.GET)
     public ResponseDo getActivityInfo(@PathVariable("activityId") String activityId,
                                       @RequestParam(value = "userId", required = false) String userId,
-                                      @RequestParam(value = "token", required = false) String token) {
+                                      @RequestParam(value = "token", required = false) String token,
+                                      @RequestParam(value = "longitude", required = false) Double longitude,
+                                      @RequestParam(value = "latitude", required = false) Double latitude) {
         LOG.debug("activity/{activityId}/info begin");
         try {
             if (StringUtils.isNotEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
-            return activityService.getActivityInfo(userId, activityId);
+
+            Landmark landmark = new Landmark();
+            landmark.setLatitude(latitude);
+            landmark.setLongitude(longitude);
+            return activityService.getActivityInfo(userId, activityId, landmark);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

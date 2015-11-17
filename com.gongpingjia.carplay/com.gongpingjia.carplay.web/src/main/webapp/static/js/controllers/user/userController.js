@@ -8,6 +8,7 @@
 gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location', 'DTOptionsBuilder', 'DTColumnDefBuilder', 'userService',
     function ($scope, $rootScope, $http, $location, DTOptionsBuilder, DTColumnDefBuilder, userService) {
 
+
         /**
          * Define data table columns
          */
@@ -20,7 +21,7 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
             DTColumnDefBuilder.newColumnDef(6),
             DTColumnDefBuilder.newColumnDef(7),
             DTColumnDefBuilder.newColumnDef(8),
-            DTColumnDefBuilder.newColumnDef(9).notSortable(),
+            DTColumnDefBuilder.newColumnDef(9),
             DTColumnDefBuilder.newColumnDef(10)];
 
         /**
@@ -32,25 +33,19 @@ gpjApp.controller('userController', ['$scope', '$rootScope', '$http', '$location
         /**
          * Define data table options
          */
-        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('displayLength', 100);
+        $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('displayLength', 100)
+            .withOption('order', [0, 'desc']);
 
         /**
          * Reset search criteria
          */
         $scope.resetCriteria = function () {
-            var start = new Date();
-            start.setHours(0, 0, 0, 0);
-            start.setTime(start.getTime() - 1000 * 60 * 60 * 24 * 7);
-
-            var end = new Date();
-            end.setHours(0, 0, 0, 0);
-
             $scope.criteria = {
                 phone: '',
                 nickname: '',
                 licenseAuthStatus: '',
                 photoAuthStatus: '',
-                startDate: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+                startDate: moment().subtract(6, 'day').format('YYYY-MM-DD'),
                 endDate: moment().format('YYYY-MM-DD')
             };
         };

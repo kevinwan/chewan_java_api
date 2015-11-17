@@ -72,6 +72,12 @@
         <appender-ref ref="console"/>
     </category>
 
+    <category name="redis.clients">
+        <priority value="INFO"/>
+        <appender-ref ref="logFile"/>
+        <appender-ref ref="console"/>
+    </category>
+
 
     <root>
         <priority value="debug"/>

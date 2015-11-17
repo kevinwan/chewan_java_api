@@ -108,7 +108,7 @@ public class ActivityServiceImpl implements ActivityService {
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
                 buildNearByUsers(user, activity.getActivityId()), message, ext);
 
-        return ResponseDo.buildSuccessResponse();
+        return ResponseDo.buildSuccessResponse(activity.getActivityId());
     }
 
     private void saveInterestMessage(String userId, Activity activity, Long current) {
@@ -266,7 +266,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo getActivityInfo(String userId, String activityId) throws ApiException {
+    public ResponseDo getActivityInfo(String userId, String activityId, Landmark landmark) throws ApiException {
         LOG.debug("getActivityInfo");
 
         Criteria criteria = Criteria.where("activityId").is(activityId);
@@ -286,6 +286,9 @@ public class ActivityServiceImpl implements ActivityService {
         organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
 
         activity.setOrganizer(organizer);
+        if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
+            activity.setDistance(DistanceUtil.getDistance(landmark, activity.getEstabPoint()));
+        }
         return ResponseDo.buildSuccessResponse(activity);
     }
 
@@ -629,8 +632,8 @@ public class ActivityServiceImpl implements ActivityService {
             if (json.containsKey("destPoint") && StringUtils.isNotEmpty(json.getString("destination"))) {
                 update.set("destPoint", JSONObject.toBean(json.getJSONObject("destPoint"), Landmark.class));
             }
-            update.set("establish",JSONObject.toBean(json.getJSONObject("establish"),Address.class));
-            update.set("estabPoint", JSONObject.toBean(json.getJSONObject("estabPoint"),Landmark.class));
+            update.set("establish", JSONObject.toBean(json.getJSONObject("establish"), Address.class));
+            update.set("estabPoint", JSONObject.toBean(json.getJSONObject("estabPoint"), Landmark.class));
             update.set("majorType", json.getString("majorType"));
             update.set("type", json.getString("type"));
             update.set("pay", json.getString("pay"));
