@@ -189,7 +189,7 @@ public class StatisticViewServiceImpl implements StatisticViewService {
     public List<EventInfo> getStatisticActivityContactMap() {
         List<EventInfo> eventInfoList = new ArrayList<>(2);
         String collectionName = "statisticActivityContact";
-        eventInfoList.add(new EventInfo(StatisticActivityContact.ACTIVITY_DYNAMIC_CALL, collectionName, "打电话"));
+        eventInfoList.add(new EventInfo(StatisticActivityContact.ACTIVITY_DYNAMIC_CALL, collectionName, "电话"));
         eventInfoList.add(new EventInfo(StatisticActivityContact.ACTIVITY_DYNAMIC_CHAT, collectionName, "聊天"));
         return eventInfoList;
     }
@@ -199,7 +199,7 @@ public class StatisticViewServiceImpl implements StatisticViewService {
         List<EventInfo> eventInfoList = new ArrayList<>(4);
         String collectionName = "statisticActivityMatch";
         eventInfoList.add(new EventInfo(StatisticActivityMatch.ACTIVITY_TYPE_MATCH_COUNT, collectionName, "类型匹配"));
-        eventInfoList.add(new EventInfo(StatisticActivityMatch.ACTIVITY_MATCH_INVITED_COUNT, collectionName, "邀请"));
+        eventInfoList.add(new EventInfo(StatisticActivityMatch.ACTIVITY_MATCH_INVITED_COUNT, collectionName, "邀她点击"));
         eventInfoList.add(new EventInfo(StatisticActivityMatch.ACTIVITY_MATCH_COUNT, collectionName, "附近点击"));
         eventInfoList.add(new EventInfo(StatisticActivityMatch.ACTIVITY_TYPE_CLICK, collectionName, "类型点击"));
         return eventInfoList;
@@ -209,7 +209,7 @@ public class StatisticViewServiceImpl implements StatisticViewService {
     public List<EventInfo> getStatisticDriverAuthMap() {
         List<EventInfo> eventInfoList = new ArrayList<>(3);
         String collectionName = "statisticDriverAuth";
-        eventInfoList.add(new EventInfo(StatisticDriverAuth.DRIVER_AUTHENTICATION, collectionName, "车主认证点击"));
+        eventInfoList.add(new EventInfo(StatisticDriverAuth.DRIVER_AUTHENTICATION, collectionName, "车主认证"));
         eventInfoList.add(new EventInfo(StatisticDriverAuth.DRIVING_LICENSE_AUTH, collectionName, "行驶证上传"));
         eventInfoList.add(new EventInfo(StatisticDriverAuth.DRIVER_LICENSE_AUTH, collectionName, "驾驶证上传"));
         return eventInfoList;
@@ -240,10 +240,10 @@ public class StatisticViewServiceImpl implements StatisticViewService {
     public List<EventInfo> getStatisticUnRegisterMap() {
         List<EventInfo> eventInfoList = new ArrayList<>(4);
         String collectionName = "statisticUnRegister";
-        eventInfoList.add(new EventInfo(StatisticUnRegister.USER_REGISTER_SUCCESS, collectionName, "用户成功注册次数"));
-        eventInfoList.add(new EventInfo(StatisticUnRegister.UN_REGISTER_NEARBY_INVITED, collectionName, "约她点击次数"));
+        eventInfoList.add(new EventInfo(StatisticUnRegister.USER_REGISTER_SUCCESS, collectionName, "成功注册次数"));
+        eventInfoList.add(new EventInfo(StatisticUnRegister.UN_REGISTER_NEARBY_INVITED, collectionName, "邀她点击次数"));
         eventInfoList.add(new EventInfo(StatisticUnRegister.UN_REGISTER_MATCH_INVITED, collectionName, "活动匹配次数"));
-        eventInfoList.add(new EventInfo(StatisticUnRegister.USER_REGISTER, collectionName, "未注册次数"));
+        eventInfoList.add(new EventInfo(StatisticUnRegister.USER_REGISTER, collectionName, "注册点击次数"));
         return eventInfoList;
     }
 
@@ -251,8 +251,8 @@ public class StatisticViewServiceImpl implements StatisticViewService {
     public List<EventInfo> getStatisticUnRegisterDynamicMap() {
         List<EventInfo> eventInfoList = new ArrayList<>(2);
         String collectionName = "statisticUnRegister";
-        eventInfoList.add(new EventInfo(StatisticUnRegister.UN_REGISTER_DYNAMIC_ACCEPT, collectionName, "未注册用户同意假数据"));
-        eventInfoList.add(new EventInfo(StatisticUnRegister.DYNAMIC_ACCEPT_REGISTER, collectionName, "未注册用户同意后立即注册事件"));
+        eventInfoList.add(new EventInfo(StatisticUnRegister.UN_REGISTER_DYNAMIC_ACCEPT, collectionName, "未注册用户同意邀请"));
+        eventInfoList.add(new EventInfo(StatisticUnRegister.DYNAMIC_ACCEPT_REGISTER, collectionName, "未注册用户同意后注册"));
         return eventInfoList;
     }
 
