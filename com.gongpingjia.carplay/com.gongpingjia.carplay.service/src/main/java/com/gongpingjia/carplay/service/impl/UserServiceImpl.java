@@ -492,6 +492,7 @@ public class UserServiceImpl implements UserService {
             AlbumViewHistory history = historyDao.findOne(query);
             if (history == null) {
                 //第一次查看他的信息，需要推送一下，后续再看 不需要推送
+                history = new AlbumViewHistory();
                 history.setViewTime(DateUtil.getTime());
                 history.setViewUserId(viewUser);
                 history.setUserId(beViewedUser);
