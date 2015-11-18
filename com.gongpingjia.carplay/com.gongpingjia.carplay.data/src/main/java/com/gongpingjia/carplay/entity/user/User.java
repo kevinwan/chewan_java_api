@@ -364,6 +364,7 @@ public class User {
     }
 
     public static void appendAlbum(Map<String, Object> userMap, List<Photo> album) {
+        Collections.sort(album);
         List<Map<String, Object>> albumList = new ArrayList<>(album.size());
         for (Photo item : album) {
             albumList.add(item.buildBaseInfo());

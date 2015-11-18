@@ -425,10 +425,9 @@ public class UserServiceImpl implements UserService {
         }
 
         //获取用户的相册
-        List<Photo> userAlbum = photoDao.getUserAlbum(beViewedUser);
-        Collections.sort(userAlbum);
-
         Map<String, Object> map = beViewedUserInfo.buildCommonUserMap();
+        beViewedUserInfo.appendCompute(map, photoDao.getUserAlbumCount(beViewedUserInfo.getUserId()));
+        User.appendAlbum(map, photoDao.getUserAlbum(beViewedUser));
         User.appendSubscribeFlag(map, false);
         if (!viewUser.equals(beViewedUser)) {
             //表示不是自己查看自己，beViewedUser被别人看过,记录相册查看的历史信息
@@ -460,8 +459,6 @@ public class UserServiceImpl implements UserService {
                 User.appendDrivingLicense(map, userAuthentication.getDrivingLicense());
             }
         }
-        beViewedUserInfo.appendCompute(map, photoDao.getUserAlbumCount(beViewedUserInfo.getUserId()));
-        User.appendAlbum(map, photoDao.getUserAlbum(beViewedUserInfo.getUserId()));
 
         return ResponseDo.buildSuccessResponse(map);
     }
