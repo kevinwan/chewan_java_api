@@ -573,7 +573,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userDao.findByIds(userMap.keySet());
         for (User item : userList) {
-            Map<String, Object> map = item.buildBaseUserMap();
+            Map<String, Object> map = item.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(user.getLandmark(), item.getLandmark()));
             userMap.put(item.getUserId(), map);
         }
@@ -727,13 +727,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException {
-        LOG.debug("Begin check input parameters");
+        LOG.debug("Begin check input parameters, delete photos:{}", json);
         checker.checkUserInfo(userId, token);
         if (CommonUtil.isArrayEmpty(json, "photos")) {
             LOG.warn("Input parameters photos is empty");
             throw new ApiException("输入参数有误");
         }
-        String[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
+        Object[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
 
         LOG.debug("delete photos in database");
         Query query = Query.query(Criteria.where("id").in(photos)
@@ -1163,6 +1163,7 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> map = user.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
             User.appendCover(map, userDao.getCover(user.getUserId()));
+            map.put("viewTime", item.getViewTime());
             users.add(map);
         }
         return ResponseDo.buildSuccessResponse(users);

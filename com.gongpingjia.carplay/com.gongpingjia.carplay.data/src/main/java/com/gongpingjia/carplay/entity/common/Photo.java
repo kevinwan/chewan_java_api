@@ -32,8 +32,10 @@ public class Photo implements Comparable<Photo> {
 
     @Indexed
     private String userId;
-
+    //0 用户相册照片
     private int type;
+    //0 表示管理员没有check ， 1表示checked
+    private int checked = 0;
 
     public Photo() {
     }
@@ -97,8 +99,17 @@ public class Photo implements Comparable<Photo> {
         this.type = type;
     }
 
+    public int getChecked() {
+        return checked;
+    }
+
+    public void setChecked(int checked) {
+        this.checked = checked;
+    }
+
     public Map<String, Object> buildBaseInfo() {
         Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
         map.put("url", CommonUtil.getThirdPhotoServer() + key);
         return map;
     }
@@ -107,14 +118,7 @@ public class Photo implements Comparable<Photo> {
         Map<String, Object> map = buildBaseInfo();
         map.put("userId", userId);
         map.put("key", key);
-        return map;
-    }
-
-    public Map<String, Object> buildFullInfo() {
-        Map<String, Object> map = buildCommonInfo();
         map.put("uploadTime", uploadTime);
-        map.put("id", id);
         return map;
     }
-
 }

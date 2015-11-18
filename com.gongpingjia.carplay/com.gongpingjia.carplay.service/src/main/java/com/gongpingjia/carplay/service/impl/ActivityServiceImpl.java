@@ -281,7 +281,9 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.error("the activity {} cannot found the organizer user {}", activityId, userId);
             throw new ApiException("该活动找不到对应的 User");
         }
-        activity.setOrganizer(organizer.buildCommonUserMap());
+        Map<String, Object> map = organizer.buildCommonUserMap();
+        User.appendCover(map, userDao.getCover(organizer.getUserId()));
+        activity.setOrganizer(map);
         if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
             activity.setDistance(DistanceUtil.getDistance(landmark, activity.getEstabPoint()));
         }
@@ -1070,7 +1072,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ResponseDo registerUserActivity(String phone, String userId,Activity activity) throws ApiException {
+    public ResponseDo registerUserActivity(String phone, String userId, Activity activity) throws ApiException {
         LOG.debug("activityRegister");
 
         User user = userDao.findUserByPhone(phone);
