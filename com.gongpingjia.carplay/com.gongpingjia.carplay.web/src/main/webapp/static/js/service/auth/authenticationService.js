@@ -141,9 +141,9 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                     for (var index in photos) {
                         var photo = photos[index];
                         if (photo.delete) {
-                            deleteIds[deleteIds.length] = photo.id;
+                            deleteIds.push(photo.id);
                         } else {
-                            remainIds[remainIds.length] = photo.id;
+                            remainIds.push(photo.id);
                         }
                     }
 

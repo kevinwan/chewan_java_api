@@ -53,13 +53,13 @@
     </div>
 
     <div class="form-inline col-md-12">
-        <div class="col-md-12" style="margin-top:20px">
+        <div class="col-md-12" style="margin-top:20px" ng-repeat="photos in photoArrays">
             <ul id="albums" class="thumbnails">
                 <!--Add dynamic-->
                 <li class="col-md-2" ng-repeat="photo in photos" style="list-style: none">
                     <div class="thumbnail" style="position: relative;">
                         <input type="checkbox" name="photoDelete" ng-model="photo.delete"/>
-                        <img src="{{photo.url}}" alt="" width="160px" height="140px" class="left:0 bottom:0"/>
+                        <img src="{{photo.url}}" alt="" width="140px" height="160px" class="left:0 bottom:0"/>
                     </div>
                 </li>
             </ul>

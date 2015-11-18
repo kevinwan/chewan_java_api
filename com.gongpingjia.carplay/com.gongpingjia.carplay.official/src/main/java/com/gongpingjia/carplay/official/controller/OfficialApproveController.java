@@ -211,7 +211,7 @@ public class OfficialApproveController {
                                              @RequestParam(value = "phone", required = false) String phone,
                                              @RequestParam("start") Long start, @RequestParam("end") Long end,
                                              @RequestParam(value = "checked", defaultValue = "0") int checked,
-                                             @RequestParam(value = "limit", defaultValue = "50") Integer limit) {
+                                             @RequestParam(value = "limit", defaultValue = "49") Integer limit) {
         LOG.debug("Query user photos by admin:{}, user phone:{}, timespan start:{}--{}", Arrays.asList(userId, phone, start, end));
         try {
             parameterChecker.checkAdminUserInfo(userId, token);
