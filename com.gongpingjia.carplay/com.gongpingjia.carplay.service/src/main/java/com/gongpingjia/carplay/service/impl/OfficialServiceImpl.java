@@ -18,6 +18,7 @@ import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Area;
 import com.gongpingjia.carplay.entity.common.AreaRange;
+import com.gongpingjia.carplay.entity.common.Landmark;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.entity.user.UserShareJoin;
 import com.gongpingjia.carplay.service.OfficialService;
@@ -110,7 +111,7 @@ public class OfficialServiceImpl implements OfficialService {
 
 
     @Override
-    public ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit) throws ApiException {
+    public ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit, Landmark landmark) throws ApiException {
         if (limit <= 0) {
             LOG.warn("limit is {}", limit);
             throw new ApiException("参数异常 limit为正整数");
@@ -137,26 +138,22 @@ public class OfficialServiceImpl implements OfficialService {
             if (!StringUtils.isEmpty(userId)) {
                 queryUser = userDao.findById(userId);
             }
-
-            LOG.debug("Build members and organizer");
-
             jsonObject.put("isMember", officialActivity.getMembers().contains(userId));
             jsonObject.put("memberSize", officialActivity.getMembers().size());
-
-            //获取 分页段的
             if (ignore >= officialActivity.getMembers().size()) {
                 jsonObject.put("members", new ArrayList<>(0));
                 return ResponseDo.buildSuccessResponse(jsonObject);
             }
-            int endIndex = ignore + limit;
-            endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
-            List<String> pageMemberUserIds = officialActivity.getMembers().subList(ignore, endIndex);
+            //获取所有的成员信息；主要是为了计算距离；
+            List<User> userList = userDao.findByIds(officialActivity.getMembers());
 
-            //获取分页成员的信息；
+            //获取分页用户ID列表
+            List<String> pageMemberUserIds = getPageMemberIds(ignore, limit, officialActivity, queryUser, landmark, userList);
+
+            //获取所有成员的 同去参加官方活动 appointment
             List<Appointment> appointmentList = appointmentDao.find(Query.query(Criteria.where("activityId").is(officialActivity.getOfficialActivityId())
                     .orOperator(Criteria.where("applyUserId").in(pageMemberUserIds), Criteria.where("invitedUserId").in(pageMemberUserIds))
                     .and("activityCategory").is(Constants.ActivityCatalog.TOGETHER)));
-
             Set<String> userIdSet = new HashSet<>(pageMemberUserIds.size() + appointmentList.size() * 2);
             for (String item : pageMemberUserIds) {
                 userIdSet.add(item);
@@ -166,15 +163,14 @@ public class OfficialServiceImpl implements OfficialService {
                 userIdSet.add(appointment.getInvitedUserId());
             }
 
-            //获取 分页成员的具体信息；
-            List<User> users = userDao.findByIds(userIdSet);
-            Map<String, User> userMap = new HashMap<>(users.size());
-            for (User user : users) {
-                userMap.put(user.getUserId(), user);
+            Map<String, User> userMap = new HashMap<>(userIdSet.size());
+            for (User user : userList) {
+                if (userIdSet.contains(user.getUserId())) {
+                    userMap.put(user.getUserId(), user);
+                }
             }
             List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
             for (String userItemId : pageMemberUserIds) {
-
                 User user = userMap.get(userItemId);
                 Map<String, Object> map = user.buildCommonUserMap();
                 if (queryUser == null) {
@@ -190,6 +186,34 @@ public class OfficialServiceImpl implements OfficialService {
 
             jsonObject.put("members", members);
             return ResponseDo.buildSuccessResponse(jsonObject);
+        }
+    }
+
+
+    private List<String> getPageMemberIds(int ignore, int limit, OfficialActivity officialActivity, User queryUser, Landmark landmark, List<User> userList) {
+        int endIndex = ignore + limit;
+        endIndex = endIndex > officialActivity.getMembers().size() ? officialActivity.getMembers().size() : endIndex;
+        //根据距离进行排序；
+        if (null != queryUser && landmark == null) {
+            landmark = queryUser.getLandmark();
+        }
+        if (null != landmark) {
+            for (User itemUser : userList) {
+                itemUser.setDistance(DistanceUtil.getDistance(itemUser.getLandmark(), new Landmark()));
+            }
+            Collections.sort(userList, new Comparator<User>() {
+                @Override
+                public int compare(User o1, User o2) {
+                    return o1.getDistance() > o2.getDistance() ? 1 : -1;
+                }
+            });
+            List<String> pageMemberUserIds = new ArrayList<>(endIndex - ignore);
+            for (int index = ignore; index < endIndex; index++) {
+                pageMemberUserIds.add(userList.get(index).getUserId());
+            }
+            return pageMemberUserIds;
+        } else {
+            return officialActivity.getMembers().subList(ignore, endIndex);
         }
     }
 
@@ -449,6 +473,78 @@ public class OfficialServiceImpl implements OfficialService {
         modifyChatGroup(officialActivity, userId);
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+
+    @Override
+    public ResponseDo quitJoinActivity(String activityId, String userId) throws ApiException {
+        OfficialActivity officialActivity = officialActivityDao.findById(activityId);
+        if (null == officialActivity) {
+            throw new ApiException("活动不存在");
+        }
+        User user = userDao.findById(userId);
+        if (null == user) {
+            throw new ApiException("用户不存在");
+        }
+        if (officialActivity.getMembers() == null || officialActivity.getMembers().isEmpty() || !officialActivity.getMembers().contains(userId)) {
+            throw new ApiException("用户没有参加该活动");
+        }
+
+        //删除emchatGroup中的信息
+        try {
+            JSONObject result = chatThirdPartyService.deleteUserFromChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(), user.getEmchatName());
+            LOG.info("emchat remove result:{}", result);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage(), e);
+            throw new ApiException("退出环信群组失败");
+        }
+
+        List<String> members = officialActivity.getMembers();
+        //appointment中的信息删除；
+        Criteria criteria = Criteria.where("activityId").is(officialActivity.getOfficialActivityId());
+        criteria.orOperator(Criteria.where("applyUserId").is(userId), Criteria.where("invitedUserId").is(userId));
+        criteria.and("activityCategory").in(Arrays.asList(Constants.ActivityCatalog.OFFICIAL, Constants.ActivityCatalog.TOGETHER));
+        criteria.and("deleteFlag").is(false);
+        appointmentDao.update(Query.query(criteria), Update.update("deleteFlag", true));
+
+        //群聊信息更改；
+        int index = members.indexOf(userId);
+        members.remove(index);
+        // 头像作为一部分 重置头像
+        if (index < Constants.CHATGROUP_MAX_PHOTO_COUNT && index != -1) {
+            setChatGroupDescription(members, officialActivity);
+        }
+
+        //成员信息更改
+        Update update = Update.update("members", members);
+        //男女数目 与总人数
+        if (StringUtils.equals(user.getGender(), Constants.UserGender.MALE)) {
+            update.inc("maleNum", -1);
+        } else {
+            update.inc("femaleNum", -1);
+        }
+        update.inc("nowJoinNum", -1);
+
+        officialActivityDao.update(officialActivity.getOfficialActivityId(), update);
+
+        return ResponseDo.buildSuccessResponse();
+    }
+
+    private void setChatGroupDescription(List<String> members, OfficialActivity officialActivity) throws ApiException {
+        if (null == members || members.isEmpty()) {
+            chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
+                    officialActivity.getTitle(), "");
+        } else {
+            StringBuilder builder = new StringBuilder();
+            List<User> users = userDao.findByIds(officialActivity.getMembers().size() > Constants.CHATGROUP_MAX_PHOTO_COUNT ?
+                    officialActivity.getMembers().subList(0, Constants.CHATGROUP_MAX_PHOTO_COUNT) : officialActivity.getMembers());
+            String localServer = CommonUtil.getLocalPhotoServer();
+            for (User item : users) {
+                builder.append(localServer).append(item.getAvatar()).append(";");
+            }
+            chatThirdPartyService.modifyChatGroup(chatCommonService.getChatToken(), officialActivity.getEmchatGroupId(),
+                    officialActivity.getTitle(), builder.substring(0, builder.length() - 1).replace("/", "|"));
+        }
     }
 
     //修改聊天群组的description信息，用于记录群组的图像

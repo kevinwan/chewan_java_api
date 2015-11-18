@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.entity.common.Address;
+import com.gongpingjia.carplay.entity.common.Landmark;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,7 +18,7 @@ public interface OfficialService {
     ResponseDo getActivityInfo(HttpServletRequest request, String id, Integer idType, String userId) throws ApiException;
 
 
-    ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit) throws ApiException;
+    ResponseDo getActivityPageMemberInfo(String id, Integer idType, String userId, Integer ignore, Integer limit,Landmark landmark) throws ApiException;
 
 
     /**
@@ -34,6 +35,15 @@ public interface OfficialService {
      * @return
      */
     ResponseDo applyJoinActivity(String activityId, String userId) throws ApiException;
+
+    /**
+     * 退出参加官方活动
+     * @param activityId
+     * @param userId
+     * @return
+     * @throws ApiException
+     */
+    ResponseDo quitJoinActivity(String activityId, String userId) throws ApiException;
 
 
     ResponseDo inviteUserTogether(String activityId, String fromUserId, String toUserId, boolean transfer, String message) throws ApiException;

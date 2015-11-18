@@ -21,7 +21,7 @@ import java.util.*;
  * 用户相关信息,以及环信用户信息
  */
 @Document
-public class User {
+public class User{
     @Id
     private String userId;
 
@@ -74,6 +74,9 @@ public class User {
 
     @Transient
     private int matchTimes = 0;
+
+    @Transient
+    private double distance;
 
     public Address getAddress() {
         return address;
@@ -392,8 +395,15 @@ public class User {
         userMap.put("authentication", authentication);
     }
 
+    public double getDistance() {
+        return distance;
+    }
 
-//    private List<Photo> album;
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    //    private List<Photo> album;
 //
 //    public List<Photo> getAlbum() {
 //        return album;

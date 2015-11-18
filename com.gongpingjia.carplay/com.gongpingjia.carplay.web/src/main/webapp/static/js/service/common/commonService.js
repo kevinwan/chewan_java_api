@@ -9,7 +9,7 @@
  * @constructor
  */
 
-gpjApp.factory('commonService', ['restProxyService','ChewanOfficialApiEndPoint', function (restProxyService,ChewanOfficialApiEndPoint) {
+gpjApp.factory('commonService', ['restProxyService', 'ChewanOfficialApiEndPoint', function (restProxyService, ChewanOfficialApiEndPoint) {
 
     return {
         transferLongToDateString: function (longTime) {
@@ -31,8 +31,12 @@ gpjApp.factory('commonService', ['restProxyService','ChewanOfficialApiEndPoint',
             var date = new Date();
             date.setTime(longTime);
             //format  YYYY-MM-DD HH24:MM
+
+            var hourStr = date.getHours() >= 10 ? date.getHours() : '0' + date.getHours();
+            var minuteStr = date.getMinutes() >= 10 ? date.getMinutes() : '0' + date.getMinutes();
+
             return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " "
-                + date.getHours() + ":" + date.getMinutes();
+                + hourStr + ":" + minuteStr;
         },
 
         transferLongToTimeString: function (longTime) {
@@ -100,7 +104,7 @@ gpjApp.factory('commonService', ['restProxyService','ChewanOfficialApiEndPoint',
                 return str;
             }
         },
-        getAreaRangeInfo:function(code){
+        getAreaRangeInfo: function (code) {
             return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/areaRange/info?code=' + code)
         }
     }
