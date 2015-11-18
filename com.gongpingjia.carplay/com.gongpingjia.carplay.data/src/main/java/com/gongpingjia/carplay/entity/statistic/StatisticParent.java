@@ -26,6 +26,8 @@ public class StatisticParent {
     private Integer hour;
     private Integer minute;
 
+    private Integer week;
+
     public void recordTime(Long current) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(current);
@@ -35,6 +37,7 @@ public class StatisticParent {
         this.day = calendar.get(Calendar.DAY_OF_MONTH);
         this.hour = calendar.get(Calendar.HOUR_OF_DAY);
         this.minute = calendar.get(Calendar.MINUTE);
+        this.week = calendar.getWeeksInWeekYear();
     }
 
     public String getId() {
@@ -107,5 +110,13 @@ public class StatisticParent {
 
     public void setMinute(Integer minute) {
         this.minute = minute;
+    }
+
+    public Integer getWeek() {
+        return week;
+    }
+
+    public void setWeek(Integer week) {
+        this.week = week;
     }
 }

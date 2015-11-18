@@ -89,7 +89,7 @@ public class StatisticViewServiceImpl implements StatisticViewService {
             countMapList.add(eventCountMap);
         }
 
-        List<String> betweenStrList = DateBetweenUtil.getBetweenStrList(startStr, endStr);
+        List<String> betweenStrList = DateBetweenUtil.getBetweenList(startStr, endStr, 0);
         ArrayList<Map<String, Object>> countList = new ArrayList<>(betweenStrList.size());
         for (String itemDate : betweenStrList) {
             Map<String, Object> dataMap = new HashMap();
@@ -113,21 +113,32 @@ public class StatisticViewServiceImpl implements StatisticViewService {
         List<Map<String, Integer>> countMapList = new ArrayList<>(eventInfoList.size());
         String startStr = jsonObject.getString("startTime");
         String endStr = jsonObject.getString("endTime");
+        int timeRangeType = jsonObject.getInt("timeRangeType");
+        //timeRangeType 0 天 1 周 2 月
         for (EventInfo eventInfo : eventInfoList) {
-            Map<String, Integer> eventCountMap = countService.getCountByDay(startStr, endStr, eventInfo.collectionName, eventInfo.eventName);
+            Map<String, Integer> eventCountMap = null;
+            if (timeRangeType == 0) {
+                eventCountMap = countService.getCountByDay(startStr, endStr, eventInfo.collectionName, eventInfo.eventName);
+            } else if (timeRangeType == 1) {
+                eventCountMap = countService.getCountByWeek(startStr, endStr, eventInfo.collectionName, eventInfo.eventName);
+            } else if (timeRangeType == 2) {
+                eventCountMap = countService.getCountByMonth(startStr, endStr, eventInfo.collectionName, eventInfo.eventName);
+            } else {
+                throw new ApiException("timeRangeType illegal ：{}" + timeRangeType);
+            }
+
             countMapList.add(eventCountMap);
             nameList.add(eventInfo.showName);
         }
         resultMap.put("series", nameList);
 
-        List<String> betweenStrList = DateBetweenUtil.getBetweenStrList(startStr, endStr);
+        List<String> betweenStrList = DateBetweenUtil.getBetweenList(startStr, endStr, timeRangeType);
         ArrayList<Map<String, Object>> countList = new ArrayList<>(betweenStrList.size());
         for (String itemDate : betweenStrList) {
             Map<String, Object> dataMap = new HashMap();
             dataMap.put("x", itemDate);
             ArrayList itemCountList = new ArrayList(countList.size());
             for (Map<String, Integer> countMap : countMapList) {
-//                itemCountList.add(countMap.get(itemDate));
                 itemCountList.add(transferNullToZero(countMap, itemDate));
             }
 

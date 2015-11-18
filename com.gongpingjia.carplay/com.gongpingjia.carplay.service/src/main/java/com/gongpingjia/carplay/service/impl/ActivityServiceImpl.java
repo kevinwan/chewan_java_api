@@ -554,14 +554,19 @@ public class ActivityServiceImpl implements ActivityService {
             criteria.and("destination.city").is(city);
         }
 
-        String pay = json.getString("pay");
-        if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
-            criteria.and("pay").is(pay);
+        String majorType = json.getString("majorType");
+        if (StringUtils.isNotEmpty(majorType)) {
+            criteria.and("majorType").is(majorType);
         }
 
         String type = json.getString("type");
         if (StringUtils.isNotEmpty(type) && !StringUtils.equals(type, "-1")) {
-            criteria.and("majorType").is(type);
+            criteria.and("type").is(type);
+        }
+
+        String pay = json.getString("pay");
+        if (StringUtils.isNotEmpty(pay) && !StringUtils.equals(pay, "-1")) {
+            criteria.and("pay").is(pay);
         }
 
         String transferStr = json.getString("transfer");
@@ -1078,5 +1083,38 @@ public class ActivityServiceImpl implements ActivityService {
 
         LOG.debug("Finished query data, begin build response");
         return ResponseDo.buildSuccessResponse(buildResponse(userId, userMap, activityList, subscriberSet));
+    }
+
+    @Override
+    public ResponseDo registerUserActivity(String phone, String userId,Activity activity) throws ApiException {
+        LOG.debug("activityRegister");
+
+        User user = userDao.findUserByPhone(phone);
+//        if (user == null) {
+//            throw new ApiException("用户不存在");
+//        }
+
+        if (user == null) {
+            user = userDao.findById(userId);
+        }
+
+        Long current = DateUtil.getTime();
+
+        saveUserActivity(user.getUserId(), activity, current);
+
+        saveInterestMessage(user.getUserId(), activity, current);
+
+        //向关注我的人发送感兴趣的信息
+        Map<String, Object> ext = new HashMap<>(1);
+        ext.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.interest", "{0}想找人一起{1}"),
+                user.getNickname(), activity.getType());
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,
+                buildUserSubscribers(user.getUserId()), message, ext);
+
+        chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.NEARBY,
+                buildNearByUsers(user, activity.getActivityId()), message, ext);
+
+        return ResponseDo.buildSuccessResponse();
     }
 }

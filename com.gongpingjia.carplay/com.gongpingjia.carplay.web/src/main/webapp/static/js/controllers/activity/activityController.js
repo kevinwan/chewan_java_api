@@ -66,13 +66,13 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
          */
         $scope.dtColumnDefs = [
             DTColumnDefBuilder.newColumnDef(0).withOption('data', null).renderWith(actionCheckBox).notSortable(),
-            DTColumnDefBuilder.newColumnDef(1).withOption('data', null).renderWith(actionUserInfo).notSortable(),
-            DTColumnDefBuilder.newColumnDef(2).withOption('data', null).renderWith(actionEstablish),
-            DTColumnDefBuilder.newColumnDef(3).withOption('data', null).renderWith(actionDestination),
-            DTColumnDefBuilder.newColumnDef(4).withOption('data', 'type'),
-            DTColumnDefBuilder.newColumnDef(5).withOption('data', null).renderWith(actionPay),
-            DTColumnDefBuilder.newColumnDef(6).withOption('data', null).renderWith(actionTransfer).notSortable(),
-            DTColumnDefBuilder.newColumnDef(7).withOption('data', null).renderWith(actionCreateTime),
+            DTColumnDefBuilder.newColumnDef(1).withOption('data', null).renderWith(actionCreateTime).notSortable(),
+            DTColumnDefBuilder.newColumnDef(2).withOption('data', 'type').notSortable(),
+            DTColumnDefBuilder.newColumnDef(3).withOption('data', null).renderWith(actionPay).notSortable(),
+            DTColumnDefBuilder.newColumnDef(4).withOption('data', null).renderWith(actionTransfer).notSortable(),
+            DTColumnDefBuilder.newColumnDef(5).withOption('data', null).renderWith(actionEstablish).notSortable(),
+            DTColumnDefBuilder.newColumnDef(6).withOption('data', null).renderWith(actionDestination).notSortable(),
+            DTColumnDefBuilder.newColumnDef(7).withOption('data', null).renderWith(actionUserInfo).notSortable(),
             DTColumnDefBuilder.newColumnDef(8).withOption('data', null).renderWith(actionDeal).notSortable(),
             DTColumnDefBuilder.newColumnDef(9).withOption('data', 'activityId').notVisible().notSortable()
         ];
@@ -90,7 +90,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
         }
 
         function actionEstablish(data, type, full, meta) {
-            if(data.establish === undefined || data.establish === null) {
+            if (data.establish === undefined || data.establish === null) {
                 return "无";
             }
             data.establish.city = commonService.transferIllegalToEmpty(data.establish.city);
@@ -100,7 +100,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
         }
 
         function actionDestination(data, type, full, meta) {
-            if(data.destination === undefined || data.destination === null) {
+            if (data.destination === undefined || data.destination === null) {
                 return "无";
             }
             data.destination.city = commonService.transferIllegalToEmpty(data.destination.city);
@@ -113,10 +113,10 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                 '</span>';
         }
 
-        function actionPay(data, type, full, meta){
-            if(commonService.isNull(data.pay)){
+        function actionPay(data, type, full, meta) {
+            if (commonService.isNull(data.pay)) {
                 return "";
-            }else{
+            } else {
                 return data.pay;
             }
 
@@ -166,8 +166,8 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                     criteria.toTime = "";
                 }
 
-                criteria.province =   commonService.transferIllegalToEmpty(criteria.province);
-                criteria.city =   commonService.transferIllegalToEmpty(criteria.province);
+                criteria.province = commonService.transferIllegalToEmpty(criteria.province);
+                criteria.city = commonService.transferIllegalToEmpty(criteria.province);
 
                 $rootScope.loadingPromise = activityService.getActivityList(criteria).success(function (res) {
                     if (res.result === 0) {
@@ -222,7 +222,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
         };
 
 
-        $scope.addActivity = function(){
+        $scope.addActivity = function () {
             $location.path("/activity/add");
         };
 
@@ -253,6 +253,23 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
             }
         };
 
+
+        $rootScope.loadingPromise = commonService.getActivityTypes().success(function (data) {
+            $scope.allTypeOptions = data;
+        });
+
+        $scope.changeMajorType = function (majorType) {
+            if (majorType === undefined || majorType === null || majorType === "") {
+                return;
+            }
+            $scope.criteria.type = '';
+            for (var index in $scope.allTypeOptions) {
+                if ($scope.allTypeOptions[index].majorType === majorType) {
+                    $scope.typeOptions = $scope.allTypeOptions[index].type;
+                }
+            }
+        };
+
         /**
          * Reset search criteria
          */
@@ -261,7 +278,8 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                 phone: '',
                 province: '',
                 city: '',
-                type: '-1',
+                majorType:'',
+                type: '',
                 pay: '-1',
                 transfer: '-1',
                 fromDate: moment().subtract(6, 'day').format('YYYY-MM-DD'),

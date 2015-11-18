@@ -41,12 +41,21 @@
             <label class="control-label bolder blue" for="type">活动类型</label>
 
             <div class="controls">
-                <select id="type" ng-init="criteria.type='-1'"
-                        data-ng-model="criteria.type" style="width:100%;">
-                    <option value="-1">全部</option>
-                    <option value="吃饭">吃饭</option>
-                    <option value="唱歌">唱歌</option>
-                    <option value="看电影">看电影</option>
+                <select id="majorType" ng-model="criteria.majorType"
+                        ng-options=" item.majorType as item.majorType for item in allTypeOptions"
+                        ng-change="changeMajorType(criteria.majorType)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="control-label bolder blue" for="type">活动子类型</label>
+
+            <div class="controls">
+                <select id="type" ng-model="criteria.type"
+                        ng-options=" item as item for item in typeOptions">
+                    <option value="">全部</option>
                 </select>
             </div>
         </div>
@@ -65,6 +74,9 @@
             </div>
         </div>
 
+
+    </div>
+    <div class="form-inline col-md-12">
         <div class="col-md-2">
             <label class="control-label bolder blue" for="transfer">包接送</label>
 
@@ -77,8 +89,6 @@
                 </select>
             </div>
         </div>
-    </div>
-    <div class="form-inline col-md-12">
         <div class="col-md-2">
             <label class="control-label bolder blue" for="fromDate">创建日期 起</label>
 

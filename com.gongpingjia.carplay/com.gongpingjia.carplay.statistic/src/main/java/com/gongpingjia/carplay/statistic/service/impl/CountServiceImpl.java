@@ -71,4 +71,70 @@ public class CountServiceImpl implements CountService {
         }
         return countMap;
     }
+
+    @Override
+    public Map<String, Integer> getCountByWeek(String startStr, String endStr, String collectionName, String eventType) throws ApiException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Long startTime = null;
+        Long endTime = null;
+        try {
+            startTime = dateFormat.parse(startStr).getTime();
+            //endTime + 1天的时间     当天的数据也需要返回
+            endTime = DateUtil.addTime(dateFormat.parse(endStr), Calendar.DATE, 1);
+        } catch (ParseException e) {
+            logger.error(e.getMessage(), e);
+            throw new ApiException("时间转换出错");
+        }
+//        Calendar startCal = Calendar.getInstance();
+//        startCal.setTimeInMillis(startTime);
+//        Calendar endCal = Calendar.getInstance();
+//        endCal.setTimeInMillis(endTime);
+//        startTime = DateUtil.addTime(startCal.getTime(), Calendar.DATE, (0 - startCal.get(Calendar.DAY_OF_WEEK)));
+//        endTime = DateUtil.addTime(endCal.getTime(), Calendar.DATE, 7 - endCal.get(Calendar.DAY_OF_WEEK) - 1);
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("createTime").gte(startTime).lt(endTime).and("event").is(eventType)),
+                Aggregation.group("year", "week").sum("count").as("count")
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, collectionName, Map.class);
+        List<Map> mappedResults = results.getMappedResults();
+        Map<String, Integer> countMap = new HashMap<>(mappedResults.size());
+        for (Map item : mappedResults) {
+            StringBuilder timeStr = new StringBuilder();
+            timeStr.append(item.get("year")).append("-").append(item.get("week"));
+            countMap.put(timeStr.toString(), (Integer) item.get("count"));
+        }
+        return countMap;
+    }
+
+    @Override
+    public Map<String, Integer> getCountByMonth(String startStr, String endStr, String collectionName, String eventType) throws ApiException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Long startTime = null;
+        Long endTime = null;
+        try {
+            startTime = dateFormat.parse(startStr).getTime();
+            //endTime + 1天的时间     当天的数据也需要返回
+            endTime = DateUtil.addTime(dateFormat.parse(endStr), Calendar.DATE, 1);
+        } catch (ParseException e) {
+            logger.error(e.getMessage(), e);
+            throw new ApiException("时间转换出错");
+        }
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("createTime").gte(startTime).lt(endTime).and("event").is(eventType)),
+                Aggregation.group("year", "month").sum("count").as("count")
+        );
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, collectionName, Map.class);
+        List<Map> mappedResults = results.getMappedResults();
+        Map<String, Integer> countMap = new HashMap<>(mappedResults.size());
+        for (Map item : mappedResults) {
+            StringBuilder timeStr = new StringBuilder();
+            String month = String.valueOf(item.get("month"));
+            if (month.length() == 1) {
+                month = "0" + month;
+            }
+            timeStr.append(item.get("year")).append("-").append(month);
+            countMap.put(timeStr.toString(), (Integer) item.get("count"));
+        }
+        return countMap;
+    }
 }

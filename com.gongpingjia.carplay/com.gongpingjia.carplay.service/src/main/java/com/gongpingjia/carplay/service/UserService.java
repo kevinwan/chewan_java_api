@@ -175,4 +175,5 @@ public interface UserService {
      * @return
      */
     ResponseDo getDynamicActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
+
 }

@@ -20,6 +20,19 @@
 <!-- /.page-header -->
 
 <div class="col-md-2">
+    <label class="control-label bolder blue" for="rangeType">单位选择</label>
+
+    <div class="controls">
+        <select id="rangeType" data-ng-model="criteria.timeRangeType" style="width:100%;"
+                ng-init="criteria.timeRangeType= 0">
+            <option value="0">天</option>
+            <option value="1">周</option>
+            <option value="2">月</option>
+        </select>
+    </div>
+</div>
+
+<div class="col-md-2">
     <label class="control-label bolder blue" for="fromDate">开始时间</label>
 
     <div class="">
@@ -46,6 +59,7 @@
         </select>
     </div>
 </div>
+
 
 <div class="form-inline col-md-12">
     <div class="clearfix visible‐xs‐block"></div>

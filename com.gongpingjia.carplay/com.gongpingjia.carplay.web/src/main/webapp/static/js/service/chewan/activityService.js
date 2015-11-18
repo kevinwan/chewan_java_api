@@ -29,8 +29,8 @@ gpjApp.factory('activityService', ['$http', 'restProxyService', 'authService', '
             getAreaInfo:function(areCode) {
                 return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/area/list?parentId=' + areCode);
             },
-            testInfo:function(data) {
-                return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, '/test/list',data);
+            getUserInfo:function(phone){
+                return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, '/official/userInfo/phone?token=' + USER_TOKEN + "&userId=" + USER_ID + "&phone=" + phone);
             }
         }
     }]);

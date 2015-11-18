@@ -26,4 +26,8 @@ public interface CountService {
      * @throws ApiException
      */
     public Map<String,Integer> getCountByDay(String startStr, String endStr, String collectionName, String eventType) throws ApiException;
+
+    public Map<String, Integer> getCountByWeek(String startStr, String endStr, String collectionName, String eventType) throws ApiException;
+
+    public Map<String, Integer> getCountByMonth(String startStr, String endStr, String collectionName, String eventType) throws ApiException;
 }

@@ -1,8 +1,8 @@
 'use strict';
 
 
-gpjApp.controller('statisticCommonController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', 'statisticService','$routeParams',
-    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, statisticService,$routeParams) {
+gpjApp.controller('statisticCommonController', ['$scope', '$rootScope', '$location', 'officialActivityService', 'moment', '$window', 'commonService', 'statisticService', '$routeParams',
+    function ($scope, $rootScope, $location, officialActivityService, moment, $window, commonService, statisticService, $routeParams) {
 
         $scope.config = {
             title: '统计图',
@@ -21,11 +21,11 @@ gpjApp.controller('statisticCommonController', ['$scope', '$rootScope', '$locati
         $scope.type = $routeParams.type;
 
         $scope.search = function () {
-            if($scope.criteria.endTime < $scope.criteria.startTime) {
+            if ($scope.criteria.endTime < $scope.criteria.startTime) {
                 alert("结束时间必须大于开始时间");
                 return;
             }
-            $rootScope.loadingPromise = statisticService.getCommonInfo($scope.criteria,$scope.type).success(function (res) {
+            $rootScope.loadingPromise = statisticService.getCommonInfo($scope.criteria, $scope.type).success(function (res) {
                 if (res.result === 0) {
                     $scope.data = res.data;
                 } else {

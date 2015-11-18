@@ -5,9 +5,11 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.common.Landmark;
+import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.impl.OfficialParameterChecker;
 import com.gongpingjia.carplay.service.ActivityService;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class UserActivityController {
     private ActivityService activityService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private OfficialParameterChecker officialParameterChecker;
 
 
@@ -39,12 +44,15 @@ public class UserActivityController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo registerActivity(@RequestParam("userId") String userId, @RequestParam("token") String token, @RequestBody JSONObject json, HttpServletRequest request) {
         try {
-            if (CommonUtil.isEmpty(json, Arrays.asList("majorType", "type", "estabPoint", "establish", "transfer"))) {
+            if (CommonUtil.isEmpty(json,Arrays.asList("phone"))) {
+                throw new ApiException("手机号码不能为空");
+            }
+            if (CommonUtil.isEmpty(json.getJSONObject("activity"), Arrays.asList("majorType", "type", "estabPoint", "establish", "transfer"))) {
                 throw new ApiException("输入参数有误");
             }
             officialParameterChecker.checkAdminUserInfo(userId,token);
 
-            Activity activity =  (Activity)JSONObject.toBean(json, Activity.class);
+            Activity activity =  (Activity)JSONObject.toBean(json.getJSONObject("activity"), Activity.class);
 
             Landmark landmark = activity.getEstabPoint();
             if (landmark == null || !landmark.correct()) {
@@ -57,7 +65,8 @@ public class UserActivityController {
                     throw new ApiException("输入参数错误");
                 }
             }
-            return activityService.activityRegister(userId,activity);
+
+            return activityService.registerUserActivity(json.getString("phone"),userId,activity);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

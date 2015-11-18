@@ -117,4 +117,7 @@ public interface ActivityService {
      *@param ignore @return
      */
     ResponseDo getActivityPushInfos(HttpServletRequest request, String userId, Integer limit, Integer ignore);
+
+
+    ResponseDo registerUserActivity(String phone,String userId,Activity activity) throws ApiException;
 }

@@ -3,6 +3,41 @@
 
 gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location', 'activityService', 'moment', '$window', 'commonService', '$q',
     function ($scope, $rootScope, $location, activityService, moment, $window, commonService, $q) {
+        $scope.phoneArr = [];
+        for (var phoneNum = 10012340001; phoneNum <= 10012340033; phoneNum++) {
+            $scope.phoneArr.push(phoneNum);
+        }
+        ;
+
+        $scope.randomPhone = function () {
+            $scope.phone = 10012340001 + Math.floor(Math.random() * 33);
+        };
+
+        function randomInt(from, to) {
+            return from + Math.floor(Math.random() * (to - from + 1));
+        };
+
+        function randomArr(arr) {
+            return arr[randomInt(0, arr.length - 1)];
+        };
+
+        $scope.payOptions = ['不限', 'AA', '请我吧', '我请客'];
+
+        $scope.transferOptions = [{'name':'是','value':true},{'name':'否','value':false}];
+
+        $scope.randomAll = function () {
+            $scope.phone = randomInt(10012340001, 10012340033);
+            $scope.activity.majorType = $scope.allTypeOptions[randomInt(0, $scope.allTypeOptions.length - 1)].majorType;
+            for (var index in $scope.allTypeOptions) {
+                if ($scope.allTypeOptions[index].majorType === $scope.activity.majorType) {
+                    $scope.typeOptions = $scope.allTypeOptions[index].type;
+                }
+            }
+            $scope.activity.type = $scope.typeOptions[randomInt(0, $scope.typeOptions.length - 1)];
+            $scope.activity.pay = randomArr($scope.payOptions);
+            $scope.activity.transfer = randomArr($scope.transferOptions).value;
+            $scope.randomEstablish();
+        };
 
         $scope.close = function () {
             $location.path('/activity/list');
@@ -60,6 +95,17 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
                 }
             });
             return deferred.promise;
+        };
+
+        $scope.getUserInfo = function (phone) {
+            $rootScope.loadingPromise = activityService.getUserInfo(phone).success(function (result) {
+                if (result.result == 0) {
+                    $scope.nickname = result.data.nickname;
+                    $scope.activity.userId = result.data.userId;
+                } else {
+                    alert(result.errmsg);
+                }
+            });
         };
 
         $scope.randomPoint = function (code, type) {
@@ -163,7 +209,7 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
 
         $scope.addActivity = function () {
             if (validateAll()) {
-                if(!commonService.isNull($scope.destination) && !commonService.isNull($scope.destination.province)){
+                if (!commonService.isNull($scope.destination) && !commonService.isNull($scope.destination.province)) {
                     $scope.activity.destination = {};
                     $scope.activity.destination.province = $scope.destination.province.name;
                     $scope.activity.destination.city = $scope.destination.city.name;
@@ -175,8 +221,8 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
                 $scope.activity.establish.city = $scope.establish.city.name;
                 $scope.activity.establish.district = $scope.establish.district.name;
                 $scope.activity.establish.street = $scope.establish.street.name;
-
-                $rootScope.loadingPromise = activityService.saveActivity($scope.activity).success(function (result) {
+                var postData = {'phone': $scope.phone, 'activity': $scope.activity};
+                $rootScope.loadingPromise = activityService.saveActivity(postData).success(function (result) {
                     if (result.result === 0) {
                         alert("发布活动成功");
                         $location.path('/activity/list');
@@ -188,6 +234,22 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
                 });
             }
         };
+
+
+        $scope.randomEstablish = function () {
+            $scope.establish.province = randomArr($scope.provinceOptions);
+            $scope.initChildArea($scope.establish.province, 'estabCityOptions').then(function () {
+                $scope.establish.city = randomArr($scope.estabCityOptions);
+                return $scope.initChildArea($scope.establish.city, 'estabDistrictOptions');
+            }).then(function () {
+                $scope.establish.district = randomArr($scope.estabDistrictOptions);
+                return $scope.initChildArea($scope.establish.district, 'estabStreetOptions');
+            }).then(function () {
+                $scope.establish.street = randomArr($scope.estabStreetOptions);
+                $scope.randomPoint($scope.establish.street.code, 'establish');
+            });
+        }
+
     }
 ]);
 
