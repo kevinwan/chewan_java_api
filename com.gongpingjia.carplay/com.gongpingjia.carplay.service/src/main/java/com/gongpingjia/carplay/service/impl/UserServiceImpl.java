@@ -727,7 +727,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseDo deleteAlbumPhotos(String userId, String token, JSONObject json) throws ApiException {
-        LOG.debug("Begin check input parameters");
+        LOG.debug("Begin check input parameters, delete photos:{}", json);
         checker.checkUserInfo(userId, token);
         if (CommonUtil.isArrayEmpty(json, "photos")) {
             LOG.warn("Input parameters photos is empty");
