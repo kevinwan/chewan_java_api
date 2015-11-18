@@ -573,7 +573,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userDao.findByIds(userMap.keySet());
         for (User item : userList) {
-            Map<String, Object> map = item.buildBaseUserMap();
+            Map<String, Object> map = item.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(user.getLandmark(), item.getLandmark()));
             userMap.put(item.getUserId(), map);
         }
