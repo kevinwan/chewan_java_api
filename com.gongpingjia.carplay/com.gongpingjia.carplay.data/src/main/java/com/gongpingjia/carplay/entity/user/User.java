@@ -369,7 +369,7 @@ public class User {
         for (Photo item : album) {
             albumList.add(item.buildBaseInfo());
         }
-        userMap.put("album", album);
+        userMap.put("album", albumList);
     }
 
     public static void appendCover(Map<String, Object> userMap, String cover) {
