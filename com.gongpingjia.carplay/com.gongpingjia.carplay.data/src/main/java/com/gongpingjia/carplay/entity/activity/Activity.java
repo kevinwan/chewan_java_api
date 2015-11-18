@@ -1,18 +1,16 @@
 package com.gongpingjia.carplay.entity.activity;
 
-import com.gongpingjia.carplay.common.tool.ActivityTypeConvertTool;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
-import com.gongpingjia.carplay.entity.user.User;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
-import org.springframework.data.mongodb.core.index.IndexDefinition;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/9/19.
@@ -31,7 +29,7 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     private String userId;
 
     @Transient
-    private User organizer;
+    private Map<String, Object> organizer;
 
     @Indexed
     private Long start;
@@ -92,11 +90,11 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
         this.userId = userId;
     }
 
-    public User getOrganizer() {
+    public Map<String, Object> getOrganizer() {
         return organizer;
     }
 
-    public void setOrganizer(User organizer) {
+    public void setOrganizer(Map<String, Object> organizer) {
         this.organizer = organizer;
     }
 

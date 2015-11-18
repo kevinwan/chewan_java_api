@@ -4,8 +4,8 @@ import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
+import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.dao.user.UserTokenDao;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.UploadService;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,14 +37,11 @@ public class UploadServiceImpl implements UploadService {
     @Qualifier("thirdPhotoManager")
     private PhotoService thirdPhotoManager;
 
-    /**
-     * Token校验
-     */
-    @Autowired
-    private UserTokenDao tokenDao;
-
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private PhotoDao photoDao;
 
     /**
      * 对存放在本地文件的操
@@ -146,11 +142,10 @@ public class UploadServiceImpl implements UploadService {
 
         LOG.debug("check user album exist or not");
         // 2.查数据库信息
-        User user = userDao.findById(userId);
-
+        long albumCount = photoDao.count(Query.query(Criteria.where("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM)));
         //3.检查是否达到上限
-        if (user.getAlbum() != null && user.getAlbum().size() >= PropertiesUtil.getProperty("carplay.photos.upper.limit", 40)) {
-            LOG.warn("User:{} album count is over upper limit", user.getAlbum().size());
+        if (albumCount >= PropertiesUtil.getProperty("carplay.photos.upper.limit", 40)) {
+            LOG.warn("User:{} album count is over upper limit", albumCount);
             throw new ApiException("用户照片数量已经达到上限，不能继续上传");
         }
 
@@ -161,15 +156,13 @@ public class UploadServiceImpl implements UploadService {
         String key = MessageFormat.format(Constants.PhotoKey.USER_ALBUM_KEY, userId, photoId);
 
         ResponseDo response = uploadThirdServer(data, photoId, key, true);
-
         if (response.success()) {
-            Update update = new Update();
-            Long current = DateUtil.getTime();
-            update.addToSet("album", new Photo(photoId, key, current));
-            update.set("albumStatus", Constants.UserAlbumAtuhStatus.PENDING);  //发起相册审核
-            update.set("albumModifyTime", current);
-
-            userDao.update(Query.query(Criteria.where("userId").is(user.getUserId())), update);
+            Photo photo = new Photo();
+            photo.setKey(key);
+            photo.setUserId(userId);
+            photo.setType(Constants.PhotoType.USER_ALBUM);
+            photo.setUploadTime(DateUtil.getTime());
+            photoDao.save(photo);
         }
 
         return response;

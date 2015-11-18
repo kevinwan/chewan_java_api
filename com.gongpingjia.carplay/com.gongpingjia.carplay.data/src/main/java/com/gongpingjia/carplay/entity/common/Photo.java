@@ -1,14 +1,25 @@
 package com.gongpingjia.carplay.entity.common;
 
+import com.gongpingjia.carplay.common.util.CommonUtil;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/9/19.
  * 用户上传的个人图片
  */
+@Document
 public class Photo implements Comparable<Photo> {
     //photoId
+    @Id
     private String id;
+
     //photoUrl key
     private String key;
 
@@ -16,7 +27,13 @@ public class Photo implements Comparable<Photo> {
     @Transient
     private String url;
 
+    @Indexed(direction = IndexDirection.DESCENDING)
     private Long uploadTime;
+
+    @Indexed
+    private String userId;
+
+    private int type;
 
     public Photo() {
     }
@@ -63,4 +80,41 @@ public class Photo implements Comparable<Photo> {
     public int compareTo(Photo o) {
         return (int) (o.getUploadTime() - this.getUploadTime());
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public Map<String, Object> buildBaseInfo() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("url", CommonUtil.getThirdPhotoServer() + key);
+        return map;
+    }
+
+    public Map<String, Object> buildCommonInfo() {
+        Map<String, Object> map = buildBaseInfo();
+        map.put("userId", userId);
+        map.put("key", key);
+        return map;
+    }
+
+    public Map<String, Object> buildFullInfo() {
+        Map<String, Object> map = buildCommonInfo();
+        map.put("uploadTime", uploadTime);
+        map.put("id", id);
+        return map;
+    }
+
 }

@@ -12,9 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class InterestMessage {
 
     //用户创建活动
-    public static final Integer USER_ACTIVITY = 0;
+    public static final int USER_ACTIVITY = 0;
     //用户上传照片
-    public static final Integer USER_ALBUM = 1;
+    public static final int USER_ALBUM = 1;
 
     @Id
     private String id;

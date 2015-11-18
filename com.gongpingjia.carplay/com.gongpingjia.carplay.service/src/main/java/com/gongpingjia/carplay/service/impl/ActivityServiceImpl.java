@@ -16,13 +16,13 @@ import com.gongpingjia.carplay.entity.activity.Appointment;
 import com.gongpingjia.carplay.entity.activity.PushInfo;
 import com.gongpingjia.carplay.entity.common.Address;
 import com.gongpingjia.carplay.entity.common.Landmark;
-import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
 import com.gongpingjia.carplay.entity.statistic.StatisticActivityMatch;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.ActivityService;
-import com.gongpingjia.carplay.service.util.*;
+import com.gongpingjia.carplay.service.util.ActivityQueryParam;
+import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -281,11 +281,7 @@ public class ActivityServiceImpl implements ActivityService {
             LOG.error("the activity {} cannot found the organizer user {}", activityId, userId);
             throw new ApiException("该活动找不到对应的 User");
         }
-        organizer.hideSecretInfo();
-        organizer.setAlbum(new ArrayList<Photo>(0));
-        organizer.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-
-        activity.setOrganizer(organizer);
+        activity.setOrganizer(organizer.buildCommonUserMap());
         if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
             activity.setDistance(DistanceUtil.getDistance(landmark, activity.getEstabPoint()));
         }
@@ -484,8 +480,9 @@ public class ActivityServiceImpl implements ActivityService {
             if (null == organizer) {
                 throw new ApiException("数据非法 该Activity没有找到对应的Organizer");
             }
-            organizer.setSubscribeFlag(subscribeIds.contains(organizer.getUserId()));
-            activity.setOrganizer(organizer);
+            Map<String, Object> map = organizer.buildCommonUserMap();
+            map.put("subscribeFlag", subscribeIds.contains(organizer.getUserId()));
+            activity.setOrganizer(map);
         }
     }
 
@@ -666,7 +663,7 @@ public class ActivityServiceImpl implements ActivityService {
         if (null == organizer || StringUtils.isEmpty(organizer.getUserId())) {
             throw new ApiException("该活动没有组织者");
         }
-        activity.setOrganizer(organizer);
+        activity.setOrganizer(organizer.buildCommonUserMap());
 
         Criteria criteria = new Criteria();
         criteria.and("activityId").is(activity.getActivityId());
@@ -676,8 +673,6 @@ public class ActivityServiceImpl implements ActivityService {
         if (null != appointmentList && !appointmentList.isEmpty()) {
             activity.setAppointmentList(appointmentList);
         }
-
-
         return ResponseDo.buildSuccessResponse(activity);
     }
 
@@ -816,7 +811,6 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     private List<Map<String, Object>> buildResponse(String userId, Map<String, User> userMap, List<Activity> remainActivities, Set<String> subscriberSet) {
-        String localServer = CommonUtil.getLocalPhotoServer();
         List<Map<String, Object>> result = new ArrayList<>(remainActivities.size());
         for (Activity item : remainActivities) {
             Map<String, Object> map = new HashMap<>();
@@ -827,19 +821,9 @@ public class ActivityServiceImpl implements ActivityService {
             User user = userMap.get(item.getUserId());
             Map<String, Object> organizer = new HashMap<>(9, 1);
             if (user != null) {
+                organizer = user.buildCommonUserMap();
+                User.appendCover(organizer, userDao.getCover(user.getUserId()));
                 organizer.put("userId", user.getUserId());
-                if (null != user.getCar()) {
-                    user.getCar().refreshPhotoInfo(CommonUtil.getGPJBrandLogoPrefix());
-                }
-                organizer.put("car", user.getCar());
-                organizer.put("subscribeFlag", subscriberSet.contains(item.getUserId()));
-                organizer.put("nickname", user.getNickname());
-                organizer.put("gender", user.getGender());
-                organizer.put("photoAuthStatus", user.getPhotoAuthStatus());
-                organizer.put("licenseAuthStatus", user.getLicenseAuthStatus());
-                organizer.put("avatar", localServer + user.getAvatar());
-                organizer.put("cover", user.getCover());
-                organizer.put("age", user.getAge());
             }
             map.put("organizer", organizer);
             map.put("pay", item.getPay());

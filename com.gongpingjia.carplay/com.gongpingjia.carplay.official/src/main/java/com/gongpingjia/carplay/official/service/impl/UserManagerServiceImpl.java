@@ -5,6 +5,7 @@ import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
@@ -22,8 +23,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by 123 on 2015/10/19.
@@ -39,6 +39,9 @@ public class UserManagerServiceImpl implements UserManagerService {
     @Autowired
     @Qualifier("thirdPhotoManager")
     private PhotoService thirdPhotoManager;
+
+    @Autowired
+    private PhotoDao photoDao;
 
     @Override
     public ResponseDo listUsers(String phone, String nickname, String licenseAuthStatus, String photoAuthStatus,
@@ -66,9 +69,9 @@ public class UserManagerServiceImpl implements UserManagerService {
 
         LOG.debug("query users by criteria and refresh user info");
         List<User> userList = userDao.find(Query.query(criteria).with(new Sort(new Sort.Order(Sort.Direction.DESC, "registerTime"))));
+        List<Map<String, Object>> userMapList = new ArrayList<>(userList.size());
         for (User user : userList) {
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            user.hideSecretInfo();
+            userMapList.add(user.buildCommonUserMap());
         }
 
         return ResponseDo.buildSuccessResponse(userList);
@@ -83,10 +86,10 @@ public class UserManagerServiceImpl implements UserManagerService {
             throw new ApiException("输入参数错误");
         }
 
-        user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-        user.hideSecretInfo();
+        Map<String, Object> map = user.buildCommonUserMap();
+        User.appendAlbum(map, photoDao.getUserAlbum(userId));
 
-        return ResponseDo.buildSuccessResponse(user);
+        return ResponseDo.buildSuccessResponse(map);
     }
 
     @Override
@@ -111,24 +114,23 @@ public class UserManagerServiceImpl implements UserManagerService {
         if (!CommonUtil.isEmpty(jsonObject, "deleteFlag")) {
             update.set("deleteFlag", jsonObject.getBoolean("deleteFlag"));
         }
-
-        List<String> deletePhotoKeys = new ArrayList<>();
-        if (!CommonUtil.isEmpty(jsonObject, "photoIds") && user.getAlbum() != null) {
-            List<Photo> album = new ArrayList<>();
-            JSONArray photoIds = jsonObject.getJSONArray("photoIds");
-            for (Photo photo : user.getAlbum()) {
-                if (photoIds.contains(photo.getId())) {
-                    album.add(photo);
-                } else {
-                    deletePhotoKeys.add(photo.getKey());
-                }
-            }
-            update.set("album", album);
-        }
-
         userDao.update(userId, update);
 
-        deletePhotosRemoteServer(deletePhotoKeys);
+        LOG.debug("Update user photo info ");
+        if (!CommonUtil.isEmpty(jsonObject, "photoIds")) {
+            List<Photo> userPhotos = photoDao.getUserAlbum(userId);
+            Map<String, Photo> photoMap = new HashMap<>(userPhotos.size(), 1);
+            for (Photo item : userPhotos) {
+                photoMap.put(item.getId(), item);
+            }
+
+            JSONArray photoIds = jsonObject.getJSONArray("photoIds");
+            List<String> idList = new ArrayList<>(photoIds.size());
+            photoDao.deleteUserPhotos(userId, idList);
+
+            deletePhotosRemoteServer(photoMap, idList);
+        }
+
 
         return ResponseDo.buildSuccessResponse();
     }
@@ -136,14 +138,19 @@ public class UserManagerServiceImpl implements UserManagerService {
     /**
      * 删除远程服务器相片文件
      *
-     * @param deletePhotoKeys 相片的Key列表
+     * @param deletePhotoIds 相片的Key列表
      */
-    private void deletePhotosRemoteServer(List<String> deletePhotoKeys) {
-        for (String key : deletePhotoKeys) {
+    private void deletePhotosRemoteServer(Map<String, Photo> userPhotoMap, List<String> deletePhotoIds) {
+        for (String id : deletePhotoIds) {
             try {
-                thirdPhotoManager.delete(key);
+                Photo photo = userPhotoMap.get(id);
+                if (photo != null) {
+                    thirdPhotoManager.delete(photo.getKey());
+                } else {
+                    LOG.warn("Wrong photo id:{}", id);
+                }
             } catch (Exception e) {
-                LOG.warn("Delete photo failure, key:{}", key);
+                LOG.warn("Delete photo failure, photoId:{}", id);
                 LOG.warn(e.getMessage(), e);
             }
         }

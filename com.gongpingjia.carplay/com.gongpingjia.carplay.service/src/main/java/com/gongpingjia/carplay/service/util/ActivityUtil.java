@@ -36,15 +36,15 @@ public class ActivityUtil {
     private static List<ActivityWeight> sortActivityList(List<Activity> activities, Date currentTime, Landmark nowLandmark, double maxDistance, long maxPubTime, int genderType, Set<String> toRemoveSet) {
         ArrayList<ActivityWeight> awList = new ArrayList<>(activities.size());
         for (Activity activity : activities) {
-            User user = activity.getOrganizer();
+            Map<String, Object> user = activity.getOrganizer();
 
             //过滤男女
             if (genderType == 0) {
-                if (!StringUtils.equals(user.getGender(), Constants.UserGender.MALE)) {
+                if (!StringUtils.equals(String.valueOf(user.get("gender")), Constants.UserGender.MALE)) {
                     continue;
                 }
             } else if (genderType == 1) {
-                if (!StringUtils.equals(user.getGender(), Constants.UserGender.FEMALE)) {
+                if (!StringUtils.equals(String.valueOf(user.get("gender")), Constants.UserGender.FEMALE)) {
                     continue;
                 }
             }
@@ -56,11 +56,11 @@ public class ActivityUtil {
 
             ActivityWeight aw = new ActivityWeight(activity);
             //  车主认证；
-            if (StringUtils.equals(user.getLicenseAuthStatus(), Constants.AuthStatus.ACCEPT)) {
+            if (StringUtils.equals(String.valueOf(user.get("licenseAuthStatus")), Constants.AuthStatus.ACCEPT)) {
                 aw.setCarOwnerFlag(true);
             }
             //头像认证
-            if (StringUtils.equals(user.getPhotoAuthStatus(), Constants.AuthStatus.ACCEPT)) {
+            if (StringUtils.equals(String.valueOf(user.get("photoAuthStatus")), Constants.AuthStatus.ACCEPT)) {
                 aw.setAvatarFlag(true);
             }
             //TODO

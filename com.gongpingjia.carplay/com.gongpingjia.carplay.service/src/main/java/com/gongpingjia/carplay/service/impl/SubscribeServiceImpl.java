@@ -3,13 +3,11 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.common.util.DateUtil;
 import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.user.SubscriberDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.entity.common.Car;
 import com.gongpingjia.carplay.entity.user.Subscriber;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.service.SubscribeService;
@@ -86,14 +84,10 @@ public class SubscribeServiceImpl implements SubscribeService {
         List<User> beSubscribedUsers = userDao.find(Query.query(Criteria.where("userId").in(beSubscribedSet)));
 
         LOG.debug("refresh user infomation");
-        refreshUserinfo(myself, mySubscribeUsers);
-        refreshUserinfo(myself, eachSubscribeUsers);
-        refreshUserinfo(myself, beSubscribedUsers);
-
         Map<String, Object> data = new HashMap<String, Object>(3, 1);
-        data.put("eachSubscribe", eachSubscribeUsers);
-        data.put("mySubscribe", mySubscribeUsers);
-        data.put("beSubscribed", beSubscribedUsers);
+        data.put("eachSubscribe", refreshUserinfo(myself, eachSubscribeUsers));
+        data.put("mySubscribe", refreshUserinfo(myself, mySubscribeUsers));
+        data.put("beSubscribed", refreshUserinfo(myself, beSubscribedUsers));
 
         return ResponseDo.buildSuccessResponse(data);
     }
@@ -173,27 +167,13 @@ public class SubscribeServiceImpl implements SubscribeService {
         }
 
         LOG.debug("Build response data");
-        String localServer = CommonUtil.getLocalPhotoServer();
-        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
         List<Map<String, Object>> data = new ArrayList<>(beSubscribed.size());
         for (Subscriber item : beSubscribed) {
-            Map<String, Object> map = new HashMap<>(8, 1);
             User user = userMap.get(item.getFromUser());
-            map.put("userId", user.getUserId());
-            map.put("nickname", user.getNickname());
-            map.put("gender", user.getGender());
-            map.put("age", user.getAge());
-            map.put("avatar", localServer + user.getAvatar());
+            Map<String, Object> map = user.buildCommonUserMap();
             map.put("distance", DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
-            map.put("cover", user.getCover());
+            map.put("cover", userDao.getCover(user.getUserId()));
             map.put("subscribeTime", item.getSubscribeTime());
-            map.put("photoAuthStatus", user.getPhotoAuthStatus());
-            map.put("licenseAuthStatus", user.getLicenseAuthStatus());
-            Car car = user.getCar();
-            if (car != null) {
-                car.setLogo(gpjServer + car.getLogo());
-            }
-            map.put("car", car);
             data.add(map);
         }
 
@@ -206,12 +186,14 @@ public class SubscribeServiceImpl implements SubscribeService {
      * @param myself
      * @param mySubscribeUsers
      */
-    private void refreshUserinfo(User myself, List<User> mySubscribeUsers) {
+    private List<Map<String, Object>> refreshUserinfo(User myself, List<User> mySubscribeUsers) {
+        List<Map<String, Object>> list = new ArrayList<>(mySubscribeUsers.size());
         for (User user : mySubscribeUsers) {
-            user.hideSecretInfo();
-            user.refreshPhotoInfo(CommonUtil.getLocalPhotoServer(), CommonUtil.getThirdPhotoServer(), CommonUtil.getGPJBrandLogoPrefix());
-            user.setDistance(DistanceUtil.getDistance(user.getLandmark(), myself.getLandmark()));
+            Map<String, Object> map = user.buildCommonUserMap();
+            map.put("distance", DistanceUtil.getDistance(user.getLandmark(), myself.getLandmark()));
+            list.add(map);
         }
+        return list;
     }
 
 }
