@@ -291,10 +291,11 @@ public class User {
         map.put("licenseAuthStatus", licenseAuthStatus);
         if (car != null) {
             car.setLogo(CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+            map.put("car", car);
+        } else {
+            map.put("car", "");
         }
-        map.put("car", car);
         map.put("role", role);
-
         map.put("idle", idle);
         return map;
     }

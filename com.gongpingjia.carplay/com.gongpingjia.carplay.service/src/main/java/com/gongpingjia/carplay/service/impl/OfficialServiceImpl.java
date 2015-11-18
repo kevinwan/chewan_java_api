@@ -118,9 +118,6 @@ public class OfficialServiceImpl implements OfficialService {
 
         OfficialActivity officialActivity = checkParameters(id, idType);
 
-        String localServer = CommonUtil.getLocalPhotoServer();
-        String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
-
         JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("officialActivityId", officialActivity.getOfficialActivityId());
@@ -174,7 +171,6 @@ public class OfficialServiceImpl implements OfficialService {
             }
             List<Map<String, Object>> members = new ArrayList<>(pageMemberUserIds.size());
             for (String userItemId : pageMemberUserIds) {
-
                 User user = userMap.get(userItemId);
                 Map<String, Object> map = user.buildCommonUserMap();
                 if (queryUser == null) {
@@ -182,7 +178,7 @@ public class OfficialServiceImpl implements OfficialService {
                 } else {
                     User.appendDistance(map, DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
                 }
-                buildInvitedAcceptInfo(userId, localServer, appointmentList, userMap, user, map);
+                buildInvitedAcceptInfo(userId, appointmentList, userMap, user, map);
 
                 members.add(map);
             }
@@ -194,7 +190,7 @@ public class OfficialServiceImpl implements OfficialService {
     }
 
     //构造用户的邀请接收信息
-    private void buildInvitedAcceptInfo(String userId, String localServer, List<Appointment> appointmentList,
+    private void buildInvitedAcceptInfo(String userId, List<Appointment> appointmentList,
                                         Map<String, User> userMap, User user, Map<String, Object> map) {
         //被邀请的次数
         int invitedCount = 0;
@@ -207,8 +203,8 @@ public class OfficialServiceImpl implements OfficialService {
         //是否被该用户邀请过
         boolean beInvitedFlag = false;
 
-        map.put("phone", "");
-        map.put("emchatName", "");
+//        map.put("phone", "");
+//        map.put("emchatName", "");
 
         for (Appointment appointment : appointmentList) {
             //
@@ -230,17 +226,17 @@ public class OfficialServiceImpl implements OfficialService {
                 inviteFlag = true;
                 map.put("inviteStatus", appointment.getStatus());
                 map.put("inviteTime", appointment.getModifyTime());
-                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
-                    //jackjson 不允许有null 存在
-                    if (user.getPhone() == null) {
-                        user.setPhone("");
-                    }
-                    map.put("phone", user.getPhone());
-                    if (user.getEmchatName() == null) {
-                        user.setEmchatName("");
-                    }
-                    map.put("emchatName", user.getEmchatName());
-                }
+//                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+//                    //jackjson 不允许有null 存在
+//                    if (user.getPhone() == null) {
+//                        user.setPhone("");
+//                    }
+//                    map.put("phone", user.getPhone());
+//                    if (user.getEmchatName() == null) {
+//                        user.setEmchatName("");
+//                    }
+//                    map.put("emchatName", user.getEmchatName());
+//                }
             }
 
             //该用户 邀请 我
@@ -248,17 +244,17 @@ public class OfficialServiceImpl implements OfficialService {
                 beInvitedFlag = true;
                 map.put("beInvitedStatus", appointment.getStatus());
                 map.put("beInvitedTime", appointment.getModifyTime());
-                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
-                    //jackjson 不允许有null 存在
-                    if (user.getPhone() == null) {
-                        user.setPhone("");
-                    }
-                    map.put("phone", user.getPhone());
-                    if (user.getEmchatName() == null) {
-                        user.setEmchatName("");
-                    }
-                    map.put("emchatName", user.getEmchatName());
-                }
+//                if (appointment.getStatus() == Constants.AppointmentStatus.ACCEPT) {
+//                    //jackjson 不允许有null 存在
+//                    if (user.getPhone() == null) {
+//                        user.setPhone("");
+//                    }
+//                    map.put("phone", user.getPhone());
+//                    if (user.getEmchatName() == null) {
+//                        user.setEmchatName("");
+//                    }
+//                    map.put("emchatName", user.getEmchatName());
+//                }
             }
 
         }
@@ -282,15 +278,15 @@ public class OfficialServiceImpl implements OfficialService {
         //接受了他的邀请的用户列表信息
         List<Map<String, Object>> acceptMembers = new ArrayList<>();
         for (String memberId : acceptList) {
-            Map<String, Object> acceptMember = new HashMap<>(4, 1);
+//            Map<String, Object> acceptMember = new HashMap<>(4, 1);
             User acceptUser = userMap.get(memberId);
             if (null == acceptUser) {
                 LOG.error("the user is not the official activity member userId is {} activityId is:", memberId);
             }
-            acceptMember.put("userId", acceptUser.getUserId());
-            acceptMember.put("nickname", acceptUser.getNickname());
-            acceptMember.put("avatar", localServer + acceptUser.getAvatar());
-            acceptMembers.add(acceptMember);
+//            acceptMember.put("userId", acceptUser.getUserId());
+//            acceptMember.put("nickname", acceptUser.getNickname());
+//            acceptMember.put("avatar", localServer + acceptUser.getAvatar());
+            acceptMembers.add(acceptUser.buildBaseUserMap());
         }
         map.put("acceptMembers", acceptMembers);
     }
