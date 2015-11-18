@@ -123,6 +123,36 @@ gpjApp.factory('authenticationService', ['restProxyService', 'authService', 'Che
                 getAuthHistorys: function () {
                     return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/authentication/" + applicationId + "/historys?userId="
                     + authService.getUser().userId + '&token=' + authService.getUser().token);
+                },
+
+                getUserUncheckedPhotos: function (criteria) {
+                    return restProxyService.sendHttpGet(ChewanOfficialApiEndPoint, "/official/user/photos?userId="
+                    + authService.getUser().userId + '&token=' + authService.getUser().token, {
+                        phone: criteria.phone,
+                        checked: criteria.checked,
+                        start: (criteria.startDate ? commonService.transferDateStringToLong(criteria.startDate) : undefined),
+                        end: (criteria.endDate ? commonService.transferDateStringToLong(criteria.endDate) : undefined)
+                    });
+                },
+
+                processUserAlbumPhotos: function (photos, remark) {
+                    var deleteIds = new Array();
+                    var remainIds = new Array();
+                    for (var index in photos) {
+                        var photo = photos[index];
+                        if (photo.delete) {
+                            deleteIds[deleteIds.length] = photo.id;
+                        } else {
+                            remainIds[remainIds.length] = photo.id;
+                        }
+                    }
+
+                    return restProxyService.sendHttpPost(ChewanOfficialApiEndPoint, "/authentication/album?userId="
+                    + authService.getUser().userId + '&token=' + authService.getUser().token, JSON.stringify({
+                        deleteIds: deleteIds,
+                        remainIds: remainIds,
+                        remark: remark
+                    }));
                 }
             }
         }]

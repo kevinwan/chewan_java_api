@@ -77,4 +77,12 @@ public interface OfficialApproveService {
      * @throws ApiException
      */
     ResponseDo authUserAlbum(String userId, JSONObject json) throws ApiException;
+
+    /**
+     * @param phone
+     * @param start
+     * @param end
+     * @return
+     */
+    ResponseDo getUserUncheckedPhotos(String phone, Long start, Long end, Integer limit, int checked);
 }

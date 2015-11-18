@@ -32,8 +32,10 @@ public class Photo implements Comparable<Photo> {
 
     @Indexed
     private String userId;
-
+    //0 用户相册照片
     private int type;
+    //0 表示管理员没有check ， 1表示checked
+    private int checked = 0;
 
     public Photo() {
     }
@@ -95,6 +97,14 @@ public class Photo implements Comparable<Photo> {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getChecked() {
+        return checked;
+    }
+
+    public void setChecked(int checked) {
+        this.checked = checked;
     }
 
     public Map<String, Object> buildBaseInfo() {

@@ -395,57 +395,69 @@ public class OfficialApproveServiceImpl implements OfficialApproveService {
 
     @Override
     public ResponseDo authUserAlbum(String userId, JSONObject json) throws ApiException {
-        LOG.debug("Auth user album and check user info");
-        User applyUser = userDao.findById(json.getString("userId"));
-        if (applyUser == null) {
-            LOG.warn("auth user:{} is not exist in the system", json.getString("userId"));
-            throw new ApiException("输入参数错误");
-        }
-        List<Photo> userAlbum = photoDao.getUserAlbum(applyUser.getUserId());
-        if (userAlbum.isEmpty()) {
-            LOG.warn("auth user album is empty");
-            return ResponseDo.buildSuccessResponse();
-        }
+        LOG.debug("Auth user album, delete users:{}", json);
+        JSONArray deleteIds = json.getJSONArray("deleteIds");
+        JSONArray remainIds = json.getJSONArray("remainIds");
 
-        JSONArray photoIds = json.getJSONArray("photoIds");
-        if (photoIds.isEmpty()) {
-            userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())),
-                    Update.update("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED));
-            return ResponseDo.buildSuccessResponse();
+        LOG.debug("Delete photo file on remote server");
+        List<Photo> deletePhotos = photoDao.findByIds(deleteIds);
+        Set<String> userIds = new HashSet<>(deletePhotos.size(), 1);
+        for (Photo item : deletePhotos) {
+            userIds.add(item.getUserId());
+            try {
+                thirdPhotoService.delete(item.getKey());
+            } catch (ApiException e) {
+                LOG.warn("Delete user photo failure with key:{}", item.getKey());
+            }
         }
 
-//        List<Photo> deletePhotos = new ArrayList<>(applyUser.getAlbum().size());
-//        List<Photo> leftPhotos = new ArrayList<>(applyUser.getAlbum().size());
-//        for (Photo item : applyUser.getAlbum()) {
-//            if (photoIds.contains(item.getId())) {
-//                deletePhotos.add(item);
-//            } else {
-//                leftPhotos.add(item);
-//            }
-//        }
+        LOG.debug("Delete photo record and update checked info on database");
+        photoDao.deleteByIds(deleteIds);
+        photoDao.update(Query.query(Criteria.where("id").in(remainIds)), Update.update("checked", Constants.Flag.POSITIVE));
 
-//        LOG.debug("Update user data first and remove photo on the server later");
-//        Update update = new Update();
-//        update.set("album", leftPhotos);
-//        update.set("albumStatus", Constants.UserAlbumAtuhStatus.AUTHENTICATED);  //相册审核完成
-//        userDao.update(Query.query(Criteria.where("userId").is(applyUser.getUserId())), update);
-//        for (Photo item : deletePhotos) {
-//            thirdPhotoService.delete(item.getKey());
-//        }
+        AlbumAuthHistory history = new AlbumAuthHistory();
+        history.setAuthUserId(userId);
+        if (json.containsKey("remark")) {
+            history.setRemark(json.getString("remark"));
+        }
+        history.setAuthTime(DateUtil.getTime());
+        history.setDeleteUsers(userIds.toArray(new String[0]));
+        albumAuthHistoryDao.save(history);
 
-//        AlbumAuthHistory history = new AlbumAuthHistory();
-//        history.setApplyUserId(applyUser.getUserId());
-//        history.setAuthUserId(userId);
-//        history.setAuthTime(DateUtil.getTime());
-//        history.setApplyTime(applyUser.getAlbumModifyTime());
-//        history.setRemark(json.containsKey("remark") ? json.getString("remark") : "");
-//        history.setPhotos(deletePhotos);
-//        albumAuthHistoryDao.save(history);
+        List<User> users = userDao.findByIds(userIds);
+        List<String> emchatNames = new ArrayList<>(users.size());
+        for (User item : users) {
+            emchatNames.add(item.getEmchatName());
+        }
 
-        LOG.debug("Update user data finished and send emcahat message");
+        LOG.debug("Send users emcahat message");
+        String message = PropertiesUtil.getProperty("dynamic.format.delete.album.notice", "你的相册照片违反车玩规定，已经给予删除。");
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
-                applyUser.getEmchatName(), "你的相册照片违反车玩规定，已经给予删除。");
+                emchatNames, message, new Object());
 
         return ResponseDo.buildSuccessResponse();
+    }
+
+    @Override
+    public ResponseDo getUserUncheckedPhotos(String phone, Long start, Long end, Integer limit, int checked) {
+        LOG.debug("Begin build query criteria, find unchecked photos");
+        Criteria criteria = Criteria.where("uploadTime").gte(start).lt(end + Constants.DAY_MILLISECONDS)
+                .and("checked").is(checked).and("type").is(Constants.PhotoType.USER_ALBUM);
+        if (!StringUtils.isEmpty(phone)) {
+            User user = userDao.findOne(Query.query(Criteria.where("phone").is(phone)));
+            if (user == null) {
+                LOG.info("User is not exist with phone:{}", phone);
+                return ResponseDo.buildSuccessResponse(new ArrayList<>(0));
+            }
+            criteria.and("userId").is(user.getUserId());
+        }
+
+        LOG.debug("Query photos from database");
+        List<Photo> photos = photoDao.find(Query.query(criteria).limit(limit));
+        List<Map<String, Object>> photoList = new ArrayList<>(photos.size());
+        for (Photo item : photos) {
+            photoList.add(item.buildBaseInfo());
+        }
+        return ResponseDo.buildSuccessResponse(photoList);
     }
 }

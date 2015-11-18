@@ -197,9 +197,35 @@ public class OfficialApproveController {
         }
     }
 
+    /**
+     * 获取用户的相册信息
+     *
+     * @param userId
+     * @param token
+     * @param start
+     * @param end
+     * @return
+     */
+    @RequestMapping(value = "/official/user/photos", method = RequestMethod.GET)
+    public ResponseDo getUserUncheckedPhotos(@RequestParam("userId") String userId, @RequestParam("token") String token,
+                                             @RequestParam(value = "phone", required = false) String phone,
+                                             @RequestParam("start") Long start, @RequestParam("end") Long end,
+                                             @RequestParam(value = "checked", defaultValue = "0") int checked,
+                                             @RequestParam(value = "limit", defaultValue = "50") Integer limit) {
+        LOG.debug("Query user photos by admin:{}, user phone:{}, timespan start:{}--{}", Arrays.asList(userId, phone, start, end));
+        try {
+            parameterChecker.checkAdminUserInfo(userId, token);
+
+            return officialApproveService.getUserUncheckedPhotos(phone, start, end, limit, checked);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 
     /**
      * 用户相册图片审核
+     *
      * @param userId
      * @param token
      * @param json
@@ -209,12 +235,12 @@ public class OfficialApproveController {
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo authUserAlbum(@RequestParam("userId") String userId, @RequestParam("token") String token,
                                     @RequestBody JSONObject json) {
-        LOG.debug("authUserAlbum called, authUserId:{}", userId);
+        LOG.info("authUserAlbum called, authUserId:{}", userId);
 
         try {
             parameterChecker.checkAdminUserInfo(userId, token);
 
-            if (CommonUtil.isEmpty(json, Arrays.asList("remark", "photoIds"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("deleteIds", "remainIds"))) {
                 throw new ApiException("输入参数有误");
             }
 

@@ -1,10 +1,7 @@
 package com.gongpingjia.carplay.entity.history;
 
-import com.gongpingjia.carplay.entity.common.Photo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 /**
  * Created by licheng on 2015/11/12.
@@ -16,17 +13,13 @@ public class AlbumAuthHistory {
     @Id
     private String id;
 
-    private String applyUserId;
-
     private String authUserId;
-
-    private long applyTime;
 
     private long authTime;
 
     private String remark;
 
-    private List<Photo> photos;
+    private String[] deleteUsers;
 
     public String getId() {
         return id;
@@ -34,14 +27,6 @@ public class AlbumAuthHistory {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getApplyUserId() {
-        return applyUserId;
-    }
-
-    public void setApplyUserId(String applyUserId) {
-        this.applyUserId = applyUserId;
     }
 
     public String getAuthUserId() {
@@ -68,19 +53,11 @@ public class AlbumAuthHistory {
         this.remark = remark;
     }
 
-    public long getApplyTime() {
-        return applyTime;
+    public String[] getDeleteUsers() {
+        return deleteUsers;
     }
 
-    public void setApplyTime(long applyTime) {
-        this.applyTime = applyTime;
-    }
-
-    public List<Photo> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+    public void setDeleteUsers(String[] deleteUsers) {
+        this.deleteUsers = deleteUsers;
     }
 }
