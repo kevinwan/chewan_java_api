@@ -163,6 +163,11 @@ public class UploadServiceImpl implements UploadService {
             photo.setType(Constants.PhotoType.USER_ALBUM);
             photo.setUploadTime(DateUtil.getTime());
             photoDao.save(photo);
+
+            Object responseData = response.getData();
+            if (responseData instanceof Map) {
+                ((Map) responseData).put("photoId", photo.getId());
+            }
         }
 
         return response;

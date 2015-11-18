@@ -198,6 +198,13 @@ public class OfficialApproveController {
     }
 
 
+    /**
+     * 用户相册图片审核
+     * @param userId
+     * @param token
+     * @param json
+     * @return
+     */
     @RequestMapping(value = "/authentication/album", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
     public ResponseDo authUserAlbum(@RequestParam("userId") String userId, @RequestParam("token") String token,
@@ -207,7 +214,7 @@ public class OfficialApproveController {
         try {
             parameterChecker.checkAdminUserInfo(userId, token);
 
-            if (CommonUtil.isEmpty(json, Arrays.asList("userId", "photoIds"))) {
+            if (CommonUtil.isEmpty(json, Arrays.asList("remark", "photoIds"))) {
                 throw new ApiException("输入参数有误");
             }
 
