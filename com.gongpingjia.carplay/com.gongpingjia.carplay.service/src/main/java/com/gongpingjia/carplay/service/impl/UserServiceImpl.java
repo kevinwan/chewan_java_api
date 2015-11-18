@@ -733,7 +733,7 @@ public class UserServiceImpl implements UserService {
             LOG.warn("Input parameters photos is empty");
             throw new ApiException("输入参数有误");
         }
-        String[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
+        Object[] photos = CommonUtil.getStringArray(json.getJSONArray("photos"));
 
         LOG.debug("delete photos in database");
         Query query = Query.query(Criteria.where("id").in(photos)
