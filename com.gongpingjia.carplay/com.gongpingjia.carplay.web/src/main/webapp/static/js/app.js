@@ -48,7 +48,7 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/activity/view', {
         templateUrl: 'views/activity/view.html',
         controller: 'activityViewController'
-    }).when('/activity/add',{
+    }).when('/activity/add', {
         templateUrl: 'views/activity/add.html',
         controller: 'activityAddController'
     }).when('/activity/update/:id', {
@@ -66,15 +66,18 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     }).when('/officialActivity/view/:id', {
         templateUrl: 'views/official_activity/view.html',
         controller: 'officialActivityEditController'
-    }).when('/officialActivity/updateLimit/:id',{
+    }).when('/officialActivity/updateLimit/:id', {
         templateUrl: 'views/official_activity/update_limit.html',
         controller: 'officialActivityEditController'
-    }).when('/statistic/test',{
+    }).when('/statistic/test', {
         templateUrl: 'views/statistic/test.html',
         controller: 'testController'
-    }).when('/statistic/common/:type',{
+    }).when('/statistic/common/:type', {
         templateUrl: 'views/statistic/statistic_common.html',
         controller: 'statisticCommonController'
+    }).when('/statistic/register', {
+        templateUrl: 'views/statistic/statistic_register.html',
+        controller: 'statisticRegisterController'
     });
 }]).config(['$httpProvider', function ($httpProvider) {
 
@@ -91,10 +94,10 @@ gpjApp.config(['$routeProvider', function ($routeProvider) {
     /**
      * Common error handler
      */
-    $httpProvider.responseInterceptors.push(['$q', '$window',  function ($q, $window) {
+    $httpProvider.responseInterceptors.push(['$q', '$window', function ($q, $window) {
         return function (promise) {
             return promise.then(function (response) {
-                if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录')>=0) {
+                if (response.data && response.data.errmsg && response.data.errmsg.indexOf('请重新登录') >= 0) {
                     alert(response.data.errmsg);
                     //authService.setUser(undefined);
                     $window.location.href = '/v2/login.html';
