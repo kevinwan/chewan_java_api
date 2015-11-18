@@ -1163,6 +1163,7 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> map = user.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
             User.appendCover(map, userDao.getCover(user.getUserId()));
+            map.put("viewTime", item.getViewTime());
             users.add(map);
         }
         return ResponseDo.buildSuccessResponse(users);
