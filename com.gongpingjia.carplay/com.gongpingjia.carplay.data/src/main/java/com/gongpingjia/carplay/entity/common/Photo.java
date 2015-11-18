@@ -1,10 +1,14 @@
 package com.gongpingjia.carplay.entity.common;
 
+import com.gongpingjia.carplay.common.util.CommonUtil;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by licheng on 2015/9/19.
@@ -92,4 +96,25 @@ public class Photo implements Comparable<Photo> {
     public void setType(int type) {
         this.type = type;
     }
+
+    public Map<String, Object> buildBaseInfo() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("url", CommonUtil.getThirdPhotoServer());
+        return map;
+    }
+
+    public Map<String, Object> buildCommonInfo() {
+        Map<String, Object> map = buildBaseInfo();
+        map.put("userId", userId);
+        map.put("key", key);
+        return map;
+    }
+
+    public Map<String, Object> buildFullInfo() {
+        Map<String, Object> map = buildCommonInfo();
+        map.put("uploadTime", uploadTime);
+        map.put("id", id);
+        return map;
+    }
+
 }

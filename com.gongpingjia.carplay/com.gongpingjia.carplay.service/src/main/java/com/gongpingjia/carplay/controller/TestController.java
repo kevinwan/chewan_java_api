@@ -140,25 +140,25 @@ public class TestController {
 //        }
 //        return ResponseDo.buildSuccessResponse();
 //    }
-    @RequestMapping(value = "/test/photo", method = RequestMethod.GET)
-    public ResponseDo batchCreatePhoto() {
-        UserDao userDao = BeanUtil.getBean(UserDao.class);
-        PhotoDao photoDao = BeanUtil.getBean(PhotoDao.class);
-        List<User> allusers = userDao.find(new Query());
-        LOG.debug("User size:{}", allusers.size());
-        for (User item : allusers) {
-            if (item.getAlbum() == null || item.getAlbum().isEmpty()) {
-                continue;
-            }
-            for (Photo photo : item.getAlbum()) {
-                photo.setId(null);
-                photo.setType(Constants.PhotoType.USER_ALBUM);
-                photo.setUserId(item.getUserId());
-                photoDao.save(photo);
-            }
-        }
-        LOG.debug("Finished build photo");
-        return ResponseDo.buildSuccessResponse();
-    }
+//    @RequestMapping(value = "/test/photo", method = RequestMethod.GET)
+//    public ResponseDo batchCreatePhoto() {
+//        UserDao userDao = BeanUtil.getBean(UserDao.class);
+//        PhotoDao photoDao = BeanUtil.getBean(PhotoDao.class);
+//        List<User> allusers = userDao.find(new Query());
+//        LOG.debug("User size:{}", allusers.size());
+//        for (User item : allusers) {
+//            if (item.getAlbum() == null || item.getAlbum().isEmpty()) {
+//                continue;
+//            }
+//            for (Photo photo : item.getAlbum()) {
+//                photo.setId(null);
+//                photo.setType(Constants.PhotoType.USER_ALBUM);
+//                photo.setUserId(item.getUserId());
+//                photoDao.save(photo);
+//            }
+//        }
+//        LOG.debug("Finished build photo");
+//        return ResponseDo.buildSuccessResponse();
+//    }
 
 }

@@ -364,9 +364,9 @@ public class User {
     }
 
     public static void appendAlbum(Map<String, Object> userMap, List<Photo> album) {
-        String thirdPhotoServer = CommonUtil.getThirdPhotoServer();
+        List<Map<String, Object>> albumList = new ArrayList<>(album.size());
         for (Photo item : album) {
-            item.setUrl(thirdPhotoServer + item.getKey());
+            albumList.add(item.buildBaseInfo());
         }
         userMap.put("album", album);
     }
@@ -392,13 +392,13 @@ public class User {
     }
 
 
-    private List<Photo> album;
-
-    public List<Photo> getAlbum() {
-        return album;
-    }
-
-    public void setAlbum(List<Photo> album) {
-        this.album = album;
-    }
+//    private List<Photo> album;
+//
+//    public List<Photo> getAlbum() {
+//        return album;
+//    }
+//
+//    public void setAlbum(List<Photo> album) {
+//        this.album = album;
+//    }
 }
