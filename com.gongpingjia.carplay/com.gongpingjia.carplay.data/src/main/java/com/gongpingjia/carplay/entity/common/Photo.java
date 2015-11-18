@@ -99,6 +99,7 @@ public class Photo implements Comparable<Photo> {
 
     public Map<String, Object> buildBaseInfo() {
         Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
         map.put("url", CommonUtil.getThirdPhotoServer() + key);
         return map;
     }
@@ -107,14 +108,7 @@ public class Photo implements Comparable<Photo> {
         Map<String, Object> map = buildBaseInfo();
         map.put("userId", userId);
         map.put("key", key);
-        return map;
-    }
-
-    public Map<String, Object> buildFullInfo() {
-        Map<String, Object> map = buildCommonInfo();
         map.put("uploadTime", uploadTime);
-        map.put("id", id);
         return map;
     }
-
 }
