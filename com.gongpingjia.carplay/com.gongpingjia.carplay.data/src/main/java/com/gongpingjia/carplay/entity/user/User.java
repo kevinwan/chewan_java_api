@@ -312,6 +312,7 @@ public class User {
         map.put("snsChannels", snsChannels);
         map.put("deviceToken", deviceToken);
         map.put("landmark", landmark);
+        map.put("password", password);
         return map;
     }
 
