@@ -196,7 +196,7 @@ public class OfficialServiceImpl implements OfficialService {
         }
         if (null != landmark) {
             for (User itemUser : userList) {
-                itemUser.setDistance(DistanceUtil.getDistance(itemUser.getLandmark(), new Landmark()));
+                itemUser.setDistance(DistanceUtil.getDistance(itemUser.getLandmark(), landmark));
             }
             Collections.sort(userList, new Comparator<User>() {
                 @Override
