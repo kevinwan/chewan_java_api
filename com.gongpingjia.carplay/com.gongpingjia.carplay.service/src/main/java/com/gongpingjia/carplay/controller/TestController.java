@@ -1,33 +1,17 @@
 package com.gongpingjia.carplay.controller;
 
-import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
-import com.gongpingjia.carplay.common.exception.ApiException;
-import com.gongpingjia.carplay.common.util.BeanUtil;
-import com.gongpingjia.carplay.common.util.Constants;
-import com.gongpingjia.carplay.dao.activity.OfficialActivityDao;
-import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.user.PhoneVerificationDao;
-import com.gongpingjia.carplay.dao.user.UserDao;
-import com.gongpingjia.carplay.entity.activity.OfficialActivity;
 import com.gongpingjia.carplay.entity.common.Address;
-import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.common.ProductVersion;
 import com.gongpingjia.carplay.entity.user.PhoneVerification;
-import com.gongpingjia.carplay.entity.user.User;
-import com.gongpingjia.carplay.service.UserService;
-import com.gongpingjia.carplay.service.impl.ChatCommonService;
-import com.gongpingjia.carplay.service.impl.UserServiceImpl;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Created by Administrator on 2015/9/25.
@@ -154,6 +138,7 @@ public class TestController {
 //                photo.setId(null);
 //                photo.setType(Constants.PhotoType.USER_ALBUM);
 //                photo.setUserId(item.getUserId());
+//                photo.setChecked(0);
 //                photoDao.save(photo);
 //            }
 //        }

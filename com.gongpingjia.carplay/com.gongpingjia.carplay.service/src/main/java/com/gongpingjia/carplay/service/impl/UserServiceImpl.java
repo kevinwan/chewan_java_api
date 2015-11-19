@@ -657,7 +657,8 @@ public class UserServiceImpl implements UserService {
         return appointmentMap;
     }
 
-    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap, Map<String, User> userMap, Map<String, Appointment> appointmentMap, String userId) {
+    private List<Map<String, Object>> buildResponseData(List<InterestMessage> interestMessages, Map<String, Activity> activityMap,
+                                                        Map<String, User> userMap, Map<String, Appointment> appointmentMap, String userId) {
         LOG.debug("Build response data");
         //fetch own user
         User ownUser = userDao.findById(userId);
@@ -705,6 +706,7 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> userInfo = user.buildCommonUserMap();
             User.appendCover(userInfo, userDao.getCover(user.getUserId()));
             User.appendSubscribeFlag(userInfo, true);
+            interestMap.put("user", userInfo);
             interests.add(interestMap);
         }
         return interests;

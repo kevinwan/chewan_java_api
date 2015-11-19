@@ -21,7 +21,7 @@ import java.util.*;
  * 用户相关信息,以及环信用户信息
  */
 @Document
-public class User{
+public class User {
     @Id
     private String userId;
 
@@ -293,7 +293,10 @@ public class User{
 
         map.put("licenseAuthStatus", licenseAuthStatus);
         if (car != null) {
-            car.setLogo(CommonUtil.getGPJBrandLogoPrefix() + car.getLogo());
+            String gpjServer = CommonUtil.getGPJBrandLogoPrefix();
+            if (!car.getLogo().startsWith(gpjServer)) {
+                car.setLogo(gpjServer + car.getLogo());
+            }
             map.put("car", car);
         } else {
             map.put("car", "");
@@ -404,7 +407,7 @@ public class User{
         this.distance = distance;
     }
 
-    //    private List<Photo> album;
+//    private List<Photo> album;
 //
 //    public List<Photo> getAlbum() {
 //        return album;
