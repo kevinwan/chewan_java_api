@@ -43,15 +43,15 @@
     </bean>
 
     <!--用户约会过期提醒任务-->
-    <bean id="appointmentRemindJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="com.gongpingjia.carplay.official.task.AppointmentExpiredRemindTask"></property>
-        <property name="durability" value="true"/>
-    </bean>
+    <!--<bean id="appointmentRemindJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+        <!--<property name="jobClass" value="com.gongpingjia.carplay.official.task.AppointmentExpiredRemindTask"></property>-->
+        <!--<property name="durability" value="true"/>-->
+    <!--</bean>-->
 
-    <bean id="appointmentRemindCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="appointmentRemindJob"></property>
-        <property name="cronExpression" value="${appointmentRemindJob.cronExpression}"></property>
-    </bean>
+    <!--<bean id="appointmentRemindCronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+        <!--<property name="jobDetail" ref="appointmentRemindJob"></property>-->
+        <!--<property name="cronExpression" value="${appointmentRemindJob.cronExpression}"></property>-->
+    <!--</bean>-->
 
     <!--每天清理一次推送的消息,需要配置为每天0:00执行-->
     <bean id="pushInfoCleanJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -69,7 +69,7 @@
             <list>
                 <ref bean="activityCleanCronTriggerBean"/>
                 <ref bean="appointmentCleanCronTriggerBean"/>
-                <ref bean="appointmentRemindCronTriggerBean"/>
+                <!--<ref bean="appointmentRemindCronTriggerBean"/>-->
                 <ref bean="pushInfoCleanCronTriggerBean"/>
             </list>
         </property>
