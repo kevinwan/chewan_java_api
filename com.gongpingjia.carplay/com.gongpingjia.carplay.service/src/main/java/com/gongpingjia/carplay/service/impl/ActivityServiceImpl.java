@@ -3,6 +3,7 @@ package com.gongpingjia.carplay.service.impl;
 import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
+import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.*;
 import com.gongpingjia.carplay.dao.activity.ActivityDao;
 import com.gongpingjia.carplay.dao.activity.AppointmentDao;
@@ -28,6 +29,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -76,6 +78,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private StatisticActivityMatchDao statisticActivityMatchDao;
 
+    @Autowired
+    @Qualifier("thirdPhotoManager")
+    private PhotoService thirdPhotoManager;
 
     /**
      * 注册 活动；
@@ -88,6 +93,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
         LOG.debug("activityRegister");
+
+        if (StringUtils.isNotEmpty(activity.getCover())) {
+            String coverKey = MessageFormat.format(Constants.PhotoKey.COVER_KEY, activity.getCover());
+            if (!thirdPhotoManager.isExist(coverKey)) {
+                LOG.warn("Input parameter cover is not exist");
+                throw new ApiException("上传的活动封面不存在");
+            }
+            activity.setCover(coverKey);
+        }
 
         User user = userDao.findById(userId);
 
@@ -282,7 +296,7 @@ public class ActivityServiceImpl implements ActivityService {
             throw new ApiException("该活动找不到对应的 User");
         }
         Map<String, Object> map = organizer.buildCommonUserMap();
-        User.appendCover(map, userDao.getCover(organizer.getUserId()));
+        User.appendCover(map, userDao.getCover(activity.getCover(), organizer.getUserId()));
         activity.setOrganizer(map);
         if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
             activity.setDistance(DistanceUtil.getDistance(landmark, activity.getEstabPoint()));
@@ -708,7 +722,6 @@ public class ActivityServiceImpl implements ActivityService {
         //获取所有的活动列表
         List<Activity> activityList = activityDao.find(Query.query(param.buildCommonQueryParam()));
 
-
         if (activityList.isEmpty()) {
             LOG.warn("No activity result found from database");
             return ResponseDo.buildSuccessResponse(activityList);
@@ -824,7 +837,7 @@ public class ActivityServiceImpl implements ActivityService {
             Map<String, Object> organizer = new HashMap<>(9, 1);
             if (user != null) {
                 organizer = user.buildCommonUserMap();
-                User.appendCover(organizer, userDao.getCover(user.getUserId()));
+                User.appendCover(organizer, userDao.getCover(item.getCover(), user.getUserId()));
                 organizer.put("userId", user.getUserId());
             }
             map.put("organizer", organizer);

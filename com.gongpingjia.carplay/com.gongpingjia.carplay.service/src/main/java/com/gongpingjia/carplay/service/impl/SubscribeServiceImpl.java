@@ -174,7 +174,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             User user = userMap.get(item.getFromUser());
             Map<String, Object> map = user.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
-            User.appendCover(map, userDao.getCover(user.getUserId()));
+            User.appendCover(map, userDao.getCover(null, user.getUserId()));
             User.appendSubscribeFlag(map, mySubscribeUserIds.contains(user.getUserId()));
             map.put("subscribeTime", item.getSubscribeTime());
             data.add(map);

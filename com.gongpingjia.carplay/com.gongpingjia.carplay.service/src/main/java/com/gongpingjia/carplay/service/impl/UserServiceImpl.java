@@ -541,7 +541,7 @@ public class UserServiceImpl implements UserService {
             appointment.setIsApplicant(false);
         }
 
-        User.appendCover(userInfo, userDao.getCover(String.valueOf(userInfo.get("userId"))));
+        User.appendCover(userInfo, userDao.getCover(appointment.getCover(), String.valueOf(userInfo.get("userId"))));
         appointment.setApplicant(userInfo);
     }
 
@@ -667,6 +667,9 @@ public class UserServiceImpl implements UserService {
         List<Map<String, Object>> interests = new ArrayList<>(interestMessages.size());
         for (int index = 0; index < interestMessages.size(); index++) {
             InterestMessage message = interestMessages.get(index);
+            User user = userMap.get(message.getUserId());
+            Map<String, Object> userInfo = user.buildCommonUserMap();
+
             Map<String, Object> interestMap = new HashMap<>();
             interestMap.put("id", message.getId());
             interestMap.put("type", message.getType());
@@ -690,6 +693,7 @@ public class UserServiceImpl implements UserService {
                 } else {
                     interestMap.put("activityStatus", appointment.getStatus());
                 }
+                User.appendCover(userInfo, userDao.getCover(activity.getCover(), user.getUserId()));
             } else if (message.getType() == InterestMessage.USER_ALBUM) {
                 //用户上传相册
                 interestMap.put("activityType", "");
@@ -700,11 +704,9 @@ public class UserServiceImpl implements UserService {
 
                 interestMap.put("distance", "");
                 interestMap.put("activityStatus", "");
+                User.appendCover(userInfo, userDao.getCover(null, user.getUserId()));
             }
 
-            User user = userMap.get(message.getUserId());
-            Map<String, Object> userInfo = user.buildCommonUserMap();
-            User.appendCover(userInfo, userDao.getCover(user.getUserId()));
             User.appendSubscribeFlag(userInfo, true);
             interestMap.put("user", userInfo);
             interests.add(interestMap);
@@ -1164,7 +1166,7 @@ public class UserServiceImpl implements UserService {
             User user = userMap.get(item.getViewUserId());
             Map<String, Object> map = user.buildCommonUserMap();
             User.appendDistance(map, DistanceUtil.getDistance(nowUser.getLandmark(), user.getLandmark()));
-            User.appendCover(map, userDao.getCover(user.getUserId()));
+            User.appendCover(map, userDao.getCover(null, user.getUserId()));
             map.put("viewTime", item.getViewTime());
             users.add(map);
         }
@@ -1272,7 +1274,7 @@ public class UserServiceImpl implements UserService {
 
         Map<String, Object> resultMap = new HashMap<>();
         //被查看用户的照片
-        resultMap.put("cover", userDao.getCover(viewUser.getUserId()));
+//        resultMap.put("cover", userDao.getCover(viewUser.getUserId()));
 //        resultMap.put("distance", DistanceUtil.getDistance(viewUser.getLandmark(), nowUser.getLandmark()));
 
         //被查看用户的活动信息：基本信息+我申请该活动的状态
@@ -1298,6 +1300,7 @@ public class UserServiceImpl implements UserService {
                 applyStatus = appointment.getStatus();
             }
             itemMap.put("status", applyStatus);
+            itemMap.put("cover", userDao.getCover(activity.getCover(), viewUser.getUserId()));
 
             activityInfoList.add(itemMap);
         }

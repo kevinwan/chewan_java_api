@@ -24,6 +24,8 @@ public class ActivityIntention {
     //是否包接送
     protected boolean transfer;
 
+    private String cover;
+
     public String getType() {
         return type;
     }
@@ -70,5 +72,13 @@ public class ActivityIntention {
 
     public void setTransfer(boolean transfer) {
         this.transfer = transfer;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 }

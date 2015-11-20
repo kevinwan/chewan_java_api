@@ -6,9 +6,9 @@ import com.gongpingjia.carplay.entity.user.User;
 /**
  * Created by Administrator on 2015/9/21.
  */
-public interface UserDao extends BaseDao<User,String> {
+public interface UserDao extends BaseDao<User, String> {
 
-    String getCover(String userId);
+    String getCover(String existCoverKey, String userId);
 
-    public User findUserByPhone(String phone);
+    User findUserByPhone(String phone);
 }

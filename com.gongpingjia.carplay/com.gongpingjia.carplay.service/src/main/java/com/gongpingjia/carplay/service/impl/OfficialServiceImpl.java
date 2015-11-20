@@ -462,8 +462,8 @@ public class OfficialServiceImpl implements OfficialService {
 
         LOG.debug("Send emchat message");
         User user = userDao.findById(officialActivity.getUserId());
-        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.status", "{0}{1}了您的申请"),
-                user.getNickname(), "同意");
+        String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.appointment.status", "你已成功加入\"{0}\"活动"),
+                officialActivity.getTitle());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                 applyUser.getEmchatName(), message);
 

@@ -66,7 +66,6 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
 
     private List<String> applyIds;
 
-
     @Transient
     private List<Appointment> appointmentList;
 
@@ -202,7 +201,6 @@ public class Activity extends ActivityIntention implements Comparable<Activity> 
     public void setSortFactor(double sortFactor) {
         this.sortFactor = sortFactor;
     }
-
 
     @Override
     public int compareTo(Activity o) {
