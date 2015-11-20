@@ -160,6 +160,8 @@ public class SubscribeServiceImpl implements SubscribeService {
             userMap.put(sub.getFromUser(), null);
         }
 
+        Set<String> mySubscribeUserIds = buildMySubscribers(userId, userMap);
+
         //获取关注我的用户的信息
         List<User> users = userDao.findByIds(userMap.keySet());
         for (User item : users) {
@@ -171,13 +173,24 @@ public class SubscribeServiceImpl implements SubscribeService {
         for (Subscriber item : beSubscribed) {
             User user = userMap.get(item.getFromUser());
             Map<String, Object> map = user.buildCommonUserMap();
-            map.put("distance", DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
-            map.put("cover", userDao.getCover(user.getUserId()));
+            User.appendDistance(map, DistanceUtil.getDistance(myself.getLandmark(), user.getLandmark()));
+            User.appendCover(map, userDao.getCover(user.getUserId()));
+            User.appendSubscribeFlag(map, mySubscribeUserIds.contains(user.getUserId()));
             map.put("subscribeTime", item.getSubscribeTime());
             data.add(map);
         }
 
         return ResponseDo.buildSuccessResponse(data);
+    }
+
+    private Set<String> buildMySubscribers(String userId, Map<String, User> userMap) {
+        LOG.debug("Build my subscribe users");
+        List<Subscriber> mySubscribers = subscriberDao.find(Query.query(Criteria.where("fromUser").is(userId).and("toUser").in(userMap.keySet())));
+        Set<String> mySubscribeUserIds = new HashSet<>(mySubscribers.size(), 1);
+        for (Subscriber item : mySubscribers) {
+            mySubscribeUserIds.add(item.getToUser());
+        }
+        return mySubscribeUserIds;
     }
 
     /**
