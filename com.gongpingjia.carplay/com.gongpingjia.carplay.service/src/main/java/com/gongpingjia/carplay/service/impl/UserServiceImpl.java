@@ -1400,6 +1400,7 @@ public class UserServiceImpl implements UserService {
 
         reportDao.save(report);
 
+        LOG.debug("Finished save report data");
         return ResponseDo.buildSuccessResponse();
     }
 }

@@ -518,6 +518,7 @@ public class UserInfoController {
         try {
             parameterChecker.checkUserInfo(userId, token);
             if (CommonUtil.isEmpty(json, "type")) {
+                LOG.warn("Input parameter type is empty");
                 throw new ApiException("输入参数错误");
             }
             return userService.reportActivity(json, userId, activityId, beReportedUserId);
