@@ -1,15 +1,18 @@
 package com.gongpingjia.carplay.official.service.impl;
 
+import com.gongpingjia.carplay.common.chat.ChatThirdPartyService;
 import com.gongpingjia.carplay.common.domain.ResponseDo;
 import com.gongpingjia.carplay.common.exception.ApiException;
 import com.gongpingjia.carplay.common.photo.PhotoService;
 import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
+import com.gongpingjia.carplay.common.util.PropertiesUtil;
 import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.user.UserDao;
 import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.user.User;
 import com.gongpingjia.carplay.official.service.UserManagerService;
+import com.gongpingjia.carplay.service.impl.ChatCommonService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -42,6 +45,12 @@ public class UserManagerServiceImpl implements UserManagerService {
 
     @Autowired
     private PhotoDao photoDao;
+
+    @Autowired
+    private ChatCommonService chatCommonService;
+
+    @Autowired
+    private ChatThirdPartyService chatThirdPartyService;
 
     @Override
     public ResponseDo listUsers(String phone, String nickname, String licenseAuthStatus, String photoAuthStatus,
@@ -126,9 +135,15 @@ public class UserManagerServiceImpl implements UserManagerService {
 
             JSONArray photoIds = jsonObject.getJSONArray("photoIds");
             List<String> idList = new ArrayList<>(photoIds.size());
+            idList.addAll(photoIds);
             photoDao.deleteUserPhotos(userId, idList);
 
             deletePhotosRemoteServer(photoMap, idList);
+
+            LOG.debug("Send users emcahat message");
+            String message = PropertiesUtil.getProperty("dynamic.format.delete.album.notice", "你的相册照片违反车玩规定，已经给予删除。");
+            chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
+                    Arrays.asList(user.getEmchatName()), message, new Object());
         }
 
 
