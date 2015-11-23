@@ -4,14 +4,10 @@
 gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location', 'activityService', 'moment', '$window', 'commonService', '$q',
     function ($scope, $rootScope, $location, activityService, moment, $window, commonService, $q) {
         $scope.phoneArr = [];
-        for (var phoneNum = 10012340001; phoneNum <= 10012340063; phoneNum++) {
+        for (var phoneNum = 10012340001; phoneNum < 10012340063; phoneNum++) {
             $scope.phoneArr.push(phoneNum);
         }
         ;
-
-        $scope.randomPhone = function () {
-            $scope.phone = 10012340001 + Math.floor(Math.random() * 33);
-        };
 
         function randomInt(from, to) {
             return from + Math.floor(Math.random() * (to - from + 1));
@@ -26,14 +22,15 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
         $scope.transferOptions = [{'name': '是', 'value': true}, {'name': '否', 'value': false}];
 
         $scope.randomAll = function () {
-            $scope.phone = randomInt(10012340001, 10012340033);
-            $scope.activity.majorType = $scope.allTypeOptions[randomInt(0, $scope.allTypeOptions.length - 1)].majorType;
+            $scope.phone = randomArr($scope.phoneArr);
+            //$scope.activity.majorType = $scope.allTypeOptions[randomInt(0, $scope.allTypeOptions.length - 1)].majorType;
+            $scope.activity.majorType = randomArr($scope.allTypeOptions).majorType;
             for (var index in $scope.allTypeOptions) {
                 if ($scope.allTypeOptions[index].majorType === $scope.activity.majorType) {
                     $scope.typeOptions = $scope.allTypeOptions[index].type;
                 }
             }
-            $scope.activity.type = $scope.typeOptions[randomInt(0, $scope.typeOptions.length - 1)];
+            $scope.activity.type = randomArr($scope.typeOptions);
             $scope.activity.pay = randomArr($scope.payOptions);
             $scope.activity.transfer = randomArr($scope.transferOptions).value;
             $scope.randomEstablish();
