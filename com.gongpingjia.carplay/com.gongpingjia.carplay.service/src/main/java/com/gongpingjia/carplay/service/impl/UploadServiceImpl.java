@@ -136,17 +136,19 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, String token) throws ApiException {
+    public ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, String token, int type) throws ApiException {
         // 1.参数校验
         checker.checkUserInfo(userId, token);
 
-        LOG.debug("check user album exist or not");
-        // 2.查数据库信息
-        long albumCount = photoDao.count(Query.query(Criteria.where("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM)));
-        //3.检查是否达到上限
-        if (albumCount >= PropertiesUtil.getProperty("carplay.photos.upper.limit", 40)) {
-            LOG.warn("User:{} album count is over upper limit", albumCount);
-            throw new ApiException("用户照片数量已经达到上限，不能继续上传");
+        if (type == Constants.PhotoType.USER_ALBUM) {
+            LOG.debug("check user album exist or not");
+            // 2.查数据库信息
+            long albumCount = photoDao.count(Query.query(Criteria.where("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM)));
+            //3.检查是否达到上限
+            if (albumCount >= PropertiesUtil.getProperty("carplay.photos.upper.limit", 40)) {
+                LOG.warn("User:{} album count is over upper limit", albumCount);
+                throw new ApiException("用户照片数量已经达到上限，不能继续上传");
+            }
         }
 
         LOG.debug("transfer photo file into byte array and upload photo to server");

@@ -99,19 +99,20 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseDo activityRegister(String userId, Activity activity) throws ApiException {
         LOG.debug("activityRegister");
 
-        if (StringUtils.isNotEmpty(activity.getCover())) {
-            String coverKey = MessageFormat.format(Constants.PhotoKey.COVER_KEY, activity.getCover());
-            if (!thirdPhotoManager.isExist(coverKey)) {
-                LOG.warn("Input parameter cover is not exist");
-                throw new ApiException("上传的活动封面不存在");
-            }
-            activity.setCover(coverKey);
-        } else {
-            Photo photo = photoDao.getLatestAlbumPhoto(userId);
-            if (photo != null) {
-                activity.setCover(photo.getKey());
-            }
+//        if (StringUtils.isNotEmpty(activity.getCover())) {
+//            String coverKey = MessageFormat.format(Constants.PhotoKey.COVER_KEY, activity.getCover());
+//            if (!thirdPhotoManager.isExist(coverKey)) {
+//                LOG.warn("Input parameter cover is not exist");
+//                throw new ApiException("上传的活动封面不存在");
+//            }
+//            activity.setCover(coverKey);
+//        } else {
+        Photo photo = photoDao.getLatestAlbumPhoto(userId);
+        if (photo != null) {
+            //设计要求将上传到活动封面的照片，上传到用户的相册中，因此直接将相册的最新的照片作为封面
+            activity.setCover(photo.getKey());
         }
+//        }
 
         User user = userDao.findById(userId);
 

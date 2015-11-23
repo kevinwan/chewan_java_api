@@ -52,10 +52,11 @@ public interface UploadService {
      * @param userId    用户ID
      * @param multiFile 上传的图片资源文件
      * @param token     会话token
+     * @param type
      * @return 返回上传结果信息
      * @throws ApiException 业务异常信息
      */
-    ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, String token) throws ApiException;
+    ResponseDo uploadAlbumPhoto(String userId, MultipartFile multiFile, String token, int type) throws ApiException;
 
     /**
      * 上传反馈图片资源文件
