@@ -125,7 +125,16 @@ public class UserManagerServiceImpl implements UserManagerService {
             }
 
             JSONArray photoIds = jsonObject.getJSONArray("photoIds");
-            List<String> idList = new ArrayList<>(photoIds.size());
+
+            List<String> idList = new ArrayList<>();
+
+            //photoIds是保留的ids；
+            for (Photo photo : userPhotos) {
+                if (!photoIds.contains(photo.getId())) {
+                    idList.add(photo.getId());
+                }
+            }
+
             photoDao.deleteUserPhotos(userId, idList);
 
             deletePhotosRemoteServer(photoMap, idList);
