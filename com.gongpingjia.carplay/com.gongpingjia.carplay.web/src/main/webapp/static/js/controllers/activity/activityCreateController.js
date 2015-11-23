@@ -4,7 +4,7 @@
 gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location', 'activityService', 'moment', '$window', 'commonService', '$q',
     function ($scope, $rootScope, $location, activityService, moment, $window, commonService, $q) {
         $scope.phoneArr = [];
-        for (var phoneNum = 10012340001; phoneNum <= 10012340033; phoneNum++) {
+        for (var phoneNum = 10012340001; phoneNum <= 10012340063; phoneNum++) {
             $scope.phoneArr.push(phoneNum);
         }
         ;
@@ -23,7 +23,7 @@ gpjApp.controller('activityAddController', ['$scope', '$rootScope', '$location',
 
         $scope.payOptions = ['不限', 'AA', '请我吧', '我请客'];
 
-        $scope.transferOptions = [{'name':'是','value':true},{'name':'否','value':false}];
+        $scope.transferOptions = [{'name': '是', 'value': true}, {'name': '否', 'value': false}];
 
         $scope.randomAll = function () {
             $scope.phone = randomInt(10012340001, 10012340033);
