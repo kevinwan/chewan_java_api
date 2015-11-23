@@ -509,18 +509,18 @@ public class UserInfoController {
         }
     }
 
-    @RequestMapping(value = "/user/{reportUserId}/report", method = RequestMethod.POST,
+    @RequestMapping(value = "/user/{beReportedUserId}/report", method = RequestMethod.POST,
             headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
-    public ResponseDo reportUser(@PathVariable("reportUserId") String reportUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
+    public ResponseDo reportUser(@PathVariable("beReportedUserId") String beReportedUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
                                  @RequestParam(value = "activityId", required = false) String activityId, @RequestBody JSONObject json) {
-        LOG.info("Begin change user password, userId:{}", userId);
+        LOG.info("Begin report beReportedUserId:{} ,userId:{}", beReportedUserId, userId);
 
         try {
             parameterChecker.checkUserInfo(userId, token);
             if (CommonUtil.isEmpty(json, "type")) {
-                throw new ApiException("参数错误");
+                throw new ApiException("输入参数错误");
             }
-            return userService.reportActivity(json, userId, activityId, reportUserId);
+            return userService.reportActivity(json, userId, activityId, beReportedUserId);
         } catch (ApiException e) {
             LOG.warn(e.getMessage());
             return ResponseDo.buildFailureResponse(e.getMessage());

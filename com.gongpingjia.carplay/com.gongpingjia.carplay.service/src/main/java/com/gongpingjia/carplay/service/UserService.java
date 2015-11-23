@@ -178,12 +178,14 @@ public interface UserService {
 
 
     /**
-     * 举报用户发布的活动
+     * 举报用户 或者用户的活动
      * @param json
-     * @param userId
+     * @param reportUserId
+     * @param activityId
+     * @param beReportedUserId
      * @return
      * @throws ApiException
      */
-    ResponseDo reportActivity(JSONObject json, String userId,String activityId,String reportUserId) throws ApiException;
+    ResponseDo reportActivity(JSONObject json, String reportUserId,String activityId,String beReportedUserId) throws ApiException;
 
 }

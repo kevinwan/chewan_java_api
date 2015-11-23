@@ -18,7 +18,7 @@ public class Report {
      * 被举报人
      */
     @Indexed
-    private String reportUserId;
+    private String beReportedUserId;
 
     /**
      * 被举报的活动主键     可以为空；//TODO
@@ -30,7 +30,7 @@ public class Report {
      * 举报人主键，对应User 中的 userId
      */
     @Indexed
-    private String userId;
+    private String reportUserId;
 
     /**
      * 举报的类型 例如 色情低俗，广告骚扰，政治敏感，诈骗，违法 等
@@ -56,13 +56,12 @@ public class Report {
         this.activityReportId = activityReportId;
     }
 
-
-    public String getReportUserId() {
-        return reportUserId;
+    public String getBeReportedUserId() {
+        return beReportedUserId;
     }
 
-    public void setReportUserId(String reportUserId) {
-        this.reportUserId = reportUserId;
+    public void setBeReportedUserId(String beReportedUserId) {
+        this.beReportedUserId = beReportedUserId;
     }
 
     public String getActivityId() {
@@ -73,12 +72,12 @@ public class Report {
         this.activityId = activityId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getReportUserId() {
+        return reportUserId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setReportUserId(String reportUserId) {
+        this.reportUserId = reportUserId;
     }
 
     public String getType() {

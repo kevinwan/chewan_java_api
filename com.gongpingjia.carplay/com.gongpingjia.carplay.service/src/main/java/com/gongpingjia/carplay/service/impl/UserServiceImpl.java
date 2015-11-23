@@ -1355,20 +1355,22 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * 举报用户发布的活动
+     * 举报用户或者 用户发布的活动
      *
      * @param json
-     * @param userId
+     * @param reportUserId
+     * @param activityId
+     * @param beReportedUserId
      * @return
      * @throws ApiException
      */
     @Override
-    public ResponseDo reportActivity(JSONObject json, String userId, String activityId, String reportUserId) throws ApiException {
+    public ResponseDo reportActivity(JSONObject json, String reportUserId, String activityId, String beReportedUserId) throws ApiException {
         LOG.debug("report activity activityId:{}", activityId);
 
-        User user = userDao.findOne(Query.query(Criteria.where("userId").is(reportUserId).and("deleteFlag").is(false)));
+        User user = userDao.findOne(Query.query(Criteria.where("userId").is(beReportedUserId).and("deleteFlag").is(false)));
         if (null == user) {
-            LOG.warn("user not exists userId:{}", reportUserId);
+            LOG.warn("user not exists userId:{}", beReportedUserId);
             throw new ApiException("用户不存在");
         }
         if (StringUtils.isNotEmpty(activityId)) {
@@ -1377,10 +1379,14 @@ public class UserServiceImpl implements UserService {
                 LOG.warn("activity not exists activityId:{}", activityId);
                 throw new ApiException("活动不存在");
             }
+            if (StringUtils.equals(beReportedUserId, activity.getUserId())) {
+                LOG.warn("the activity not belong to the be reported user  beReportedUserId:{},activityId:{}", beReportedUserId, activityId);
+                throw new ApiException("活动不属于被举报人");
+            }
         }
 
         Report report = new Report();
-        report.setReportUserId(userId);
+        report.setReportUserId(reportUserId);
         report.setType(json.getString("type"));
         if (json.containsKey("content")) {
             report.setContent(json.getString("content"));
@@ -1388,8 +1394,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(activityId)) {
             report.setActivityId(activityId);
         }
-        report.setReportUserId(reportUserId);
-        report.setUserId(userId);
+        report.setBeReportedUserId(beReportedUserId);
         report.setCreateTime(DateUtil.getTime());
 
         reportDao.save(report);
