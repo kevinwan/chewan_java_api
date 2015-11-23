@@ -134,13 +134,17 @@ public class UserManagerServiceImpl implements UserManagerService {
             }
 
             JSONArray photoIds = jsonObject.getJSONArray("photoIds");
-            List<String> idList = new ArrayList<>(photoIds.size());
-            idList.addAll(photoIds);
+            List<String> idList = new ArrayList<>(userPhotos.size() - photoIds.size());
+            for (Photo item : userPhotos) {
+                if (!photoIds.contains(item.getId())) {
+                    idList.add(item.getId());
+                }
+            }
             photoDao.deleteUserPhotos(userId, idList);
 
             deletePhotosRemoteServer(photoMap, idList);
 
-            LOG.debug("Send users emcahat message");
+            LOG.debug("Send users emchat message");
             String message = PropertiesUtil.getProperty("dynamic.format.delete.album.notice", "你的相册照片违反车玩规定，已经给予删除。");
             chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.OFFICIAL,
                     Arrays.asList(user.getEmchatName()), message, new Object());
