@@ -508,4 +508,22 @@ public class UserInfoController {
             return ResponseDo.buildFailureResponse(e.getMessage());
         }
     }
+
+    @RequestMapping(value = "/user/{reportUserId}/report", method = RequestMethod.POST,
+            headers = {"Accept=application/json; charset=UTF-8", "Content-Type=application/json"})
+    public ResponseDo reportUser(@PathVariable("reportUserId") String reportUserId, @RequestParam("userId") String userId, @RequestParam("token") String token,
+                                 @RequestParam(value = "activityId", required = false) String activityId, @RequestBody JSONObject json) {
+        LOG.info("Begin change user password, userId:{}", userId);
+
+        try {
+            parameterChecker.checkUserInfo(userId, token);
+            if (CommonUtil.isEmpty(json, "type")) {
+                throw new ApiException("参数错误");
+            }
+            return userService.reportActivity(json, userId, activityId, reportUserId);
+        } catch (ApiException e) {
+            LOG.warn(e.getMessage());
+            return ResponseDo.buildFailureResponse(e.getMessage());
+        }
+    }
 }

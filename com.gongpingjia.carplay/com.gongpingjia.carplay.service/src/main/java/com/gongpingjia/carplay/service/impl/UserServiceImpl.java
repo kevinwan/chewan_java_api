@@ -13,6 +13,7 @@ import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.dao.history.AlbumViewHistoryDao;
 import com.gongpingjia.carplay.dao.history.AuthenticationHistoryDao;
 import com.gongpingjia.carplay.dao.history.InterestMessageDao;
+import com.gongpingjia.carplay.dao.report.ReportDao;
 import com.gongpingjia.carplay.dao.user.*;
 import com.gongpingjia.carplay.entity.activity.Activity;
 import com.gongpingjia.carplay.entity.activity.Appointment;
@@ -23,10 +24,12 @@ import com.gongpingjia.carplay.entity.common.Photo;
 import com.gongpingjia.carplay.entity.history.AlbumViewHistory;
 import com.gongpingjia.carplay.entity.history.AuthenticationHistory;
 import com.gongpingjia.carplay.entity.history.InterestMessage;
+import com.gongpingjia.carplay.entity.report.Report;
 import com.gongpingjia.carplay.entity.user.*;
 import com.gongpingjia.carplay.service.UserService;
 import com.gongpingjia.carplay.service.util.DistanceUtil;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
@@ -39,7 +42,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -112,6 +114,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PhotoDao photoDao;
+
+    @Autowired
+    private ReportDao reportDao;
 
     @Override
     public ResponseDo register(User user, JSONObject json) throws ApiException {
@@ -1348,4 +1353,47 @@ public class UserServiceImpl implements UserService {
         return ResponseDo.buildSuccessResponse();
     }
 
+
+    /**
+     * 举报用户发布的活动
+     *
+     * @param json
+     * @param userId
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    public ResponseDo reportActivity(JSONObject json, String userId, String activityId, String reportUserId) throws ApiException {
+        LOG.debug("report activity activityId:{}", activityId);
+
+        User user = userDao.findOne(Query.query(Criteria.where("userId").is(reportUserId).and("deleteFlag").is(false)));
+        if (null == user) {
+            LOG.warn("user not exists userId:{}", reportUserId);
+            throw new ApiException("用户不存在");
+        }
+        if (StringUtils.isNotEmpty(activityId)) {
+            Activity activity = activityDao.findOne(Query.query(Criteria.where("activityId").is(activityId).and("deleteFlag").is(false)));
+            if (null == activity) {
+                LOG.warn("activity not exists activityId:{}", activityId);
+                throw new ApiException("活动不存在");
+            }
+        }
+
+        Report report = new Report();
+        report.setReportUserId(userId);
+        report.setType(json.getString("type"));
+        if (json.containsKey("content")) {
+            report.setContent(json.getString("content"));
+        }
+        if (StringUtils.isNotEmpty(activityId)) {
+            report.setActivityId(activityId);
+        }
+        report.setReportUserId(reportUserId);
+        report.setUserId(userId);
+        report.setCreateTime(DateUtil.getTime());
+
+        reportDao.save(report);
+
+        return ResponseDo.buildSuccessResponse();
+    }
 }

@@ -176,4 +176,14 @@ public interface UserService {
      */
     ResponseDo getDynamicActivityAppointments(String userId, String token, Integer[] status, Integer limit, Integer ignore) throws ApiException;
 
+
+    /**
+     * 举报用户发布的活动
+     * @param json
+     * @param userId
+     * @return
+     * @throws ApiException
+     */
+    ResponseDo reportActivity(JSONObject json, String userId,String activityId,String reportUserId) throws ApiException;
+
 }
