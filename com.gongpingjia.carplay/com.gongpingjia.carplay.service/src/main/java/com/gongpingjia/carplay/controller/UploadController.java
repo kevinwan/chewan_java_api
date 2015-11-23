@@ -140,8 +140,8 @@ public class UploadController {
         LOG.info("uploadCoverPhoto attach size: {}", attach.getSize());
         try {
             long maxSize = Long.parseLong(PropertiesUtil.getProperty("official.activity.cover.maxSize", "200")) * 1024;
-            int maxWidth = Integer.parseInt(PropertiesUtil.getProperty("official.activity.cover.maxWidth","825"));
-            LOG.info("maxSize is :{} maxWidth:{}",maxSize,maxWidth);
+            int maxWidth = Integer.parseInt(PropertiesUtil.getProperty("official.activity.cover.maxWidth", "825"));
+            LOG.info("maxSize is :{} maxWidth:{}", maxSize, maxWidth);
             BufferedImage image = null;
             try {
                 image = ImageIO.read(attach.getInputStream());
@@ -174,15 +174,17 @@ public class UploadController {
      *
      * @param userId 用户ID
      * @param attach 上传的附件
+     * @param type   上传类型，如果是活动页面上活动封面，type参数值为1,默认0为用户相册上传
      * @return 返回响应结果信息
      */
     @RequestMapping(value = "/user/{userId}/album/upload", method = RequestMethod.POST, headers = {"Content-Type=multipart/form-data"})
     public ResponseDo uploadAlbumPhoto(@PathVariable("userId") String userId, @RequestParam("token") String token,
+                                       @RequestParam(value = "type", defaultValue = "0") int type,
                                        @RequestBody MultipartFile attach) {
         LOG.info("uploadAlbumPhoto attach size: {}, userId: {}", attach.getSize(), userId);
 
         try {
-            return service.uploadAlbumPhoto(userId, attach, token);
+            return service.uploadAlbumPhoto(userId, attach, token, type);
         } catch (ApiException e) {
             LOG.warn(e.getMessage(), e);
             return ResponseDo.buildFailureResponse(e.getMessage());

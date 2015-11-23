@@ -33,4 +33,11 @@ public interface PhotoDao extends BaseDao<Photo, String> {
      * @param photoIds
      */
     void deleteUserPhotos(String userId, List<String> photoIds);
+
+    /**
+     * 获取用户相册中的最近的一张照片
+     * @param userId  用户Id
+     * @return
+     */
+    Photo getLatestAlbumPhoto(String userId);
 }
