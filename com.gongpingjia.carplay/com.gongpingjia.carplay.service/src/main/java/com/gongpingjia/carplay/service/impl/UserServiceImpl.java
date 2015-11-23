@@ -749,12 +749,13 @@ public class UserServiceImpl implements UserService {
                 .and("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM));
         photoDao.delete(query);
 
-        List<Photo> photoList = photoDao.find(query);
-        LOG.debug("delete photo in qiniu server");
-        for (Photo item : photoList) {
-            photoService.delete(item.getKey());
-        }
-        LOG.debug("Finished delete photo in database and qiniu server");
+        //不删除七牛服务器上个人的相册，只删除本地的数据
+//        List<Photo> photoList = photoDao.find(query);
+//        LOG.debug("delete photo in qiniu server");
+//        for (Photo item : photoList) {
+//            photoService.delete(item.getKey());
+//        }
+//        LOG.debug("Finished delete photo in database and qiniu server");
 
         return ResponseDo.buildSuccessResponse(photos);
     }

@@ -4,6 +4,7 @@ import com.gongpingjia.carplay.common.util.CommonUtil;
 import com.gongpingjia.carplay.common.util.Constants;
 import com.gongpingjia.carplay.dao.common.PhotoDao;
 import com.gongpingjia.carplay.entity.common.Photo;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -33,5 +34,11 @@ public class PhotoDaoImpl extends BaseDaoImpl<Photo, String> implements PhotoDao
     @Override
     public void deleteUserPhotos(String userId, List<String> photoIds) {
         delete(Query.query(Criteria.where("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM).and("id").in(photoIds)));
+    }
+
+    @Override
+    public Photo getLatestAlbumPhoto(String userId) {
+        return findOne(Query.query(Criteria.where("userId").is(userId).and("type").is(Constants.PhotoType.USER_ALBUM))
+                .with(new Sort(new Sort.Order(Sort.Direction.DESC, "uploadTime"))));
     }
 }
