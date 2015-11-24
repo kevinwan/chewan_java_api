@@ -1380,7 +1380,7 @@ public class UserServiceImpl implements UserService {
                 LOG.warn("activity not exists activityId:{}", activityId);
                 throw new ApiException("活动不存在");
             }
-            if (StringUtils.equals(beReportedUserId, activity.getUserId())) {
+            if (!StringUtils.equals(beReportedUserId, activity.getUserId())) {
                 LOG.warn("the activity not belong to the be reported user  beReportedUserId:{},activityId:{}", beReportedUserId, activityId);
                 throw new ApiException("活动不属于被举报人");
             }
