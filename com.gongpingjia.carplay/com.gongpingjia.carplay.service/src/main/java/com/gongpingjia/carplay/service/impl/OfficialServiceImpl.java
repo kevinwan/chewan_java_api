@@ -648,7 +648,7 @@ public class OfficialServiceImpl implements OfficialService {
         User fromUser = userDao.findById(fromUserId);
         User toUser = userDao.findById(toUserId);
         String pushMsg = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.official.activity.invite",
-                "{0}邀请您同去参加官方活动"), fromUser.getNickname());
+                "{0}邀请您同去参加{1}活动"), fromUser.getNickname(), officialActivity.getTitle());
         chatThirdPartyService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.ACTIVITY_STATE,
                 toUser.getEmchatName(), pushMsg);
 
