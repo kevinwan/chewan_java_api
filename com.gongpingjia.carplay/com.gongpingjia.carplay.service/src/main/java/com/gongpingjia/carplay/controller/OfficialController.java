@@ -107,8 +107,14 @@ public class OfficialController {
                 parameterChecker.checkUserInfo(userId, token);
             }
             Landmark landmark = null;
-            if (longitude < 180 && longitude > 0 && latitude < 90 && latitude > 0) {
-                landmark = new Landmark(longitude, latitude);
+            if (longitude != -1D && latitude != -1D) {
+                landmark = new Landmark();
+                landmark.setLatitude(latitude);
+                landmark.setLongitude(longitude);
+                if (!landmark.correct()) {
+                    LOG.warn("Input parameter landmark error, latitude:{}, longitude:{}", latitude, longitude);
+                    throw new ApiException("输入参数错误");
+                }
             }
             return officialService.getActivityPageMemberInfo(id, idType, userId, ignore, limit, landmark);
         } catch (ApiException e) {
