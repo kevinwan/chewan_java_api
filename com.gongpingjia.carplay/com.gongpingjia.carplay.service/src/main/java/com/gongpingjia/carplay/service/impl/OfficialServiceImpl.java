@@ -171,7 +171,7 @@ public class OfficialServiceImpl implements OfficialService {
                 User user = userMap.get(userItemId);
                 Map<String, Object> map = user.buildCommonUserMap();
                 if (queryUser == null) {
-                    User.appendDistance(map, null);
+                    User.appendDistance(map, Double.POSITIVE_INFINITY);
                 } else {
                     User.appendDistance(map, DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
                 }

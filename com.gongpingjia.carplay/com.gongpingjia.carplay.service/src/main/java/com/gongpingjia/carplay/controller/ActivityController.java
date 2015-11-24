@@ -92,7 +92,7 @@ public class ActivityController {
                                       @RequestParam(value = "token", required = false) String token,
                                       @RequestParam(value = "longitude", required = false) Double longitude,
                                       @RequestParam(value = "latitude", required = false) Double latitude) {
-        LOG.debug("activity/{activityId}/info begin");
+        LOG.debug("activity/{}/info begin", activityId);
         try {
             if (StringUtils.isNotEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
