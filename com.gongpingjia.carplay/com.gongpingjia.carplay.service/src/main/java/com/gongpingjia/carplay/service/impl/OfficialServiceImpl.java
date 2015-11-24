@@ -170,11 +170,7 @@ public class OfficialServiceImpl implements OfficialService {
             for (String userItemId : pageMemberUserIds) {
                 User user = userMap.get(userItemId);
                 Map<String, Object> map = user.buildCommonUserMap();
-                if (queryUser == null) {
-                    User.appendDistance(map, -1D);
-                } else {
-                    User.appendDistance(map, DistanceUtil.getDistance(queryUser.getLandmark(), user.getLandmark()));
-                }
+                User.appendDistance(map, user.getDistance());
                 buildInvitedAcceptInfo(userId, appointmentList, userMap, user, map);
 
                 members.add(map);
