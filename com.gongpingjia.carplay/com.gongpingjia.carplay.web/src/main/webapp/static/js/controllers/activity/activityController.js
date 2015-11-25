@@ -73,8 +73,9 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
             DTColumnDefBuilder.newColumnDef(5).withOption('data', null).renderWith(actionEstablish).notSortable(),
             DTColumnDefBuilder.newColumnDef(6).withOption('data', null).renderWith(actionDestination).notSortable(),
             DTColumnDefBuilder.newColumnDef(7).withOption('data', null).renderWith(actionUserInfo).notSortable(),
-            DTColumnDefBuilder.newColumnDef(8).withOption('data', null).renderWith(actionDeal).notSortable(),
-            DTColumnDefBuilder.newColumnDef(9).withOption('data', 'activityId').notVisible().notSortable()
+            DTColumnDefBuilder.newColumnDef(8).withOption('data', null).renderWith(actionActivityCover).notSortable(),
+            DTColumnDefBuilder.newColumnDef(9).withOption('data', null).renderWith(actionDeal).notSortable(),
+            DTColumnDefBuilder.newColumnDef(10).withOption('data', 'activityId').notVisible().notSortable()
         ];
 
         function actionCheckBox(data, type, full, meta) {
@@ -134,6 +135,14 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
             return commonService.transferLongToDateTimeString(data.createTime);
         }
 
+        $scope.browsePhoto = function (photoUrl) {
+            $window.open(photoUrl, '_blank');
+        }
+
+        function actionActivityCover(data, type, full, meta) {
+            return '<img ng-src="' + data.cover + '" ng-click="browsePhoto(\'' + data.cover + '\')" width="50px" height="50px">';
+        }
+
         function actionDeal(data, type, full, meta) {
             return ' <button ng-click="updateActivity(\'' + data.activityId +
                 '\')">修改</button>'
@@ -180,7 +189,6 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                         $scope.deleteIdSet = {};
                         $scope.allIds = [];
                         $scope.allCheckItem = false;
-
 
                         $scope.total = res.data.recordsFiltered;
                         res.backInfo = res.data;
@@ -278,7 +286,7 @@ gpjApp.controller('activityController', ['$scope', '$rootScope', '$http', '$moda
                 phone: '',
                 province: '',
                 city: '',
-                majorType:'',
+                majorType: '',
                 type: '',
                 pay: '-1',
                 transfer: '-1',

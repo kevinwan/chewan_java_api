@@ -652,6 +652,8 @@ public class ActivityServiceImpl implements ActivityService {
             item.put("pay", activity.getPay());
             item.put("transfer", activity.isTransfer());
             item.put("createTime", activity.getCreateTime());
+            item.put("cover", userDao.getCover(activity.getCover(), activity.getUserId()));
+
             jsonArray.add(item);
         }
         resultJson.put("activityList", jsonArray);
