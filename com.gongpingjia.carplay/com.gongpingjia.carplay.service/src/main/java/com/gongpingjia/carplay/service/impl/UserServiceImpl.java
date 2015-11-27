@@ -905,11 +905,13 @@ public class UserServiceImpl implements UserService {
             for (User item : users) {
                 emchatNames.add(item.getEmchatName());
             }
+            Map<String, Object> ext = new HashMap<>(1);
+            ext.put("avatar", CommonUtil.getLocalPhotoServer() + user.getAvatar());
             String message = MessageFormat.format(PropertiesUtil.getProperty("dynamic.format.album", "{0}上传了{1}张照片"),
                     user.getNickname(), count);
 
             chatThirdService.sendUserGroupMessage(chatCommonService.getChatToken(), Constants.EmchatAdmin.INTEREST,
-                    emchatNames, message, null);
+                    emchatNames, message, ext);
         }
         return ResponseDo.buildSuccessResponse();
     }
