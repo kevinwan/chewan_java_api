@@ -103,6 +103,7 @@ public class OfficialController {
                                              @RequestParam(value = "longitude", defaultValue = "-1") Double longitude,
                                              @RequestParam(value = "latitude", defaultValue = "-1") Double latitude) {
         try {
+            LOG.info("Input id:{}, idType:{}", id, idType);
             if (StringUtils.isNotEmpty(userId)) {
                 parameterChecker.checkUserInfo(userId, token);
             }
