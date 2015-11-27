@@ -446,7 +446,7 @@ public class UserServiceImpl implements UserService {
                 history.setUserId(beViewedUser);
                 historyDao.save(history);
             } else {
-                historyDao.update(query, Update.update("viewTime", DateUtil.getTime()));
+                historyDao.updateFirst(query, Update.update("viewTime", DateUtil.getTime()));
             }
 
             User viewUserInfo = userDao.findById(viewUser);
